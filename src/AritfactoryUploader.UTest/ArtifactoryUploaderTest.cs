@@ -251,5 +251,52 @@ namespace AritfactoryUploader.UTest
             // Assert
             Assert.AreEqual(ApiConstant.ErrorInUpload, response.ReasonPhrase);
         }
+        [TestCase("DEBIAN")]
+        [TestCase("NUGET")]
+        public async Task UploadPackageToRepo_WhenDebianOrNugetNameMismatch_UpdatesCopyPackageApiUrl(string componentType)
+        {
+            // Arrange
+            var originalName = componentType == "DEBIAN" ? "pkg-old_1.0.0.deb" : "Package.Old.1.0.0.nupkg";
+            var newName = componentType == "DEBIAN" ? "pkg-new_1.0.0.deb" : "Package.New.1.0.0.nupkg";
+
+            var component = new ComponentsToArtifactory
+            {
+                ComponentType = componentType,
+                PackageType = PackageType.ClearedThirdParty, // forces copy operation
+                Token = "apiKey",
+                JfrogPackageName = originalName,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dest-repo",
+                Path = "path",
+                CopyPackageApiUrl = $"https://example.jfrog.io/artifactory/api/copy/src-repo/{originalName}?to=/dest-repo/{originalName}"
+            };
+
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.JfrogFoundPackagesDebian = new();
+            displayPackagesInfo.JfrogFoundPackagesNuget = new();
+            var timeout = 5000;
+
+            var jfrogServiceMock = new Mock<IJFrogService>();
+            jfrogServiceMock
+                .Setup(s => s.GetPackageInfo(component))
+                .ReturnsAsync(new AqlResult { Name = newName });
+
+            var jfrogApiCommMock = new Mock<IJFrogApiCommunication>();
+            jfrogApiCommMock
+                .Setup(c => c.CopyFromRemoteRepo(component))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            ArtfactoryUploader.JFrogService = jfrogServiceMock.Object;
+            ArtfactoryUploader.JFrogApiCommInstance = jfrogApiCommMock.Object;
+
+            // Act
+            var response = await ArtfactoryUploader.UploadPackageToRepo(component, timeout, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Expected successful copy response.");
+            Assert.IsTrue(component.CopyPackageApiUrl.Contains(newName), "CopyPackageApiUrl did not update to new package name.");
+            Assert.IsFalse(component.CopyPackageApiUrl.Contains(originalName), "Original package name still present after replacement.");
+            jfrogApiCommMock.Verify(m => m.CopyFromRemoteRepo(component), Times.Once);
+        }
     }
 }

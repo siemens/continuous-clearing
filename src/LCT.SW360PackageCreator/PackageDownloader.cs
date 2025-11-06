@@ -24,7 +24,7 @@ namespace LCT.SW360PackageCreator
 {
     public class PackageDownloader : IPackageDownloader
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly List<DownloadedSourceInfo> m_downloadedSourceInfos = new List<DownloadedSourceInfo>();
         private const string Source = "source";
         private static readonly string[] WindowsLineSeparators = ["\r\n"];
@@ -66,23 +66,23 @@ namespace LCT.SW360PackageCreator
             {
                 Logger.Debug($"DownloadSourceCodeUsingGitClone():{ex}");
                 return downloadedPackageName;
-            }           
+            }
             Result result = CloneSource(component, downloadPath, taggedVersion, compressedFilePath);
 
             Logger.Debug($"DownloadSourceCodeUsingGitClone:Release Name : {component.Name}@{component.Version}, stdout:{result?.StdOut}, npm pack stdErr:{result?.StdErr}");
             m_downloadedSourceInfos.Add(new DownloadedSourceInfo() { Name = component.Name, Version = component.Version, DownloadedPath = compressedFilePath, SourceRepoUrl = component.DownloadUrl, TaggedVersion = taggedVersion });
-            component.DownloadUrl = GetSourceRepositoryUrl(component,taggedVersion);
+            component.DownloadUrl = GetSourceRepositoryUrl(component, taggedVersion);
             return compressedFilePath;
         }
         private static string GetSourceRepositoryUrl(ComparisonBomData component, string tag)
-        {            
+        {
             if (!string.IsNullOrEmpty(component.SourceUrl) && component.SourceUrl.Contains("github.com", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(tag))
             {
-                string repoUrl =component.SourceUrl;
+                string repoUrl = component.SourceUrl;
                 repoUrl = repoUrl.TrimEnd('/');
                 string encodedTag = Uri.EscapeDataString(tag);
                 return $"{repoUrl}/tree/{encodedTag}";
-            }            
+            }
             return component.DownloadUrl;
         }
         private static string SanitizeFileName(string name)

@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common;
 using LCT.PackageIdentifier.Model.NugetModel;
 using log4net;
 using Microsoft.Build.Evaluation;
@@ -14,26 +15,37 @@ using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Directory = System.IO.Directory;
 
 namespace LCT.PackageIdentifier
 {
     public class NugetDevDependencyParser
     {
         private static NugetDevDependencyParser instance = null;
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly List<string> s_nugetDirectDependencies = new List<string>();
         public static IReadOnlyList<string> NugetDirectDependencies => s_nugetDirectDependencies;
 
+        /// <summary>
+        /// Private constructor for singleton pattern implementation.
+        /// Registers MSBuild defaults if not already registered.
+        /// Excluded from code coverage as it's trivial and not directly testable.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
         private NugetDevDependencyParser()
         {
-            MSBuildLocator.RegisterDefaults();
+            if (!MSBuildLocator.IsRegistered)
+            {
+                MSBuildLocator.RegisterDefaults();
+            }
         }
 
         public static NugetDevDependencyParser Instance

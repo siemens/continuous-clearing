@@ -738,7 +738,7 @@ namespace LCT.Services.UTest
 
             // Assert
             Assert.IsTrue(result, "Should return true when both Package_Url and Purl_Id are null or empty.");
-           
+
         }
 
         [Test]
@@ -761,7 +761,7 @@ namespace LCT.Services.UTest
 
             // Assert
             Assert.IsTrue(result, "Should return true when ValidateProjectTypePurl returns true.");
-           
+
         }
         [Test]
         public void CheckAvailabilityByNameAndVersion_ReturnsFalse_WhenSw360ComponentIsNull()

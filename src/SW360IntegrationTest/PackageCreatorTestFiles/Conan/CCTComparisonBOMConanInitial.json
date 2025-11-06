@@ -38,10 +38,10 @@
   "components": [
     {
       "type": "library",
-      "bom-ref": "pkg:conan/rapidjson@1.1.0-csc-01",
-      "name": "rapidjson",
-      "version": "1.1.0-csc-01",
-      "purl": "pkg:conan/rapidjson@1.1.0-csc-01",
+      "bom-ref": "pkg:conan/libcurl@8.15.0",
+      "name": "libcurl",
+      "version": "8.15.0",
+      "purl": "pkg:conan/libcurl@8.15.0",
       "properties": [
         {
           "name": "internal:siemens:clearing:development",
@@ -53,7 +53,7 @@
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "rapidjson/1.1.0-csc-01@siemens-energy/stable#6d624490b731387491675eebeff7ab66"
+          "value": "libcurl/8.15.0"
         },
         {
           "name": "internal:siemens:clearing:identifier-type",
@@ -79,10 +79,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:conan/libest@3.2.0-shared.5",
-      "name": "libest",
-      "version": "3.2.0-shared.5",
-      "purl": "pkg:conan/libest@3.2.0-shared.5",
+      "bom-ref": "pkg:conan/openssl@3.5.2",
+      "name": "openssl",
+      "version": "3.5.2",
+      "purl": "pkg:conan/openssl@3.5.2",
       "properties": [
         {
           "name": "internal:siemens:clearing:development",
@@ -94,7 +94,7 @@
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "libest/3.2.0-shared.5@siemens-energy/stable#0"
+          "value": "openssl/3.5.2"
         },
         {
           "name": "internal:siemens:clearing:identifier-type",

@@ -30,7 +30,7 @@ namespace LCT.Services
     public class SW360CommonService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade) : ISW360CommonService
     {
 
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
         private readonly List<string> externalIdKeyList = new List<string>() { "?package-url=", "?purl.id=" };
 

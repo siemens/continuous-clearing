@@ -91,6 +91,9 @@
 		<None Update="PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="PackageIdentifierUTTestFiles\conan.dep.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

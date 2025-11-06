@@ -6,7 +6,9 @@
 
 using LCT.APICommunications.Model;
 using LCT.Common;
+using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
+using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
 using LCT.Facade.Interfaces;
@@ -35,8 +37,9 @@ namespace LCT.SW360PackageCreator
     {
         private static bool m_Verbose = false;
         public static Stopwatch CreatorStopWatch { get; set; }
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private static List<ComparisonBomData> parsedBomData;
 
         protected Program() { }
 
@@ -58,38 +61,22 @@ namespace LCT.SW360PackageCreator
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string FolderPath = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
-            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder path: {FolderPath}", null);
+            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
+            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Creator);
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
-            Logger.Logger.Log(null, Level.Notice, $"\n====================<<<<< Package creator >>>>>====================", null);
-            Logger.Logger.Log(null, Level.Notice, $"\nStart of Package creator execution : {DateTime.Now}", null);
+            LoggerHelper.SpectreConsoleInitialMessage("Package creator");
 
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
-            Logger.Logger.Log(null, Level.Notice, $"Input parameters used in Package Creator:\n\t" +
-              $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-              $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-              $"BomFilePath\t\t --> {bomFilePath}\n\t" +
-              $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-              $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
-              $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-              $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-              $"FossologyURL\t\t --> {appSettings.SW360.Fossology.URL}\n\t" +
-              $"EnableFossTrigger\t --> {appSettings.SW360.Fossology.EnableTrigger}\n\t" +
-              $"IgnoreDevDependency\t --> {appSettings.SW360.IgnoreDevDependency}\n\t" +
-              $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t", null);
-
-            if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Notice, $"\tMode\t\t\t --> {appSettings.Mode}\n", null);
+            ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
 
             //Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
@@ -99,6 +86,10 @@ namespace LCT.SW360PackageCreator
                     await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
+
+            //Look for Compliance exceptions and print them with warnings 
+            await ComplianceCheckForAllFoundComponents();
+
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry.Enable)
             {
@@ -159,11 +150,38 @@ namespace LCT.SW360PackageCreator
 
             // parsing the input file
             ComponentCreator componentCreator = new ComponentCreator();
-            List<ComparisonBomData> parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
+            parsedBomData = await componentCreator.CycloneDxBomParser(appSettings, sw360Service, cycloneDXBomParser, creatorHelper);
 
             // initializing Component creation 
             await componentCreator.CreateComponentInSw360(appSettings, sw360CreatorService, sw360Service,
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
         }
+
+        private static async Task ComplianceCheckForAllFoundComponents()
+        {
+            if (parsedBomData != null && parsedBomData.Count > 0)
+            {
+                ComplianceCheck compliance = new ComplianceCheck();
+                ComplianceSettingsModel complianceSettings = new();
+                string baseDir = AppContext.BaseDirectory;
+                string[] foundFiles = Directory.GetFiles(baseDir, "ComplianceSettings.json", SearchOption.AllDirectories);
+
+                if (foundFiles.Length > 0)
+                {
+                    string settingsPath = foundFiles[0];
+                    complianceSettings = await compliance.LoadSettingsAsync(settingsPath);
+                }
+                else
+                {
+                    Logger.Debug("ComplianceSettings.json not found.");
+                }
+
+                if (compliance.Check(complianceSettings, parsedBomData))
+                {
+                    PipelineArtifactUploader.PrintWarning(compliance.GetResults().ToString());
+                }
+            }
+        }
+
     }
 }

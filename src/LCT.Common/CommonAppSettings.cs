@@ -5,11 +5,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Model;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Reflection;
 
 namespace LCT.Common
 {
@@ -28,6 +31,8 @@ namespace LCT.Common
         public static string SourceURLConan { get; set; } = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
         public static string AlpineAportsGitURL { get; set; } = $"https://gitlab.alpinelinux.org/alpine/aports.git";
 
+        public static string SourceUrlForCargo { get; set; } = $"api/v1/crates/";
+        public static string SourceBaseUrlForCargo { get; set; } = $"https://crates.io";
         private string m_ProjectType;
         public CommonAppSettings()
         {
@@ -59,6 +64,7 @@ namespace LCT.Common
         public Config Alpine { get; set; }
         public Config Poetry { get; set; }
         public Config Conan { get; set; }
+        public Config Cargo { get; set; }
         public string Mode { get; set; } = string.Empty;
         public bool IsTestMode
         {
@@ -69,11 +75,13 @@ namespace LCT.Common
 
         }
     }
+    [ExcludeFromCodeCoverage]
     public class Telemetry
     {
         public bool Enable { get; set; } = true;
         public string ApplicationInsightsConnectionString { get; set; }
     }
+    [ExcludeFromCodeCoverage]
     public class SW360
     {
         private string m_URL;
@@ -100,6 +108,7 @@ namespace LCT.Common
         }
 
     }
+    [ExcludeFromCodeCoverage]
     public class Fossology
     {
         private string m_FOSSURL;
@@ -123,7 +132,6 @@ namespace LCT.Common
         }
         public bool EnableTrigger { get; set; }
     }
-
     public class Jfrog
     {
         private string m_Token;
@@ -145,11 +153,15 @@ namespace LCT.Common
 
         public bool DryRun { get; set; } = false;
     }
-    public class Directory
+    public class Directory(IEnvironmentHelper envHelper)
     {
+        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly IEnvironmentHelper environmentHelper = envHelper;
         private string m_InputFolder;
         private string m_OutputFolder;
         private string m_LogFolder;
+
+        public Directory() : this(new EnvironmentHelper()) { }
 
         public string InputFolder
         {
@@ -159,16 +171,23 @@ namespace LCT.Common
             }
             set
             {
-                if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                try
                 {
-                    var folderAction = new FolderAction();
-                    folderAction.ValidateFolderPath(value);
-                    m_InputFolder = value;
+                    if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                    {
+                        var folderAction = new FolderAction();
+                        folderAction.ValidateFolderPath(value);
+                        m_InputFolder = value;
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    Logger.Error($"Input file folder not found : {value}");
+                    environmentHelper.CallEnvironmentExit(-1);
                 }
             }
         }
-
         public string OutputFolder
         {
             get

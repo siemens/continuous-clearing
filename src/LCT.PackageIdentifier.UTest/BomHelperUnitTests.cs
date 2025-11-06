@@ -19,6 +19,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LCT.PackageIdentifier.UTest
@@ -339,7 +340,8 @@ namespace LCT.PackageIdentifier.UTest
             Mock<IFrameworkPackages> frameworkPackages = new Mock<IFrameworkPackages>();
             Mock<ICompositionBuilder> compositionBuilder = new Mock<ICompositionBuilder>();
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
-            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object, spdxBomParser.Object);
+            Mock<IRuntimeIdentifier> runtimeIdentifier = new Mock<IRuntimeIdentifier>();
+            IParser parser = new NugetProcessor(cycloneDXBomParser.Object, frameworkPackages.Object, compositionBuilder.Object, spdxBomParser.Object, runtimeIdentifier.Object);
             Mock<IJFrogService> jFrogService = new Mock<IJFrogService>();
             Mock<IBomHelper> bomHelper = new Mock<IBomHelper>();
             bomHelper.Setup(x => x.GetListOfComponentsFromRepo(It.IsAny<string[]>(), It.IsAny<IJFrogService>())).ReturnsAsync(aqlResultList);
@@ -541,25 +543,6 @@ namespace LCT.PackageIdentifier.UTest
             mock.Object.WriteBomKpiDataToConsole(new BomKpiData());
             mock.Verify(x => x.WriteBomKpiDataToConsole(It.IsAny<BomKpiData>()), Times.Once);
         }
-
-
-        [TestCase]
-        public void Test_WriteInternalComponentsListToKpi()
-        {
-            var lstComponentForBOM = new List<Component>()
-            {
-                new Component()
-                {
-                 Name="Test",
-                 Version="1",
-                }
-            };
-
-            IBomHelper helper = new BomHelper();
-            helper.WriteInternalComponentsListToKpi(lstComponentForBOM);
-            Assert.That(lstComponentForBOM.Count, Is.EqualTo(1));
-        }
-
         [TestCase]
         public void TestGetHashCodeUsingNpmView_InputNameAndVersion_ReturnsHashCode()
         {
@@ -913,6 +896,138 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual(2, result.Count);
             Assert.Contains(expectedResults[0], result);
             Assert.Contains(expectedResults[1], result);
+        }
+
+        [Test]
+        public async Task GetCargoListOfComponentsFromRepo_WithNullRepoList_ReturnsEmptyList()
+        {
+            // Arrange
+            string[] repoList = null;
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+
+            // Act
+            var result = await bomHelper.GetCargoListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetCargoListOfComponentsFromRepo_WithValidRepoList_ReturnsComponents()
+        {
+            // Arrange
+            string[] repoList = new string[] { "cargo-repo1", "cargo-repo2" };
+            var jFrogServiceMock = new Mock<IJFrogService>();
+            var bomHelper = new BomHelper();
+            var expectedResults = new List<AqlResult>
+    {
+        new AqlResult { Name = "cargo-component1", Repo = "cargo-repo1" },
+        new AqlResult { Name = "cargo-component2", Repo = "cargo-repo2" }
+    };
+
+            jFrogServiceMock.Setup(x => x.GetCargoComponentDataByRepo("cargo-repo1"))
+                .ReturnsAsync(new List<AqlResult> { expectedResults[0] });
+            jFrogServiceMock.Setup(x => x.GetCargoComponentDataByRepo("cargo-repo2"))
+                .ReturnsAsync(new List<AqlResult> { expectedResults[1] });
+
+            // Act
+            var result = await bomHelper.GetCargoListOfComponentsFromRepo(repoList, jFrogServiceMock.Object);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.Contains(expectedResults[0], result);
+            Assert.Contains(expectedResults[1], result);
+        }
+
+        [Test]
+        public void GetExcludedComponentsList_ExcludesInvalidComponents()
+        {
+            // Arrange
+            var components = new List<Component>
+    {
+        new Component { Name = "Valid", Version = "1.0", Purl = "pkg:cargo/Valid@1.0" },
+        new Component { Name = "", Version = "1.0", Purl = "pkg:cargo/Invalid@1.0" }
+    };
+            string purlPrefix = "pkg:cargo";
+            // Act
+            var result = BomHelper.GetExcludedComponentsList(components, purlPrefix, "cargo");
+
+            // Assert
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Valid", result[0].Name);
+        }
+
+        [Test]
+        public void GetDistinctComponentList_RemovesDuplicates()
+        {
+            // Arrange
+            var components = new List<Component>
+    {
+        new Component { Name = "A", Version = "1.0", Purl = "pkg:cargo/A@1.0" },
+        new Component { Name = "A", Version = "1.0", Purl = "pkg:cargo/A@1.0" },
+        new Component { Name = "B", Version = "2.0", Purl = "pkg:cargo/B@2.0" }
+    };
+
+            // Act
+            BomHelper.GetDistinctComponentList(ref components);
+
+            // Assert
+            Assert.AreEqual(2, components.Count);
+            Assert.IsTrue(components.Any(c => c.Name == "A"));
+            Assert.IsTrue(components.Any(c => c.Name == "B"));
+        }
+
+        [Test]
+        public void RemoveExcludedComponents_RemovesComponentsFromBom()
+        {
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                Cargo = new Config
+                {
+                    Exclude = new[] { "ExcludeMe" }
+                }
+            };
+            var bom = new Bom
+            {
+                Components = new List<Component>
+        {
+            new Component { Name = "KeepMe", Version = "1.0", Purl = "pkg:cargo/KeepMe@1.0" },
+            new Component { Name = "ExcludeMe", Version = "2.0", Purl = "pkg:cargo/ExcludeMe@2.0" }
+        },
+                Dependencies = new List<Dependency>()
+            };
+
+            // Act
+            var result = BomHelper.RemoveExcludedComponents(appSettings, bom);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Components.Count);
+            Assert.AreEqual("KeepMe", result.Components[0].Name);
+        }
+
+        [Test]
+        public void GetDetailsforManuallyAddedComp_SetsProperties()
+        {
+            // Arrange
+            var components = new List<Component>
+    {
+        new Component { Name = "ManualComp", Version = "1.0", Purl = "pkg:cargo/ManualComp@1.0", Properties = new List<Property>() }
+    };
+
+            // Act
+            BomHelper.GetDetailsforManuallyAddedComp(components);
+
+            // Assert
+            var propNames = components[0].Properties.Select(p => p.Name).ToList();
+            Assert.Contains(Dataconstant.Cdx_IsDevelopment, propNames);
+            Assert.Contains(Dataconstant.Cdx_IdentifierType, propNames);
+            Assert.AreEqual("false", components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IsDevelopment).Value);
+            Assert.AreEqual(Dataconstant.ManullayAdded, components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IdentifierType).Value);
         }
     }
 }

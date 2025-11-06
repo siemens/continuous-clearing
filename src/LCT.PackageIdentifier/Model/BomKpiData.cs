@@ -21,52 +21,52 @@ namespace LCT.PackageIdentifier.Model
         [DisplayName(@"Components In Input File")]
         public int ComponentsinPackageLockJsonFile { get; set; }
 
-        [DisplayName(@"Dev Dependent Components")]
+        [DisplayName(@"Development Components")]
         public int DevDependentComponents { get; set; }
 
-        [DisplayName(@"Bundled Dependent Components")]
+        [DisplayName(@"Bundled Components")]
         public int BundledComponents { get; set; }
 
-        [DisplayName(@"Total Duplicate Components")]
+        [DisplayName(@"Duplicate Components")]
         public int DuplicateComponents { get; set; }
 
-        [DisplayName(@"Internal Components Identified")]
+        [DisplayName(@"Internal Components")]
         public int InternalComponents { get; set; }
 
-        [DisplayName(@"Components already present in 3rd party repo(s) ")]
+        [DisplayName(@"Packages present in 3rd party repo(s)")]
         public int ThirdPartyRepoComponents { get; set; }
 
-        [DisplayName(@"Components already present in devdep repo(s)")]
+        [DisplayName(@"Packages present in devdep repo(s)")]
         public int DevdependencyComponents { get; set; }
 
-        [DisplayName(@"Components already present in release repo(s)")]
+        [DisplayName(@"Packages present in release repo(s)")]
         public int ReleaseRepoComponents { get; set; }
 
-        [DisplayName(@"Components not from official repo(s)")]
+        [DisplayName(@"Packages not present in official repo(s)")]
         public int UnofficialComponents { get; set; }
 
 
-        [DisplayName(@"Total InvalidComponents Excluded")]
+        [DisplayName(@"Invalid Components Excluded")]
         public int ComponentsExcluded { get; set; }
 
-        [DisplayName(@"Total Components Excluded SW360")]
+        [DisplayName(@"Manually Excluded SW360")]
         public int ComponentsExcludedSW360 { get; set; }
 
         [DisplayName(@"Components With SourceURL")]
         public int ComponentsWithSourceURL { get; set; }
 
-        [DisplayName(@"Components In Comparison BOM")]
+        [DisplayName(@"Components in BoM")]
         public int ComponentsInComparisonBOM { get; set; }
 
-        [DisplayName(@"Time taken by BOM Creator")]
+        [DisplayName(@"Time taken by BoM Creator")]
         public double TimeTakenByBomCreator { get; set; }
 
-        [DisplayName(@"Components Added From SBOM Template")]
+        [DisplayName(@"Components Added From SBoM Template")]
         public int ComponentsinSBOMTemplateFile { get; set; }
 
-        [DisplayName(@"Components Updated From SBOM Template")]
+        [DisplayName(@"Components overwritten from SBoM Template")]
         public int ComponentsUpdatedFromSBOMTemplateFile { get; set; }
-        [DisplayName(@"Total SPDX components imported as baseline entries")]
+        [DisplayName(@"Components from the SPDX imported as baseline entries")]
         public int UnsupportedComponentsFromSpdxFile { get; set; }
 
         public string ProjectSummaryLink { get; set; }

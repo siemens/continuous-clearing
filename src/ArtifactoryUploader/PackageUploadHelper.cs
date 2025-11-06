@@ -15,16 +15,18 @@ using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.Common.Logging;
+using LCT.Common.Model;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using File = System.IO.File;
 
 namespace LCT.ArtifactoryUploader
 {
@@ -33,7 +35,7 @@ namespace LCT.ArtifactoryUploader
     /// </summary>
     public static class PackageUploadHelper
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
 
         private static bool SetWarningCode;
@@ -107,109 +109,121 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
         {
-
-            if (item.ComponentType == "NPM")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(components);
-            }
-            else if (item.ComponentType == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(components);
-            }
-            else if (item.ComponentType == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(components);
-            }
-            else if (item.ComponentType == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesPython.Add(components);
-            }
-            else if (item.ComponentType == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesConan.Add(components);
-            }
-            else if (item.ComponentType == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(components);
-            }
-
+            ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
+            AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, notFound: true);
         }
 
         public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
         {
-
-            if (item.ComponentType == "NPM")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesNpm.Add(components);
-            }
-            else if (item.ComponentType == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesNuget.Add(components);
-            }
-            else if (item.ComponentType == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesMaven.Add(components);
-            }
-            else if (item.ComponentType == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesPython.Add(components);
-            }
-            else if (item.ComponentType == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesConan.Add(components);
-            }
-            else if (item.ComponentType == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
-                displayPackagesInfo.JfrogFoundPackagesDebian.Add(components);
-            }
-
+            ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
+            AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, notFound: false);
         }
         private static async Task SucessfullPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
         {
-            if (item.ComponentType == "NPM")
-            {
+            ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
+            AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, success: true);
+        }
 
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesNpm.Add(components);
-            }
-            else if (item.ComponentType == "NUGET")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesNuget.Add(components);
-            }
-            else if (item.ComponentType == "MAVEN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesMaven.Add(components);
-            }
-            else if (item.ComponentType == "POETRY")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesPython.Add(components);
-            }
-            else if (item.ComponentType == "CONAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesConan.Add(components);
-            }
-            else if (item.ComponentType == "DEBIAN")
-            {
-                ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
-                displayPackagesInfo.SuccessfullPackagesDebian.Add(components);
-            }
+        // Helper to reduce code duplication for adding components to display lists
+        private static void AddComponentToDisplayList(string componentType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound = false, bool success = false)
+        {
+            if (string.IsNullOrWhiteSpace(componentType))
+                return;
 
+            switch (componentType.ToUpperInvariant())
+            {
+                case "NPM":
+                    AddToNpmList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "NUGET":
+                    AddToNugetList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "MAVEN":
+                    AddToMavenList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "POETRY":
+                    AddToPoetryList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "CONAN":
+                    AddToConanList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "DEBIAN":
+                    AddToDebianList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "CARGO":
+                    AddToCargoList(component, displayPackagesInfo, notFound, success);
+                    break;
+            }
+        }
+
+        private static void AddToNpmList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesNpm.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesNpm.Add(component);
+        }
+
+        private static void AddToNugetList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesNuget.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesNuget.Add(component);
+        }
+
+        private static void AddToMavenList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesMaven.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesMaven.Add(component);
+        }
+
+        private static void AddToPoetryList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesPython.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesPython.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesPython.Add(component);
+        }
+
+        private static void AddToConanList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesConan.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesConan.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesConan.Add(component);
+        }
+
+        private static void AddToDebianList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesDebian.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesDebian.Add(component);
+        }
+
+        private static void AddToCargoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesCargo.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesCargo.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesCargo.Add(component);
         }
 
 
@@ -320,6 +334,10 @@ namespace LCT.ArtifactoryUploader
             {
                 packageNameEXtension = "package.tgz";
             }
+            if (package.ComponentType.Equals("CARGO", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ApiConstant.CargoExtension;
+            }
 
             return packageNameEXtension;
         }
@@ -343,44 +361,27 @@ namespace LCT.ArtifactoryUploader
 
         public static void WriteCreatorKpiDataToConsole(UploaderKpiData uploaderKpiData)
         {
+            KpiNames uploaderKpiNames = IdentifyKpiNames(uploaderKpiData);
             Dictionary<string, int> printList = new Dictionary<string, int>()
             {
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.ComponentInComparisonBOM)),
-                    uploaderKpiData.ComponentInComparisonBOM },
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.ComponentNotApproved)),
-                    uploaderKpiData.ComponentNotApproved },
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesToBeUploaded)),
-                    uploaderKpiData.PackagesToBeUploaded },
+                {uploaderKpiNames.ComponentsInBOM,uploaderKpiData.ComponentInComparisonBOM },
+                {uploaderKpiNames.PackagesInNotApprovedState,uploaderKpiData.ComponentNotApproved },
+                {uploaderKpiNames.PackagesInApprovedState,uploaderKpiData.PackagesToBeUploaded },
+                {uploaderKpiNames.PackagesCopiedToSipartyRepo,uploaderKpiData.PackagesUploadedToJfrog },
 
-                {CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesUploadedToJfrog)),
-                    uploaderKpiData.PackagesUploadedToJfrog },
+                {uploaderKpiNames.PackagesNotCopiedToSipartyRepo,uploaderKpiData.PackagesNotUploadedToJfrog},
 
-                { CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesNotUploadedToJfrog)),
-                    uploaderKpiData.PackagesNotUploadedToJfrog},
+                {uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesUploaded},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesToBeUploaded)),
-                    uploaderKpiData.DevPackagesToBeUploaded},
+                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesUploaded)),
-                    uploaderKpiData.DevPackagesUploaded},
+                {uploaderKpiNames.PackagesMovedToRepo,uploaderKpiData.InternalPackagesUploaded},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog)),
-                    uploaderKpiData.DevPackagesNotUploadedToJfrog},
+                {uploaderKpiNames.PackagesNotMovedToRepo,uploaderKpiData.InternalPackagesNotUploadedToJfrog},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesToBeUploaded)),
-                    uploaderKpiData.InternalPackagesToBeUploaded},
+                {uploaderKpiNames.PackagesNotExistingInRepository,uploaderKpiData.PackagesNotExistingInRemoteCache},
 
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded)),
-                    uploaderKpiData.InternalPackagesUploaded},
-
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog)),
-                    uploaderKpiData.InternalPackagesNotUploadedToJfrog},
-
-                { CommonHelper.Convert(uploaderKpiData,nameof(uploaderKpiData.PackagesNotExistingInRemoteCache)),
-                    uploaderKpiData.PackagesNotExistingInRemoteCache},
-
-                {CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedDueToError)),
-                    uploaderKpiData.PackagesNotUploadedDueToError}
+                {uploaderKpiNames.PackagesNotActionedDueToError,uploaderKpiData.PackagesNotUploadedDueToError}
             };
 
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
@@ -388,9 +389,25 @@ namespace LCT.ArtifactoryUploader
                 { "Artifactory Uploader",uploaderKpiData.TimeTakenByArtifactoryUploader }
             };
 
-            CommonHelper.WriteToConsoleTable(printList, printTimingList);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader, uploaderKpiNames);
         }
+        private static KpiNames IdentifyKpiNames(UploaderKpiData uploaderKpiData)
+        {
+            KpiNames uploaderKpiNames = new KpiNames();
+            uploaderKpiNames.ComponentsInBOM = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentInComparisonBOM));
+            uploaderKpiNames.PackagesInNotApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentNotApproved));
+            uploaderKpiNames.PackagesInApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesToBeUploaded));
+            uploaderKpiNames.PackagesCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesUploadedToJfrog));
+            uploaderKpiNames.PackagesNotCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedToJfrog));
+            uploaderKpiNames.PackagesNotExistingInRepository = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotExistingInRemoteCache));
+            uploaderKpiNames.PackagesNotActionedDueToError = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedDueToError));
+            uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesUploaded));
+            uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog));
+            uploaderKpiNames.PackagesMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded));
+            uploaderKpiNames.PackagesNotMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog));
 
+            return uploaderKpiNames;
+        }
         private static void IncrementCountersBasedOnPackageType(UploaderKpiData uploaderKpiData, PackageType packageType, bool isSuccess)
         {
             // Define a dictionary to map package types to counters

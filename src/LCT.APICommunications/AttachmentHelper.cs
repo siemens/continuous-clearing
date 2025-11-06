@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Model;
+using LCT.Common;
 using LCT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
@@ -13,6 +14,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Security;
+using Directory = System.IO.Directory;
 using Level = log4net.Core.Level;
 
 namespace LCT.APICommunications
@@ -22,7 +24,7 @@ namespace LCT.APICommunications
     /// </summary>
     public class AttachmentHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly string fullPathOfAttachmentJSON = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/Attachment.json";
         private readonly string sw360AuthToken;
         private readonly string sw360AuthTokenType;
@@ -93,11 +95,11 @@ namespace LCT.APICommunications
             }
             catch (UriFormatException ex)
             {
-                Logger.Error($"AttachComponentSourceToSW360:", ex);
+                Logger.Error($" └── AttachComponentSourceToSW360:", ex);
             }
             catch (SecurityException ex)
             {
-                Logger.Error($"AttachComponentSourceToSW360:", ex);
+                Logger.Error($" └── AttachComponentSourceToSW360:", ex);
             }
             catch (WebException webex)
             {
@@ -109,13 +111,13 @@ namespace LCT.APICommunications
                         StreamReader reader = new StreamReader(respStream);
                         string text = reader.ReadToEnd();
                         Logger.Debug($"Web exception: {text}", webex);
-                        Logger.Warn($"Web exception: {text}", webex);
+                        Logger.Warn($" └── Web exception: {text}", webex);
                     }
                 }
             }
             catch (IOException ex)
             {
-                Logger.Error($"AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
+                Logger.Error($" └── AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
                 Logger.Debug($"AttachComponentSourceToSW360:", ex);
             }
             return releaseAttachementApi;
@@ -160,7 +162,7 @@ namespace LCT.APICommunications
         {
             if (httpResponse.StatusCode == HttpStatusCode.Accepted)
             {
-                Logger.Logger.Log(null, Level.Warn, $"Moderation request is created while uploading source code in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
+                Logger.Logger.Log(null, Level.Warn, $" └── Moderation request is created while uploading source code in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.", null);
             }
             else
             {

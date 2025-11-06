@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-	<version>8.2.1</version>
+	<version>8.3.0</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -34,6 +34,7 @@
     <file src="out\net8.0\CLIUsageNpkg.txt" target="tools\CLIUsageNpkg.txt"/>
     <file src="out\net8.0\CycloneDX.Core.dll" target="tools\CycloneDX.Core.dll"/>
     <file src="out\net8.0\CycloneDX.Utils.dll" target="tools\CycloneDX.Utils.dll"/>
+    <file src="out\net8.0\Spectre.Console.dll" target="tools\Spectre.Console.dll"/>
     <file src="out\net8.0\ICSharpCode.SharpZipLib.dll" target="tools\ICSharpCode.SharpZipLib.dll"/>
     <file src="out\net8.0\JetBrains.Annotations.dll" target="tools\JetBrains.Annotations.dll"/>
     <file src="out\net8.0\Json.More.dll" target="tools\Json.More.dll"/>

@@ -4,7 +4,6 @@ using log4net.Appender;
 using log4net.Config;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace LCT.PackageIdentifier.UTest
@@ -22,164 +21,6 @@ namespace LCT.PackageIdentifier.UTest
             appSettings = new CommonAppSettings();
         }
 
-        [Test]
-        public void LogInputParameters_ShouldLogCorrectMessage_WhenBasicSBOMIsFalse()
-        {
-            // Arrange
-            string listOfInternalRepoList = "repo1,repo2";
-            string listOfInclude = "include1,include2";
-            string listOfExclude = "exclude1,exclude2";
-            string listOfExcludeComponents = "component1,component2";
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string OutFolder = Path.GetDirectoryName(exePath);
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ProjectType = "NPM",
-                SW360 = new SW360()
-                {
-                    URL = "http://sw360.url",
-                    AuthTokenType = "Bearer",
-                    ProjectName = "ProjectName",
-                    ProjectID = "ProjectID",
-                    ExcludeComponents = new List<string> { "component1", "component2" }
-                },
-
-                Directory = new LCT.Common.Directory()
-                {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
-                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
-                }
-            };
-            caToolInformation = new CatoolInfo
-            {
-                CatoolVersion = "1.0.0",
-                CatoolRunningLocation = "runningLocation"
-            };
-
-            memoryAppender = new MemoryAppender();
-            BasicConfigurator.Configure(memoryAppender);
-            // Act
-            DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
-
-            // Assert
-            string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
-                $"SW360Url\t\t --> {appSettings.SW360.URL}\n\t" +
-                $"SW360AuthTokenType\t --> {appSettings.SW360.AuthTokenType}\n\t" +
-                $"SW360ProjectName\t --> {appSettings.SW360.ProjectName}\n\t" +
-                $"SW360ProjectID\t\t --> {appSettings.SW360.ProjectID}\n\t" +
-                $"ExcludeComponents\t --> {listOfExcludeComponents}\n\t" +
-                $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
-                $"Include\t\t\t --> {listOfInclude}\n\t" +
-                $"Exclude\t\t\t --> {listOfExclude}\n";
-
-            var logEvents = memoryAppender.GetEvents();
-            Assert.IsNotEmpty(logEvents);
-            var actualLogMessage = logEvents[0].RenderedMessage;
-            Assert.AreEqual(expectedLogMessage, actualLogMessage);
-        }
-        [Test]
-        public void LogInputParameters_ShouldLogCorrectMessage_WhenBasicSBOMIsTrue()
-        {
-            // Arrange            
-            string listOfInternalRepoList = "repo1,repo2";
-            string listOfInclude = "include1,include2";
-            string listOfExclude = "exclude1,exclude2";
-            string listOfExcludeComponents = "component1,component2";
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string OutFolder = Path.GetDirectoryName(exePath);
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ProjectType = "NPM",
-                Directory = new LCT.Common.Directory()
-                {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
-                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
-                }
-
-            };
-            caToolInformation = new CatoolInfo
-            {
-                CatoolVersion = "1.0.0",
-                CatoolRunningLocation = "runningLocation"
-            };
-
-            memoryAppender = new MemoryAppender();
-            BasicConfigurator.Configure(memoryAppender);
-            // Act
-            DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
-
-            // Assert
-            string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
-                $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
-                $"Include\t\t\t --> {listOfInclude}\n\t" +
-                $"Exclude\t\t\t --> {listOfExclude}\n";
-
-            var logEvents = memoryAppender.GetEvents();
-            Assert.IsNotEmpty(logEvents);
-            var actualLogMessage = logEvents[0].RenderedMessage;
-            Assert.AreEqual(expectedLogMessage, actualLogMessage);
-        }
-        [Test]
-        public void LogInputParameters_ShouldLogCorrectMessage_WhenJfrogIsTrue()
-        {
-            // Arrange            
-            string listOfInternalRepoList = "repo1,repo2";
-            string listOfInclude = "include1,include2";
-            string listOfExclude = "exclude1,exclude2";
-            string listOfExcludeComponents = "component1,component2";
-            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string OutFolder = Path.GetDirectoryName(exePath);
-
-            CommonAppSettings appSettings = new CommonAppSettings()
-            {
-                ProjectType = "NPM",
-                Jfrog = new Jfrog(),
-                Directory = new LCT.Common.Directory()
-                {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
-                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
-                }
-            };
-            caToolInformation = new CatoolInfo
-            {
-                CatoolVersion = "1.0.0",
-                CatoolRunningLocation = "runningLocation"
-            };
-
-            memoryAppender = new MemoryAppender();
-            BasicConfigurator.Configure(memoryAppender);
-            // Act
-            DisplayInformation.LogInputParameters(caToolInformation, appSettings, listOfInternalRepoList, listOfInclude, listOfExclude, listOfExcludeComponents);
-
-            // Assert
-            string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
-                $"CaToolVersion\t\t --> {caToolInformation.CatoolVersion}\n\t" +
-                $"CaToolRunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
-                $"PackageFilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
-                $"BomFolderPath\t\t --> {appSettings.Directory.OutputFolder}\n\t" +
-                $"InternalRepoList\t --> {listOfInternalRepoList}\n\t" +
-                $"ProjectType\t\t --> {appSettings.ProjectType}\n\t" +
-                $"LogFolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t" +
-                $"Include\t\t\t --> {listOfInclude}\n\t" +
-                $"Exclude\t\t\t --> {listOfExclude}\n";
-
-            var logEvents = memoryAppender.GetEvents();
-            Assert.IsNotEmpty(logEvents);
-            var actualLogMessage = logEvents[0].RenderedMessage;
-            Assert.AreEqual(expectedLogMessage, actualLogMessage);
-        }
         [TestCase("NPM", "p*-lock.json,*.cdx.json", "node_modules,Test", "Npm-Test")]
         [TestCase("NUGET", "p*-lock.json,*.cdx.json", "package,Test", "Nuget-Test")]
         [TestCase("MAVEN", "*.cdx.json", "package,Test", "Maven-Test")]
@@ -187,6 +28,7 @@ namespace LCT.PackageIdentifier.UTest
         [TestCase("POETRY", "Poetry.lock,*.cdx.json", "package,Test", "Poetry-Test")]
         [TestCase("CONAN", "conan.lock,*.cdx.json", "package,Test", "Conan-Test")]
         [TestCase("ALPINE", "*.cdx.json", "package,Test", "Alpine-Test")]
+        [TestCase("CARGO", "*.cdx.json", "package,Test", "Cargo-Test")]
         public void DisplayIncludeFiles_ValidProjectType_ReturnsIncludeFiles(string projectType, string expectedInclude, string expectedExclude, string expectedRepos)
         {
             SetupAppSettings(projectType, expectedInclude, expectedExclude, expectedRepos);
@@ -201,6 +43,7 @@ namespace LCT.PackageIdentifier.UTest
         [TestCase("POETRY", "Poetry.lock,*.cdx.json", "package,Test", "Poetry-Test")]
         [TestCase("CONAN", "conan.lock,*.cdx.json", "package,Test", "Conan-Test")]
         [TestCase("ALPINE", "*.cdx.json", "package,Test", "Alpine-Test")]
+        [TestCase("CARGO", "*.cdx.json", "package,Test", "Cargo-Test")]
         public void DisplayExcludeFiles_ValidProjectType_ReturnsExcludeFiles(string projectType, string expectedInclude, string expectedExclude, string expectedRepos)
         {
             SetupAppSettings(projectType, expectedInclude, expectedExclude, expectedRepos);
@@ -215,6 +58,7 @@ namespace LCT.PackageIdentifier.UTest
         [TestCase("POETRY", "Poetry.lock,*.cdx.json", "package,Test", "Poetry-Test")]
         [TestCase("CONAN", "conan.lock,*.cdx.json", "package,Test", "Conan-Test")]
         [TestCase("ALPINE", "*.cdx.json", "package,Test", "Alpine-Test")]
+        [TestCase("CARGO", "*.cdx.json", "package,Test", "Cargo-Test")]
         public void GetInternalRepolist_ValidProjectType_ReturnsInternalRepos(string projectType, string expectedInclude, string expectedExclude, string expectedRepos)
         {
             SetupAppSettings(projectType, expectedInclude, expectedExclude, expectedRepos);
@@ -282,7 +126,7 @@ namespace LCT.PackageIdentifier.UTest
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
             var logMessage = logEvents.First().RenderedMessage;
-            Assert.AreEqual("CycloneDX Bom file generated without using SW360 and Jfrog details.", logMessage);
+            Assert.AreEqual("CycloneDX BoM file generated without using SW360 and JFrog details.", logMessage);
         }
 
         [Test]
@@ -300,7 +144,7 @@ namespace LCT.PackageIdentifier.UTest
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
             var logMessage = logEvents.First().RenderedMessage;
-            Assert.AreEqual("CycloneDX Bom file generated without using SW360 details.", logMessage);
+            Assert.AreEqual("CycloneDX BoM file generated without using SW360 details.", logMessage);
         }
 
         [Test]
@@ -318,7 +162,7 @@ namespace LCT.PackageIdentifier.UTest
             var logEvents = memoryAppender.GetEvents();
             Assert.IsNotEmpty(logEvents);
             var logMessage = logEvents.First().RenderedMessage;
-            Assert.AreEqual("CycloneDX Bom file generated without using Jfrog details.", logMessage);
+            Assert.AreEqual("CycloneDX BoM file generated without using JFrog details.", logMessage);
         }
 
         [Test]
@@ -366,6 +210,9 @@ namespace LCT.PackageIdentifier.UTest
                     break;
                 case "ALPINE":
                     appSettings.Alpine = new Config { Include = includeList, Exclude = excludeList, Artifactory = new Artifactory { InternalRepos = repoList } };
+                    break;
+                case "CARGO":
+                    appSettings.Cargo = new Config { Include = includeList, Exclude = excludeList, Artifactory = new Artifactory { InternalRepos = repoList } };
                     break;
             }
         }
