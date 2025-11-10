@@ -695,7 +695,7 @@ namespace LCT.Common.Logging
 
             content
                 .Append($"Start of Package Creater execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input parameters used in Package Creater[/]\n\n");
+                .Append($"[green]-[/] [green]Input parameters used in Package Creator[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendCreatorSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
@@ -1393,5 +1393,61 @@ namespace LCT.Common.Logging
             }
         }
 
+        public static void WriteChocoManualStepsNotification(List<Component> components)
+        {
+            if (components == null || components.Count == 0)
+                return;
+
+            // Get all Choco components to display in the table
+            var chocoComponents = components.Where(c => 
+                c.Properties?.Any(p => 
+                    string.Equals(p.Name, Dataconstant.Cdx_ProjectType, StringComparison.OrdinalIgnoreCase) && 
+                    string.Equals(p.Value, "CHOCO", StringComparison.OrdinalIgnoreCase)) == true).ToList();
+
+            if (chocoComponents.Count == 0)
+                return;
+
+                WriteChocoManualStepsNotificationWithSpectre(chocoComponents);
+        }
+
+        private static void WriteChocoManualStepsNotificationWithSpectre(List<Component> chocoComponents)
+        {
+            SafeSpectreAction(() =>
+            {
+                // Display warning message first (outside box)
+                WriteLine();
+                WriteInfoWithMarkup("[bold yellow]⚠️ ATTENTION: Manual License Clearing Required for Chocolatey Packages[/] \n");
+                WriteInfoWithMarkup("[yellow] * Chocolatey packages have been identified in your project.[/]");
+                WriteInfoWithMarkup("[yellow]Please note that manual license clearing steps are required for these packages.[/]");
+                WriteInfoWithMarkup("[yellow]Please ensure all Chocolatey packages are properly reviewed and cleared according to your organization's license policies.[/]");
+                WriteLine();
+
+                // Create and display table with Choco components (inside box)
+                var table = new Table()
+                    .BorderColor(Color.Yellow)
+                    .Border(TableBorder.Rounded)
+                    .Title("[yellow]Chocolatey Packages Requiring Manual License Clearing[/]")
+                    .Expand();
+
+
+              
+                table.AddColumn(new TableColumn("[green]Name[/]").Width(60).NoWrap());
+                table.AddColumn(new TableColumn("[blue]Version[/]").Width(30).NoWrap());
+
+                foreach (var item in chocoComponents)
+                {
+                    string name = string.IsNullOrWhiteSpace(item.Name) ? "N/A" : item.Name;
+                    string version = string.IsNullOrWhiteSpace(item.Version) ? "N/A" : item.Version;
+
+                    table.AddRow(
+                        $"[white]{Markup.Escape(name)}[/]",
+                        $"[white]{Markup.Escape(version)}[/]"
+                    );
+                }
+
+                ConsoleInstance.Write(table);
+                WriteLine();
+            }, "Manual License Clearing Required for Chocolatey Packages", "Alert");
+        }
     }
 }
