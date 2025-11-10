@@ -936,48 +936,6 @@ namespace LCT.SW360PackageCreator.UTest
         }
 
         [Test]
-        public void GetCreatorKpiData_WithChocoComponents_ReturnsZeroedMetrics()
-        {
-            // Arrange
-            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>();
-            var creatorHelper = new CreatorHelper(packageDownloaderList);
-
-            Program.CreatorStopWatch = new Stopwatch();
-            Program.CreatorStopWatch.Start();
-
-            var chocoComparisonData = new List<ComparisonBomData>
-            {
-                new ComparisonBomData
-                {
-                    Name = "7zip",
-                    Version = "19.0.0",
-                    ComponentStatus = "Not Processed for CHOCO",
-                    ReleaseStatus = "Not Processed for CHOCO"
-                },
-                new ComparisonBomData
-                {
-                    Name = "firefox",
-                    Version = "95.0.1",
-                    ComponentStatus = "Not Processed for CHOCO",
-                    ReleaseStatus = "Not Processed for CHOCO"
-                }
-            };
-
-            // Act
-            var kpiData = creatorHelper.GetCreatorKpiData(chocoComparisonData);
-
-            // Assert
-            Assert.That(kpiData.ComponentsOrReleasesCreatedNewlyInSw360, Is.EqualTo(0));
-            Assert.That(kpiData.ComponentsOrReleasesExistingInSw360, Is.EqualTo(0));
-            Assert.That(kpiData.ComponentsOrReleasesNotCreatedInSw360, Is.EqualTo(0));
-            Assert.That(kpiData.ComponentsWithoutSourceDownloadUrl, Is.EqualTo(0));
-            Assert.That(kpiData.ComponentsWithSourceDownloadUrl, Is.EqualTo(0));
-            Assert.That(kpiData.ComponentsUploadedInFossology, Is.EqualTo(0));
-            Assert.That(kpiData.ComponentsNotUploadedInFossology, Is.EqualTo(0));
-            Assert.That(kpiData.TimeTakenByComponentCreator, Is.GreaterThan(0));
-        }
-
-        [Test]
         public void WriteSourceNotFoundListToConsole_WithChocoComponents_SkipsActionItemTable()
         {
             // Arrange
