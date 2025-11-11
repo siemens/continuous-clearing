@@ -1405,7 +1405,8 @@ namespace LCT.SW360PackageCreator.UTest
                     Name = "npm-package",
                     Version = "1.0.0",
                     ComponentStatus = Dataconstant.Available,
-                    ReleaseStatus = Dataconstant.Available
+                    ReleaseStatus = Dataconstant.Available,
+                    ReleaseID = "npm-release-id"
                 }
             };
 
@@ -1420,7 +1421,8 @@ namespace LCT.SW360PackageCreator.UTest
                 Directory = new Common.Directory()
                 {
                     OutputFolder = "outputFolder"
-                }
+                },
+                Mode = "production" // Ensure IsTestMode is false
             };
 
             var mockSw360CreatorService = new Mock<ISw360CreatorService>();
@@ -1430,6 +1432,16 @@ namespace LCT.SW360PackageCreator.UTest
             var mockCreatorHelper = new Mock<ICreatorHelper>();
 
             var componentCreator = new ComponentCreator();
+
+            // Mock the releasesInfo to prevent null reference
+            var mockReleasesInfo = new ReleasesInfo
+            {
+                Name = "npm-package",
+                Embedded = new AttachmentEmbedded
+                {
+                    Sw360attachments = new List<Sw360Attachments>()
+                }
+            };
 
             mockCreatorHelper.Setup(x => x.GetUpdatedComponentsDetails(It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(), It.IsAny<ISW360Service>(), It.IsAny<Bom>()))
                 .ReturnsAsync(new Bom());
@@ -1441,6 +1453,8 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(new List<ReleaseLinked>());
             mockSw360CreatorService.Setup(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
+            mockSw360CreatorService.Setup(x => x.GetReleaseInfo(It.IsAny<string>()))
+                .ReturnsAsync(mockReleasesInfo);
 
             // Act
             await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, 
@@ -1454,6 +1468,8 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Assert - Files should still be written
             mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
+            mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
         }
 
         [Test]
