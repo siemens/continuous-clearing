@@ -694,7 +694,7 @@ namespace LCT.Common.Logging
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Package Creater execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"Start of Package Creator execution: [green]{DateTime.Now}[/]\n\n")
                 .Append($"[green]-[/] [green]Input parameters used in Package Creator[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
