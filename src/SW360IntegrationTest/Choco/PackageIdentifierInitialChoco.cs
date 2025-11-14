@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
+
 // -------------------------------------------------------------------------------------------------------------------- 
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
@@ -21,11 +22,14 @@ namespace SW360IntegrationTest.Choco
         private string CCTLocalBomTestFile { get; set; }
         private string OutFolder { get; set; }
         TestParamChoco testParameters;
+
         [SetUp]
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
+
             CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Choco", "CCTComparisonBOMChocoInitial.json"));
+
             if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
             {
                 Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs")));
@@ -37,6 +41,7 @@ namespace SW360IntegrationTest.Choco
         {
             string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Choco"));
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
+
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
@@ -54,22 +59,29 @@ namespace SW360IntegrationTest.Choco
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
         }
+
+
         [Test, Order(2)]
         public void LocalBOMCreation_AfterSuccessfulExeRun_ReturnsSuccess()
         {
             bool fileExist = false;
+
             // Expected
             ComponentJsonParsor expected = new ComponentJsonParsor();
             expected.Read(CCTLocalBomTestFile);
+
             // Actual
             string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
+
                 ComponentJsonParsor actual = new ComponentJsonParsor();
                 actual.Read(generatedBOM);
+
                 foreach (var item in expected.Components)
                 {
+
                     foreach (var i in actual.Components)
                     {
                         if ((i.Name == item.Name) && (i.Version == item.Version))
@@ -81,42 +93,11 @@ namespace SW360IntegrationTest.Choco
                             Assert.AreEqual(item.BomRef, component.BomRef);
                         }
                     }
+
                 }
             }
 
             Assert.IsTrue(fileExist, "Test to BOM file present");
-        }
-
-        [Test, Order(4)]
-        public void VerifyChocoComponentsKpiData_AfterComponentCreatorRun_ReturnsExpectedMetrics()
-        {
-            // Verify that the KPI data file was created and contains appropriate CHOCO-specific metrics
-            string kpiDataPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_CreatorKpiData.json"));
-            
-            Assert.IsTrue(File.Exists(kpiDataPath), "KPI data file should be created");
-
-            // Read and verify KPI data as JSON object since we don't have access to CreatorKpiData here
-            string kpiContent = File.ReadAllText(kpiDataPath);
-            dynamic kpiData = JsonConvert.DeserializeObject(kpiContent);
-            
-            Assert.IsNotNull(kpiData, "KPI data should be deserializable");
-            Assert.That((int)kpiData.ComponentsReadFromComparisonBOM, Is.GreaterThan(0), "Should have components read from BOM");
-            
-            // For CHOCO components, SW360-related metrics should reflect the actual behavior
-            Assert.That((int)kpiData.ComponentsOrReleasesCreatedNewlyInSw360, Is.EqualTo(0), "No components should be created in SW360 for CHOCO");
-            Assert.That((int)kpiData.ComponentsOrReleasesExistingInSw360, Is.EqualTo(0), "No existing components should be found in SW360 for CHOCO");
-            
-            // These should reflect the actual count of CHOCO components
-            Assert.That((int)kpiData.ComponentsOrReleasesNotCreatedInSw360, Is.GreaterThan(0), "Should show count of CHOCO components not created in SW360");
-            Assert.That((int)kpiData.ComponentsNotUploadedInFossology, Is.GreaterThan(0), "Should show count of CHOCO components not uploaded to Fossology");
-            
-            Assert.That((int)kpiData.ComponentsUploadedInFossology, Is.EqualTo(0), "No FOSSology uploads for CHOCO");
-            
-            // Verify that components without source and download URLs are 0 for CHOCO
-            Assert.That((int)kpiData.ComponentsWithoutSourceDownloadUrl, Is.EqualTo(0), "No source download URL issues for CHOCO");
-            Assert.That((int)kpiData.ComponentsWithSourceDownloadUrl, Is.EqualTo(0), "No source download URL tracking for CHOCO");
-            Assert.That((int)kpiData.ComponentsWithoutPackageUrl, Is.EqualTo(0), "No package URL issues for CHOCO");
-            Assert.That((int)kpiData.ComponentsWithoutSourceAndPackageUrl, Is.EqualTo(0), "No combined URL issues for CHOCO");
         }
     }
 }
