@@ -1010,5 +1010,55 @@ namespace LCT.SW360PackageCreator.UTest
             Assert.That(chocoData.FossologyLink, Is.Empty);
             Assert.That(chocoData.ReleaseCreatedBy, Is.Empty);
         }
+
+        [Test]
+        public void GetCreatorKpiData_WithChocoComponents_ReturnsCorrectChocoMetrics()
+        {
+            // Arrange
+            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>();
+            var creatorHelper = new CreatorHelper(packageDownloaderList);
+
+            Program.CreatorStopWatch = new Stopwatch();
+            Program.CreatorStopWatch.Start();
+
+            // Simulate CHOCO comparison data
+            List<ComparisonBomData> chocoCompareBomData = new List<ComparisonBomData>
+            {
+                new ComparisonBomData
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    ComponentStatus = "Not Processed for CHOCO",
+                    ReleaseStatus = "Not Processed for CHOCO",
+                    ApprovedStatus = "Not Applicable",
+                    FossologyUploadStatus = "Not Applicable"
+                },
+                new ComparisonBomData
+                {
+                    Name = "firefox",
+                    Version = "95.0.1",
+                    ComponentStatus = "Not Processed for CHOCO",
+                    ReleaseStatus = "Not Processed for CHOCO",
+                    ApprovedStatus = "Not Applicable",
+                    FossologyUploadStatus = "Not Applicable"
+                }
+            };
+
+            // Act
+            CreatorKpiData result = creatorHelper.GetCreatorKpiData(chocoCompareBomData);
+
+            // Assert - For CHOCO components, these should be the actual count
+            Assert.That(result.ComponentsOrReleasesNotCreatedInSw360, Is.EqualTo(2), "Should reflect count of CHOCO components not created in SW360");
+            Assert.That(result.ComponentsNotUploadedInFossology, Is.EqualTo(2), "Should reflect count of CHOCO components not uploaded to Fossology");
+            
+            // These should be 0 for CHOCO
+            Assert.That(result.ComponentsOrReleasesCreatedNewlyInSw360, Is.EqualTo(0));
+            Assert.That(result.ComponentsOrReleasesExistingInSw360, Is.EqualTo(0));
+            Assert.That(result.ComponentsUploadedInFossology, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithoutSourceDownloadUrl, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithSourceDownloadUrl, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithoutPackageUrl, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithoutSourceAndPackageUrl, Is.EqualTo(0));
+        }
     }
 }

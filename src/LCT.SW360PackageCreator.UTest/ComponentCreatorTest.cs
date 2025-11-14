@@ -1318,7 +1318,7 @@ namespace LCT.SW360PackageCreator.UTest
         }
 
         [Test]
-        public async Task CreateComponentInSw360_WithAllChocoComponents_SkipsSw360Processing()
+        public async Task CreateComponentInSw360_WithAllChocoComponents_SkipsSw360ProcessingAndNotifiesUser()
         {
             // Arrange
             var chocoComparisonData = new List<ComparisonBomData>
@@ -1361,18 +1361,27 @@ namespace LCT.SW360PackageCreator.UTest
 
             var componentCreator = new ComponentCreator();
 
+            // Set up mocks for file operations
             mockCreatorHelper.Setup(x => x.GetDownloadUrlNotFoundList(It.IsAny<List<ComparisonBomData>>()))
                 .Returns(new List<ComparisonBomData>());
 
             mockCreatorHelper.Setup(x => x.GetCreatorKpiData(It.IsAny<List<ComparisonBomData>>()))
-                .Returns(new CreatorKpiData());
+                .Returns(new CreatorKpiData
+                {
+                    ComponentsReadFromComparisonBOM = 2,
+                    ComponentsOrReleasesCreatedNewlyInSw360 = 0,
+                    ComponentsOrReleasesExistingInSw360 = 0,
+                    ComponentsOrReleasesNotCreatedInSw360 = 2, // Should be count of CHOCO components
+                    ComponentsUploadedInFossology = 0,
+                    ComponentsNotUploadedInFossology = 2 // Should be count of CHOCO components
+                });
 
             // Act
             await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, 
                 mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, 
                 mockCreatorHelper.Object, chocoComparisonData);
 
-            // Assert - SW360 operations should not be called
+            // Assert - SW360 operations should not be called for all CHOCO components
             mockSw360ProjectService.Verify(x => x.GetAlreadyLinkedReleasesByProjectId(It.IsAny<string>()), Times.Never);
             mockSw360CreatorService.Verify(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()), Times.Never);
             mockCreatorHelper.Verify(x => x.GetUpdatedComponentsDetails(It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(), It.IsAny<ISW360Service>(), It.IsAny<Bom>()), Times.Never);
@@ -1382,9 +1391,10 @@ namespace LCT.SW360PackageCreator.UTest
             mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
 
-            // Assert - UpdatedCompareBomData should be set to the parsed data
+            // Assert - UpdatedCompareBomData should be set to the parsed data for CHOCO components
             Assert.That(componentCreator.UpdatedCompareBomData.Count, Is.EqualTo(2));
             Assert.That(componentCreator.UpdatedCompareBomData[0].ComponentStatus, Is.EqualTo("Not Processed for CHOCO"));
+            Assert.That(componentCreator.UpdatedCompareBomData[1].ComponentStatus, Is.EqualTo("Not Processed for CHOCO"));
         }
 
         [Test]

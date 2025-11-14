@@ -499,16 +499,16 @@ namespace LCT.SW360PackageCreator
 
             if (allChocoComponents && updatedCompareBomData.Count > 0)
             {
-                // For CHOCO components, set appropriate default values
+                // For CHOCO components, these metrics should reflect the actual count of CHOCO packages
                 creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360 = 0;
                 creatorKpiData.ComponentsOrReleasesExistingInSw360 = 0;
-                creatorKpiData.ComponentsOrReleasesNotCreatedInSw360 = 0;
+                creatorKpiData.ComponentsOrReleasesNotCreatedInSw360 = updatedCompareBomData.Count; // Count of CHOCO packages not created in SW360
                 creatorKpiData.ComponentsWithoutSourceDownloadUrl = 0;
                 creatorKpiData.ComponentsWithSourceDownloadUrl = 0;
                 creatorKpiData.ComponentsWithoutPackageUrl = 0;
                 creatorKpiData.ComponentsWithoutSourceAndPackageUrl = 0;
                 creatorKpiData.ComponentsUploadedInFossology = 0;
-                creatorKpiData.ComponentsNotUploadedInFossology = 0;
+                creatorKpiData.ComponentsNotUploadedInFossology = updatedCompareBomData.Count; // Count of CHOCO packages not uploaded to Fossology
             }
             else
             {
