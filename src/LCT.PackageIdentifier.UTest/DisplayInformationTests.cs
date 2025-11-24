@@ -10,6 +10,62 @@ namespace LCT.PackageIdentifier.UTest
 {
     [TestFixture]
     public class DisplayInformationTests
+
+            [TestCase("NPM")]
+            [TestCase("NUGET")]
+            [TestCase("MAVEN")]
+            [TestCase("DEBIAN")]
+            [TestCase("POETRY")]
+            [TestCase("CONAN")]
+            [TestCase("ALPINE")]
+            [TestCase("CARGO")]
+            [TestCase("CHOCO")]
+            public void DisplayIncludeFiles_NullInclude_ReturnsEmptyString(string projectType)
+            {
+                appSettings.ProjectType = projectType;
+                switch (projectType)
+                {
+                    case "NPM": appSettings.Npm = new Config { Include = null }; break;
+                    case "NUGET": appSettings.Nuget = new Config { Include = null }; break;
+                    case "MAVEN": appSettings.Maven = new Config { Include = null }; break;
+                    case "DEBIAN": appSettings.Debian = new Config { Include = null }; break;
+                    case "POETRY": appSettings.Poetry = new Config { Include = null }; break;
+                    case "CONAN": appSettings.Conan = new Config { Include = null }; break;
+                    case "ALPINE": appSettings.Alpine = new Config { Include = null }; break;
+                    case "CARGO": appSettings.Cargo = new Config { Include = null }; break;
+                    case "CHOCO": appSettings.Choco = new Config { Include = null }; break;
+                }
+                string result = DisplayInformation.DisplayIncludeFiles(appSettings);
+                Assert.AreEqual(string.Empty, result);
+            }
+
+            [TestCase("NPM")]
+            [TestCase("NUGET")]
+            [TestCase("MAVEN")]
+            [TestCase("DEBIAN")]
+            [TestCase("POETRY")]
+            [TestCase("CONAN")]
+            [TestCase("ALPINE")]
+            [TestCase("CARGO")]
+            [TestCase("CHOCO")]
+            public void DisplayIncludeFiles_EmptyInclude_ReturnsEmptyString(string projectType)
+            {
+                appSettings.ProjectType = projectType;
+                switch (projectType)
+                {
+                    case "NPM": appSettings.Npm = new Config { Include = new string[0] }; break;
+                    case "NUGET": appSettings.Nuget = new Config { Include = new string[0] }; break;
+                    case "MAVEN": appSettings.Maven = new Config { Include = new string[0] }; break;
+                    case "DEBIAN": appSettings.Debian = new Config { Include = new string[0] }; break;
+                    case "POETRY": appSettings.Poetry = new Config { Include = new string[0] }; break;
+                    case "CONAN": appSettings.Conan = new Config { Include = new string[0] }; break;
+                    case "ALPINE": appSettings.Alpine = new Config { Include = new string[0] }; break;
+                    case "CARGO": appSettings.Cargo = new Config { Include = new string[0] }; break;
+                    case "CHOCO": appSettings.Choco = new Config { Include = new string[0] }; break;
+                }
+                string result = DisplayInformation.DisplayIncludeFiles(appSettings);
+                Assert.AreEqual(string.Empty, result);
+            }
     {
         private CommonAppSettings appSettings;
         private CatoolInfo caToolInformation;

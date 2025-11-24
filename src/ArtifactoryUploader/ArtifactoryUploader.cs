@@ -32,47 +32,20 @@ namespace LCT.ArtifactoryUploader
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
-            string operationType = component.PackageType == PackageType.ClearedThirdParty
-                || component.PackageType == PackageType.Development ? "copy" : "move";
-            if (component.ComponentType == "CHOCO")
-            {
-                if (component.PackageType == PackageType.Internal)
-                {
-                    operationType = "move";
-                }
-                else
-                {
-                    operationType = "copy";
-                }
-            }
+            string operationType = GetOperationType(component);
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
             {
-
                 // Package Information
                 var packageInfo = await GetPackageInfoWithRetry(JFrogService, component);
                 if (packageInfo == null)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound)
-                    {
-                        ReasonPhrase = ApiConstant.PackageNotFound
-                    };
+                    return CreateNotFoundResponse(ApiConstant.PackageNotFound);
                 }
 
                 // Perform Copy or Move operation
-                responsemessage = component.PackageType switch
-                {
-                    PackageType.ClearedThirdParty or PackageType.Development =>
-                        (component.ComponentType == "CHOCO"
-                            ? await JFrogApiCommInstance.CopyFromRemoteRepo(component)
-                            : await JFrogApiCommInstance.CopyFromRemoteRepo(component)),
-                    PackageType.Internal =>
-                        (component.ComponentType == "CHOCO"
-                            ? await JFrogApiCommInstance.MoveFromRepo(component)
-                            : await JFrogApiCommInstance.MoveFromRepo(component)),
-                    _ => new HttpResponseMessage(HttpStatusCode.NotFound)
-                };
+                responsemessage = await GetRepoOperationResponse(component);
 
                 // Check status code and handle errors
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
@@ -82,25 +55,56 @@ namespace LCT.ArtifactoryUploader
                 }
 
                 await PackageUploadHelper.JfrogFoundPackagesAsync(component, displayPackagesInfo, operationType, responsemessage, dryRunSuffix);
-
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
-                responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
-                return responsemessage;
+                return HandleUploadException(ex, responsemessage);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
-                responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
-                return responsemessage;
+                return HandleUploadException(ex, responsemessage);
             }
             finally
             {
                 Logger.Debug("Ending UploadPackageToArtifactory method");
             }
 
+            return responsemessage;
+        }
+
+        private static string GetOperationType(ComponentsToArtifactory component)
+        {
+            if (component.ComponentType == "CHOCO")
+            {
+                return component.PackageType == PackageType.Internal ? "move" : "copy";
+            }
+            return (component.PackageType == PackageType.ClearedThirdParty || component.PackageType == PackageType.Development) ? "copy" : "move";
+        }
+
+        private static async Task<HttpResponseMessage> GetRepoOperationResponse(ComponentsToArtifactory component)
+        {
+            return component.PackageType switch
+            {
+                PackageType.ClearedThirdParty or PackageType.Development =>
+                    await JFrogApiCommInstance.CopyFromRemoteRepo(component),
+                PackageType.Internal =>
+                    await JFrogApiCommInstance.MoveFromRepo(component),
+                _ => new HttpResponseMessage(HttpStatusCode.NotFound)
+            };
+        }
+
+        private static HttpResponseMessage CreateNotFoundResponse(string reasonPhrase)
+        {
+            return new HttpResponseMessage(HttpStatusCode.NotFound)
+            {
+                ReasonPhrase = reasonPhrase
+            };
+        }
+
+        private static HttpResponseMessage HandleUploadException(Exception ex, HttpResponseMessage responsemessage)
+        {
+            Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
+            responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
             return responsemessage;
         }
 

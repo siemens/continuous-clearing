@@ -26,6 +26,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
+using LCT.SW360PackageCreator;
 
 namespace LCT.SW360PackageCreator.UTest
 {
@@ -46,7 +47,6 @@ namespace LCT.SW360PackageCreator.UTest
                 ,new ComparisonBomData()
                 {
                      Name="test",
-                   DownloadUrl=Dataconstant.DownloadUrlNotFound
                 },
                 new ComparisonBomData()
                 {
@@ -355,29 +355,10 @@ namespace LCT.SW360PackageCreator.UTest
                 Version = "3.118"
             });
 
-            List<Components> componentsAvailableInSw360 = new List<Components>();
-            componentsAvailableInSw360.Add(new Components()
-            {
-                Name = "adduser",
-                Version = "3.118",
-                ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
-                ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
-                SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
-                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
-            });
-
-            List<Components> comparisonBomData = new List<Components>();
-            comparisonBomData.Add(new Components()
-            {
-                Name = "adduser",
-                Version = "3.118",
-                ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
-                ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
-                SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
-                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
-            });
-            var iSW360Service = new Mock<ISW360Service>();
-            iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
+            // Use reflection to set the private static property
+            var type = typeof(ComponentCreator);
+            var prop = type.GetProperty("TotalComponentsFromPackageIdentifier", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            prop.SetValue(null, updatedCompareBomData.Count);
 
             //Act
             CreatorKpiData data = creatorHelper.GetCreatorKpiData(updatedCompareBomData);
@@ -466,7 +447,7 @@ namespace LCT.SW360PackageCreator.UTest
             var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
 
             //Assert
-            Assert.That(attachmentUrlList.IsNullOrEmpty);
+            Assert.That(attachmentUrlList == null || attachmentUrlList.Count == 0);
         }
 
         [Test]
