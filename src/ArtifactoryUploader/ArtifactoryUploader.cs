@@ -32,19 +32,7 @@ namespace LCT.ArtifactoryUploader
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadPackageToArtifactory method");
-            string operationType = component.PackageType == PackageType.ClearedThirdParty
-                || component.PackageType == PackageType.Development ? "copy" : "move";
-            if (component.ComponentType == "CHOCO")
-            {
-                if (component.PackageType == PackageType.Internal)
-                {
-                    operationType = "move";
-                }
-                else
-                {
-                    operationType = "copy";
-                }
-            }
+            string operationType = GetOperationType(component);
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
@@ -64,13 +52,9 @@ namespace LCT.ArtifactoryUploader
                 responsemessage = component.PackageType switch
                 {
                     PackageType.ClearedThirdParty or PackageType.Development =>
-                        (component.ComponentType == "CHOCO"
-                            ? await JFrogApiCommInstance.CopyFromRemoteRepo(component)
-                            : await JFrogApiCommInstance.CopyFromRemoteRepo(component)),
+                        await JFrogApiCommInstance.CopyFromRemoteRepo(component),
                     PackageType.Internal =>
-                        (component.ComponentType == "CHOCO"
-                            ? await JFrogApiCommInstance.MoveFromRepo(component)
-                            : await JFrogApiCommInstance.MoveFromRepo(component)),
+                        await JFrogApiCommInstance.MoveFromRepo(component),
                     _ => new HttpResponseMessage(HttpStatusCode.NotFound)
                 };
 
@@ -111,14 +95,11 @@ namespace LCT.ArtifactoryUploader
 
             var packageInfo = await TryGetPackageInfo(component);
 
-
-            // Handle DEBIAN or NUGET package name mismatch
             if ((component.ComponentType == "DEBIAN" || component.ComponentType == "NUGET") && packageInfo != null && packageInfo.Name != component.JfrogPackageName)
             {
                 component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
             }
 
-            // Retry with lowercase values if packageInfo is still null
             if (packageInfo == null)
             {
                 _ = component.SrcRepoName.ToLower();
@@ -137,6 +118,14 @@ namespace LCT.ArtifactoryUploader
             return packageInfo;
         }
         public static string GettPathForArtifactoryUpload()
+                private static string GetOperationType(ComponentsToArtifactory component)
+                {
+                    if (component.ComponentType == "CHOCO")
+                    {
+                        return component.PackageType == PackageType.Internal ? "move" : "copy";
+                    }
+                    return component.PackageType == PackageType.ClearedThirdParty || component.PackageType == PackageType.Development ? "copy" : "move";
+                }
         {
             string localPathforartifactory = string.Empty;
             try
