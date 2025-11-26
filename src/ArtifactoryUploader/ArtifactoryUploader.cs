@@ -111,11 +111,14 @@ namespace LCT.ArtifactoryUploader
 
             var packageInfo = await TryGetPackageInfo(component);
 
+
+            // Handle DEBIAN or NUGET package name mismatch
             if ((component.ComponentType == "DEBIAN" || component.ComponentType == "NUGET") && packageInfo != null && packageInfo.Name != component.JfrogPackageName)
             {
                 component.CopyPackageApiUrl = component.CopyPackageApiUrl.Replace(component.JfrogPackageName, packageInfo.Name);
             }
 
+            // Retry with lowercase values if packageInfo is still null
             if (packageInfo == null)
             {
                 _ = component.SrcRepoName.ToLower();
@@ -133,7 +136,7 @@ namespace LCT.ArtifactoryUploader
 
             return packageInfo;
         }
-        
+        public static string GettPathForArtifactoryUpload()
         {
             string localPathforartifactory = string.Empty;
             try
