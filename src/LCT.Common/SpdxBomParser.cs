@@ -21,10 +21,10 @@ namespace LCT.Common
 {
     public class SpdxBomParser : ISpdxBomParser
     {
-        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public Bom ParseSPDXBom(string filePath)
         {
-            Logger.Debug($"Starting SPDX BOM parsing for file: {filePath}");
+            Logger.Debug($"ParseSPDXBom():Starting SPDX BOM parsing for file: {filePath}");
             Bom bom = new Bom();
             bom.Components = new List<Component>();
             bom.Dependencies = new List<Dependency>();
@@ -52,14 +52,17 @@ namespace LCT.Common
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Unauthorized access while reading the Spdx BOM file.", "ParseSPDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("Unauthorized access exception in reading SPDX BOM", ex);
             }
             catch (FileNotFoundException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("File not found while reading the Spdx BOM file.", "ParseSPDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("File not found exception in reading SPDX BOM", ex);
             }
             catch (JsonReaderException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while reading the Spdx BOM file.", "ParseSPDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("JSON reader exception in reading SPDX BOM", ex);
             }
             Logger.Debug($"SPDX BOM parsing completed. Final BOM contains {bom.Components?.Count ?? 0} components and {bom.Dependencies?.Count ?? 0} dependencies");
@@ -103,7 +106,7 @@ namespace LCT.Common
             CleanupComponentManufacturerData(components);
             bom.Components = components;
             bom.Dependencies = dependencies;
-            Logger.Debug($"BOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
+            Logger.Debug($"SBOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
         }
         private static void AddDevelopmentPropertyToComponents(List<Component> components, IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
         {
@@ -144,16 +147,16 @@ namespace LCT.Common
                 {
                     components.Add(component);
                     componentIndex[package.SPDXID] = component;
-                    Logger.Debug($"Successfully created component for package: {package.Name}");
                 }
             }
+            Logger.Debug($"ProcessSpdxPackages():Total components identified :{components.Count}.");
             Logger.Debug($"ProcessSpdxPackages():Package processing completed.");
             return (components, componentIndex);
         }
 
         private static Component CreateComponentFromPackage(Package package)
         {
-            Logger.Debug($"CreateComponentFromPackage():Creating component from package: {package.Name}");
+            
             if (package.ExternalRefs == null)
                 return null;
 
@@ -163,7 +166,7 @@ namespace LCT.Common
 
             var purl = purlRef.ReferenceLocator;
             var bomRef = !string.IsNullOrEmpty(purl) ? purl : package.SPDXID;
-            Logger.Debug($"Creating component with PURL: {purl}, BOM Ref: {bomRef}");
+            
             var component = new Component
             {
                 Name = package.Name,
@@ -182,7 +185,7 @@ namespace LCT.Common
             {
                 component.Manufacturer.BomRef = bomRef;
             }
-            Logger.Debug($"CreateComponentFromPackage():Component created successfully for package: {package.Name}");
+            
             return component;
         }
 
@@ -195,16 +198,20 @@ namespace LCT.Common
 
         private static List<Dependency> ProcessSpdxRelationships(IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
         {
+            Logger.Debug("ProcessSpdxRelationships(): Starting SPDX relationships processing...");
             if (relationships == null)
             {
-                Logger.Debug("No relationships found in SPDX data.");
+                Logger.Debug("ProcessSpdxRelationships(): No relationships found in SPDX data.");
                 return new List<Dependency>();
             }
 
             var supportedRelationshipTypes = GetSupportedRelationshipTypes();
             var dependencyMap = BuildDependencyMap(relationships, componentIndex, supportedRelationshipTypes);
             AddDevelopmentPropertyToComponents(componentIndex.Values.ToList(), relationships, componentIndex);
-            return ConvertDependencyMapToCycloneDx(dependencyMap);
+            var cycloneDxDependencies = ConvertDependencyMapToCycloneDx(dependencyMap);
+            Logger.Debug($"ProcessSpdxRelationships(): Converted dependency map to CycloneDX format with {cycloneDxDependencies.Count} dependencies.");
+            Logger.Debug("ProcessSpdxRelationships(): SPDX relationships processing completed.");
+            return cycloneDxDependencies;
         }
 
         private static HashSet<string> GetSupportedRelationshipTypes()
@@ -233,7 +240,7 @@ namespace LCT.Common
                 var (dependentRef, dependencyRef) = GetDependencyRefs(relationship, componentIndex);
                 if (string.IsNullOrEmpty(dependentRef) || string.IsNullOrEmpty(dependencyRef))
                     continue;
-
+                Logger.Debug($"BuildDependencyMap(): Adding relationship to dependency map: DependentRef={dependentRef}, DependencyRef={dependencyRef}, Type={relationship.RelationshipType}");
                 AddToDependencyMap(dependencyMap, dependentRef, dependencyRef, relationship.RelationshipType);
             }
 
@@ -249,12 +256,13 @@ namespace LCT.Common
 
         private static (string dependentRef, string dependencyRef) GetDependencyRefs(Relationship relationship, Dictionary<string, Component> componentIndex)
         {
+            Logger.Debug($"GetDependencyRefs(): Resolving dependency references for relationship: {relationship.SpdxElementId} -> {relationship.RelatedSpdxElement}");
             var parentComponent = componentIndex[relationship.SpdxElementId];
             var childComponent = componentIndex[relationship.RelatedSpdxElement];
 
             var parentBomRef = parentComponent.Manufacturer.BomRef;
             var childBomRef = childComponent.Manufacturer.BomRef;
-
+            Logger.Debug($"GetDependencyRefs(): Resolved dependency references for relationship: ParentBomRef={parentBomRef}, ChildBomRef={childBomRef}");
             // For DEPENDENCY_OF, DEV_DEPENDENCY_OF, RUNTIME_DEPENDENCY_OF
             // A DEPENDENCY_OF B means A is a dependency of B
             // So B depends on A, meaning B (child) depends on A (parent)
@@ -271,6 +279,7 @@ namespace LCT.Common
             {
                 dependencies = new List<(string bomRef, string relationshipType)>();
                 dependencyMap[dependentRef] = dependencies;
+                Logger.Debug($"AddToDependencyMap(): Created new dependency list for DependentRef={dependentRef}");
             }
 
             if (!dependencies.Any(d => d.bomRef == dependencyRef))

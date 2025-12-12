@@ -40,6 +40,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await apiCall(repoName);
+                await LogHandlingHelper.HttpResponseHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", httpResponseMessage);
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -51,15 +52,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", httpException, "Check the JFrog server details ");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(", invalidOperationExcep, "An invalid operation occurred while processing the request.");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", taskCancelledException, "The request was canceled. This could be due to a timeout.");
             }
 
             return aqlResult;
@@ -101,15 +102,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                Logger.Debug(httpException);
+                LogHandlingHelper.ExceptionErrorHandling("Get package info", $"MethodName:GetPackageInfo()", httpException, "Check the JFrog server details or token validity.");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                Logger.Debug(invalidOperationExcep);
+                LogHandlingHelper.ExceptionErrorHandling("Get package info", $"MethodName:GetPackageInfo()", invalidOperationExcep, "An invalid operation occurred while processing the request.");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                Logger.Debug(taskCancelledException);
+                LogHandlingHelper.ExceptionErrorHandling("Get package info", $"MethodName:GetPackageInfo()", taskCancelledException, "The request was canceled. This could be due to a timeout.");
             }
 
             return aqlResult;

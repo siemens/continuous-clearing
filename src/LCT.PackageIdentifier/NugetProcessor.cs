@@ -48,11 +48,12 @@ namespace LCT.PackageIdentifier
         private bool isSelfContainedProject = false;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private RuntimeInfo runtimeInfo = new();
-
+        private List<Component> listOfInternalComponents = new List<Component>();
+        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
-            Logger.Debug($"ParsePackageFile():Start");
+            Logger.Debug($"ParsePackageFile():Starting to parse the package file for identifying nuget components.");
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();
             bom.Dependencies = new List<Dependency>();
@@ -76,7 +77,7 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
-            Logger.Debug($"ParsePackageFile():End");
+            Logger.Debug($"ParsePackageFile():Completed parsing the package file.");
             return bom;
         }
 
@@ -108,12 +109,14 @@ namespace LCT.PackageIdentifier
                     if (idAttribute?.Value == null)
                     {
                         Logger.Error($"\t{packagesFilePath}: ID attribute not found.");
+                        LogHandlingHelper.BasicErrorHandling("Missing ID Attribute", "ParsePackageConfig()", $"ID attribute not found in file: {packagesFilePath}", $"Identify ID attribute in this file:{packagesFilePath}");
                         continue;
                     }
 
                     if (versionAttribute?.Value == null)
                     {
                         Logger.Error($"\t{packagesFilePath}: ID: '{idAttribute.Value}' version attribute not found.");
+                        LogHandlingHelper.BasicErrorHandling("Missing Version Attribute", "ParsePackageConfig()", $"Version attribute not found for ID: '{idAttribute.Value}' in file: {packagesFilePath}", $"Identify version attribute in this file:{packagesFilePath}");
                         continue;
                     }
                     NugetPackage package = new NugetPackage()
@@ -128,11 +131,13 @@ namespace LCT.PackageIdentifier
             }
             catch (IOException ex)
             {
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("IOException", "ParsePackageConfig()", ex, $"File Path: {packagesFilePath}");
+                Logger.Error($"IOException occurred while parsing the package file: {packagesFilePath}. Details: {ex.Message}");
             }
             catch (XmlSyntaxException ex)
             {
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("XmlSyntaxException", "ParsePackageConfig()", ex, $"File Path: {packagesFilePath}");
+                Logger.Error($"XML syntax error occurred while parsing the package file: {packagesFilePath}. Details: {ex.Message}");
             }
             return nugetPackages;
         }
@@ -183,11 +188,13 @@ namespace LCT.PackageIdentifier
             }
             catch (IOException ex)
             {
-                Logger.Error($"Error occured while parsing .csproj file for dependencies", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while accessing .csproj files.", "Parsecsproj()", ex, "");
+                Logger.Error($"IOException occurred while parsing .csproj files for dependencies. Details: {ex.Message}");
             }
             catch (XmlSyntaxException ex)
             {
-                Logger.Error($"Error occured while parsing .csproj file for dependencies:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while parsing XML in .csproj files.", "Parsecsproj()", ex, "");
+                Logger.Error($"XmlSyntaxException occurred while parsing .csproj files for dependencies. Details: {ex.Message}");
             }
             return referenceList;
         }
@@ -222,7 +229,8 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentException ex)
             {
-                Logger.Error($"Error occured while getting ReferenceTagDetails:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while processing ReferenceTagDetails.", "ReferenceTagDetails()", ex, "");
+                Logger.Error($"ArgumentException occurred while getting ReferenceTagDetails. Details: {ex.Message}");
             }
 
             ReferenceDetails fileInfo = new ReferenceDetails()
@@ -239,6 +247,7 @@ namespace LCT.PackageIdentifier
                                                           IJFrogService jFrogService,
                                                           IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
@@ -250,6 +259,8 @@ namespace LCT.PackageIdentifier
                 var processedComponent = ProcessNugetComponent(component, aqlResultList, bomhelper, appSettings, projectType);
                 modifiedBOM.Add(processedComponent);
             }
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }
 
@@ -307,24 +318,28 @@ namespace LCT.PackageIdentifier
                                              Component component,
                                              IBomHelper bomHelper, out string jfrogRepoPath)
         {
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = string.Empty;
             string jfrogcomponentName = $"{component.Name}-{component.Version}.nupkg";
-
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {jfrogcomponentName}.");
             var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
             if (aqlResults == null || aqlResults.Count <= 0)
             {
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Component not found with name: {jfrogcomponentName}. Trying alternate name format.");
                 jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
                 aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
             }
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
-
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Repository name identified: {repoName}.");
 
             if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Repository name not found for component. ");
                 string fullName = bomHelper.GetFullNameOfComponent(component);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Get full name for component:{fullName} ");
                 string fullNameVersion = $"{fullName}-{component.Version}.nupkg";
                 if (fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -345,11 +360,13 @@ namespace LCT.PackageIdentifier
             {
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
+                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): JFrog repository path: {jfrogRepoPath}.");
             }
             if (aqlResult != null)
             {
                 aqlResult.Repo ??= repoName;
             }
+            Logger.Debug($"GetJfrogArtifactoryRepoDetials(): Completed repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
             return aqlResult;
         }
 
@@ -366,6 +383,7 @@ namespace LCT.PackageIdentifier
             ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
 
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
 
@@ -379,15 +397,19 @@ namespace LCT.PackageIdentifier
             // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
+            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
 
         private static bool IsInternalNugetComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
+            Logger.Debug($"IsInternalNugetComponent(): Checking if component [Name: {component.Name}, Version: {component.Version}] is an internal NuGet component.");
             string jfrogcomponentName = $"{component.Name}.{component.Version}.nupkg";
             if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalNugetComponent(): Component [Name: {component.Name}, Version: {component.Version}] found in JFrog repository with name: {jfrogcomponentName}.");
                 return true;
             }
 
@@ -397,8 +419,10 @@ namespace LCT.PackageIdentifier
                 && aqlResultList.Exists(
                 x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))
             {
+                Logger.Debug($"IsInternalNugetComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {fullNameVersion}.");
                 return true;
             }
+            Logger.Debug($"IsInternalNugetComponent(): Component [Name: {component.Name}, Version: {component.Version}] is not an internal NuGet component.");
             return false;
         }
 
@@ -410,6 +434,7 @@ namespace LCT.PackageIdentifier
 
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
+            Logger.Debug("AddSiemensDirectProperty(): Starting to add SiemensDirect property to BOM components.");
             var bomComponentsList = bom.Components;
             foreach (var component in bomComponentsList)
             {
@@ -417,7 +442,7 @@ namespace LCT.PackageIdentifier
                     .Any(x => x.Contains(component.Name) && x.Contains(component.Version));
 
                 string siemensDirectValue = isDirectDep ? "true" : "false";
-
+                Logger.Debug($"AddSiemensDirectProperty(): Component [Name: {component.Name}, Version: {component.Version}] is a direct dependency. Setting SiemensDirect property to {siemensDirectValue}.");
                 component.Properties ??= new List<Property>();
                 var properties = component.Properties;
                 CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
@@ -427,6 +452,7 @@ namespace LCT.PackageIdentifier
             }
 
             bom.Components = bomComponentsList;
+            Logger.Debug("AddSiemensDirectProperty(): Completed adding SiemensDirect property to BOM components.");
         }
 
         #endregion
@@ -437,7 +463,7 @@ namespace LCT.PackageIdentifier
                                     ref List<Component> listComponentForBOM,
                                     ref Bom bom)
         {
-            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget);
+            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget, environmentHelper);
             if (!isSelfContainedProject)
             {
                 GetFrameworkPackagesForAllConfigLockFiles(configFiles);
@@ -464,16 +490,16 @@ namespace LCT.PackageIdentifier
             List<Component> componentsForBOM = new List<Component>();
             if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
+                Logger.Debug($"Template BOM file detected: {filepath}");
                 listOfTemplateBomfilePaths.Add(filepath);
-            }
-
-            Logger.Debug($"ParsingInputFileForBOM():FileName: {filepath}");
+            }            
 
             if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) &&
                 !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
-                Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+                Logger.Debug($"HandleConfigFile():CycloneDX file detected: {filepath}");
                 Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
+                LogHandlingHelper.IdentifierInputFileComponents(filepath, bomList.Components);
                 if (bomList.Components != null)
                 {
                     CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
@@ -487,9 +513,10 @@ namespace LCT.PackageIdentifier
             }
             else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+                Logger.Debug($"HandleConfigFile():Spdx sbom file detected: {filepath}");
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                LogHandlingHelper.IdentifierInputFileComponents(filepath, bomList.Components);
                 SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
                 componentsForBOM.AddRange(bomList.Components);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
@@ -504,10 +531,11 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+                Logger.Debug($"HandleConfigFile():Package file detected: {filepath}");
                 var listofComponents = new List<NugetPackage>();
                 var dependencies = new List<Dependency>();
                 ParseInputFiles(appSettings, filepath, listofComponents);
+                IdentifiedNugetPackages(filepath, listofComponents);
                 ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
 
                 if (bom.Dependencies == null || bom.Dependencies.Count == 0)
@@ -521,7 +549,33 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
             }
         }
+        private static void IdentifiedNugetPackages(string filepath, List<NugetPackage> packages)
+        {
 
+            if (packages == null || packages.Count == 0)
+            {
+                // Log a message indicating no packages were found
+                Logger.Debug($"No Nuget packages were found in the file: {filepath}");
+                return;
+            }
+
+            // Build the table
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($" Nuget PACKAGES FOUND IN FILE: {filepath}");
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} |");
+            logBuilder.AppendLine(LogHandlingHelper.LogHeaderSeparator);
+
+            foreach (var package in packages)
+            {
+                logBuilder.AppendLine($"| {package.ID,-40} | {package.Version,-20} |");
+            }
+
+            logBuilder.AppendLine(LogHandlingHelper.LogSeparator);
+
+            Logger.Debug(logBuilder.ToString());
+        }
         private void PostProcessBOM(
             CommonAppSettings appSettings,
             ref List<Component> listComponentForBOM,
@@ -637,10 +691,12 @@ namespace LCT.PackageIdentifier
 
         private static void GetDependencyDetails(Component compnent, NugetPackage prop, ref List<Dependency> dependencies)
         {
+            Logger.Debug($"GetDependencyDetails(): Starting dependency extraction for component: [Name: {compnent.Name}, Version: {compnent.Version}, PURL: {compnent.Purl}]");
             List<Dependency> subDependencies = new();
             foreach (var item in prop.Dependencies)
             {
                 string purl = item;
+                Logger.Debug($"GetDependencyDetails(): Extracted Sub-Dependency: [PURL: {purl}]");
                 Dependency dependentList = new Dependency()
                 {
                     Ref = purl
@@ -652,7 +708,9 @@ namespace LCT.PackageIdentifier
                 Ref = compnent.Purl,
                 Dependencies = subDependencies
             };
+            Logger.Debug($"GetDependencyDetails(): Final Dependency for Component: [Ref: {dependency.Ref}, Sub-Dependencies: [{string.Join(", ", dependency.Dependencies.Select(d => d.Ref))}]]");
             dependencies.Add(dependency);
+            Logger.Debug($"GetDependencyDetails(): Completed dependency extraction for component: [Name: {compnent.Name}, Version: {compnent.Version}, PURL: {compnent.Purl}]\n");
         }
 
         private static List<Component> KeepUniqueNonDevComponents(List<Component> listComponentForBOM)
@@ -693,6 +751,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
+                LogHandlingHelper.BasicErrorHandling("FileNotFound", "ParseInputFiles()", $"Input file not found or unsupported: {filepath}", $"provide {FileConstant.NugetAssetFile} or packages.config filesin this path :{filepath} ");
                 Logger.Warn($"Input file NOT_FOUND :{filepath}");
             }
         }
@@ -743,7 +802,7 @@ namespace LCT.PackageIdentifier
             //Invalid Package Details..
             catch (RegexMatchTimeoutException ex)
             {
-                Logger.Debug($"Error occured while Extracting Library Details:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error occured while Extracting Library Details", "ExtractLibraryDetails()", ex, $"Library: {library}");
                 version = "";
                 return "";
 
@@ -751,7 +810,7 @@ namespace LCT.PackageIdentifier
             //Invalid Package Details..
             catch (ArgumentException ex)
             {
-                Logger.Debug($"Error occured while Extracting Library Details:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error occured while Extracting Library Details", "ExtractLibraryDetails()", ex, $"Library: {library}");
                 version = "";
                 return "";
 
@@ -913,7 +972,7 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentNullException ex)
             {
-                Logger.Debug($"Error in GetFrameworkPackagesForAllConfigLockFiles:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Framework Packages", $"MethodName:GetFrameworkPackagesForAllConfigLockFiles(),argument null exception", ex, "");
             }
         }
 
@@ -939,11 +998,11 @@ namespace LCT.PackageIdentifier
             }
             catch (IOException ex)
             {
-                Logger.Debug($"GetUniqueTargetFrameworkKeysForConfigFile: IO error while reading the config file '{configFile}':", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Unique Target Framework Keys", $"MethodName:GetUniqueTargetFrameworkKeysForConfigFile(),IO error while reading the config file '{configFile}'", ex, "");
             }
             catch (ArgumentNullException ex)
             {
-                Logger.Debug($"Error in GetUniqueTargetFrameworkKeysForConfigFile:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Unique Target Framework Keys", $"MethodName:GetUniqueTargetFrameworkKeysForConfigFile(),Argument null exception while reading the config file '{configFile}'", ex, "");
             }
             return uniqueKeys;
         }

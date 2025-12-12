@@ -73,6 +73,7 @@ namespace LCT.PackageIdentifier
             services.AddTransient<ICycloneDXBomParser, CycloneDXBomParser>();
             services.AddTransient<IBomCreator, BomCreator>();
             services.AddTransient<ISpdxBomParser, SpdxBomParser>();
+            services.AddTransient<IEnvironmentHelper, EnvironmentHelper>();
             services.AddTransient<Program>();
             services.AddScoped<ICompositionBuilder, CompositionBuilder>();
             services.AddScoped<IRuntimeIdentifier, DotnetRuntimeIdentifer>();
@@ -88,11 +89,14 @@ namespace LCT.PackageIdentifier
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
-            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
+            Logger.Debug($"====================<<<<< Package Identifier >>>>>====================");
+            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
+            Log4Net.AppendVerboseValue(appSettings);
             appSettings.ProjectType = CommonHelper.CanonicalizeProjectType(appSettings.ProjectType);
             ProjectReleases projectReleases = new ProjectReleases();
-            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
+            string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             _settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Identifier);
             LoggerHelper.SpectreConsoleInitialMessage("Package Identifier");

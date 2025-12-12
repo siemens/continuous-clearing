@@ -32,7 +32,9 @@ namespace LCT.SW360PackageCreator
 
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
+            Logger.Debug($"DownloadPackage():Start downloading process of source code for this component , Name-{component.Name},version-{component.Version}");
             string path = Download(component, localPathforDownload);
+            Logger.Debug($"DownloadPackage():Completed downloading process of source code for this component , Name-{component.Name},version-{component.Version}");
             await Task.Delay(10);
             return path;
         }
@@ -64,7 +66,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Debug($"DownloadSourceCodeUsingGitClone():{ex}");
+                LogHandlingHelper.ExceptionErrorHandling("Download", $"MethodName:Download(), Release Name: {component.Name}@{component.Version}, DownloadPath: {downloadPath}", ex, "Unauthorized access occurred while trying to create the download directory.");
                 return downloadedPackageName;
             }
             Result result = CloneSource(component, downloadPath, taggedVersion, compressedFilePath);
@@ -96,6 +98,7 @@ namespace LCT.SW360PackageCreator
         }
         private static string GetCorrectVersion(ComparisonBomData component)
         {
+            Logger.Debug($"GetCorrectVersion():Start identifying correct version for this component , Name-{component.Name},version-{component.Version}");
             string correctVersion = string.Empty;
             Result result = ListTagsOfComponent(component);
 
@@ -137,7 +140,7 @@ namespace LCT.SW360PackageCreator
                     }
                 }
             }
-            Logger.Debug($"componentName - given version:{component.Version}, correctVersion:{correctVersion}");
+            Logger.Debug($"GetCorrectVersion():Completed identifying correct version for this component ,given version:{component.Version}, correct Version:{correctVersion}");
             return correctVersion;
         }
         private static string[] GetTagListFromResult(Result result)
@@ -167,9 +170,9 @@ namespace LCT.SW360PackageCreator
                 }
                 return version;
             }
-            catch (FormatException)
+            catch (FormatException ex)
             {
-                Logger.Debug($"Invalid version format: {version}");
+                LogHandlingHelper.ExceptionErrorHandling("GetBaseVersion", $"MethodName:GetBaseVersion(), ", ex, "Format exception while trying to identify the version.");
                 return version;
             }
         }
@@ -190,8 +193,9 @@ namespace LCT.SW360PackageCreator
 
         private static Result ListTagsOfComponent(ComparisonBomData component)
         {
+            Logger.Debug($"ListTagsOfComponent():Start git process for identifying list of tags for this component , Name-{component.Name},version-{component.Version}");
             string gitCommand = $"ls-remote --tags {component.DownloadUrl}";
-            Logger.Debug($"GetCorrectVersion():{component.Name}@{component.Version} --> {gitCommand}");
+            Logger.Debug($"ListTagsOfComponent():{component.Name}@{component.Version} --> {gitCommand}");
 
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
@@ -205,7 +209,8 @@ namespace LCT.SW360PackageCreator
             const int timeOutMs = 200 * 60 * 1000;
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo, timeOutMs);
             Result result = processResult?.Result ?? new Result();
-            Logger.Debug($"GetCorrectVersion:{gitCommand}:{result.ExitCode}, output:{result.StdOut}, Error:{result.StdErr}");
+            Logger.Debug($"ListTagsOfComponent():{gitCommand}:{result.ExitCode}, output:{result.StdOut}, Error:{result.StdErr}");
+            Logger.Debug($"ListTagsOfComponent():Completed git process for identifying list of tags for this component , Name-{component.Name},version-{component.Version}");
             return result;
         }
 

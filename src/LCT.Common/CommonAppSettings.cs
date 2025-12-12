@@ -33,6 +33,7 @@ namespace LCT.Common
 
         public static string SourceUrlForCargo { get; set; } = $"api/v1/crates/";
         public static string SourceBaseUrlForCargo { get; set; } = $"https://crates.io";
+        public bool Verbose { get; set; } = false;
         private string m_ProjectType;
         public CommonAppSettings()
         {
@@ -177,7 +178,7 @@ namespace LCT.Common
                     !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                     {
                         var folderAction = new FolderAction();
-                        folderAction.ValidateFolderPath(value);
+                        folderAction.ValidateFolderPath(value,environmentHelper);
                         m_InputFolder = value;
                     }
                 }
@@ -200,7 +201,7 @@ namespace LCT.Common
                 {
                     var folderAction = new FolderAction();
                     m_OutputFolder = value;
-                    folderAction.ValidateFolderPath(value);
+                    folderAction.ValidateFolderPath(value,environmentHelper);
                 }
                 catch (DirectoryNotFoundException)
                 {
@@ -221,7 +222,7 @@ namespace LCT.Common
                 {
                     m_LogFolder = value;
                     var folderAction = new FolderAction();
-                    folderAction.ValidateFolderPath(value);
+                    folderAction.ValidateFolderPath(value, environmentHelper);
                 }
                 catch (DirectoryNotFoundException)
                 {
