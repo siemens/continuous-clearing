@@ -1298,7 +1298,7 @@ namespace LCT.Common.Logging
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                Logger.Logger.Log(null, Level.Notice, $"  ├── Initiating FOSSology process for: Release : Name - [cyan]{formattedName}[/] , version - [cyan]{item.Version}[/]", null);
+                Logger.Logger.Log(null, Level.Notice, $"   ├── Initiating FOSSology process for: Release : Name - [cyan]{formattedName}[/] , version - [cyan]{item.Version}[/]", null);
             }
             else
             {

@@ -801,19 +801,19 @@ namespace LCT.SW360PackageCreator
 
             if (isSourceUrlMissing && isDownloadUrlMissing)
             {
-                Logger.Warn($"  └── Source URL AND Release source Download URL are not found (source file not attached) for {component.Name}-{component.Version}");
+                Logger.Warn($"   └── Source URL AND Release source Download URL are not found (source file not attached) for {component.Name}-{component.Version}");
                 Logger.Debug($"LogSourceAndDownloadUrlWarnings(): Both SourceUrl and DownloadUrl not found for {component.Name}-{component.Version}");
             }
             else
             {
                 if (isSourceUrlMissing)
                 {
-                    Logger.Warn($"  └── Source URL is not found for {component.Name}-{component.Version}");
+                    Logger.Warn($"   └── Source URL is not found for {component.Name}-{component.Version}");
                     Logger.Debug($"LogSourceAndDownloadUrlWarnings():SourceUrl not found for {component.Name}-{component.Version}");
                 }
                 else if (isDownloadUrlMissing)
                 {
-                    Logger.Warn($"  └── Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
+                    Logger.Warn($"   └── Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
                 }
             }
 
