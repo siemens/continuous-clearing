@@ -46,7 +46,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                Logger.Debug($"ParsePackageFile():FileName: {filepath}");
+                Logger.DebugFormat("ParsePackageFile():FileName: {0}", filepath);
                 var chocoList = ParsePackageConfig(filepath, appSettings);
                 nugetPackages.AddRange(chocoList);
             }

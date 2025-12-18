@@ -103,7 +103,7 @@ namespace LCT.ArtifactoryUploader
 
         private static HttpResponseMessage HandleUploadException(Exception ex, HttpResponseMessage responsemessage)
         {
-            Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
+            Logger.Error("Error has occurred in UploadPackageToArtifactory--{Exception}", ex);
             responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
             return responsemessage;
         }

@@ -821,5 +821,225 @@ namespace LCT.SW360PackageCreator.UTest
             File.Delete(tarGzFilePath);
             Directory.Delete(tempDir);
         }
+
+        [Test]
+        public async Task SetContentsForComparisonBOM_WithAllChocoComponents_ReturnsMinimalComparisonData()
+        {
+            // Arrange
+            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>();
+            var creatorHelper = new CreatorHelper(packageDownloaderList);
+
+            var chocoComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    ProjectType = "CHOCO",
+                    ComponentExternalId = "pkg:choco/7zip",
+                    ReleaseExternalId = "pkg:choco/7zip@19.0.0",
+                    SourceUrl = "https://chocolatey.org/packages/7zip",
+                    DownloadUrl = "https://chocolatey.org/packages/7zip"
+                },
+                new Components
+                {
+                    Name = "firefox",
+                    Version = "95.0.1", 
+                    ProjectType = "CHOCO",
+                    ComponentExternalId = "pkg:choco/firefox",
+                    ReleaseExternalId = "pkg:choco/firefox@95.0.1"
+                }
+            };
+
+            var sw360Service = new Mock<ISW360Service>();
+
+            // Act
+            var result = await creatorHelper.SetContentsForComparisonBOM(chocoComponents, sw360Service.Object);
+
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result[0].Name, Is.EqualTo("7zip"));
+            Assert.That(result[0].ComponentStatus, Is.EqualTo("Not Processed for CHOCO"));
+            Assert.That(result[0].ReleaseStatus, Is.EqualTo("Not Processed for CHOCO"));
+            Assert.That(result[0].ApprovedStatus, Is.EqualTo("Not Applicable"));
+            Assert.That(result[0].FossologyUploadStatus, Is.EqualTo("Not Applicable"));
+            Assert.That(result[1].Name, Is.EqualTo("firefox"));
+            Assert.That(result[1].ComponentStatus, Is.EqualTo("Not Processed for CHOCO"));
+
+            // Verify SW360 service was never called
+            sw360Service.Verify(x => x.GetAvailableReleasesInSw360(It.IsAny<List<Components>>()), Times.Never);
+        }
+
+        [Test]
+        public async Task SetContentsForComparisonBOM_WithMixedChocoAndOtherComponents_ProcessesNormally()
+        {
+            // Arrange
+            var debianPatcher = new Mock<IDebianPatcher>();
+            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "DEBIAN", new DebianPackageDownloader(debianPatcher.Object) }
+            };
+            var creatorHelper = new CreatorHelper(packageDownloaderList);
+
+            var mixedComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = "7zip",
+                    Version = "19.0.0", 
+                    ProjectType = "CHOCO",
+                    ComponentExternalId = "pkg:choco/7zip",
+                    ReleaseExternalId = "pkg:choco/7zip@19.0.0"
+                },
+                new Components
+                {
+                    Name = "adduser",
+                    Version = "3.118",
+                    ProjectType = "DEBIAN",
+                    ComponentExternalId = "pkg:deb/debian/adduser",
+                    ReleaseExternalId = "pkg:deb/debian/adduser@3.118"
+                }
+            };
+
+            var sw360Service = new Mock<ISW360Service>();
+            sw360Service.Setup(x => x.GetAvailableReleasesInSw360(It.IsAny<List<Components>>()))
+                       .ReturnsAsync(new List<Components>());
+            sw360Service.Setup(x => x.GetDuplicateComponentsByPurlId())
+                       .Returns(new List<Components>());
+
+            // Act
+            var result = await creatorHelper.SetContentsForComparisonBOM(mixedComponents, sw360Service.Object);
+
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(2));
+            // SW360 service should be called for mixed components
+            sw360Service.Verify(x => x.GetAvailableReleasesInSw360(It.IsAny<List<Components>>()), Times.Once);
+        }
+
+        [Test]
+        public void WriteSourceNotFoundListToConsole_WithChocoComponents_SkipsActionItemTable()
+        {
+            // Arrange
+            CommonAppSettings appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    URL = "http://localhost:8090"
+                }
+            };
+
+            var chocoComparisonData = new List<ComparisonBomData>
+            {
+                new ComparisonBomData
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    ComponentStatus = "Not Processed for CHOCO",
+                    ReleaseStatus = "Not Processed for CHOCO",
+                    DownloadUrl = Dataconstant.DownloadUrlNotFound
+                }
+            };
+
+            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>();
+            var creatorHelper = new CreatorHelper(packageDownloaderList);
+
+            // Act & Assert - Should not throw any exceptions or show action item tables
+            Assert.DoesNotThrow(() => creatorHelper.WriteSourceNotFoundListToConsole(chocoComparisonData, appSettings));
+        }
+
+        [Test]
+        public void CreateMinimalComparisonDataForChoco_CreatesCorrectData()
+        {
+            // Arrange
+            var chocoComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    Group = "chocolatey",
+                    ComponentExternalId = "pkg:choco/7zip",
+                    ReleaseExternalId = "pkg:choco/7zip@19.0.0",
+                    SourceUrl = "https://chocolatey.org/packages/7zip",
+                    DownloadUrl = "https://chocolatey.org/packages/7zip"
+                }
+            };
+
+            // Act - Use reflection to access private method
+            var method = typeof(CreatorHelper).GetMethod("CreateMinimalComparisonDataForChoco", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var result = (List<ComparisonBomData>)method.Invoke(null, new object[] { chocoComponents });
+
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(1));
+            var chocoData = result[0];
+            Assert.That(chocoData.Name, Is.EqualTo("7zip"));
+            Assert.That(chocoData.Version, Is.EqualTo("19.0.0"));
+            Assert.That(chocoData.Group, Is.EqualTo("chocolatey"));
+            Assert.That(chocoData.ComponentExternalId, Is.EqualTo("pkg:choco/7zip"));
+            Assert.That(chocoData.ReleaseExternalId, Is.EqualTo("pkg:choco/7zip@19.0.0"));
+            Assert.That(chocoData.SourceUrl, Is.EqualTo("https://chocolatey.org/packages/7zip"));
+            Assert.That(chocoData.DownloadUrl, Is.EqualTo("https://chocolatey.org/packages/7zip"));
+            Assert.That(chocoData.ComponentStatus, Is.EqualTo("Not Processed for CHOCO"));
+            Assert.That(chocoData.ReleaseStatus, Is.EqualTo("Not Processed for CHOCO"));
+            Assert.That(chocoData.ApprovedStatus, Is.EqualTo("Not Applicable"));
+            Assert.That(chocoData.IsComponentCreated, Is.EqualTo("Not Created"));
+            Assert.That(chocoData.IsReleaseCreated, Is.EqualTo("Not Created"));
+            Assert.That(chocoData.FossologyUploadStatus, Is.EqualTo("Not Applicable"));
+            Assert.That(chocoData.ReleaseAttachmentLink, Is.Empty);
+            Assert.That(chocoData.ReleaseLink, Is.Empty);
+            Assert.That(chocoData.FossologyLink, Is.Empty);
+            Assert.That(chocoData.ReleaseCreatedBy, Is.Empty);
+        }
+
+        [Test]
+        public void GetCreatorKpiData_WithChocoComponents_ReturnsCorrectChocoMetrics()
+        {
+            // Arrange
+            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>();
+            var creatorHelper = new CreatorHelper(packageDownloaderList);
+
+            Program.CreatorStopWatch = new Stopwatch();
+            Program.CreatorStopWatch.Start();
+
+            // Simulate CHOCO comparison data
+            List<ComparisonBomData> chocoCompareBomData = new List<ComparisonBomData>
+            {
+                new ComparisonBomData
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    ComponentStatus = "Not Processed for CHOCO",
+                    ReleaseStatus = "Not Processed for CHOCO",
+                    ApprovedStatus = "Not Applicable",
+                    FossologyUploadStatus = "Not Applicable"
+                },
+                new ComparisonBomData
+                {
+                    Name = "firefox",
+                    Version = "95.0.1",
+                    ComponentStatus = "Not Processed for CHOCO",
+                    ReleaseStatus = "Not Processed for CHOCO",
+                    ApprovedStatus = "Not Applicable",
+                    FossologyUploadStatus = "Not Applicable"
+                }
+            };
+
+            // Act
+            CreatorKpiData result = creatorHelper.GetCreatorKpiData(chocoCompareBomData);
+
+            // Assert - For CHOCO components, these should be the actual count
+            Assert.That(result.ComponentsOrReleasesNotCreatedInSw360, Is.EqualTo(2), "Should reflect count of CHOCO components not created in SW360");
+            Assert.That(result.ComponentsNotUploadedInFossology, Is.EqualTo(2), "Should reflect count of CHOCO components not uploaded to Fossology");
+            
+            // These should be 0 for CHOCO
+            Assert.That(result.ComponentsOrReleasesCreatedNewlyInSw360, Is.EqualTo(0));
+            Assert.That(result.ComponentsOrReleasesExistingInSw360, Is.EqualTo(0));
+            Assert.That(result.ComponentsUploadedInFossology, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithoutSourceDownloadUrl, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithSourceDownloadUrl, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithoutPackageUrl, Is.EqualTo(0));
+            Assert.That(result.ComponentsWithoutSourceAndPackageUrl, Is.EqualTo(0));
+        }
     }
 }

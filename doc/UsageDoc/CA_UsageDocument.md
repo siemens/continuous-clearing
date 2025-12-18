@@ -246,6 +246,7 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
     * Input file repository should contain your Choco `.nupkg` files.
     * Choco packages will be uploaded to the configured NuGet/Choco repositories in Artifactory.
     * No extra configuration is needed—just include your Choco packages as you would with other supported types.
+    * Manual license clearing in SW360 is required for Choco packages.
   
 ## SPDX v2.3 Support
 
