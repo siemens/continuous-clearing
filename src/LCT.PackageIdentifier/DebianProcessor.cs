@@ -69,6 +69,7 @@ namespace LCT.PackageIdentifier
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
             bom = RemoveExcludedComponents(appSettings, bom);
+            CommonHelper.UpdateDependencyRefsToComponentBomRef(ref bom,appSettings);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
 
             if (bom.Components != null)
@@ -82,7 +83,7 @@ namespace LCT.PackageIdentifier
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
-
+        
         private static void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> debianDirectDependencies = [.. bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>()];

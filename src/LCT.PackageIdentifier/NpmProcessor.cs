@@ -49,12 +49,14 @@ namespace LCT.PackageIdentifier
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<Component> componentsForBOM = new List<Component>();
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
             Bom bom = new Bom();
             List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
             int totalUnsupportedComponentsIdentified = 0;
 
-            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
+            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies,ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             totalComponentsIdentified = componentsForBOM.Count;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
@@ -68,8 +70,7 @@ namespace LCT.PackageIdentifier
             if (componentsWithMultipleVersions.Count != 0)
             {
                 CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
-            }
-
+            }            
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
@@ -81,7 +82,24 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
+        public static void AddSiemensDirectProperty(ref Bom bom)
+        {
+            List<string> npmDirectDependencies = new List<string>();
+            npmDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
+            var bomComponentsList = bom.Components;
 
+            foreach (var component in bomComponentsList)
+            {
+                string siemensDirectValue = npmDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version))
+                    ? "true"
+                    : "false";
+                component.Properties ??= new List<Property>();
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_SiemensDirect, siemensDirectValue);
+                component.Properties = properties;
+            }
+            bom.Components = bomComponentsList;
+        }
         public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
@@ -232,7 +250,7 @@ namespace LCT.PackageIdentifier
                 string packageName = GetPackageName(properties, prop);
 
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
-
+                //string bomRefComponentName = packageName;
                 SetComponentGroupAndName(components, packageName);
 
                 components.Type = Component.Classification.Library;
@@ -331,7 +349,7 @@ namespace LCT.PackageIdentifier
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
                 string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;
-
+                //string bomRefComponentName = prop.Name;
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
 
                 if (prop.Name.Contains('@'))
@@ -458,28 +476,50 @@ namespace LCT.PackageIdentifier
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
-        {
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies,ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
+        {            
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
             List<string> listOfTemplateBomfilePaths = new List<string>();
-
+            Bom cdxGenBomData = GetCdxGenBomData(configFiles, appSettings);
             foreach (string filepath in configFiles)
-            {
-                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    listOfTemplateBomfilePaths.Add(filepath);
-                    continue;
+                    if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                    {
+                        listOfTemplateBomfilePaths.Add(filepath);
+                        continue;
+                    }
+
+                    Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                    ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile,ref ListofDependenciesFromLockFile);
                 }
 
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-                ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
-            }
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref ListofComponentsFromLockFile,
+                ref ListofDependenciesFromLockFile,
+                ref componentsForBOM,
+                ref dependencies,
+                cdxGenBomData);
 
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
         }
+       
+        private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
+        {
+            var cdxGenBomData = CommonHelper.GetCdxGenBomData(configFiles, _cycloneDXBomParser.ParseCycloneDXBom);
+            if (cdxGenBomData?.Components != null)
+            {
+                cdxGenBomData.Components = [.. cdxGenBomData.Components.Where(c => c.Type != Component.Classification.Application)];
+                CheckValidComponentsForProjectType(cdxGenBomData.Components, appSettings.ProjectType);
+            }
+            else
+            {
+                return null;
+            }
 
-        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+                return cdxGenBomData;
+        }
+        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies, ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
         {
             if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
             {
@@ -491,7 +531,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                ProcessPackageFile(filepath, appSettings, ref componentsForBOM, ref dependencies);
+                ProcessPackageFile(filepath, appSettings,ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
         }
 
@@ -537,13 +577,14 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
 
-        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
+        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Dependency> dependencies,ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofdependenciesFromLockFile)
         {
             Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
             var components = ParsePackageLockJson(filepath, appSettings);
             AddingIdentifierType(components, "PackageFile", filepath);
-            componentsForBOM.AddRange(components);
+            ListofComponentsFromLockFile.AddRange(components);
             GetDependencyDetails(components, dependencies);
+            ListofdependenciesFromLockFile.AddRange(dependencies);
         }
 
         public static void GetDependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)

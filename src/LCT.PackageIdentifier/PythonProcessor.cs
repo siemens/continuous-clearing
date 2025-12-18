@@ -38,12 +38,16 @@ namespace LCT.PackageIdentifier
 
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
+            
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
-            List<Component> listComponentForBOM;
+            List<Component> listComponentForBOM=new List<Component>();
             List<Dependency> dependencies = new List<Dependency>();
             List<string> listOfTemplateBomfilePaths = new List<string>();
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
+            Bom cdxGenBomData = GetCdxGenBomData(configFiles, appSettings);
             foreach (string config in configFiles)
             {
                 if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -52,20 +56,27 @@ namespace LCT.PackageIdentifier
                 }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
-                    listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
+                    listofComponents=ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
+                    ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents));
                 }
                 else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
+                    listofComponents=ExtractDetailsFromJson(config, appSettings, ref dependencies);
+                    listComponentForBOM.AddRange(FormComponentReleaseExternalID(listofComponents));
                 }
             }
 
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref ListofComponentsFromLockFile,
+                ref ListofDependenciesFromLockFile,
+                ref listComponentForBOM,
+                ref dependencies,
+                cdxGenBomData);
 
             int initialCount = listofComponents.Count;
             int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
-            GetDistinctComponentList(ref listofComponents);
-            listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
+            GetDistinctComponentList(ref listofComponents);            
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
@@ -89,7 +100,21 @@ namespace LCT.PackageIdentifier
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
+        private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
+        {
+            var cdxGenBomData = CommonHelper.GetCdxGenBomData(configFiles, _cycloneDXBomParser.ParseCycloneDXBom);
+            if (cdxGenBomData?.Components != null)
+            {
+                cdxGenBomData.Components = [.. cdxGenBomData.Components.Where(c => c.Type != Component.Classification.Application)];
+                CycloneDXBomParser.CheckValidComponentsForProjectType(cdxGenBomData.Components, appSettings.ProjectType);
+            }
+            else
+            {
+                return null;
+            }
 
+                return cdxGenBomData;
+        }
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
             List<string> pythonDirectDependencies = new List<string>();

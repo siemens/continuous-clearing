@@ -44,6 +44,68 @@ namespace LCT.Common
             return false;
         }
 
+        /// <summary>
+        /// Finds and parses a cdxgen-generated CycloneDX SBOM file if present in the provided config files.
+        /// The detected dependency file path is removed from the list to avoid further processing elsewhere.
+        /// Parsing is performed by the provided delegate to avoid introducing cross-project dependencies.
+        /// </summary>
+        /// <param name="configFiles">List of config file paths (will be mutated if dependency file is found)</param>
+        /// <param name="appSettings">Application settings</param>
+        /// <param name="parseCycloneDxBom">Delegate used to parse the CycloneDX file and return a Bom</param>
+        /// <returns>Parsed Bom or null when not found/invalid</returns>
+        public static Bom GetCdxGenBomData(List<string> configFiles, Func<string, Bom> parseCycloneDxBom)
+        {
+            var dependencyFilePath = configFiles
+                .FirstOrDefault(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
+
+            if (string.IsNullOrEmpty(dependencyFilePath))
+            {
+                Logger.Warn("   Can you please provide the cdxgen-generated SBOM data to get more accurate dependencies");
+                return null;
+            }
+
+            // Remove the dependency file so it is not processed again later in the pipeline
+            configFiles.Remove(dependencyFilePath);
+
+            // Parse via delegate (so this helper does not depend on PackageIdentifier types)
+            var cdxGenBomData = parseCycloneDxBom?.Invoke(dependencyFilePath);
+
+            if (cdxGenBomData?.Components != null)
+            {
+                return cdxGenBomData;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Merge cdxgen output into the in-memory lists or fall back to discovered lock-file content.
+        /// If cdxGenBomData has components, ApplyCdxGenEnrichment is used. Otherwise, discovered
+        /// components and dependencies are appended to the BOM lists.
+        /// </summary>
+        public static void EnrichCdxGenforPackagefilesData(
+            ref List<Component> listOfComponentsFromLockFile,
+            ref List<Dependency> listOfDependenciesFromLockFile,
+            ref List<Component> componentsForBOM,
+            ref List<Dependency> dependencies,
+            Bom cdxGenBomData)
+        {
+            if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
+            {
+                componentsForBOM.AddRange(listOfComponentsFromLockFile);
+                dependencies.AddRange(listOfDependenciesFromLockFile);
+            }
+            else
+            {
+                ApplyCdxGenEnrichment(
+                    ref listOfComponentsFromLockFile,
+                    ref listOfDependenciesFromLockFile,
+                    ref componentsForBOM,
+                    ref dependencies,
+                    cdxGenBomData);
+            }
+        }
+
         public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
         {
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
@@ -538,6 +600,154 @@ namespace LCT.Common
                 "ALPINE" => "Alpine",
                 _ => projectType.Trim(),
             };
+        }
+        public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies,Bom? cdxGenBomData)
+        {
+            if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
+            {
+                return;
+            }
+
+            // Merge properties into cdx components from discovered components
+            EnrichComponentsFromCdxGen(ref ListofComponentsFromLockFile, cdxGenBomData.Components);
+
+            // Replace components list with cdxgen components (as per existing behavior)            
+            if (cdxGenBomData.Components != null && cdxGenBomData.Components.Count > 0)
+            {
+                componentsForBOM.AddRange(cdxGenBomData.Components);
+            }
+
+            // Replace dependencies with cdxgen dependencies if present
+            if (cdxGenBomData.Dependencies != null && cdxGenBomData.Dependencies.Count > 0)
+            {
+                dependencies.AddRange(cdxGenBomData.Dependencies);
+            }
+
+            // Add SiemensDirect property based on cdxgen dependency refs
+            AddSiemensDirectProperty(ref cdxGenBomData);
+        }
+        public static void AddSiemensDirectProperty(ref Bom bom)
+        {
+            List<string> npmDirectDependencies = new List<string>();
+            npmDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
+            var bomComponentsList = bom.Components;
+
+            foreach (var component in bomComponentsList)
+            {
+                string siemensDirectValue = npmDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version))
+                    ? "true"
+                    : "false";
+                component.Properties ??= new List<Property>();
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_SiemensDirect, siemensDirectValue);
+                component.Properties = properties;
+            }
+            bom.Components = bomComponentsList;
+        }
+        private static void EnrichComponentsFromCdxGen(ref List<Component> componentsForBOM, List<Component> cdxComponents)
+        {
+            // Index existing by Purl and by Name+Version
+            var byPurl = new Dictionary<string, Component>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in componentsForBOM.Where(c => !string.IsNullOrEmpty(c.Purl)))
+            {
+                byPurl[c.Purl] = c; // overwrite if key exists
+            }
+
+            // Index existing by Name+Version with overwrite semantics
+            var byNameVer = new Dictionary<string, Component>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in componentsForBOM.Where(c => !string.IsNullOrEmpty(c.Name) && !string.IsNullOrEmpty(c.Version)))
+            {
+                var key = $"{c.Name}|{c.Version}";
+                byNameVer[key] = c; // overwrite if key exists
+            }
+
+            foreach (var cdx in cdxComponents)
+            {
+                Component? existing = null;
+
+                if (!string.IsNullOrEmpty(cdx.Purl) && byPurl.TryGetValue(cdx.Purl, out var matchByPurl))
+                {
+                    existing = matchByPurl;
+                }
+                else
+                {
+                    var key = (!string.IsNullOrEmpty(cdx.Name) && !string.IsNullOrEmpty(cdx.Version))
+                        ? $"{cdx.Name}|{cdx.Version}"
+                        : null;
+
+                    if (key != null && byNameVer.TryGetValue(key, out var matchByNameVer))
+                    {
+                        existing = matchByNameVer;
+                    }
+                }
+
+                // Safely merge properties only when an existing component with properties is found
+                if (existing != null && existing.Properties != null && existing.Properties.Count > 0)
+                {
+                    cdx.Properties = [.. existing.Properties.Select(p => new Property { Name = p.Name, Value = p.Value })];
+                }
+                else
+                {
+                    // Preserve any properties that may already exist on cdx, otherwise initialize
+                    cdx.Properties ??= new List<Property>();
+                }
+            }
+        }
+        public static void UpdateDependencyRefsToComponentBomRef(ref Bom bom, CommonAppSettings appSettings)
+        {
+            if (bom == null || bom.Dependencies == null || bom.Components == null) return;
+
+            var compMap = bom.Components
+                .Where(c => !string.IsNullOrWhiteSpace(c.Purl) && c.Purl.StartsWith(Dataconstant.PurlCheck()[appSettings.ProjectType.ToUpperInvariant()]))
+                .Select(c =>
+                {
+                    var core = c.Purl.Split('?', 2)[0];
+                    return (core, purl: c.Purl);
+                })
+                .GroupBy(x => x.core, StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.First().purl, StringComparer.Ordinal);
+
+            void NormalizeRef(Dependency dep)
+            {
+                if (dep?.Ref == null) return;
+
+                if (dep.Ref.StartsWith(Dataconstant.PurlCheck()[appSettings.ProjectType.ToUpperInvariant()]))
+                {
+                    var core = dep.Ref.Split('?', 2)[0];
+                    if (compMap.TryGetValue(core, out var canonical))
+                    {
+                        dep.Ref = canonical;
+                    }
+                    else
+                    {
+                        // For NPM, NuGet, Maven: keep core without '?arch=source'
+                        // For Debian (and others): default to '?arch=source'
+                        if (appSettings.ProjectType.Equals("NPM", StringComparison.OrdinalIgnoreCase) ||
+                            appSettings.ProjectType.Equals("NUGET", StringComparison.OrdinalIgnoreCase) ||
+                            appSettings.ProjectType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dep.Ref = core;
+                        }
+                        else
+                        {
+                            dep.Ref = $"{core}?arch=source";
+                        }
+                    }
+                }
+
+                if (dep.Dependencies != null)
+                {
+                    foreach (var child in dep.Dependencies)
+                    {
+                        NormalizeRef(child);
+                    }
+                }
+            }
+
+            foreach (var d in bom.Dependencies)
+            {
+                NormalizeRef(d);
+            }
         }
         #endregion
     }

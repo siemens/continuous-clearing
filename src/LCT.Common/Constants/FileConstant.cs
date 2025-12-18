@@ -61,6 +61,6 @@ namespace LCT.Common.Constants
         public const string ConanFileExtension = ".dep.json";
         public const string CargoFileExtension = "metadata.json";
         public const string CrateFileExtension = ".crate";
-
+        public const string DependencyFileExtension = "cdx_dep.json";
     }
 }
