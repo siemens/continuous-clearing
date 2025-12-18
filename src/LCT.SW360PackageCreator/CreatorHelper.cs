@@ -43,6 +43,7 @@ namespace LCT.SW360PackageCreator
         List<Components> componentsAvailableInSw360 = new List<Components>();
         List<Components> DuplicateComponentsByPurlId = new List<Components>();
         private const string SOURCE = "SOURCE";
+        private const string ChocoNotProcessedStatus = "Not Processed for CHOCO";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
         public List<ComparisonBomData> GetDownloadUrlNotFoundList(List<ComparisonBomData> comparisionBomDataList)
@@ -283,8 +284,8 @@ namespace LCT.SW360PackageCreator
                     ReleaseExternalId = component.ReleaseExternalId,
                     SourceUrl = component.SourceUrl,
                     DownloadUrl = component.DownloadUrl,
-                    ComponentStatus = "Not Processed for CHOCO",
-                    ReleaseStatus = "Not Processed for CHOCO",
+                    ComponentStatus = ChocoNotProcessedStatus,
+                    ReleaseStatus = ChocoNotProcessedStatus,
                     ApprovedStatus = "Not Applicable",
                     IsComponentCreated = "Not Created",
                     IsReleaseCreated = "Not Created",
@@ -495,7 +496,7 @@ namespace LCT.SW360PackageCreator
 
             // Check if all components are CHOCO packages
             bool allChocoComponents = updatedCompareBomData.All(component => 
-                string.Equals(component.ComponentStatus, "Not Processed for CHOCO", StringComparison.OrdinalIgnoreCase));
+                string.Equals(component.ComponentStatus, ChocoNotProcessedStatus, StringComparison.OrdinalIgnoreCase));
 
             if (allChocoComponents && updatedCompareBomData.Count > 0)
             {
@@ -676,7 +677,7 @@ namespace LCT.SW360PackageCreator
         {
             // Check if all components are Choco packages
             bool allChocoComponents = comparisionBomDataList.All(component => 
-                string.Equals(component.ComponentStatus, "Not Processed for CHOCO", StringComparison.OrdinalIgnoreCase));
+                string.Equals(component.ComponentStatus, ChocoNotProcessedStatus, StringComparison.OrdinalIgnoreCase));
 
             if (allChocoComponents && comparisionBomDataList.Count > 0)
             {
