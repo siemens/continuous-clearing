@@ -84,12 +84,12 @@ namespace LCT.ArtifactoryUploader
             }
             finally
             {
-                Logger.Debug($"UploadPackageToRepo(): Ending the upload process for component: {component.Name}.");                
+                Logger.DebugFormat("UploadPackageToRepo(): Ending the upload process for component: {0}.", component.Name);
             }
 
             return responsemessage;
         }
-
+        
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
             async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)
