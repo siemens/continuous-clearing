@@ -109,7 +109,7 @@ namespace LCT.Common
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                Logger.Error($"The provided value for '{name}' is null, empty, or whitespace. Value: '{value}'");
+                Logger.ErrorFormat("The provided value for '{0}' is null, empty, or whitespace. Value: '{1}'", name, value);
                 LogHandlingHelper.ExceptionErrorHandling("CheckNullOrEmpty()", $"Validation failed for parameter: {name}", new ArgumentException($"Invalid value for {name} - {value}"), $"The provided value for '{name}' is null, empty, or whitespace.");
             }
         }
@@ -474,7 +474,7 @@ namespace LCT.Common
                         RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
                         component.Properties = properties;
                         noOfExcludedComponents++;
-                        Logger.Debug($"Component excluded due to PURL match: Name = {component.Name}, Version = {component.Version}, PURL = {component.Purl}");
+                        Logger.DebugFormat("Component excluded due to PURL match: Name = {0}, Version = {1}, PURL = {2}", component.Name, component.Version, component.Purl);
                     }
                 }
             }
@@ -507,7 +507,7 @@ namespace LCT.Common
                         var properties = component.Properties;
                         RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
                         component.Properties = properties;
-                        Logger.Debug($"Component excluded due to Name and Version match: Name = {component.Name}, Version = {component.Version}");
+                        Logger.DebugFormat("Component excluded due to Name and Version match: Name = {0}, Version = {1}", component.Name, component.Version);
                     }
                 }
             }

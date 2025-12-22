@@ -35,7 +35,7 @@ namespace LCT.ArtifactoryUploader
             Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has started");
             //Reading the CycloneBOM data
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
-            Logger.Debug($"UploadPackageToArtifactory():Identified bom file with path:{bomFilePath}");
+            Logger.DebugFormat("UploadPackageToArtifactory(): Identified bom file with path: {0}", bomFilePath);
             Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper);
 
             LoggerHelper.DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);

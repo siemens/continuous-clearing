@@ -51,7 +51,8 @@ namespace LCT.APICommunications
         private readonly int timeOut = sw360ConnectionSettings.Timeout;
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-
+        private const string GetReleasesMessage = "Get Releases";
+        private const string TriggerFossologyMessage = "Trigger Fossology Process";
         #endregion
         #region PUBLIC METHODS
 
@@ -143,7 +144,7 @@ namespace LCT.APICommunications
                 }
                 else
                 {
-                    LogHandlingHelper.BasicErrorHandling("GetReleases", $"MethodName:GetReleases()",
+                    LogHandlingHelper.BasicErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()",
                 $"SW360 server is not accessible. StatusCode: {responseMessage?.StatusCode}, ReasonPhrase: {responseMessage?.ReasonPhrase}",
                 "Please wait for some time and re-run the pipeline.");
                     Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again." +
@@ -153,20 +154,20 @@ namespace LCT.APICommunications
             }
             catch (TaskCanceledException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("GetReleases", $"MethodName:GetReleases()", ex,
+                LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex,
             "TaskCanceledException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
                 Logger.Error("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (HttpRequestException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("GetReleases", $"MethodName:GetReleases()", ex, "");
+                LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex, "");
                 Logger.Error("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("GetReleases", $"MethodName:GetReleases()", ex,
+                LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex,
             "InvalidOperationException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
                 Logger.Error("InvalidOperationException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
@@ -180,9 +181,9 @@ namespace LCT.APICommunications
             string url = $"{sw360ReleaseApi}/{releaseId}{ApiConstant.FossTriggerAPIPrefix}{sw360link}{ApiConstant.FossTriggerAPISuffix}";
             try
             {
-                await LogHandlingHelper.HttpRequestHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess()", httpClient, url);
+                await LogHandlingHelper.HttpRequestHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", httpClient, url);
                 var response = await httpClient.GetAsync(url);
-                await LogHandlingHelper.HttpResponseHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess()", response);
+                await LogHandlingHelper.HttpResponseHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", response);
                 if (!response.IsSuccessStatusCode)
                 {
                     string errorContent = await response.Content.ReadAsStringAsync();
@@ -195,7 +196,7 @@ namespace LCT.APICommunications
             }
             catch (HttpRequestException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess()", ex, "An HTTP request error occurred while triggering the Fossology process.");
+                LogHandlingHelper.ExceptionErrorHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", ex, "An HTTP request error occurred while triggering the Fossology process.");
                 throw;
             }
         }
@@ -203,7 +204,7 @@ namespace LCT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to check fossology process status");
-            await LogHandlingHelper.HttpRequestHandling("TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess()", httpClient, link);
+            await LogHandlingHelper.HttpRequestHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", httpClient, link);
             return await httpClient.GetAsync(link);
         }
         public async Task<string> GetComponents()

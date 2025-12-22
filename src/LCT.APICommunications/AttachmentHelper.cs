@@ -33,7 +33,7 @@ namespace LCT.APICommunications
 
         private const string fileMimeType = "application /x-compressed";
         private const string fileFormKey = "file";
-
+        private const string AttachmentErrorMessage = "Not able to attachment";
         public AttachmentHelper(string sw360TokenType, string sw360Token, string releaseApi)
         {
             sw360AuthToken = sw360Token;
@@ -97,12 +97,12 @@ namespace LCT.APICommunications
             }
             catch (UriFormatException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Attachment Error", $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, $"Invalid URI format: {url.AbsoluteUri}");
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, $"Invalid URI format: {url.AbsoluteUri}");
                 Logger.Error($"   └── AttachComponentSourceToSW360:", ex);
             }
             catch (SecurityException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Attachment Error", $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "A security exception occurred. Ensure the application has the required permissions.");
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "A security exception occurred. Ensure the application has the required permissions.");
                 Logger.Error($"   └── AttachComponentSourceToSW360:", ex);
             }
             catch (WebException webex)
@@ -114,7 +114,7 @@ namespace LCT.APICommunications
                     {
                         StreamReader reader = new StreamReader(respStream);
                         string text = reader.ReadToEnd();
-                        LogHandlingHelper.ExceptionErrorHandling("Attachment Error", $"Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", webex, $"Web exception occurred. Details: {text}");
+                        LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", webex, $"Web exception occurred. Details: {text}");
                         Logger.Warn($"   └── Web exception: {text}", webex);
                     }
                 }
@@ -122,7 +122,7 @@ namespace LCT.APICommunications
             catch (IOException ex)
             {
                 Logger.Error($"   └── AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
-                LogHandlingHelper.ExceptionErrorHandling("Attachment Error", $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "An I/O error occurred while processing the attachment.");
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "An I/O error occurred while processing the attachment.");
             }
             return releaseAttachementApi;
         }

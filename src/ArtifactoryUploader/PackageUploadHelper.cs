@@ -261,7 +261,7 @@ namespace LCT.ArtifactoryUploader
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
-                    Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version}  contains Source repository:{item.SrcRepoName} and Destination Repository:{item.DestRepoName} ,So now started upload package process .");
+                    Logger.DebugFormat("PackageUploadToArtifactory():{0} and {1}  contains Source repository:{3} and Destination Repository:{4} ,So now started upload package process .", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
                     await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
                 }
                 else
@@ -269,14 +269,14 @@ namespace LCT.ArtifactoryUploader
                     uploaderKpiData.PackagesNotExistingInRemoteCache++;
                     item.DestRepoName = null;
                     await JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
-                    Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version}  is not found in any jfrog repository.");
+                    Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is not found in any jfrog repository.", item.Name, item.Version);
                 }
             }
             else
             {
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
                 await SucessfullPackagesAsync(item, displayPackagesInfo);
-                Logger.Debug($"PackageUploadToArtifactory():{item.Name} and {item.Version} is identified in source:{item.SrcRepoName} and destination:{item.DestRepoName} repositories");
+                Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is identified in source: {2} and destination: {3} repositories",item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
                 item.DestRepoName = null;
             }
         }

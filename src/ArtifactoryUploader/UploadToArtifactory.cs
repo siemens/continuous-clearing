@@ -37,7 +37,7 @@ namespace LCT.ArtifactoryUploader
 
             foreach (var item in comparisonBomData)
             {
-                Logger.Debug($"GetComponentsToBeUploadedToArtifactory():Identifying data for this component name-{item.Name},version-{item.Version} ");
+                Logger.DebugFormat("GetComponentsToBeUploadedToArtifactory(): Identifying data for this component name-{0}, version-{1}", item.Name, item.Version);
                 var packageType = GetPackageType(item);
 
                 if (packageType != PackageType.Unknown)
@@ -75,7 +75,7 @@ namespace LCT.ArtifactoryUploader
                     components.JfrogPackageName = GetJfrogPackageName(components);
                     components.JfrogRepoPath = GetJfrogRepPath(components);
                     componentsToBeUploaded.Add(components);
-                    Logger.Debug($"GetComponentsToBeUploadedToArtifactory():Component identified as unknown package type,name-{item.Name},version-{item.Version}");
+                    Logger.DebugFormat("GetComponentsToBeUploadedToArtifactory(): Component identified as unknown package type, name-{0}, version-{1}", item.Name, item.Version);
                 }
                 else
                 {
@@ -603,7 +603,7 @@ namespace LCT.ArtifactoryUploader
                         .Find(p => p.Name == propertyName)?
                         .Value?
                         .ToUpperInvariant();
-            Logger.Debug($"GetPackageType(): Determining package type for Component - Name: {item.Name}, Version: {item.Version}");
+            Logger.DebugFormat("GetPackageType(): Determining package type for Component - Name: {0}, Version: {1}", item.Name, item.Version);
             if (GetPropertyValue(Dataconstant.Cdx_ClearingState) == "APPROVED")
             {
                 Logger.Debug($"GetPackageType(): Package type determined as Clearing state is APPROVED");

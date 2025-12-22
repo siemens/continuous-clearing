@@ -55,11 +55,11 @@ namespace ArtifactoryUploader
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
             Log4Net.AppendVerboseValue(appSettings);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
+            string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Uploader);
             string bomFilePath = GetBomFilePath(appSettings);
-            Logger.Debug($"Main():Identified bom file with path:{bomFilePath}");
+            Logger.DebugFormat("Main(): Identified bom file with path: {0}", bomFilePath);
             LoggerHelper.SpectreConsoleInitialMessage("Artifactory Uploader");
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Uploader, bomFilePath: bomFilePath);
