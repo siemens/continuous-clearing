@@ -261,7 +261,7 @@ namespace LCT.ArtifactoryUploader
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
-                    Logger.DebugFormat("PackageUploadToArtifactory():{0} and {1}  contains Source repository:{3} and Destination Repository:{4} ,So now started upload package process .", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
+                    Logger.DebugFormat("PackageUploadToArtifactory():{0} and {1}  contains Source repository:{2} and Destination Repository:{3} ,So now started upload package process .", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
                     await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
                 }
                 else
