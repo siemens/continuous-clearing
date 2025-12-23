@@ -38,6 +38,7 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        private const string ParsePackageConfigMethod = "ParsePackageConfig()";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
@@ -109,14 +110,14 @@ namespace LCT.PackageIdentifier
                     if (idAttribute?.Value == null)
                     {
                         Logger.Error($"\t{packagesFilePath}: ID attribute not found.");
-                        LogHandlingHelper.BasicErrorHandling("Missing ID Attribute", "ParsePackageConfig()", $"ID attribute not found in file: {packagesFilePath}", $"Identify ID attribute in this file:{packagesFilePath}");
+                        LogHandlingHelper.BasicErrorHandling("Missing ID Attribute", ParsePackageConfigMethod, $"ID attribute not found in file: {packagesFilePath}", $"Identify ID attribute in this file:{packagesFilePath}");
                         continue;
                     }
 
                     if (versionAttribute?.Value == null)
                     {
                         Logger.Error($"\t{packagesFilePath}: ID: '{idAttribute.Value}' version attribute not found.");
-                        LogHandlingHelper.BasicErrorHandling("Missing Version Attribute", "ParsePackageConfig()", $"Version attribute not found for ID: '{idAttribute.Value}' in file: {packagesFilePath}", $"Identify version attribute in this file:{packagesFilePath}");
+                        LogHandlingHelper.BasicErrorHandling("Missing Version Attribute", ParsePackageConfigMethod, $"Version attribute not found for ID: '{idAttribute.Value}' in file: {packagesFilePath}", $"Identify version attribute in this file:{packagesFilePath}");
                         continue;
                     }
                     NugetPackage package = new NugetPackage()
@@ -131,12 +132,12 @@ namespace LCT.PackageIdentifier
             }
             catch (IOException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("IOException", "ParsePackageConfig()", ex, $"File Path: {packagesFilePath}");
+                LogHandlingHelper.ExceptionErrorHandling("IOException", ParsePackageConfigMethod, ex, $"File Path: {packagesFilePath}");
                 Logger.Error($"IOException occurred while parsing the package file: {packagesFilePath}. Details: {ex.Message}");
             }
             catch (XmlSyntaxException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("XmlSyntaxException", "ParsePackageConfig()", ex, $"File Path: {packagesFilePath}");
+                LogHandlingHelper.ExceptionErrorHandling("XmlSyntaxException", ParsePackageConfigMethod, ex, $"File Path: {packagesFilePath}");
                 Logger.Error($"XML syntax error occurred while parsing the package file: {packagesFilePath}. Details: {ex.Message}");
             }
             return nugetPackages;

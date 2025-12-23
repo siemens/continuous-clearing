@@ -873,18 +873,18 @@ namespace LCT.SW360PackageCreator
             {
                 URL = $"{CommonAppSettings.PyPiURL}{componentName}" +
                     $"{Dataconstant.ForwardSlash}{componenVersion}{Dataconstant.ForwardSlash}json";
-                await LogHandlingHelper.HttpRequestHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", httpClient, URL);
+                await LogHandlingHelper.HttpRequestHandling("Request For source url", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", httpClient, URL);
                 var response = await httpClient.GetStringAsync(URL);
-                LogHandlingHelper.HttpResponseOfStringContent("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", response);
+                LogHandlingHelper.HttpResponseOfStringContent("Response from source url", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", response);
                 return response.ToString();
             }
             catch (HttpRequestException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", ex, "An HTTP request error occurred while trying to fetch the response from PyPi.");
+                LogHandlingHelper.ExceptionErrorHandling("HttpRequestException for while getting source url", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", ex, "An HTTP request error occurred while trying to fetch the response from PyPi.");
             }
             catch (TaskCanceledException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("GetResponseFromPyPiOrg", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", ex, "The request to PyPi was canceled, possibly due to a timeout.");
+                LogHandlingHelper.ExceptionErrorHandling("TaskCanceledException for while getting source url", $"MethodName:GetResponseFromPyPiOrg(), ComponentName: {componentName}, Version: {componenVersion}", ex, "The request to PyPi was canceled, possibly due to a timeout.");
             }
             return result;
         }

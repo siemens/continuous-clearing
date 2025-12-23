@@ -86,13 +86,13 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 sw360components.isComponentExist = false;
-                LogHandlingHelper.ExceptionErrorHandling("GetReleaseDataByExternalId", $"MethodName:GetComponentDataByExternalId(), ComponentName:{componentName}, componentExternalId:{componentExternalId}", ex, "An HTTP request error occurred while trying to fetch release data. ");
+                LogHandlingHelper.ExceptionErrorHandling("Exception while getting Component Data By ExternalId", $"MethodName:GetComponentDataByExternalId(), ComponentName:{componentName}, componentExternalId:{componentExternalId}", ex, "An HTTP request error occurred while trying to fetch release data. ");
                 Logger.Error($"GetComponentDataByExternalId():", ex);
             }
             catch (AggregateException ex)
             {
                 sw360components.isComponentExist = false;
-                LogHandlingHelper.ExceptionErrorHandling("GetComponentDataByExternalId", $"MethodName:GetComponentDataByExternalId(), ComponentName:{componentName}, componentExternalId:{componentExternalId}", ex, "Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
+                LogHandlingHelper.ExceptionErrorHandling("AggregateException while getting Component Data By ExternalId", $"MethodName:GetComponentDataByExternalId(), ComponentName:{componentName}, componentExternalId:{componentExternalId}", ex, "Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
                 Logger.Error($"GetComponentDataByExternalId():", ex);
             }
 
@@ -160,17 +160,17 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 releasestatus.isReleaseExist = false;
-                LogHandlingHelper.ExceptionErrorHandling("GetReleaseDataByExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "An HTTP request error occurred while trying to fetch release data.");
+                LogHandlingHelper.ExceptionErrorHandling("Exception while getting Release Data By ExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "An HTTP request error occurred while trying to fetch release data.");
                 Logger.Error($"GetReleaseDataByExternalId():", ex);
             }
             catch (AggregateException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("GetReleaseDataByExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
+                LogHandlingHelper.ExceptionErrorHandling("AggregateException while getting Component Data By ExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
                 Logger.Error($"GetReleaseDataByExternalId():", ex);
             }
             catch (JsonReaderException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("GetReleaseDataByExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "A JSON parsing error occurred while deserializing the response. Ensure the response format is correct and matches the expected structure.");
+                LogHandlingHelper.ExceptionErrorHandling("JsonReaderException while getting Component Data By ExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "A JSON parsing error occurred while deserializing the response. Ensure the response format is correct and matches the expected structure.");
                 Logger.Error($"GetReleaseDataByExternalId():JsonReaderException", ex);
             }
 

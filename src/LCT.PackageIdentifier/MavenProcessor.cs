@@ -23,6 +23,7 @@ namespace LCT.PackageIdentifier
 {
     public class MavenProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
+        private const string FalseString = "false";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
@@ -112,7 +113,7 @@ namespace LCT.PackageIdentifier
             if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
-                Logger.Debug($"No components were found in the file: {filePath}");
+                Logger.DebugFormat("No components were found in the file: {0}", filePath);
                 return;
             }
             // Build the table
@@ -125,7 +126,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var component in components)
             {
-                string devDependent = component.Properties?.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value ?? "false";
+                string devDependent = component.Properties?.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment)?.Value ?? FalseString;
                 logBuilder.AppendLine($"| {component.Name,-40} | {component.Version,-40} | {component.Purl,-100} | {devDependent,-15} |");
             }
 
@@ -266,11 +267,11 @@ namespace LCT.PackageIdentifier
                 //check to see if the second list is empty(which means customer has only provided one bom file)no dev dependency will be identified here
                 if (checkBOM.Count == 0)
                 {
-                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                    SetPropertiesforBOM(ref ListOfComponents, item, FalseString);
                 }
                 else if (checkBOM.Exists(x => x.Name == item.Name && x.Version == item.Version)) //check t see if both list has common elements
                 {
-                    SetPropertiesforBOM(ref ListOfComponents, item, "false");
+                    SetPropertiesforBOM(ref ListOfComponents, item, FalseString);
                 }
                 else //incase one list has a component not present in another then it will be marked as Dev
                 {

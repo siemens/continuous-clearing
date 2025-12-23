@@ -24,6 +24,8 @@ namespace LCT.PackageIdentifier
     public static class FolderScanner
     {
 
+        private const string FileScanningContext = "File Scanning";
+        private const string FileScannerMethod = "FileScanner()";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static List<string> FileScanner(string rootPath, Config config, IEnvironmentHelper environmentHelper)
         {
@@ -51,21 +53,21 @@ namespace LCT.PackageIdentifier
         {
             if (config?.Include == null && config?.Exclude == null)
             {
-                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", "Inclusion/Exclusion list is not provided. Unable to identify the files.", "Please check if you have provided a valid settings file with inclusion/exclusion patterns.");
+                LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, "Inclusion/Exclusion list is not provided. Unable to identify the files.", "Please check if you have provided a valid settings file with inclusion/exclusion patterns.");
                 Logger.Error($"Inlude:{config?.Include} or Exclude:{config?.Exclude} in config is found to be empty,Inclusion/Exclusion list is not provided!!Unable to identify the files\nPlease check if you have given a valid settings file");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (string.IsNullOrWhiteSpace(rootPath))
             {
-                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"No root path provided at{nameof(rootPath)} - {rootPath}.", "Provide a valid input file path.");
+                LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, $"No root path provided at{nameof(rootPath)} - {rootPath}.", "Provide a valid input file path.");
                 Logger.Error($"Invalid value for the {nameof(rootPath)} - {rootPath},No root path given.Provide a valid input file path");
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (!System.IO.Directory.Exists(rootPath))
             {
-                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"Root path does not exist at {rootPath}.", "Provide a valid path.");
+                LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, $"Root path does not exist at {rootPath}.", "Provide a valid path.");
                 Logger.Error($"The {nameof(rootPath)}  is not found at this path - {rootPath},Root path does not exist.Provide a valid  path");
                 environmentHelper.CallEnvironmentExit(-1);
             }
@@ -88,14 +90,14 @@ namespace LCT.PackageIdentifier
             catch (ArgumentNullException ex)
             {
                 Logger.Error($"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}': {ex.Message}");
-                LogHandlingHelper.BasicErrorHandling("File Scanning", "FileScanner()", $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.", "Check the input path and inclusion patterns.");
+                LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.", "Check the input path and inclusion patterns.");
                 throw;
             }
         }
 
         private static void HandleNoValidFilesFound(IEnvironmentHelper environmentHelper)
         {
-            LogHandlingHelper.BasicErrorHandling("File scanning failed due to no valid input files found.", "FileScanner()", $"The provided package file path does not contain any valid input files. Please check the input path and inclusion/exclusion patterns.", "Provide valid input files");
+            LogHandlingHelper.BasicErrorHandling("File scanning failed due to no valid input files found.", FileScannerMethod, $"The provided package file path does not contain any valid input files. Please check the input path and inclusion/exclusion patterns.", "Provide valid input files");
             Logger.Error("Provided package file path does not contain valid input files.");
             environmentHelper.CallEnvironmentExit(-1);
         }

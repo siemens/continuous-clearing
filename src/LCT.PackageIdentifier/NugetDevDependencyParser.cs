@@ -29,6 +29,8 @@ namespace LCT.PackageIdentifier
     public class NugetDevDependencyParser
     {
         private static NugetDevDependencyParser instance = null;
+        private const string EvaluateTestProjectContext = "Evaluate Test Project";
+        private const string IsTestProjectMethod = "IsTestProject()";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly List<string> s_nugetDirectDependencies = new List<string>();
@@ -96,31 +98,31 @@ namespace LCT.PackageIdentifier
             }
             catch (InvalidProjectFileException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
+                LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Failed to read project file, evaluation fails for : " + projectPath);
                 return false;
             }
             catch (InvalidOperationException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
+                LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Failed to read project file, Maybe there is already an equivalent project loaded in the project collection " + projectPath);
                 return false;
             }
             catch (MissingFieldException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
+                LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Unable to read project file : " + projectPath);
                 return false;
             }
             catch (ArgumentException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
+                LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Unable to read project file : " + projectPath);
                 return false;
             }
             catch (IOException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Evaluate Test Project", "IsTestProject()", ex, $"Failed to read project file: {projectPath}");
+                LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
                 Logger.Warn($"Unable to read project file : " + projectPath);
                 return false;
             }

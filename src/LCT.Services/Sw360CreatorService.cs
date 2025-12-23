@@ -316,7 +316,7 @@ namespace LCT.Services
                 await LogHandlingHelper.HttpResponseHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", response);
                 if (!response.IsSuccessStatusCode)
                 {
-                    await LogHandlingHelper.HttpResponseErrorHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", response, "");
+                    await LogHandlingHelper.HttpResponseErrorHandling("Error occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", response, "");
                     Environment.ExitCode = -1;
                     Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
                     return false;
@@ -325,14 +325,14 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An HTTP request error occurred while linking releases to the project.");
+                LogHandlingHelper.ExceptionErrorHandling("HttpRequestException occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An HTTP request error occurred while linking releases to the project.");
                 Logger.Error($"LinkReleasesToProject():", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An aggregate exception occurred while linking releases to the project.");
+                LogHandlingHelper.ExceptionErrorHandling("AggregateException occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An aggregate exception occurred while linking releases to the project.");
                 Logger.Error($"LinkReleasesToProject():", ex);
                 Environment.ExitCode = -1;
                 return false;

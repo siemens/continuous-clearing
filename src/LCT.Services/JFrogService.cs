@@ -40,7 +40,7 @@ namespace LCT.Services
             try
             {
                 httpResponseMessage = await apiCall(repoName);
-                await LogHandlingHelper.HttpResponseHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", httpResponseMessage);
+                await LogHandlingHelper.HttpResponseHandling("Response of component data", $"MethodName:GetInternalComponentDataByRepo()", httpResponseMessage);
                 if (httpResponseMessage == null || !httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new List<AqlResult>();
@@ -52,15 +52,15 @@ namespace LCT.Services
             }
             catch (HttpRequestException httpException)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", httpException, "Check the JFrog server details ");
+                LogHandlingHelper.ExceptionErrorHandling("HttpRequestException getting component data from repo", $"MethodName:GetInternalComponentDataByRepo()", httpException, "Check the JFrog server details ");
             }
             catch (InvalidOperationException invalidOperationExcep)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo(", invalidOperationExcep, "An invalid operation occurred while processing the request.");
+                LogHandlingHelper.ExceptionErrorHandling("InvalidOperationException getting component data from repo", $"MethodName:GetInternalComponentDataByRepo(", invalidOperationExcep, "An invalid operation occurred while processing the request.");
             }
             catch (TaskCanceledException taskCancelledException)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Get component data by repo", $"MethodName:GetInternalComponentDataByRepo()", taskCancelledException, "The request was canceled. This could be due to a timeout.");
+                LogHandlingHelper.ExceptionErrorHandling("TaskCanceledException getting component data from repo", $"MethodName:GetInternalComponentDataByRepo()", taskCancelledException, "The request was canceled. This could be due to a timeout.");
             }
 
             return aqlResult;
