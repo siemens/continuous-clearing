@@ -51,7 +51,7 @@ namespace LCT.PackageIdentifier
         private bool isSelfContainedProject = false;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private RuntimeInfo runtimeInfo = new();
-        private List<Component> listOfInternalComponents = new List<Component>();
+        private static List<Component> listOfInternalComponents = new List<Component>();
         private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         #region public methods
         public virtual Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)

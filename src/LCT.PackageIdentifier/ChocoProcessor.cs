@@ -24,7 +24,7 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-
+        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         /// <summary>
         /// Parses package configuration files from the specified input folder and generates a Bill of Materials (BOM).
         /// </summary>
@@ -39,7 +39,7 @@ namespace LCT.PackageIdentifier
         /// files.</returns>
         public override Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco,environmentHelper);
             List<Component> chocoComponents = new();
             List<NugetPackage> nugetPackages = new();
             Bom bom = new();
