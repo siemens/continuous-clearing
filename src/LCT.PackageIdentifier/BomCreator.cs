@@ -37,6 +37,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomCreator : IBomCreator
     {
+        private const string JFrogConnValidationContext = "JFrog Connection Validation";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
@@ -66,7 +67,7 @@ namespace LCT.PackageIdentifier
                                       ProjectReleases projectReleases,
                                        CatoolInfo caToolInformation)
         {
-            Logger.Debug($"GenerateBom():SBOM generation process has started.");
+            Logger.Debug("GenerateBom():SBOM generation process has started.");
             Bom listOfComponentsToBom;
             jfrog = appSettings.Jfrog;
             sw360 = appSettings.SW360;
@@ -103,10 +104,10 @@ namespace LCT.PackageIdentifier
             Program.BomStopWatch?.Stop();
             bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
                 (int)Program.BomStopWatch.Elapsed.TotalSeconds;
-            Logger.Debug($"GenerateBom(): Starting to write KPI data to the output folder - {appSettings.Directory.OutputFolder}");
+            Logger.DebugFormat("GenerateBom(): Starting to write KPI data to the output folder - {0}", appSettings.Directory.OutputFolder);
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
                 FileConstant.BomKpiDataFileName, defaultProjectName);
-            Logger.Debug($"GenerateBom(): Successfully wrote KPI data to the output folder - {appSettings.Directory.OutputFolder}.\n");
+            Logger.DebugFormat("GenerateBom(): Successfully wrote KPI data to the output folder - {0}.\n", appSettings.Directory.OutputFolder);
             if (appSettings.SW360 != null)
             {
                 // Writes Project Summary Url on CLI
@@ -261,24 +262,24 @@ namespace LCT.PackageIdentifier
                 {
                     if (response.IsSuccessStatusCode)
                     {
-                        await LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection()", response, "");
+                        await LogHandlingHelper.HttpResponseHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "");
                         Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
                         LoggerHelper.JfrogConnectionInfoDisplayForCli();
                         return true;
                     }
                     else if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
-                        await LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection()", response, "Check the JFrog server details or token validity.");
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "Check the JFrog server details or token validity.");
                         Logger.Error($"Check the JFrog token validity/permission..");
                     }
                     else if (response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection()", response, "Check the JFrog server details .");
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "Check the JFrog server details .");
                         Logger.Error($"Check the provided JFrog server details..");
                     }
                     else
                     {
-                        await LogHandlingHelper.HttpResponseErrorHandling("JFrog Connection Validation", $"Methodname:CheckJFrogConnection()", response, "");
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "");
                         Logger.Error($"JFrog Connection was not successfull check the server status.");
                     }
                 }

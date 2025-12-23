@@ -34,7 +34,7 @@ namespace LCT.Common
                 {
                     bom.Components.Remove(component);
                     listUnsupportedComponents.Add(component);
-                    Logger.Debug($"CheckValidComponentsFromSpdxfile():Name:{component.Name},Version:{component.Version},Purl:{component.Purl} identified as a unsupported component");
+                    Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Name:{0},Version:{1},Purl:{2} identified as a unsupported component", component.Name, component.Version, component.Purl);
                 }
             }
             foreach (var dependency in bom.Dependencies.ToList())
@@ -48,8 +48,8 @@ namespace LCT.Common
             }
             listOfUnsupportedComponents.Components.AddRange(listUnsupportedComponents);
             listOfUnsupportedComponents.Dependencies.AddRange(listUnsupportedDependencies);
-            Logger.Debug($"CheckValidComponentsFromSpdxfile():Total identified unsupported Components:{listUnsupportedComponents.Count}");
-            Logger.Debug($"CheckValidComponentsFromSpdxfile():Total identified unsupported Dependencies:{listUnsupportedDependencies.Count}");
+            Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Total identified unsupported Components:{0}", listUnsupportedComponents.Count);
+            Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Total identified unsupported Dependencies:{0}", listUnsupportedDependencies.Count);
             Logger.Debug("CheckValidComponentsFromSpdxfile():Completed the Supported and unsupported packages from spdx input files");
         }
         public static void AddSpdxPropertysForUnsupportedComponents(List<Component> UnsupportedComponentList, string filePath)

@@ -43,12 +43,16 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.ExceptionErrorHandling(context, details, ex, additionalDetails);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("TestContext") &&
-                log.Contains("TestDetails") &&
-                log.Contains("TestException") &&
-                log.Contains("AdditionalTestDetails"))), Times.Once);
+            // Assert: verify DebugFormat(format, arg0, arg1) and inspect the second argument (built log)
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "{0}{1}"),
+                It.IsAny<object>(),
+                It.Is<string>(built =>
+                    built.Contains("TestContext") &&
+                    built.Contains("TestDetails") &&
+                    built.Contains("TestException") &&
+                    built.Contains("AdditionalTestDetails")
+                )), Times.Once);
         }
         [Test]
         public void ExceptionErrorHandling_ShouldLogInnerExceptionDetails()
@@ -65,14 +69,18 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.ExceptionErrorHandling(context, details, exception, additionalDetails);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("TestContext") &&
-                log.Contains("TestDetails") &&
-                log.Contains("AdditionalTestDetails") &&
-                log.Contains("OuterExceptionMessage") &&
-                log.Contains("InnerExceptionMessage") &&
-                log.Contains("INNER EXCEPTION DETAILS"))), Times.Once);
+            // Assert: verify DebugFormat(format, arg0, arg1) and inspect the second argument (built log)
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "{0}{1}"),
+                It.IsAny<object>(),
+                It.Is<string>(built =>
+                    built.Contains("TestContext") &&
+                    built.Contains("TestDetails") &&
+                    built.Contains("AdditionalTestDetails") &&
+                    built.Contains("OuterExceptionMessage") &&
+                    built.Contains("InnerExceptionMessage") &&
+                    built.Contains("INNER EXCEPTION DETAILS")
+                )), Times.Once);
         }
         [Test]
         public void BasicErrorHandling_ShouldLogBasicErrorDetails()
@@ -86,12 +94,16 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.BasicErrorHandling(context, details, message, additional);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("TestContext") &&
-                log.Contains("TestDetails") &&
-                log.Contains("TestMessage") &&
-                log.Contains("TestAdditional"))), Times.Once);
+            // Assert: verify DebugFormat(format, arg0, arg1) and inspect built log
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "{0}{1}"),
+                It.IsAny<object>(),
+                It.Is<string>(built =>
+                    built.Contains("TestContext") &&
+                    built.Contains("TestDetails") &&
+                    built.Contains("TestMessage") &&
+                    built.Contains("TestAdditional")
+                )), Times.Once);
         }
 
         [Test]
@@ -375,17 +387,21 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("COMPONENTS FOUND IN FILE: test-file.json") &&
-                log.Contains("Component1") &&
-                log.Contains("1.0.0") &&
-                log.Contains("pkg:example/component1@1.0.0") &&
-                log.Contains("true") &&
-                log.Contains("Component2") &&
-                log.Contains("2.0.0") &&
-                log.Contains("pkg:example/component2@2.0.0") &&
-                log.Contains("false"))), Times.Once);
+            // Assert: method logs table via DebugFormat with leading newline
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "{0}{1}"),
+                It.IsAny<object>(),
+                It.Is<string>(built =>
+                    built.Contains("COMPONENTS FOUND IN FILE: test-file.json") &&
+                    built.Contains("Component1") &&
+                    built.Contains("1.0.0") &&
+                    built.Contains("pkg:example/component1@1.0.0") &&
+                    built.Contains("true") &&
+                    built.Contains("Component2") &&
+                    built.Contains("2.0.0") &&
+                    built.Contains("pkg:example/component2@2.0.0") &&
+                    built.Contains("false")
+                )), Times.Once);
         }
 
         [Test]
@@ -398,9 +414,11 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("No components were found in the file: test-file.json"))), Times.Once);
+            // Assert: method uses DebugFormat(format, arg0)
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "No components were found in the file: {0}"),
+                It.Is<object>(arg0 => arg0 != null && arg0.ToString() == filepath)
+            ), Times.Once);
         }
 
         [Test]
@@ -414,8 +432,10 @@ namespace LCT.Common.UTest
             LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
             // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("No components were found in the file: test-file.json"))), Times.Once);
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "No components were found in the file: {0}"),
+                It.Is<object>(arg0 => arg0 != null && arg0.ToString() == filepath)
+            ), Times.Once);
         }
 
         [Test]
@@ -437,13 +457,17 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("COMPONENTS FOUND IN FILE: test-file.json") &&
-                log.Contains("Component1") &&
-                log.Contains("1.0.0") &&
-                log.Contains("pkg:example/component1@1.0.0") &&
-                log.Contains("false"))), Times.Once);
+            // Assert: method logs table via DebugFormat with leading newline
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "{0}{1}"),
+                It.IsAny<object>(),
+                It.Is<string>(built =>
+                    built.Contains("COMPONENTS FOUND IN FILE: test-file.json") &&
+                    built.Contains("Component1") &&
+                    built.Contains("1.0.0") &&
+                    built.Contains("pkg:example/component1@1.0.0") &&
+                    built.Contains("false")
+                )), Times.Once);
         }
         [Test]
         public void ComponentsList_ShouldLogTableWithComponents()
@@ -490,9 +514,11 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.ComponentsList(filepath, components);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Debug(It.Is<string>(log =>
-                log.Contains("No components were found in the file: test-file.json"))), Times.Once);
+            // Assert: method uses DebugFormat(format, arg0)
+            _mockLogger.Verify(logger => logger.DebugFormat(
+                It.Is<string>(fmt => fmt == "No components were found in the file: {0}"),
+                It.Is<object>(arg0 => arg0 != null && arg0.ToString() == filepath)
+            ), Times.Once);
         }
 
         [Test]
@@ -708,9 +734,11 @@ namespace LCT.Common.UTest
             // Act
             LogHandlingHelper.ListOfBomFileComponents(bomFilePath, components);
 
-            // Assert
-            _mockLogger.Verify(logger => logger.Warn(It.Is<string>(log =>
-                log.Contains("No components found in the BOM file: test-bom.json"))), Times.Once);
+            // Assert: method uses WarnFormat("No components found in the BOM file: {0}", bomFilePath)
+            _mockLogger.Verify(logger => logger.WarnFormat(
+                It.Is<string>(fmt => fmt == "No components found in the BOM file: {0}"),
+                It.Is<object>(arg0 => arg0 != null && arg0.ToString() == bomFilePath)
+            ), Times.Once);
         }
         [Test]
         public void HttpResponseOfStringContent_ShouldLogResponseBody()

@@ -36,7 +36,7 @@ namespace LCT.Common
             if (args != null)
             {
                 string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
-                Logger.Debug($"ReadConfiguration():Commandline arguments: {string.Join(" ", maskedArgs)}");
+                Logger.DebugFormat("ReadConfiguration():Commandline arguments: {0}", string.Join(" ", maskedArgs));
             }
             if (args?.Length == 0)
             {
@@ -190,7 +190,7 @@ namespace LCT.Common
         private static void CheckForMissingParameter(CommonAppSettings appSettings, List<string> reqParameters)
         {
             StringBuilder missingParameters = new StringBuilder();
-            Logger.Debug($"CheckForMissingParameter(): Required Parameters: {string.Join(", ", reqParameters)}");
+            Logger.DebugFormat("CheckForMissingParameter(): Required Parameters: {0}", string.Join(", ", reqParameters));
             foreach (string key in reqParameters)
             {
                 object currentObject = GetNestedPropertyValue(appSettings, key);
@@ -203,7 +203,7 @@ namespace LCT.Common
 
             if (missingParameters.Length > 0)
             {
-                Logger.Debug($"HandleMissingParameters(): Missing Parameters: {missingParameters.ToString().Trim()}");
+                Logger.DebugFormat("HandleMissingParameters(): Missing Parameters: {0}", missingParameters.ToString().Trim());
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
             }

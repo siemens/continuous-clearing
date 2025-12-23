@@ -26,6 +26,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
+        private const string ProjectTypeAlpine = "ALPINE";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
@@ -46,7 +47,7 @@ namespace LCT.PackageIdentifier
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Logger.Debug($"ParsePackageFile():Template file detected: {filepath}");
+                    Logger.DebugFormat("ParsePackageFile():Template file detected: {0}", filepath);
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
                 else
@@ -131,7 +132,7 @@ namespace LCT.PackageIdentifier
                 };
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[ProjectTypeAlpine]))
                 {
 
                     alpinePackages.Add(package);
@@ -152,7 +153,7 @@ namespace LCT.PackageIdentifier
         }
         private static string GetReleaseExternalId(string name, string version)
         {
-            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()["ALPINE"]);
+            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()[ProjectTypeAlpine]);
         }
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
@@ -186,7 +187,7 @@ namespace LCT.PackageIdentifier
                     Version = prop.Version
                 };
                 component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
-                component.BomRef = string.IsNullOrEmpty(distro) ? $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}" : $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
+                component.BomRef = string.IsNullOrEmpty(distro) ? $"{Dataconstant.PurlCheck()[ProjectTypeAlpine]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}" : $"{Dataconstant.PurlCheck()[ProjectTypeAlpine]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
                 component.Type = Component.Classification.Library;
                 AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);

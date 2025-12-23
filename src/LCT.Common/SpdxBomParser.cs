@@ -24,7 +24,7 @@ namespace LCT.Common
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public Bom ParseSPDXBom(string filePath)
         {
-            Logger.Debug($"ParseSPDXBom():Starting SPDX BOM parsing for file: {filePath}");
+            Logger.DebugFormat("ParseSPDXBom():Starting SPDX BOM parsing for file: {0}", filePath);
             Bom bom = new Bom();
             bom.Components = new List<Component>();
             bom.Dependencies = new List<Dependency>();
@@ -106,7 +106,7 @@ namespace LCT.Common
             CleanupComponentManufacturerData(components);
             bom.Components = components;
             bom.Dependencies = dependencies;
-            Logger.Debug($"SBOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
+            Logger.DebugFormat("SBOM conversion completed. Components: {0}, Dependencies: {1}", components.Count, dependencies.Count);
         }
         private static void AddDevelopmentPropertyToComponents(List<Component> components, IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
         {
@@ -149,8 +149,8 @@ namespace LCT.Common
                     componentIndex[package.SPDXID] = component;
                 }
             }
-            Logger.Debug($"ProcessSpdxPackages():Total components identified :{components.Count}.");
-            Logger.Debug($"ProcessSpdxPackages():Package processing completed.");
+            Logger.DebugFormat("ProcessSpdxPackages():Total components identified :{0}.", components.Count);
+            Logger.Debug("ProcessSpdxPackages():Package processing completed.");
             return (components, componentIndex);
         }
 
@@ -209,7 +209,7 @@ namespace LCT.Common
             var dependencyMap = BuildDependencyMap(relationships, componentIndex, supportedRelationshipTypes);
             AddDevelopmentPropertyToComponents(componentIndex.Values.ToList(), relationships, componentIndex);
             var cycloneDxDependencies = ConvertDependencyMapToCycloneDx(dependencyMap);
-            Logger.Debug($"ProcessSpdxRelationships(): Converted dependency map to CycloneDX format with {cycloneDxDependencies.Count} dependencies.");
+            Logger.DebugFormat("ProcessSpdxRelationships(): Converted dependency map to CycloneDX format with {0} dependencies.", cycloneDxDependencies.Count);
             Logger.Debug("ProcessSpdxRelationships(): SPDX relationships processing completed.");
             return cycloneDxDependencies;
         }
@@ -240,7 +240,7 @@ namespace LCT.Common
                 var (dependentRef, dependencyRef) = GetDependencyRefs(relationship, componentIndex);
                 if (string.IsNullOrEmpty(dependentRef) || string.IsNullOrEmpty(dependencyRef))
                     continue;
-                Logger.Debug($"BuildDependencyMap(): Adding relationship to dependency map: DependentRef={dependentRef}, DependencyRef={dependencyRef}, Type={relationship.RelationshipType}");
+                Logger.DebugFormat("BuildDependencyMap(): Adding relationship to dependency map: DependentRef={0}, DependencyRef={1}, Type={2}", dependentRef, dependencyRef, relationship.RelationshipType);
                 AddToDependencyMap(dependencyMap, dependentRef, dependencyRef, relationship.RelationshipType);
             }
 
@@ -256,13 +256,13 @@ namespace LCT.Common
 
         private static (string dependentRef, string dependencyRef) GetDependencyRefs(Relationship relationship, Dictionary<string, Component> componentIndex)
         {
-            Logger.Debug($"GetDependencyRefs(): Resolving dependency references for relationship: {relationship.SpdxElementId} -> {relationship.RelatedSpdxElement}");
+            Logger.DebugFormat("GetDependencyRefs(): Resolving dependency references for relationship: {0} -> {1}", relationship.SpdxElementId, relationship.RelatedSpdxElement);
             var parentComponent = componentIndex[relationship.SpdxElementId];
             var childComponent = componentIndex[relationship.RelatedSpdxElement];
 
             var parentBomRef = parentComponent.Manufacturer.BomRef;
             var childBomRef = childComponent.Manufacturer.BomRef;
-            Logger.Debug($"GetDependencyRefs(): Resolved dependency references for relationship: ParentBomRef={parentBomRef}, ChildBomRef={childBomRef}");
+            Logger.DebugFormat("GetDependencyRefs(): Resolved dependency references for relationship: ParentBomRef={0}, ChildBomRef={1}", parentBomRef, childBomRef);
             // For DEPENDENCY_OF, DEV_DEPENDENCY_OF, RUNTIME_DEPENDENCY_OF
             // A DEPENDENCY_OF B means A is a dependency of B
             // So B depends on A, meaning B (child) depends on A (parent)
@@ -279,7 +279,7 @@ namespace LCT.Common
             {
                 dependencies = new List<(string bomRef, string relationshipType)>();
                 dependencyMap[dependentRef] = dependencies;
-                Logger.Debug($"AddToDependencyMap(): Created new dependency list for DependentRef={dependentRef}");
+                Logger.DebugFormat("AddToDependencyMap(): Created new dependency list for DependentRef={0}", dependentRef);
             }
 
             if (!dependencies.Any(d => d.bomRef == dependencyRef))

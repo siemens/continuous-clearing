@@ -282,7 +282,7 @@ namespace LCT.PackageIdentifier
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                Logger.Debug($"ParseBomFile():Spdx file detected: {filePath}");
+                Logger.DebugFormat("ParseBomFile():Spdx file detected: {0}", filePath);
                 Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
                 LogHandlingHelper.IdentifierInputFileComponents(filePath, bom.Components);
@@ -292,7 +292,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Debug($"ParseBomFile():CycloneDX file detected: {filePath}");
+                Logger.DebugFormat("ParseBomFile():CycloneDX file detected: {0}", filePath);
                 Bom bom;
                 bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
                 LogHandlingHelper.IdentifierInputFileComponents(filePath, bom.Components);

@@ -39,7 +39,7 @@ namespace LCT.Common
 
                 CopyAll(diSource, diTarget);
                 isCopied = true;
-                Logger.Debug($"CopyToTargetDirectory(): Successfully copied from '{sourceDirectory}' to '{targetDirectory}'.");
+                Logger.DebugFormat("CopyToTargetDirectory(): Successfully copied from '{0}' to '{1}'.", sourceDirectory, targetDirectory);
             }
             catch (IOException ex)
             {
@@ -101,7 +101,7 @@ namespace LCT.Common
 
                 ZipFile.CreateFromDirectory(startPath, zipPath);
                 isZiped = true;
-                Logger.Debug($"FolderAction.ZipFileToTargetDirectory(): Successfully zipped directory '{startPath}' to '{zipPath}'.");
+                Logger.DebugFormat("FolderAction.ZipFileToTargetDirectory(): Successfully zipped directory '{0}' to '{1}'.", startPath, zipPath);
             }
             catch (IOException ex)
             {
@@ -128,7 +128,7 @@ namespace LCT.Common
 
         private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
-            Logger.Debug($"FolderAction.CopyAll(): Start copying from '{source.FullName}' to '{target.FullName}'.");
+            Logger.DebugFormat("FolderAction.CopyAll(): Start copying from '{0}' to '{1}'.", source.FullName, target.FullName);            
 
             try
             {
@@ -162,8 +162,8 @@ namespace LCT.Common
             {
                 LogHandlingHelper.ExceptionErrorHandling("Copy Error", $"Failed to copy from '{source.FullName}' to '{target.FullName}'.", ex, "Unauthorized access occurred. Ensure the application has the required permissions to access the directories.");
                 Logger.Error("FolderAction.CopyAll():", ex);
-            }
-            Logger.Debug($"FolderAction.CopyAll(): Finished copying from '{source.FullName}' to '{target.FullName}'.");            
+            }            
+            Logger.DebugFormat("FolderAction.CopyAll(): Finished copying from '{0}' to '{1}'.", source.FullName, target.FullName);
         }
     }
 }

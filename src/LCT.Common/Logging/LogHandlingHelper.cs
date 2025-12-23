@@ -23,6 +23,8 @@ namespace LCT.Common
         public const string LogSeparator = "============================================================================================================================================";
         public const string LogHeaderSeparator = "--------------------------------------------------------------------------------------------------------------------------------------------";
         public const string MaskedValue = "*****";
+        private const string TableMessage = "Details";
+        private const string Version = "Version";
         private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new JsonSerializerOptions
         {
             WriteIndented = true
@@ -36,13 +38,13 @@ namespace LCT.Common
         {
             var logBuilder = new StringBuilder();
             BuildErrorLog(logBuilder, context, details, null, additionalDetails, ex);
-            Logger.Debug("\n" + logBuilder.ToString());
+            Logger.DebugFormat("{0}{1}", Environment.NewLine, logBuilder.ToString());
         }
         public static void BasicErrorHandling(string context, string details, string message, string additional)
         {
             var logBuilder = new StringBuilder();
             BuildErrorLog(logBuilder, context, details, message, additional);
-            Logger.Debug("\n" + logBuilder.ToString());
+            Logger.DebugFormat("{0}{1}", Environment.NewLine, logBuilder.ToString());
         }
         public static async Task HttpResponseHandling(string context, string details, HttpResponseMessage response, string additionalDetails = null)
         {
@@ -195,7 +197,7 @@ namespace LCT.Common
             logBuilder.AppendLine($"| {"Field",-20} | {"Value",-100} |");
             logBuilder.AppendLine(LogHeaderSeparator);
             logBuilder.AppendLine($"| {"Time",-20} | {GetISTTime(),-100} |");
-            logBuilder.AppendLine($"| {"Details",-20} | {details,-100} |");
+            logBuilder.AppendLine($"| {TableMessage,-20} | {details,-100} |");
             logBuilder.AppendLine($"| {"Context",-20} | {context,-100} |");
 
             // Add additional details if available
@@ -204,7 +206,7 @@ namespace LCT.Common
                 logBuilder.AppendLine(LogHeaderSeparator);
                 logBuilder.AppendLine(" ADDITIONAL DETAILS");
                 logBuilder.AppendLine(LogHeaderSeparator);
-                logBuilder.AppendLine($"| {"Details",-20} | {additionalDetails,-100} |");
+                logBuilder.AppendLine($"| {TableMessage,-20} | {additionalDetails,-100} |");
             }
 
             logBuilder.AppendLine(LogHeaderSeparator);
@@ -329,7 +331,7 @@ namespace LCT.Common
             logBuilder.AppendLine($"| {"Field",-20} | {"Value",-100} |");
             logBuilder.AppendLine(LogHeaderSeparator);
             logBuilder.AppendLine($"| {"Time",-20} | {GetISTTime(),-100} |");
-            logBuilder.AppendLine($"| {"Details",-20} | {details,-100} |");
+            logBuilder.AppendLine($"| {TableMessage,-20} | {details,-100} |");
             logBuilder.AppendLine($"| {"Description",-20} | {context,-100} |");
         }
         private static void AppendAdditionalDetails(StringBuilder logBuilder, string additionalDetails)
@@ -369,7 +371,7 @@ namespace LCT.Common
                 logBuilder.AppendLine(LogHeaderSeparator);
                 logBuilder.AppendLine(" ADDITIONAL DETAILS");
                 logBuilder.AppendLine(LogHeaderSeparator);
-                logBuilder.AppendLine($"| {"Details",-20} | {additionalDetails,-100} |");
+                logBuilder.AppendLine($"| {TableMessage,-20} | {additionalDetails,-100} |");
             }
 
             logBuilder.AppendLine($"{LogSeparator}");
@@ -484,7 +486,7 @@ namespace LCT.Common
         {
             if (components == null || components.Count == 0)
             {
-                Logger.Warn($"No components found in the BOM file: {bomFilePath}");
+                Logger.WarnFormat("No components found in the BOM file: {0}", bomFilePath);
                 return;
             }
 
@@ -507,7 +509,7 @@ namespace LCT.Common
             logBuilder.AppendLine($"{LogSeparator}");
 
             // Create the table header
-            logBuilder.Append($"|{"Component Name",-60} |{"Version",-15} | {"PURL",-80} |");
+            logBuilder.Append($"|{"Component Name",-60} |{Version,-15} | {"PURL",-80} |");
             foreach (var simplifiedName in propertyMapping.Values)
             {
                 logBuilder.Append($" {simplifiedName,-45}|");
@@ -590,7 +592,7 @@ namespace LCT.Common
             // Rows
             table.AppendLine($"| {"Name",-45} | {initialItem.Name,-100} | {updatedItem.Name,-100} |");
             table.AppendLine($"| {"Group",-45} | {initialItem.Group,-100} | {updatedItem.Group,-100} |");
-            table.AppendLine($"| {"Version",-45} | {initialItem.Version,-100} | {updatedItem.Version,-100} |");
+            table.AppendLine($"| {Version,-45} | {initialItem.Version,-100} | {updatedItem.Version,-100} |");
             table.AppendLine($"| {"ComponentExternalId",-45} | {initialItem.ComponentExternalId,-100} | {updatedItem.ComponentExternalId,-100} |");
             table.AppendLine($"| {"ReleaseExternalId",-45} | {initialItem.ReleaseExternalId,-100} | {updatedItem.ReleaseExternalId,-100} |");
             table.AppendLine($"| {"PackageUrl",-45} | {initialItem.PackageUrl,-100} | {updatedItem.PackageUrl,-100} |");
@@ -631,7 +633,7 @@ namespace LCT.Common
             logBuilder.AppendLine($"{LogSeparator}");
             logBuilder.AppendLine($" Available SW360 releases data");
             logBuilder.AppendLine($"{LogSeparator}");
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"ReleaseLink",-100} | {"ReleaseExternalId",-100} | {"ComponentExternalId",-100} |");
+            logBuilder.AppendLine($"| {"Name",-40} | {Version,-20} | {"ReleaseLink",-100} | {"ReleaseExternalId",-100} | {"ComponentExternalId",-100} |");
             logBuilder.AppendLine($"{LogHeaderSeparator}");
 
             foreach (var component in components)
@@ -660,7 +662,7 @@ namespace LCT.Common
             logBuilder.AppendLine($"{LogSeparator}");
 
             // Create the table header
-            logBuilder.AppendLine($"| {"Name",-20} | {"Group",-15} | {"Version",-10} | {"ComponentExternalId",-50} | {"ReleaseExternalId",-70} | {"SourceUrl",-100} | {"DownloadUrl",-100} | {"ComponentStatus",-20} | {"ReleaseStatus",-20} | {"ApprovedStatus",-25} | {"IsComponentCreated",-20} | {"IsReleaseCreated",-20} | {"FossologyUploadStatus",-25} | {"ReleaseLink",-150} | {"ReleaseID",-15} | {"AlpineSource",-20} | {"PatchUrls",-100} |");
+            logBuilder.AppendLine($"| {"Name",-20} | {"Group",-15} | {Version,-10} | {"ComponentExternalId",-50} | {"ReleaseExternalId",-70} | {"SourceUrl",-100} | {"DownloadUrl",-100} | {"ComponentStatus",-20} | {"ReleaseStatus",-20} | {"ApprovedStatus",-25} | {"IsComponentCreated",-20} | {"IsReleaseCreated",-20} | {"FossologyUploadStatus",-25} | {"ReleaseLink",-150} | {"ReleaseID",-15} | {"AlpineSource",-20} | {"PatchUrls",-100} |");
             logBuilder.AppendLine(new string('-', 400));
 
             // Add rows for each component
@@ -682,7 +684,7 @@ namespace LCT.Common
             tableBuilder.AppendLine($"\n{LogSeparator}");
             tableBuilder.AppendLine(" Consolidated Component Table");
             tableBuilder.AppendLine($"{LogSeparator}");
-            tableBuilder.AppendLine($"| {"Component Name",-30} | {"Version",-15} | {"Repo Name",-35} | {"Internal Repo",-15} |");
+            tableBuilder.AppendLine($"| {"Component Name",-30} | {Version,-15} | {"Repo Name",-35} | {"Internal Repo",-15} |");
             tableBuilder.AppendLine($"{LogHeaderSeparator}");
 
             foreach (var component in allComponents)
@@ -707,7 +709,7 @@ namespace LCT.Common
             if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
-                Logger.Debug($"No components were found in the file: {filePath}");
+                Logger.DebugFormat("No components were found in the file: {0}", filePath);
                 return;
             }
             // Build the table
@@ -715,7 +717,7 @@ namespace LCT.Common
             logBuilder.AppendLine("\n" + $"{LogSeparator}");
             logBuilder.AppendLine($" COMPONENTS FOUND IN FILE: {filePath}");
             logBuilder.AppendLine($"{LogSeparator}");
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-40} | {"PURL",-100} | {"DevDependent",-15} |");
+            logBuilder.AppendLine($"| {"Name",-40} | {Version,-40} | {"PURL",-100} | {"DevDependent",-15} |");
             logBuilder.AppendLine($"{LogHeaderSeparator}");
 
             foreach (var component in components)
@@ -727,14 +729,14 @@ namespace LCT.Common
             logBuilder.AppendLine($"{LogSeparator}");
 
             // Log the table
-            Logger.Debug("\n" + logBuilder.ToString());
+            Logger.DebugFormat("{0}{1}", Environment.NewLine, logBuilder.ToString());
         }
         public static void ComponentsList(string filePath, List<Component> components)
         {
             if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
-                Logger.Debug($"No components were found in the file: {filePath}");
+                Logger.DebugFormat("No components were found in the file: {0}", filePath);
                 return;
             }
             // Build the table
@@ -742,7 +744,7 @@ namespace LCT.Common
             logBuilder.AppendLine($"{LogSeparator}");
             logBuilder.AppendLine($" Components Foung In File: {filePath}");
             logBuilder.AppendLine($"{LogSeparator}");
-            logBuilder.AppendLine($"| {"Name",-40} | {"Version",-20} | {"PURL",-60} |");
+            logBuilder.AppendLine($"| {"Name",-40} | {Version,-20} | {"PURL",-60} |");
             logBuilder.AppendLine($"{LogHeaderSeparator}");
 
             foreach (var component in components)

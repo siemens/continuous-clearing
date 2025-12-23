@@ -26,6 +26,8 @@ namespace LCT.Common
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string CatoolBomFilePath { get; set; }
         private const string FileOperationsMessage = "File Operations";
+        private const string LogMessage = "Generated FilePath: {0}";
+
         public void ValidateFilePath(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -60,7 +62,7 @@ namespace LCT.Common
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
-                Logger.DebugFormat("Generated FilePath: {0}", filePath);
+                Logger.DebugFormat(LogMessage, filePath);
 
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, jsonString);
@@ -93,7 +95,7 @@ namespace LCT.Common
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = CatoolBomFilePath = Path.Combine(folderPath, fileName);
-                Logger.DebugFormat("Generated FilePath: {0}", filePath);
+                Logger.DebugFormat(LogMessage, filePath);
 
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, dataToWrite.ToString());
@@ -257,7 +259,7 @@ namespace LCT.Common
                 string fileName = $"{name}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
-                Logger.DebugFormat("Generated FilePath: {0}", filePath);
+                Logger.DebugFormat(LogMessage, filePath);
                 File.WriteAllText(filePath, jsonString);
                 Logger.Debug("WriteContentToReportNotApprovedFile():Content successfully written to the file.");
             }
@@ -289,7 +291,7 @@ namespace LCT.Common
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
-                Logger.DebugFormat("Generated FilePath: {0}", filePath);
+                Logger.DebugFormat(LogMessage, filePath);
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, jsonString);
                 Logger.Debug("WriteContentToMultipleVersionsFile():Content successfully written to the file.");
