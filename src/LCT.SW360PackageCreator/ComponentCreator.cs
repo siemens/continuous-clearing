@@ -644,14 +644,14 @@ namespace LCT.SW360PackageCreator
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
-            Logger.Debug(!string.IsNullOrEmpty(uploadId) ? $"GetUploadIdWhenReleaseExists(): UploadId identified from release data. UploadId={uploadId}" : "GetUploadIdWhenReleaseExists(): UploadId not identified from release data.");
+            
             if (releasesInfo.AdditionalData != null &&
                 releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
                 fossologyUrl.Contains(appSettings?.SW360?.Fossology?.URL))
             {
                 item.FossologyLink = fossologyUrl;
                 item.FossologyUploadId = uploadId;
-                Logger.Debug($"GetUploadIdWhenReleaseExists(): FossologyLink identified from releasedata: {item.FossologyLink}");
+                Logger.DebugFormat("GetUploadIdWhenReleaseExists(): FossologyLink identified from releasedata: {0}", item.FossologyLink);
             }
             else if (releasesInfo.AdditionalData == null || !releasesInfo.AdditionalData.ContainsKey(ApiConstant.AdditionalDataFossologyURL))
             {
@@ -716,7 +716,6 @@ namespace LCT.SW360PackageCreator
             else
             {
                 Environment.ExitCode = -1;
-                Logger.FatalFormat("Linking release to the project is failed. Release version - {0} not found under this component - {1}. ", item.Version, item.Name);
                 Logger.ErrorFormat("Linking release to the project is failed. Release version - {0} not found under this component - {1}. ", item.Version, item.Name);
             }
         }

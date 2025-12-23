@@ -44,6 +44,8 @@ namespace LCT.SW360PackageCreator
         public static UrlHelper Instance { get; } = new UrlHelper();
         public CommonAppSettings CommonAppSettings { get; } = new CommonAppSettings();
 
+        private const string SrcUrlFailWarnFormat = "Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url";
+
         private bool _disposed;
 
         /// <summary>
@@ -474,19 +476,19 @@ namespace LCT.SW360PackageCreator
                     else
                     {
                         repositoryUrl = "";
-                        Logger.WarnFormat("Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url", componentName);
+                        Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                     }
                 }
                 else
                 {
-                    Logger.WarnFormat("Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url", componentName);
+                    Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                     Logger.DebugFormat("GetSourceUrlForCargoPackage(): HTTP Status: {0} for URL: {1}", response.StatusCode, downLoadUrl);
                 }
             }
             catch (HttpRequestException ex)
             {
                 Logger.Debug("GetSourceUrlForCargoPackage()", ex);
-                Logger.WarnFormat("Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url", componentName);
+                Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
             }
             return repositoryUrl;
         }
@@ -527,12 +529,12 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.WarnFormat("Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url", componentName);
+                    Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                     LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForConanPackage", $"MethodName:GetSourceUrlForConanPackage(), ComponentName: {componentName}, Version: {componenVersion}, URL: {downLoadUrl}", ex, "An HTTP request error occurred while trying to fetch the Conan package source URL.");
                 }
                 catch (YamlException ex)
                 {
-                    Logger.WarnFormat("Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url", componentName);
+                    Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                     LogHandlingHelper.ExceptionErrorHandling("GetSourceUrlForConanPackage", $"MethodName:GetSourceUrlForConanPackage(), ComponentName: {componentName}, Version: {componenVersion}, URL: {downLoadUrl}", ex, "A YAML parsing error occurred while trying to deserialize the Conan package data.");
                 }
                 catch (ArgumentNullException ex)
@@ -573,7 +575,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (HttpRequestException ex)
             {
-                Logger.WarnFormat("Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url", componentName);
+                Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                 LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromNuspecFile", $"MethodName:GetSourceURLFromNuspecFile(), ComponentName: {componentName}, NuspecURL: {nuspecURL}", ex, "An HTTP request error occurred while trying to fetch the Nuspec file.");
             }
             return GithubUrl;
