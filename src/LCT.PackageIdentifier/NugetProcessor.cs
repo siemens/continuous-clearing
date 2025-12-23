@@ -14,6 +14,7 @@ using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
+using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
@@ -53,7 +54,7 @@ namespace LCT.PackageIdentifier
         private List<Component> listOfInternalComponents = new List<Component>();
         private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         #region public methods
-        public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
+        public virtual Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             Logger.Debug("ParsePackageFile():Starting to parse the package file for identifying nuget components.");
             List<Component> listComponentForBOM = new List<Component>();
@@ -382,13 +383,41 @@ namespace LCT.PackageIdentifier
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
-            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            ValidateIdentificationOfInternalComponentsParameters(componentData, appSettings, jFrogService, bomhelper);
+            return await IdentificationOfInternalComponentsAsync(componentData, appSettings, jFrogService, bomhelper);
+        }
 
+        private static void ValidateIdentificationOfInternalComponentsParameters(
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        {
+            if (appSettings == null)
+                throw new ArgumentNullException(nameof(appSettings), "appSettings cannot be null.");
+            if (componentData == null)
+                throw new ArgumentNullException(nameof(componentData), "componentData cannot be null.");
+            if (jFrogService == null)
+                throw new ArgumentNullException(nameof(jFrogService), "jFrogService cannot be null.");
+            if (bomhelper == null)
+                throw new ArgumentNullException(nameof(bomhelper), "bomhelper cannot be null.");
+        }
+
+        private static async Task<ComponentIdentification> IdentificationOfInternalComponentsAsync(
+        ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
+        {
             Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
-            // get the  component list from Jfrog for given repo
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
+            // get the component list from Jfrog for given repo
+            List<AqlResult> aqlResultList;
 
+            if (appSettings.ProjectType != null && appSettings.ProjectType.Equals("CHOCO", StringComparison.InvariantCultureIgnoreCase))
+            {
+                aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Choco.Artifactory.InternalRepos, jFrogService);
+            }
+            else
+            {
+                // For NUGET project type, get the component list from NUGET internal repo
+                aqlResultList = await bomhelper.GetListOfComponentsFromRepo(appSettings.Nuget.Artifactory.InternalRepos, jFrogService);
+            }
             var inputIterationList = componentData.comparisonBOMData;
 
             // Use the common helper method
@@ -434,7 +463,7 @@ namespace LCT.PackageIdentifier
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
-        public static void AddSiemensDirectProperty(ref Bom bom)
+        public virtual void AddSiemensDirectProperty(ref Bom bom)
         {
             Logger.Debug("AddSiemensDirectProperty(): Starting to add SiemensDirect property to BOM components.");
             var bomComponentsList = bom.Components;
@@ -658,7 +687,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
+        public static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
         {
             foreach (var prop in listofComponents)
             {

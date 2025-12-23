@@ -66,6 +66,7 @@ namespace LCT.Common
         public Config Poetry { get; set; }
         public Config Conan { get; set; }
         public Config Cargo { get; set; }
+        public Config Choco { get; set; }
         public string Mode { get; set; } = string.Empty;
         public bool IsTestMode
         {

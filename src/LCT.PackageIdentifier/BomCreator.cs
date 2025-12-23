@@ -191,6 +191,9 @@ namespace LCT.PackageIdentifier
                 case "CARGO":
                     parser = new CargoProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
+                case "CHOCO":
+                    parser = new ChocoProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
                 default:
                     LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "CallPackageParser()", $"Invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");

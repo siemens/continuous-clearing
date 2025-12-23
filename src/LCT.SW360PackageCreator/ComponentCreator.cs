@@ -238,21 +238,38 @@ namespace LCT.SW360PackageCreator
             string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.DebugFormat("BoM Generation Path - {0}", bomGenerationPath);
 
-            // create component in sw360
-            await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
-            var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
+            // Check if all components are Choco packages
+            bool allChocoComponents = parsedBomData.All(component => 
+                string.Equals(component.ComponentStatus, "Not Processed for CHOCO", StringComparison.OrdinalIgnoreCase));
 
-            var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
+            if (!allChocoComponents)
+            {
+                // Only process SW360 operations if not all components are CHOCO
+                // create component in sw360
+                await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
+                var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
 
-            await UpdateSBOMReleasesWithSw360Info(alreadyLinkedReleases);
+                var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
 
-            var releasesFoundInCbom = ReleasesFoundInCbom.ToList();
+                await UpdateSBOMReleasesWithSw360Info(alreadyLinkedReleases);
 
-            // Linking releases to the project
-            await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
+                var releasesFoundInCbom = ReleasesFoundInCbom.ToList();
 
-            // update comparison bom data
-            bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
+                // Linking releases to the project
+                await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
+
+                // update comparison bom data
+                bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
+
+                //write list of components which are not linked
+                LoggerHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
+            }
+            else
+            {
+                Logger.Debug("CreateComponentInSw360(): Skipping SW360 processing for CHOCO components");
+                // For CHOCO components, just set UpdatedCompareBomData to the parsed data
+                UpdatedCompareBomData = parsedBomData;
+            }
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
 
@@ -275,8 +292,8 @@ namespace LCT.SW360PackageCreator
             //write download url not found list to kpi 
             creatorHelper.WriteSourceNotFoundListToConsole(UpdatedCompareBomData, appSettings);
 
-            //write list of components which are not linked
-            LoggerHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
+            // Notify user about manual steps required for Choco packages
+            LoggerHelper.WriteChocoManualStepsNotification(bom?.Components);
 
             Logger.Debug("CreateComponentInSw360():Create component process completed");
         }
@@ -285,7 +302,14 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
         {
-            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BoM = {componentsToBoms.Count} ", null);
+            // Check if any components are CHOCO (this method is only called for non-CHOCO components now)
+            bool hasChocoComponents = componentsToBoms.Any(component => 
+                string.Equals(component.ComponentStatus, "Not Processed for CHOCO", StringComparison.OrdinalIgnoreCase));
+
+            if (!hasChocoComponents)
+            {
+                Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BoM = {componentsToBoms.Count} ", null);
+            }
 
             try
             {

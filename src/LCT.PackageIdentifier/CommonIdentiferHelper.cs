@@ -62,7 +62,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                bomFileName = FileConstant.basicSBOMName;
+                bomFileName = FileConstant.basicSBOMName + "_Bom.cdx.json";
             }
 
             return bomFileName;

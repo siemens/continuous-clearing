@@ -793,7 +793,83 @@ namespace AritfactoryUploader.UTest
             return componentLists;
         }
     }
-    // ...existing code...
+    [TestFixture]
+    public class UploadToArtifactoryHelperTests
+    {
+        [TestCase("pkg:npm/foo@1.0.0", "NPM")]
+        [TestCase("pkg:nuget/foo@1.0.0", "NUGET")]
+        [TestCase("pkg:choco/foo@1.0.0", "CHOCO")]
+        [TestCase("pkg:maven/foo@1.0.0", "MAVEN")]
+        [TestCase("pkg:pypi/foo@1.0.0", "POETRY")]
+        [TestCase("pkg:conan/foo@1.0.0", "CONAN")]
+        [TestCase("pkg:deb/debian/foo@1.0.0", "DEBIAN")]
+        [TestCase("pkg:cargo/foo@1.0.0", "CARGO")]
+        [TestCase("pkg:unknown/foo@1.0.0", "")]
+        public void GetComponentType_ReturnsExpectedType(string purl, string expected)
+        {
+            var component = new Component { Purl = purl };
+            var result = typeof(UploadToArtifactory)
+                .GetMethod("GetComponentType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .Invoke(null, new object[] { component }) as string;
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void AddUnknownComponentToDisplayList_AddsToCorrectList()
+        {
+            var comp = new ComponentsToArtifactory { Name = "foo", Version = "1.0.0" };
+            var types = new[] { "NPM", "NUGET", "MAVEN", "POETRY", "CONAN", "DEBIAN", "CARGO" };
+            foreach (var t in types)
+            {
+                var d = new DisplayPackagesInfo
+                {
+                    UnknownPackagesNpm = new List<ComponentsToArtifactory>(),
+                    UnknownPackagesNuget = new List<ComponentsToArtifactory>(),
+                    UnknownPackagesMaven = new List<ComponentsToArtifactory>(),
+                    UnknownPackagesPython = new List<ComponentsToArtifactory>(),
+                    UnknownPackagesConan = new List<ComponentsToArtifactory>(),
+                    UnknownPackagesDebian = new List<ComponentsToArtifactory>(),
+                    UnknownPackagesCargo = new List<ComponentsToArtifactory>()
+                };
+                typeof(UploadToArtifactory)
+                    .GetMethod("AddUnknownComponentToDisplayList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                    .Invoke(null, new object[] { t, comp, d });
+                switch (t)
+                {
+                    case "NPM": Assert.AreEqual(1, d.UnknownPackagesNpm.Count); break;
+                    case "NUGET": Assert.AreEqual(1, d.UnknownPackagesNuget.Count); break;
+                    case "MAVEN": Assert.AreEqual(1, d.UnknownPackagesMaven.Count); break;
+                    case "POETRY": Assert.AreEqual(1, d.UnknownPackagesPython.Count); break;
+                    case "CONAN": Assert.AreEqual(1, d.UnknownPackagesConan.Count); break;
+                    case "DEBIAN": Assert.AreEqual(1, d.UnknownPackagesDebian.Count); break;
+                    case "CARGO": Assert.AreEqual(1, d.UnknownPackagesCargo.Count); break;
+                }
+            }
+        }
+
+        [TestCase(PackageType.Internal, "internalRepo")]
+        [TestCase(PackageType.Development, "devRepo")]
+        [TestCase(PackageType.ClearedThirdParty, "thirdPartyRepo")]
+        [TestCase(PackageType.Unknown, "")]
+        public void GetRepoName_ReturnsExpected(PackageType type, string expected)
+        {
+            var result = typeof(UploadToArtifactory)
+                .GetMethod("GetRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .Invoke(null, new object[] { type, "internalRepo", "devRepo", "thirdPartyRepo" }) as string;
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void GetFullNameOfComponent_ReturnsExpected()
+        {
+            var withGroup = new Component { Group = "grp", Name = "foo" };
+            var noGroup = new Component { Name = "bar" };
+            var method = typeof(UploadToArtifactory).GetMethod("GetFullNameOfComponent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.AreEqual("grp/foo", method.Invoke(null, new object[] { withGroup }));
+            Assert.AreEqual("bar", method.Invoke(null, new object[] { noGroup }));
+        }
+    }
+    
 
     [TestFixture]
     public class GetArtifactoryRepoNameTests
