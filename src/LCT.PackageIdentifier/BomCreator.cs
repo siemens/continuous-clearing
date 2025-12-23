@@ -38,6 +38,7 @@ namespace LCT.PackageIdentifier
     public class BomCreator : IBomCreator
     {
         private const string JFrogConnValidationContext = "JFrog Connection Validation";
+        private const string CheckJFrogConnectionMethod = "Methodname:CheckJFrogConnection()";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
@@ -93,9 +94,9 @@ namespace LCT.PackageIdentifier
 
             string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
             // Writes Comparison Bom
-            Logger.Logger.Log(null, Level.Notice, $"Writing CycloneDX BOM to the output folder.", null);
+            Logger.Logger.Log(null, Level.Notice, "Writing CycloneDX BoM to the output folder.", null);
             WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
-            Logger.Logger.Log(null, Level.Notice, $"CycloneDX BOM writing process has been completed.", null);
+            Logger.Logger.Log(null, Level.Notice, "CycloneDX BoM writing process has been completed.", null);
 
             // Log warnings based on appSettings
             DisplayInformation.LogBomGenerationWarnings(appSettings);
@@ -143,9 +144,9 @@ namespace LCT.PackageIdentifier
             bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
             if (fileExists && appSettings.MultipleProjectType)
             {
-                Logger.Debug($"WriteContentToCycloneDxBOM():Start process for appending components due multiple project type {appSettings.MultipleProjectType}.");
+                Logger.DebugFormat("WriteContentToCycloneDxBOM():Start process for appending components due multiple project type {0}.", appSettings.MultipleProjectType);
                 string existingFilePath = files.FirstOrDefault(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
-                Logger.Debug($"WriteContentToCycloneDxBOM():Identified existing file for appending components.{existingFilePath}");
+                Logger.DebugFormat("WriteContentToCycloneDxBOM():Identified existing file for appending components.{0}", existingFilePath);
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, existingFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
@@ -262,25 +263,25 @@ namespace LCT.PackageIdentifier
                 {
                     if (response.IsSuccessStatusCode)
                     {
-                        await LogHandlingHelper.HttpResponseHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "");
+                        await LogHandlingHelper.HttpResponseHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "");
                         Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
                         LoggerHelper.JfrogConnectionInfoDisplayForCli();
                         return true;
                     }
                     else if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
-                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "Check the JFrog server details or token validity.");
-                        Logger.Error($"Check the JFrog token validity/permission..");
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "Check the JFrog server details or token validity.");
+                        Logger.Error("Check the JFrog token validity/permission..");
                     }
                     else if (response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "Check the JFrog server details .");
-                        Logger.Error($"Check the provided JFrog server details..");
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "Check the JFrog server details .");
+                        Logger.Error("Check the provided JFrog server details..");
                     }
                     else
                     {
-                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, "Methodname:CheckJFrogConnection()", response, "");
-                        Logger.Error($"JFrog Connection was not successfull check the server status.");
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "");
+                        Logger.Error("JFrog Connection was not successfull check the server status.");
                     }
                 }
                 return false;

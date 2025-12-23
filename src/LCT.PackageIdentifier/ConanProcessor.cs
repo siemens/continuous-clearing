@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
-            Logger.Debug($"ParsePackageFile():Started Parseing input File for conan components.");
+            Logger.Debug("ParsePackageFile():Started Parseing input File for conan components.");
             List<Component> componentsForBOM;
             Bom bom = new Bom();
             int totalUnsupportedComponentsIdentified = 0;
@@ -72,7 +72,7 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
-            Logger.Debug($"ParsePackageFile():Completed Parseing input File for conan components.\n");
+            Logger.Debug("ParsePackageFile():Completed Parseing input File for conan components.\n");
             return bom;
         }
 
@@ -121,7 +121,7 @@ namespace LCT.PackageIdentifier
         {
             string repoName = GetArtifactoryRepoName(aqlResultList, component, out string jfrogRepoPath);
             string jfrogpackageName = $"{component.Name}/{component.Version}";
-            Logger.Debug($"Repo Name for the package {jfrogpackageName} is {repoName}");
+            Logger.DebugFormat("Repo Name for the package {0} is {1}", jfrogpackageName, repoName);
 
             var hashes = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogpackageName, StringComparison.OrdinalIgnoreCase));
             Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
@@ -234,11 +234,11 @@ namespace LCT.PackageIdentifier
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(filepath);
-                    Logger.Debug($"ParsingInputFileForBOM():Template BOM file detected: " + filepath);
+                    Logger.DebugFormat("ParsingInputFileForBOM():Template BOM file detected: {0}", filepath);
                 }
                 if (filepath.ToLower().EndsWith(FileConstant.ConanFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():conan.lock file detected: {filepath}");
+                    Logger.DebugFormat("ParsingInputFileForBOM():conan.lock file detected: {0}", filepath);
                     var components = ParseDepJson(filepath, ref dependencies);
                     AddingIdentifierType(components, "PackageFile");
                     componentsForBOM.AddRange(components);
@@ -246,7 +246,7 @@ namespace LCT.PackageIdentifier
                 }
                 else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():Spdx file detected: {filepath}");
+                    Logger.DebugFormat("ParsingInputFileForBOM():Spdx file detected: {0}", filepath);
                     BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                     Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                     bom = _spdxBomParser.ParseSPDXBom(filepath);
@@ -262,7 +262,7 @@ namespace LCT.PackageIdentifier
                 else if (filepath.EndsWith(FileConstant.CycloneDXFileExtension)
                     && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Logger.Debug($"ParsingInputFileForBOM():CycloneDX file detected: {filepath}");
+                    Logger.DebugFormat("ParsingInputFileForBOM():CycloneDX file detected: {0}", filepath);
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
                     BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
@@ -306,7 +306,7 @@ namespace LCT.PackageIdentifier
 
                 if (depJson?.Graph?.Nodes == null)
                 {
-                    Logger.Warn($"No nodes found in dep.json file: {filepath}");
+                    Logger.WarnFormat("No nodes found in dep.json file: {0}", filepath);
                     return StartingComponentForBOM;
                 }
 
@@ -327,13 +327,13 @@ namespace LCT.PackageIdentifier
             {
                 Environment.ExitCode = -1;
                 LogHandlingHelper.ExceptionErrorHandling("I/O error occurred while accessing the package lock JSON file.", "ParseDepJson()", ex, $"File Path: {filepath}");
-                Logger.Error($"ParseDepJson(): IO Error", ex);
+                Logger.Error("ParseDepJson(): IO Error", ex);
             }
             catch (SecurityException ex)
             {
                 Environment.ExitCode = -1;
                 LogHandlingHelper.ExceptionErrorHandling("Security error occurred while accessing the package lock JSON file.", "ParseDepJson()", ex, $"File Path: {filepath}");
-                Logger.Error($"ParseDepJson(): Security Error", ex);
+                Logger.Error("ParseDepJson(): Security Error", ex);
             }
 
             return StartingComponentForBOM;
@@ -488,7 +488,7 @@ namespace LCT.PackageIdentifier
             if (aqlResultList.Exists(
                 x => x.Path.Contains(jfrogcomponentPath, StringComparison.OrdinalIgnoreCase)))
             {
-                Logger.Debug($"IsInternalConanComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {jfrogcomponentPath}.");
+                Logger.DebugFormat("IsInternalConanComponent(): Component [Name: {0}, Version: {1}] is internal,Found in JFrog repository with full name: {2}.", component.Name, component.Version, jfrogcomponentPath);
                 return true;
             }
 
@@ -497,7 +497,7 @@ namespace LCT.PackageIdentifier
 
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
         {
-            Logger.Debug($"GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
+            Logger.DebugFormat("GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {0}, Version: {1}].", component.Name, component.Version);
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             var conanPackagePath = aqlResultList.FirstOrDefault(x => x.Path.Contains(jfrogcomponentPath) && x.Name.Contains("package.tgz"));
@@ -507,7 +507,7 @@ namespace LCT.PackageIdentifier
             }
             var aqllist = aqlResultList.FindAll(x => x.Path.Contains(
                 jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
-            Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {jfrogcomponentPath}.");
+            Logger.DebugFormat("GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {0}.", jfrogcomponentPath);
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
 
             return repoName;

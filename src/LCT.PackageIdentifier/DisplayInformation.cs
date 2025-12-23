@@ -33,7 +33,7 @@ namespace LCT.PackageIdentifier
                 {
                     totalString = string.Join(",", includeList);
                 }
-                Logger.Debug($"DisplayIncludeFiles():Include files for project type {appSettings.ProjectType}: {totalString}");
+                Logger.DebugFormat("DisplayIncludeFiles():Include files for project type {0}: {1}", appSettings.ProjectType, totalString);
             }
             else
             {
@@ -66,7 +66,7 @@ namespace LCT.PackageIdentifier
                 {
                     totalString = string.Join(",", excludeList);
                 }
-                Logger.Debug($"DisplayExcludeFiles():Exclude files for project type {appSettings.ProjectType}: {totalString}");
+                Logger.DebugFormat("DisplayExcludeFiles():Exclude files for project type {0}: {1}", appSettings.ProjectType, totalString);
             }
             else
             {
@@ -112,7 +112,7 @@ namespace LCT.PackageIdentifier
                 if (repos != null)
                 {
                     listOfInternalRepoList = string.Join(",", repos);
-                    Logger.Debug($"GetInternalRepolist():Internal repositories for project type {appSettings.ProjectType}: {listOfInternalRepoList}");
+                    Logger.DebugFormat("GetInternalRepolist():Internal repositories for project type {0}: {1}", appSettings.ProjectType, listOfInternalRepoList);
                 }
             }
             else

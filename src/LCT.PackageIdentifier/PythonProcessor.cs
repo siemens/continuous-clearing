@@ -51,11 +51,11 @@ namespace LCT.PackageIdentifier
                 if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listOfTemplateBomfilePaths.Add(config);
-                    Logger.Debug($"ParsePackageFile():Template BOM file detected: {config}");
+                    Logger.DebugFormat("ParsePackageFile():Template BOM file detected: {0}", config);
                 }
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
-                    Logger.Debug($"ParsePackageFile():Poetry lock file detected: {config}");
+                    Logger.DebugFormat("ParsePackageFile():Poetry lock file detected: {0}", config);
                     listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
                 }
                 else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
@@ -105,7 +105,7 @@ namespace LCT.PackageIdentifier
                 Property siemensDirect = new() { Name = Dataconstant.Cdx_SiemensDirect, Value = "false" };
                 if (pythonDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version)))
                 {
-                    Logger.Debug($"AddSiemensDirectProperty(): Component [Name: {component.Name}, Version: {component.Version}] is a direct dependency. Setting Siemens Direct property to true.");
+                    Logger.DebugFormat("AddSiemensDirectProperty(): Component [Name: {0}, Version: {1}] is a direct dependency. Setting Siemens Direct property to true.", component.Name, component.Version);
                     siemensDirect.Value = "true";
                 }
 
@@ -207,7 +207,7 @@ namespace LCT.PackageIdentifier
             List<PythonPackage> PythonPackages = new List<PythonPackage>();
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                Logger.Debug($"ExtractDetailsFromJson():Spdx file detected: {filePath}");
+                Logger.DebugFormat("ExtractDetailsFromJson():Spdx file detected: {0}", filePath);
                 BomHelper.NamingConventionOfSPDXFile(filePath, appSettings);
                 Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
                 bom = _spdxBomParser.ParseSPDXBom(filePath);
@@ -240,12 +240,12 @@ namespace LCT.PackageIdentifier
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
-                    Logger.Debug($"ExtractDetailsFromJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                    Logger.DebugFormat("ExtractDetailsFromJson():ValidComponent : Component Details : {0} @ {1} @ {2}", package.Name, package.Version, package.PurlID);
                 }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"ExtractDetailsFromJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                    Logger.DebugFormat("ExtractDetailsFromJson():InvalidComponent : Component Details : {0} @ {1} @ {2}", package.Name, package.Version, package.PurlID);
                 }
             }
 
@@ -325,7 +325,7 @@ namespace LCT.PackageIdentifier
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
             if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version)))
             {
-                Logger.Debug($"IsInternalPythonComponent(): Component [Name: {component.Name}, Version: {component.Version}] is internal,Found in JFrog repository with full name: {jfrogcomponentName}.");
+                Logger.DebugFormat("IsInternalPythonComponent(): Component [Name: {0}, Version: {1}] is internal,Found in JFrog repository with full name: {2}.", component.Name, component.Version, jfrogcomponentName);
                 return true;
             }
 
@@ -417,12 +417,12 @@ namespace LCT.PackageIdentifier
                                                      out string jfrogPackageName,
                                                      out string jfrogRepoPath)
         {
-            Logger.Debug($"GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {component.Name}, Version: {component.Version}].");
+            Logger.DebugFormat("GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {0}, Version: {1}].", component.Name, component.Version);
             jfrogPackageName = Dataconstant.PackageNameNotFoundInJfrog;
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             string jfrogPackageNameWhlExten = GetJfrogNameOfPypiComponent(
                 component.Name, component.Version, aqlResultList);
-            Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {jfrogPackageNameWhlExten}.");
+            Logger.DebugFormat("GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {0}.", jfrogPackageNameWhlExten);
             var aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase));
             jfrogPackageName = jfrogPackageNameWhlExten;
@@ -433,7 +433,7 @@ namespace LCT.PackageIdentifier
             {
                 string fullName = bomHelper.GetFullNameOfComponent(component);
                 string fullNameVersion = GetJfrogNameOfPypiComponent(fullName, component.Version, aqlResultList);
-                Logger.Debug($"GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {fullNameVersion}.");
+                Logger.DebugFormat("GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {0}.", fullNameVersion);
                 if (!fullNameVersion.Equals(jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase))
                 {
                     var aqllist = aqlResultList.FindAll(x => x.Name.Contains(fullNameVersion, StringComparison.OrdinalIgnoreCase)
@@ -448,7 +448,7 @@ namespace LCT.PackageIdentifier
             {
                 var aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
-                Logger.Debug($"GetJfrogArtifactoryRepoDetials(): JFrog repository path: {jfrogRepoPath}.");
+                Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): JFrog repository path: {0}.", jfrogRepoPath);
             }
 
             if (string.IsNullOrEmpty(jfrogPackageName))
@@ -500,7 +500,7 @@ namespace LCT.PackageIdentifier
             if (packages == null || packages.Count == 0)
             {
                 // Log a message indicating no packages were found
-                Logger.Debug($"No Python packages were found in the file: {filepath}");
+                Logger.DebugFormat("No Python packages were found in the file: {0}", filepath);
                 return;
             }
 

@@ -28,17 +28,17 @@ namespace LCT.PackageIdentifier
                 return NotFoundInRepo;
             }
 
-            Logger.Debug($"GetRepodetailsFromPerticularOrder(): Total repositories identified from AQL result: {aqlResults.Count}");
+            Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): Total repositories identified from AQL result: {0}", aqlResults.Count);
             var repoKeywords = new[] { "release", "devdep", "dev" };
             string repo = FindRepositoryByKeywords(aqlResults, repoKeywords);
 
             if (repo != null)
             {
-                Logger.Debug($"GetRepodetailsFromPerticularOrder(): Found repository: {repo}");
+                Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): Found repository: {0}", repo);
                 return repo;
             }
             repo = aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
-            Logger.Debug($"GetRepodetailsFromPerticularOrder(): No specific repository found. Returning repository or 'Not Found in Repo': {repo}");
+            Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): No specific repository found. Returning repository or 'Not Found in Repo': {0}", repo);
             return repo;
         }
         private static string FindRepositoryByKeywords(List<AqlResult> aqlResults, string[] keywords)

@@ -68,7 +68,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"TriggerFossologyValidation(): {ex.Message}");
+                Logger.Error($"TriggerFossologyValidation(): {ex.Message}", ex);
                 LogHandlingHelper.ExceptionErrorHandling("Fossology Validation", "TriggerFossologyValidation()", ex, "Investigate the exception details.");
             }
         }
@@ -212,7 +212,7 @@ namespace LCT.SW360PackageCreator
                     catch (HttpRequestException ex)
                     {
                         // Fossology URL is not valid                                   
-                        Logger.Error($"Fossology URL is not working. Please check and try again.");
+                        Logger.Error($"Fossology URL is not working. Please check and try again.", ex);
                         LogHandlingHelper.ExceptionErrorHandling("HttpRequestException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "Check the network connection and ensure the Fossology server is reachable.");
                         environmentHelper.CallEnvironmentExit(-1);
                     }
@@ -220,7 +220,7 @@ namespace LCT.SW360PackageCreator
                 else
                 {
                     Logger.Debug($"FossologyUrlValidation(): Fossology URL is not valid.");
-                    LogHandlingHelper.BasicErrorHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", $"Fossology URL does not match the expected production or staging URLs. URL: {url}", "Ensure the Fossology URL matches the configured production or staging URLs.");
+                    LogHandlingHelper.BasicErrorHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", $"Fossology URL does not match the configured production or staging URLs. URL: {url}", "Ensure the Fossology URL matches the configured production or staging URLs.");
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }

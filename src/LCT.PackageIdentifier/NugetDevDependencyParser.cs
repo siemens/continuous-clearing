@@ -181,7 +181,7 @@ namespace LCT.PackageIdentifier
                         }
                     }
 
-                    Logger.Debug($"ParseJsonFile():Total identified components from asset file: " + components.Count);
+                    Logger.DebugFormat("ParseJsonFile():Total identified components from asset file: {0}", components.Count);
                 }
 
             }
