@@ -48,7 +48,7 @@ namespace LCT.Services
         /// <returns>Sw360Components</returns>
         public async Task<ComponentStatus> GetComponentDataByExternalId(string componentName, string componentExternalId)
         {
-            Logger.Debug($"GetComponentDataByExternalId(): Starting to identifying Component through External Id - Name-{componentName},ExternalId-{componentExternalId}");
+            Logger.DebugFormat("GetComponentDataByExternalId(): Starting to identifying Component through External Id - Name-{0},ExternalId-{1}", componentName, componentExternalId);
             string externalIdUriString;
             if (componentExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
             {
@@ -87,13 +87,13 @@ namespace LCT.Services
             {
                 sw360components.isComponentExist = false;
                 LogHandlingHelper.ExceptionErrorHandling("Exception while getting Component Data By ExternalId", $"MethodName:GetComponentDataByExternalId(), ComponentName:{componentName}, componentExternalId:{componentExternalId}", ex, "An HTTP request error occurred while trying to fetch release data. ");
-                Logger.Error($"GetComponentDataByExternalId():", ex);
+                Logger.Error("GetComponentDataByExternalId():", ex);
             }
             catch (AggregateException ex)
             {
                 sw360components.isComponentExist = false;
                 LogHandlingHelper.ExceptionErrorHandling("AggregateException while getting Component Data By ExternalId", $"MethodName:GetComponentDataByExternalId(), ComponentName:{componentName}, componentExternalId:{componentExternalId}", ex, "Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
-                Logger.Error($"GetComponentDataByExternalId():", ex);
+                Logger.Error("GetComponentDataByExternalId():", ex);
             }
 
             return sw360components;
@@ -118,7 +118,7 @@ namespace LCT.Services
         /// <returns>Sw360Releases</returns>
         public async Task<Releasestatus> GetReleaseDataByExternalId(string releaseName, string releaseVersion, string releaseExternalId)
         {
-            Logger.Debug($"GetReleaseDataByExternalId(): Identifying release data through ExternalId, Release details - {releaseName}@{releaseVersion}");
+            Logger.DebugFormat("GetReleaseDataByExternalId(): Identifying release data through ExternalId, Release details - {0}@{1}", releaseName, releaseVersion);
             Releasestatus releasestatus = new Releasestatus();
 
             releasestatus.isReleaseExist = false;
@@ -136,7 +136,7 @@ namespace LCT.Services
                     //It's for Local Sw360 servers,making an API call with EscapeDataString..
                     if (sw360releasesdata.Count == 0 && (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
                     {
-                        Logger.Debug($"GetReleaseDataByExternalId(): If releaseExternalId have NPM or Debian or Alpine . We reruning the api call.");
+                        Logger.Debug("GetReleaseDataByExternalId(): If releaseExternalId have NPM or Debian or Alpine . We reruning the api call.");
                         releaseExternalId = Uri.EscapeDataString(releaseExternalId);
                         httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
                         await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
@@ -161,17 +161,17 @@ namespace LCT.Services
             {
                 releasestatus.isReleaseExist = false;
                 LogHandlingHelper.ExceptionErrorHandling("Exception while getting Release Data By ExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "An HTTP request error occurred while trying to fetch release data.");
-                Logger.Error($"GetReleaseDataByExternalId():", ex);
+                Logger.Error("GetReleaseDataByExternalId():", ex);
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("AggregateException while getting Component Data By ExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
-                Logger.Error($"GetReleaseDataByExternalId():", ex);
+                Logger.Error("GetReleaseDataByExternalId():", ex);
             }
             catch (JsonReaderException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("JsonReaderException while getting Component Data By ExternalId", $"MethodName:GetReleaseDataByExternalId(), ReleaseName:{releaseName}, ReleaseVersion:{releaseVersion}, ReleaseExternalId:{releaseExternalId}", ex, "A JSON parsing error occurred while deserializing the response. Ensure the response format is correct and matches the expected structure.");
-                Logger.Error($"GetReleaseDataByExternalId():JsonReaderException", ex);
+                Logger.Error("GetReleaseDataByExternalId():JsonReaderException", ex);
             }
 
             return releasestatus;
@@ -224,7 +224,7 @@ namespace LCT.Services
         {
             Dictionary<int, Sw360Releases> releaseCollection = new Dictionary<int, Sw360Releases>();
 
-            Logger.Debug($"GetReleaseExistStatus(): Identifying release exist status from SW360: {name}");
+            Logger.DebugFormat("GetReleaseExistStatus(): Identifying release exist status from SW360: {0}", name);
             foreach (var release in sw360releasesdata)
             {
                 string packageUrl = string.Empty;
@@ -249,7 +249,7 @@ namespace LCT.Services
             }
             Releasestatus releasestatus = new Releasestatus();
             releasestatus.sw360Releases = releaseCollection[releaseCollection.Keys.Max()];
-            Logger.Debug($"GetReleaseExistStatus(): Selected release '{releasestatus.sw360Releases?.Name}' for the name '{name}' based on the highest number of PURL IDs.\n");
+            Logger.DebugFormat("GetReleaseExistStatus(): Selected release '{0}' for the name '{1}' based on the highest number of PURL IDs.\n", releasestatus.sw360Releases?.Name, name);
             releasestatus.isReleaseExist = !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(releasestatus.sw360Releases?.ExternalIds?.Purl_Id);
 
             return releasestatus;
@@ -260,12 +260,12 @@ namespace LCT.Services
         {
             Dictionary<int, Sw360Components> componentCollection = new Dictionary<int, Sw360Components>();
 
-            Logger.Debug($"GetComponentExistStatus(): Identifying component exist status from SW360 : {name}");
+            Logger.DebugFormat("GetComponentExistStatus(): Identifying component exist status from SW360 : {0}", name);
             foreach (var componentsData in sw360components)
             {
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, componentsData, packageUrl);
-                Logger.Debug($"GetComponentExistStatus(): Component Name : {name} from {packageUrl}");
+                Logger.DebugFormat("GetComponentExistStatus(): Component Name : {0} from {1}", name, packageUrl);
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
@@ -287,7 +287,7 @@ namespace LCT.Services
             ComponentStatus component = new ComponentStatus();
 
             component.Sw360components = componentCollection[componentCollection.Keys.Max()];
-            Logger.Debug($"GetComponentExistStatus(): Component Name : {name} selected {component.Sw360components?.Name},based on the highest number of PURL IDs \n");
+            Logger.DebugFormat("GetComponentExistStatus(): Component Name : {0} selected {1},based on the highest number of PURL IDs \n", name, component.Sw360components?.Name);
             component.isComponentExist = !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Package_Url) || !string.IsNullOrEmpty(component.Sw360components?.ExternalIds?.Purl_Id);
             return component;
 

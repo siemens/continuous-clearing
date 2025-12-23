@@ -23,10 +23,10 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public Result ApplyPatch(ComparisonBomData component, string localDownloadPath, string fileName)
         {
-            Logger.Debug($"ApplyPatch():Started Applying patch for component, Name-{component.Name},version-{component.Version}");
+            Logger.DebugFormat("ApplyPatch():Started Applying patch for component, Name-{0},version-{1}", component.Name, component.Version);
             Result result;
             string dockerCommandForApplyPatching;
-            localDownloadPath = localDownloadPath.Substring(0, localDownloadPath.Length - 1);            
+            localDownloadPath = localDownloadPath.Substring(0, localDownloadPath.Length - 1);
             string combinedFileName = $"{component.Name}_{component.Version.Replace(".debian", "")}{FileConstant.DebianCombinedPatchExtension}";
             const string tarParameters = "--force-local --format=gnu --sort=name --owner=0 --group=0 --numeric-owner --mtime=\'2020-01-01 00:00:00Z\'";
             string archiveDirName = $"{component.Name}";
@@ -47,7 +47,7 @@ namespace LCT.SW360PackageCreator
                     $"tar -cjf {combinedFileName} {archiveDirName}/ {tarParameters}\"";
                     p.StartInfo.FileName = Path.Combine("cmd.exe");
                     p.StartInfo.Arguments = @"/c " + dockerCommandForApplyPatching;
-                    Logger.Debug($"ApplyPatch():Docker command for applying patch for windows platform:{dockerCommandForApplyPatching}");
+                    Logger.DebugFormat("ApplyPatch():Docker command for applying patch for windows platform:{0}", dockerCommandForApplyPatching);
                 }
                 else
                 {
@@ -56,14 +56,14 @@ namespace LCT.SW360PackageCreator
                     p.StartInfo.FileName = FileConstant.DockerCMDTool;
                     p.StartInfo.Arguments = "-c \" " + dockerCommandForApplyPatching + " \"";
                 }
-                Logger.Debug($"ApplyPatch():Docker command for applying patch for non windows platform:{dockerCommandForApplyPatching}");
+                Logger.DebugFormat("ApplyPatch():Docker command for applying patch for non windows platform:{0}", dockerCommandForApplyPatching);
                 // Run as administrator
                 p.StartInfo.Verb = "runas";
 
                 var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo, timeoutInMs);
                 result = processResult?.Result;
             }
-            Logger.Debug($"ApplyPatch():Completed Applying patch for component, Name-{component.Name},version-{component.Version}");
+            Logger.DebugFormat("ApplyPatch():Completed Applying patch for component, Name-{0},version-{1}", component.Name, component.Version);
             return result;
         }
     }

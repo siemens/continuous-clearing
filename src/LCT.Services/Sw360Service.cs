@@ -70,8 +70,7 @@ namespace LCT.Services
                 Sw360ServiceStopWatch.Start();
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
                 Sw360ServiceStopWatch.Stop();
-                Logger.Debug($"GetAvailableReleasesInSw360():Time taken for Get all Releases api call" +
-                    $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
+                Logger.DebugFormat("GetAvailableReleasesInSw360():Time taken for Get all Releases api call-{0}", TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds);
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
                 if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases?.Count > 0)
@@ -239,8 +238,8 @@ namespace LCT.Services
 
             if (string.IsNullOrEmpty(attachmentHash.SourceDownloadUrl))
             {
-                Logger.Debug($"DownloadReleaseSourceCode():Fossology Upload unsuccessful, Component source is not Found for {fileName}-{version} under sw360 attachments");
-                Logger.Warn($"Fossology Upload unsuccessful, Component source is not Found for {fileName}-{version} under sw360 attachments");
+                Logger.DebugFormat("DownloadReleaseSourceCode():Fossology Upload unsuccessful, Component source is not Found for {0}-{1} under sw360 attachments", fileName, version);
+                Logger.WarnFormat("Fossology Upload unsuccessful, Component source is not Found for {0}-{1} under sw360 attachments", fileName, version);
                 return componentName;
             }
             try
@@ -299,7 +298,7 @@ namespace LCT.Services
                         href = responseData.Embedded.Sw360Releases[index].Links.Self.Href;
                         releaseid = CommonHelper.GetSubstringOfLastOccurance(href, "/");
                         releaseurl = sw360url + ApiConstant.Sw360ReleaseUrlApiSuffix + releaseid + "#/tab-Summary";
-                        Logger.Debug($"GetUploadDescriptionfromSW360:ComponentName-{componentName}:{componetVersion} : {href}");
+                        Logger.DebugFormat("GetUploadDescriptionfromSW360:ComponentName-{0}:{1} : {2}", componentName, componetVersion, href);
                         return releaseurl;
                     }
                 }
@@ -326,12 +325,12 @@ namespace LCT.Services
                 if (await CheckReleaseExistenceByExternalId(component) ||
                        CheckAvailabilityByNameAndVersion(sw360Releases, component, sw360ComponentList))
                 {
-                    Logger.Debug($"GetAvailableComponenentsList():  Release Exist : Release name - {component.Name}, version - {component.Version}");
+                    Logger.DebugFormat("GetAvailableComponenentsList():  Release Exist : Release name - {0}, version - {1}", component.Name, component.Version);
                 }
                 else if (await CheckComponentExistenceByExternalId(component) ||
                          CheckAvailabilityByName(sw360ComponentList, component))
                 {
-                    Logger.Debug($"GetAvailableComponenentsList():  Component Exist : Component name - {component.Name}, version - {component.Version}");
+                    Logger.DebugFormat("GetAvailableComponenentsList():  Component Exist : Component name - {0}, version - {1}", component.Name, component.Version);
                 }
                 else
                 {
@@ -355,7 +354,7 @@ namespace LCT.Services
         }
         private static bool CheckAvailabilityByNameAndVersion(IList<Sw360Releases> sw360Releases, Components component, IList<Sw360Components> sw360ComponentList)
         {
-            Logger.Debug($"CheckAvailabilityByNameAndVersion(): Starting check for component '{component?.Name}' version '{component?.Version}'");
+            Logger.DebugFormat("CheckAvailabilityByNameAndVersion(): Starting check for component '{0}' version '{1}'", component?.Name, component?.Version);
 
             var sw360Release = FindMatchingRelease(sw360Releases, component);
             if (sw360Release == null)
@@ -406,8 +405,7 @@ namespace LCT.Services
                 return true;
             }
 
-            Logger.Debug($"GetAvailableComponenentsList(): Component Name - {component.Name}, Version - {component.Version} " +
-                        $"validating Externalids list - {sw360Component.ExternalIds?.Package_Url},{sw360Component.ExternalIds?.Purl_Id}");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Component Name - {0}, Version - {1} validating Externalids list - {2},{3}", component.Name, component.Version, sw360Component.ExternalIds?.Package_Url, sw360Component.ExternalIds?.Purl_Id);
 
             if (!ValidateProjectTypePurl(sw360Component, component))
             {
@@ -426,7 +424,7 @@ namespace LCT.Services
                 return false;
             }
 
-            Logger.Debug($"GetAvailableComponenentsList(): Validating with PURL ID: {projectPurlCheckId}");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Validating with PURL ID: {0}", projectPurlCheckId);
 
             bool hasMatchingExternalId = sw360Component.ExternalIds.Package_Url?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true
                 || sw360Component.ExternalIds.Purl_Id?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true;
@@ -437,14 +435,14 @@ namespace LCT.Services
                 return false;
             }
 
-            Logger.Debug($"GetAvailableComponenentsList(): Component Name'{component.Name}' PURL check ID matched with SW360 component PURL ID");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Component Name'{0}' PURL check ID matched with SW360 component PURL ID", component.Name);
             return true;
         }
 
         private static void HandleMismatchedPurlId(Sw360Components sw360Component, Components component)
         {
-            Logger.Debug($"GetAvailableComponenentsList(): Component Name '{component.Name}' PURL ID mismatched with SW360 component PURL ID");
-            Logger.Warn($"Component Name '{component.Name}' already exists in SW360 with different package type PURL ID. Skipping this component.");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Component Name '{0}' PURL ID mismatched with SW360 component PURL ID", component.Name);
+            Logger.WarnFormat("Component Name '{0}' already exists in SW360 with different package type PURL ID. Skipping this component.", component.Name);
 
             component.InvalidComponentByPurlId = true;
             component.ComponentLink = sw360Component.Links?.Self?.Href;
@@ -486,7 +484,7 @@ namespace LCT.Services
         private static bool CheckAvailabilityByName(IList<Sw360Components> sw360Components, Components component)
         {
             //checking for component existance with name 
-            Logger.Debug($"CheckAvailabilityByName():Starting to identifying component through name: Component name - {component.Name}");
+            Logger.DebugFormat("CheckAvailabilityByName():Starting to identifying component through name: Component name - {0}", component.Name);
             bool isComponentAvailable = false;
             Sw360Components sw360Component =
                 sw360Components.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant());
@@ -502,14 +500,14 @@ namespace LCT.Services
                 });
                 isComponentAvailable = true;
             }
-            Logger.Debug($"CheckAvailabilityByName():Identified Component status through name :{isComponentAvailable}");
-            Logger.Debug($"CheckAvailabilityByName():Completed to identifying component through name: component exist-{isComponentAvailable},Component name - {component.Name}");
+            Logger.DebugFormat("CheckAvailabilityByName():Identified Component status through name :{0}", isComponentAvailable);
+            Logger.DebugFormat("CheckAvailabilityByName():Completed to identifying component through name: component exist-{0},Component name - {1}", isComponentAvailable, component.Name);
             return isComponentAvailable;
         }
 
         private async Task<bool> CheckComponentExistenceByExternalId(Components componentToBomData)
         {
-            Logger.Debug($"CheckComponentExistenceByExternalId(): Starting to identifying component through ExternalId - {componentToBomData.Name}");
+            Logger.DebugFormat("CheckComponentExistenceByExternalId(): Starting to identifying component through ExternalId - {0}", componentToBomData.Name);
             ComponentStatus componentstatus = new ComponentStatus();
 
             try
@@ -527,7 +525,7 @@ namespace LCT.Services
                         ReleaseExternalId = string.Empty
                     });
                 }
-                Logger.Debug($"CheckComponentExistenceByExternalId():Identified Component status through External Id :{componentstatus.isComponentExist}");
+                Logger.DebugFormat("CheckComponentExistenceByExternalId():Identified Component status through External Id :{0}", componentstatus.isComponentExist);
             }
             catch (HttpRequestException ex)
             {
@@ -547,7 +545,7 @@ namespace LCT.Services
 
         private async Task<bool> CheckReleaseExistenceByExternalId(Components componentToBomData)
         {
-            Logger.Debug($"CheckReleaseExistenceByExternalId():Starting to identifying release through External Id : Release name - {componentToBomData.Name}, version - {componentToBomData.Version},ExternalId - {componentToBomData.ReleaseExternalId}");
+            Logger.DebugFormat("CheckReleaseExistenceByExternalId():Starting to identifying release through External Id : Release name - {0}, version - {1},ExternalId - {2}", componentToBomData.Name, componentToBomData.Version, componentToBomData.ReleaseExternalId);
             Releasestatus releaseStatus = new Releasestatus();
 
             try
@@ -564,7 +562,7 @@ namespace LCT.Services
                         ComponentExternalId = componentToBomData.ComponentExternalId
                     });
                 }
-                Logger.Debug($"CheckReleaseExistenceByExternalId():Identified release status through External Id :{releaseStatus.isReleaseExist}");
+                Logger.DebugFormat("CheckReleaseExistenceByExternalId():Identified release status through External Id :{0}", releaseStatus.isReleaseExist);
             }
             catch (HttpRequestException ex)
             {
@@ -578,7 +576,7 @@ namespace LCT.Services
                 releaseStatus.isReleaseExist = false;
                 Logger.Error($"CheckReleaseExistenceByExternalId():", ex);
             }
-            Logger.Debug($"CheckReleaseExistenceByExternalId():Completed to identifying release through External Id :Name - {componentToBomData.Name}, version - {componentToBomData.Version},release exist status-{releaseStatus.isReleaseExist}");
+            Logger.DebugFormat("CheckReleaseExistenceByExternalId():Completed to identifying release through External Id :Name - {0}, version - {1},release exist status-{2}", componentToBomData.Name, componentToBomData.Version, releaseStatus.isReleaseExist);
             return releaseStatus.isReleaseExist;
         }
     }

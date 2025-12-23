@@ -39,6 +39,7 @@ namespace LCT.PackageIdentifier
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string ParsePackageConfigMethod = "ParsePackageConfig()";
+        private const string NugetPackageNameFormat = "{0}.{1}.nupkg";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
@@ -116,7 +117,7 @@ namespace LCT.PackageIdentifier
 
                     if (versionAttribute?.Value == null)
                     {
-                        Logger.Error(string.Format("\t{0}: ID: '{1}' version attribute not found.", packagesFilePath, idAttribute.Value));
+                        Logger.ErrorFormat("\t{0}: ID: '{1}' version attribute not found.", packagesFilePath, idAttribute.Value);
                         LogHandlingHelper.BasicErrorHandling("Missing Version Attribute", ParsePackageConfigMethod, $"Version attribute not found for ID: '{idAttribute.Value}' in file: {packagesFilePath}", $"Identify version attribute in this file:{packagesFilePath}");
                         continue;
                     }
@@ -267,7 +268,7 @@ namespace LCT.PackageIdentifier
 
         private static Component ProcessNugetComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
         {
-            string jfrogpackageName = $"{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
+            string jfrogpackageName = string.Format(NugetPackageNameFormat, component.Name, component.Version);
             var hashes = aqlResultList.FirstOrDefault(x => x.Name == jfrogpackageName);
 
             string jfrogRepoPath = string.Empty;
@@ -329,7 +330,7 @@ namespace LCT.PackageIdentifier
             if (aqlResults == null || aqlResults.Count <= 0)
             {
                 Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Component not found with name: {0}. Trying alternate name format.", jfrogcomponentName);
-                jfrogcomponentName = string.Format("{0}.{1}.nupkg", component.Name, component.Version);
+                jfrogcomponentName = string.Format(NugetPackageNameFormat, component.Name, component.Version);
                 aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
             }
@@ -348,7 +349,7 @@ namespace LCT.PackageIdentifier
                         fullNameVersion, StringComparison.OrdinalIgnoreCase));
                     if (aqlResults == null || aqlResults.Count <= 0)
                     {
-                        fullNameVersion = string.Format("{0}.{1}.nupkg", fullName, component.Version);
+                        fullNameVersion = string.Format(NugetPackageNameFormat, fullName, component.Version);
                         aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                         jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
                     }
@@ -407,7 +408,7 @@ namespace LCT.PackageIdentifier
         private static bool IsInternalNugetComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             Logger.DebugFormat("IsInternalNugetComponent(): Checking if component [Name: {0}, Version: {1}] is an internal NuGet component.", component.Name, component.Version);
-            string jfrogcomponentName = string.Format("{0}.{1}.nupkg", component.Name, component.Version);
+            string jfrogcomponentName = string.Format(NugetPackageNameFormat, component.Name, component.Version);
             if (aqlResultList.Exists(x => x.Name.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)))
             {
                 Logger.DebugFormat("IsInternalNugetComponent(): Component [Name: {0}, Version: {1}] found in JFrog repository with name: {2}.", component.Name, component.Version, jfrogcomponentName);
@@ -415,7 +416,7 @@ namespace LCT.PackageIdentifier
             }
 
             string fullName = bomHelper.GetFullNameOfComponent(component);
-            string fullNameVersion = string.Format("{0}.{1}.nupkg", fullName, component.Version);
+            string fullNameVersion = string.Format(NugetPackageNameFormat, fullName, component.Version);
             if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                 && aqlResultList.Exists(
                 x => x.Name.Equals(fullNameVersion, StringComparison.OrdinalIgnoreCase)))

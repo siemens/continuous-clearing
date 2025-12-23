@@ -52,7 +52,7 @@ namespace LCT.Services
         public async Task<ComponentCreateStatus> CreateComponentBasesOFswComaprisonBOM(
             ComparisonBomData componentInfo, Dictionary<string, string> attachmentUrlList)
         {
-            Logger.Debug($"CreateComponentBasesOFswComaprisonBOM():starting to create component, Name-{componentInfo.Name},version-{componentInfo.Version}");
+            Logger.DebugFormat("CreateComponentBasesOFswComaprisonBOM():starting to create component, Name-{0},version-{1}", componentInfo.Name, componentInfo.Version);
             ComponentCreateStatus componentCreateStatus = new ComponentCreateStatus
             {
                 IsCreated = true,
@@ -77,9 +77,9 @@ namespace LCT.Services
                 //Component creation Success 
                 if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
                 {
-                    Logger.Debug($"CreateComponentBasesOFswComaprisonBOM(): Start Identifying componentId for creating release");
+                    Logger.Debug("CreateComponentBasesOFswComaprisonBOM(): Start Identifying componentId for creating release");
                     string componentId = await GetComponentId(componentInfo.Name);
-                    Logger.Debug($"GetComponentId(): Identified componentId for creating release is :{componentId}");
+                    Logger.DebugFormat("GetComponentId(): Identified componentId for creating release is :{0}", componentId);
                     componentCreateStatus.ReleaseStatus = await CreateReleaseForComponent(componentInfo, componentId, attachmentUrlList);
                 }
                 else
@@ -87,8 +87,7 @@ namespace LCT.Services
                     componentCreateStatus.IsCreated = false;
                     componentCreateStatus.ReleaseStatus.IsCreated = false;
                     Environment.ExitCode = -1;
-                    Logger.Debug($"CreateComponentBasesOFswComaprisonBOM():Component Name -{componentInfo.Name}- " +
-                   $"response status code-{response.StatusCode} and reason parse-{response.ReasonPhrase}");
+                    Logger.DebugFormat("CreateComponentBasesOFswComaprisonBOM():Component Name -{0}- response status code-{1} and reason parse-{2}", componentInfo.Name, response.StatusCode, response.ReasonPhrase);
                     Logger.Error($"   └── CreateComponent():Component Name -{componentInfo.Name}- " +
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
@@ -101,10 +100,7 @@ namespace LCT.Services
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
             }
-            Logger.Debug($"CreateComponentBasesOFswComaprisonBOM(): Final component and release create status" +
-                $"ComponentCreateStatus - IsCreated: {componentCreateStatus.IsCreated}, " +
-                 $"ReleaseStatus - IsCreated: {componentCreateStatus.ReleaseStatus.IsCreated}," +
-                 $" ReleaseIdToLink: {componentCreateStatus.ReleaseStatus.ReleaseIdToLink}");
+            Logger.DebugFormat("CreateComponentBasesOFswComaprisonBOM(): Final component and release create status ComponentCreateStatus - IsCreated: {0}, ReleaseStatus - IsCreated: {1}, ReleaseIdToLink: {2}", componentCreateStatus.IsCreated, componentCreateStatus.ReleaseStatus.IsCreated, componentCreateStatus.ReleaseStatus.ReleaseIdToLink);
             return componentCreateStatus;
         }
 
@@ -181,8 +177,7 @@ namespace LCT.Services
                 else if (response.StatusCode == HttpStatusCode.Conflict)
                 {
                     releaseId = await GetReleaseIdToLinkToProject(componentInfo.Name, componentInfo.Version, componentInfo.ReleaseExternalId, componentId);
-                    Logger.Debug($"CreateReleaseForComponent():Release already exists for component -->" +
-                        $"{componentInfo.Name} - {componentInfo.Version}. No changes made by tool");
+                    Logger.DebugFormat("CreateReleaseForComponent():Release already exists for component -->{0} - {1}. No changes made by tool", componentInfo.Name, componentInfo.Version);
                     createStatus.ReleaseAlreadyExist = true;
                 }
                 else
@@ -190,13 +185,12 @@ namespace LCT.Services
                     createStatus.IsCreated = false;
 
                     Environment.ExitCode = -1;
-                    Logger.Debug($"CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
-                   $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    Logger.DebugFormat("CreateReleaseForComponent():Component Name -{0}{1}- response status code-{2} and reason pharase-{3}", componentInfo.Name, componentInfo.Version, response.StatusCode, response.ReasonPhrase);
                     Logger.Error($"   └── CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
                         $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
                 }
 
-                Logger.Debug($"Component Name -{componentInfo.Name},Version :{componentInfo.Version} ,for this identified Release Id is:{releaseId}");
+                Logger.DebugFormat("Component Name -{0},Version :{1} ,for this identified Release Id is:{2}", componentInfo.Name, componentInfo.Version, releaseId);
                 createStatus.ReleaseIdToLink = releaseId;
             }
             catch (HttpRequestException e)
@@ -223,7 +217,7 @@ namespace LCT.Services
 
             if (!string.IsNullOrEmpty(releaseId))
             {
-                Logger.Debug($"Updating the Release with ID : {releaseId}");
+                Logger.DebugFormat("Updating the Release with ID : {0}", releaseId);
                 //update the package URL in the already existing release of the componentid used here
                 ReleasesInfo releasesInfo = await GetReleaseInfo(releaseId);
                 ComparisonBomData bomData = new ComparisonBomData { ReleaseExternalId = releaseExternalId };
@@ -274,13 +268,13 @@ namespace LCT.Services
         {
             if (manuallyLinkedReleases.Count <= 0 && releasesTobeLinked.Count <= 0)
             {
-                Logger.Debug($"No of release Id's to link - 0");
+                Logger.Debug("No of release Id's to link - 0");
                 return true;
             }
             try
             {
                 var finalReleasesToBeLinked = manuallyLinkedReleases.Concat(releasesTobeLinked).Distinct().ToList();
-                Logger.Debug($"No of release Id's to link - {finalReleasesToBeLinked.Count}");
+                Logger.DebugFormat("No of release Id's to link - {0}", finalReleasesToBeLinked.Count);
 
                 Dictionary<string, ReleaseLinked> linkedReleasesUniqueDict = new Dictionary<string, ReleaseLinked>();
                 foreach (var release in finalReleasesToBeLinked)
@@ -435,7 +429,7 @@ namespace LCT.Services
 
         public string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList, ComparisonBomData comparisonBomData)
         {
-            Logger.Debug($"AttachSourcesToReleasesCreated(): starting attach sources to the releases");
+            Logger.Debug("AttachSourcesToReleasesCreated(): starting attach sources to the releases");
 
             string attachmentApiUrl = string.Empty;
             foreach (var attachmenturl in attachmentUrlList)
@@ -451,7 +445,7 @@ namespace LCT.Services
                 attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport, comparisonBomData);
             }
 
-            Logger.Debug($"AttachSourcesToReleasesCreated(): completed attach sources to the releases");
+            Logger.Debug("AttachSourcesToReleasesCreated(): completed attach sources to the releases");
             return attachmentApiUrl;
         }
 
@@ -759,7 +753,7 @@ namespace LCT.Services
             try
             {
                 string releaseId = component.ReleaseId;
-                Logger.Debug($"UpdateSW360ReleaseContent():Name-{component.Name},Version-{component.Version}");
+                Logger.DebugFormat("UpdateSW360ReleaseContent():Name-{0},Version-{1}", component.Name, component.Version);
 
                 UpdateReleaseAdditinoalData updateRelease = await GetUpdateReleaseContent(releaseId, fossUrl, component.UploadId);
 
@@ -770,7 +764,7 @@ namespace LCT.Services
                 HttpResponseMessage response = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
                 await LogHandlingHelper.HttpResponseHandling("UpdateSW360ReleaseContent", $"MethodName:UpdateSW360ReleaseContent(), ReleaseId: {releaseId}", response);
                 string responseContent = await response.Content.ReadAsStringAsync();
-                Logger.Debug($"UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{responseContent}");
+                Logger.DebugFormat("UpdateSW360ReleaseContent():Response of fossology Url updation in SW360:{0}", responseContent);
                 if (responseContent.Contains(Dataconstant.ModerationRequestMessage, StringComparison.OrdinalIgnoreCase))
                 {
                     LoggerHelper.WriteFossologyStatusMessage($"⏳ Moderation request is created while updating the Fossology URL in SW360. Please request {component.ReleaseCreatedBy} or the license clearing team to approve the moderation request.");
@@ -814,13 +808,13 @@ namespace LCT.Services
         private async Task<UpdateReleaseAdditinoalData> GetUpdateReleaseContent(string releaseId, string fossUrl, string uploadId)
         {
             ReleasesInfo releasesInfo = await GetReleaseInfo(releaseId);
-            Logger.Debug($"GetUpdateReleaseContent():uploadId-{uploadId} for releaseD-{releaseId}");
+            Logger.DebugFormat("GetUpdateReleaseContent():uploadId-{0} for releaseD-{1}", uploadId, releaseId);
             string fossologyUrl = string.Empty;
             if (!string.IsNullOrEmpty(uploadId))
             {
                 fossologyUrl = $"{fossUrl}{ApiConstant.FossUploadJobUrlSuffix}{uploadId}";
             }
-            Logger.Debug($"GetUpdateReleaseContent():releaseId-{releaseId},fossologyUrl-{fossologyUrl}");
+            Logger.DebugFormat("GetUpdateReleaseContent():releaseId-{0},fossologyUrl-{1}", releaseId, fossologyUrl);
 
             Dictionary<string, string> additonalData = new Dictionary<string, string>();
 

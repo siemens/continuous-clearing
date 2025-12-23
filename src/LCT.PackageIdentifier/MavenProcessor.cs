@@ -215,7 +215,7 @@ namespace LCT.PackageIdentifier
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Logger.Debug($"GetTemplateBomFilePaths():Template BOM file detected: {filepath}");
+                    Logger.DebugFormat("GetTemplateBomFilePaths():Template BOM file detected: {0}", filepath);
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
             }

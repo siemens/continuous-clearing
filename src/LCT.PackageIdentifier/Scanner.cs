@@ -54,21 +54,21 @@ namespace LCT.PackageIdentifier
             if (config?.Include == null && config?.Exclude == null)
             {
                 LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, "Inclusion/Exclusion list is not provided. Unable to identify the files.", "Please check if you have provided a valid settings file with inclusion/exclusion patterns.");
-                Logger.Error(string.Format("Inlude:{0} or Exclude:{1} in config is found to be empty,Inclusion/Exclusion list is not provided!!Unable to identify the files\nPlease check if you have given a valid settings file", config?.Include, config?.Exclude));
+                Logger.ErrorFormat("Inlude:{0} or Exclude:{1} in config is found to be empty,Inclusion/Exclusion list is not provided!!Unable to identify the files\nPlease check if you have given a valid settings file", config?.Include, config?.Exclude);
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (string.IsNullOrWhiteSpace(rootPath))
             {
                 LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, string.Format("No root path provided at{0} - {1}.", nameof(rootPath), rootPath), "Provide a valid input file path.");
-                Logger.Error(string.Format("Invalid value for the {0} - {1},No root path given.Provide a valid input file path", nameof(rootPath), rootPath));
+                Logger.ErrorFormat("Invalid value for the {0} - {1},No root path given.Provide a valid input file path", nameof(rootPath), rootPath);
                 environmentHelper.CallEnvironmentExit(-1);
             }
 
             if (!System.IO.Directory.Exists(rootPath))
             {
                 LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, string.Format("Root path does not exist at {0}.", rootPath), "Provide a valid path.");
-                Logger.Error(string.Format("The {0}  is not found at this path - {1},Root path does not exist.Provide a valid  path", nameof(rootPath), rootPath));
+                Logger.ErrorFormat("The {0}  is not found at this path - {1},Root path does not exist.Provide a valid  path", nameof(rootPath), rootPath);
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }
@@ -89,9 +89,9 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentNullException ex)
             {
-                Logger.Error(string.Format("Error occurred while scanning files with pattern '{0}' in path '{1}': {2}", includePattern, rootPath, ex.Message), ex);
+                Logger.ErrorFormat("Error occurred while scanning files with pattern '{0}' in path '{1}': {2}", includePattern, rootPath, ex.Message);
                 LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, string.Format("Error occurred while scanning files with pattern '{0}' in path '{1}'.", includePattern, rootPath), "Check the input path and inclusion patterns.");
-                throw;
+                throw new ArgumentNullException(nameof(includePattern), $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.\nInnerException: {ex.Message}");
             }
         }
 

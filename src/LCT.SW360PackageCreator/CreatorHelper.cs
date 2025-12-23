@@ -71,17 +71,17 @@ namespace LCT.SW360PackageCreator
         {
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
             string localPathforDownload = GetDownloadPathForComponetType(component);
-            Logger.Debug($"DownloadReleaseAttachmentSource():local path for download release attachment:{localPathforDownload}");
+            Logger.DebugFormat("DownloadReleaseAttachmentSource():local path for download release attachment:{0}", localPathforDownload);
             if (!component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
             {
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                Logger.Debug($"DownloadReleaseAttachmentSource()-Name-{component.Name},version-{component.Version},localPathforDownload-{localPathforDownload}");
+                Logger.DebugFormat("DownloadReleaseAttachmentSource()-Name-{0},version-{1},localPathforDownload-{2}", component.Name, component.Version, localPathforDownload);
                 LogSourceAndDownloadUrlWarnings(component);
 
                 if (component.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound))
                 {
-                    Logger.Debug($"DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
+                    Logger.DebugFormat("DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {0}-{1}", component.Name, component.Version);
                 }
                 else
                 {
@@ -96,15 +96,15 @@ namespace LCT.SW360PackageCreator
             }
             if (AttachmentUrlList.Count > 0)
             {
-                Logger.Debug($"Attachments found for ComponentName: {component.Name}, Version: {component.Version}");
+                Logger.DebugFormat("Attachments found for ComponentName: {0}, Version: {1}", component.Name, component.Version);
                 foreach (var attachment in AttachmentUrlList)
                 {
-                    Logger.Debug($"DownloadReleaseAttachmentSource(): Attachment Key: {attachment.Key}, Attachment URL: {attachment.Value}");
+                    Logger.DebugFormat("DownloadReleaseAttachmentSource(): Attachment Key: {0}, Attachment URL: {1}", attachment.Key, attachment.Value);
                 }
             }
             else
             {
-                Logger.Debug($"DownloadReleaseAttachmentSource(): No attachments found for ComponentName: {component.Name}, Version: {component.Version}");
+                Logger.DebugFormat("DownloadReleaseAttachmentSource(): No attachments found for ComponentName: {0}, Version: {1}", component.Name, component.Version);
             }
             return AttachmentUrlList;
         }
@@ -148,7 +148,7 @@ namespace LCT.SW360PackageCreator
             {
                 AttachmentUrlList.Add(SOURCE, downloadPath);
             }
-            Logger.Debug($"GetAttachmentUrlList():Downloaded release attachment path:Name-{component.Name},Version-{component.Version},DownloadPath-{downloadPath}");
+            Logger.DebugFormat("GetAttachmentUrlList():Downloaded release attachment path:Name-{0},Version-{1},DownloadPath-{2}", component.Name, component.Version, downloadPath);
             return downloadPath;
         }
 
@@ -198,18 +198,18 @@ namespace LCT.SW360PackageCreator
             p.StartInfo.RedirectStandardInput = true;
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-            Logger.Debug($"DownloadDependencyList(): Start - ComponentName: {component.Name}, Version: {component.Version}, Group: {component.Group}");
+            Logger.DebugFormat("DownloadDependencyList(): Start - ComponentName: {0}, Version: {1}, Group: {2}", component.Name, component.Version, component.Group);
             if (isWindows)
             {
                 p.StartInfo.FileName = Path.Combine(@"cmd.exe");
                 p.StartInfo.Arguments = $"/c mvn org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-                Logger.Debug($"DownloadDependencyList(): Windows OS detected. Command: {p.StartInfo.Arguments}");
+                Logger.DebugFormat("DownloadDependencyList(): Windows OS detected. Command: {0}", p.StartInfo.Arguments);
             }
             else
             {
                 p.StartInfo.FileName = Path.Combine(@"mvn");
                 p.StartInfo.Arguments = $"org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-                Logger.Debug($"DownloadDependencyList(): Non-Windows OS detected. Command: {p.StartInfo.Arguments}");
+                Logger.DebugFormat("DownloadDependencyList(): Non-Windows OS detected. Command: {0}", p.StartInfo.Arguments);
             }
 
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);

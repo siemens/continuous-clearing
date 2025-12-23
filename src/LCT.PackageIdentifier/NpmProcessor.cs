@@ -79,7 +79,7 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
-            Logger.Debug($"ParsePackageFile():Completed parsing the package file for NPM components.\n");
+            Logger.Debug("ParsePackageFile():Completed parsing the package file for NPM components.\n");
             return bom;
         }
 
@@ -386,8 +386,8 @@ namespace LCT.PackageIdentifier
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
             listOfInternalComponents = internalComponents;
-            Logger.Debug($"IdentificationOfInternalComponents(): identified internal components:{internalComponents.Count}.");
-            Logger.Debug($"IdentificationOfInternalComponents(): Completed identification of internal components.\n");
+            Logger.DebugFormat("IdentificationOfInternalComponents(): identified internal components:{0}.", internalComponents.Count);
+            Logger.Debug("IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
 
