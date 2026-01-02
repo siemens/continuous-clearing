@@ -240,8 +240,7 @@ namespace LCT.SW360PackageCreator
 
             // Check if all components are Choco packages
             bool allChocoComponents = parsedBomData.All(component => 
-                string.Equals(component.ComponentStatus, "Not Processed for CHOCO", StringComparison.OrdinalIgnoreCase));
-
+                string.Equals(component.ComponentStatus, "Not Processed for CHOCO", StringComparison.OrdinalIgnoreCase));            
             if (!allChocoComponents)
             {
                 // Only process SW360 operations if not all components are CHOCO
