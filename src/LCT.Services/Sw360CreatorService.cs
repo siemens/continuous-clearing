@@ -52,7 +52,7 @@ namespace LCT.Services
         public async Task<ComponentCreateStatus> CreateComponentBasesOFswComaprisonBOM(
             ComparisonBomData componentInfo, Dictionary<string, string> attachmentUrlList)
         {
-            Logger.DebugFormat("CreateComponentBasesOFswComaprisonBOM():starting to create component, Name-{0},version-{1}", componentInfo.Name, componentInfo.Version);
+            Logger.DebugFormat("CreateComponentBasesOFswComaprisonBOM():Starting to create component, Name-{0},version-{1}", componentInfo.Name, componentInfo.Version);
             ComponentCreateStatus componentCreateStatus = new ComponentCreateStatus
             {
                 IsCreated = true,

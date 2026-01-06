@@ -147,7 +147,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                Logger.DebugFormat("UpdateToLocalBomFile():Local Bom not updated for {0}-{1}.\n", currName, currVersion);
+                Logger.DebugFormat("UpdateToLocalBomFile():Local BoM not updated for {0}-{1}.\n", currName, currVersion);
             }
         }
 
