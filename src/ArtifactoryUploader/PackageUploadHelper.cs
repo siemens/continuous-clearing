@@ -136,6 +136,7 @@ namespace LCT.ArtifactoryUploader
                     AddToNpmList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "NUGET":
+                case "CHOCO":
                     AddToNugetList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "MAVEN":
@@ -226,7 +227,7 @@ namespace LCT.ArtifactoryUploader
                 displayPackagesInfo.JfrogFoundPackagesCargo.Add(component);
         }
 
-
+        // Properly wrap UploadingThePackages as a method
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadingThePackages() method");
@@ -314,7 +315,7 @@ namespace LCT.ArtifactoryUploader
             {
                 packageNameEXtension = ".tgz";
             }
-            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase))
+            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase) || package.ComponentType.Equals("CHOCO", StringComparison.OrdinalIgnoreCase))
             {
                 packageNameEXtension = ".nupkg";
             }

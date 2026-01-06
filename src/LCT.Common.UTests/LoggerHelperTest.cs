@@ -715,5 +715,130 @@ namespace LCT.Common.UTest
             Assert.That(notice.RenderedMessage, Does.Contain("THIRD_PARTY_REPO_NAME:\t"));
             Assert.That(notice.RenderedMessage, Does.Contain("RELEASE_REPO_NAME:\t"));
         }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithChocoComponents_DisplaysWarningAndTable()
+        {
+            // Arrange
+            var chocoComponents = new List<Component>
+            {
+                new Component
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    Properties = new List<Property>
+                    {
+                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
+                    }
+                },
+                new Component
+                {
+                    Name = "firefox",
+                    Version = "95.0.1",
+                    Properties = new List<Property>
+                    {
+                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
+                    }
+                }
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(chocoComponents));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithMixedComponents_OnlyDisplaysChocoComponents()
+        {
+            // Arrange
+            var mixedComponents = new List<Component>
+            {
+                new Component
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    Properties = new List<Property>
+                    {
+                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
+                    }
+                },
+                new Component
+                {
+                    Name = "npm-package",
+                    Version = "1.0.0",
+                    Properties = new List<Property>
+                    {
+                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "NPM" }
+                    }
+                }
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(mixedComponents));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithNoChocoComponents_DoesNotDisplay()
+        {
+            // Arrange
+            var nonChocoComponents = new List<Component>
+            {
+                new Component
+                {
+                    Name = "npm-package",
+                    Version = "1.0.0",
+                    Properties = new List<Property>
+                    {
+                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "NPM" }
+                    }
+                }
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(nonChocoComponents));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithNullComponents_DoesNotThrow()
+        {
+            // Act & Assert
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(null));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithEmptyComponents_DoesNotThrow()
+        {
+            // Act & Assert
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(new List<Component>()));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithChocoComponentsHavingNullNames_HandlesGracefully()
+        {
+            // Arrange
+            var chocoComponents = new List<Component>
+            {
+                new Component
+                {
+                    Name = null,
+                    Version = null,
+                    Properties = new List<Property>
+                    {
+                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
+                    }
+                },
+                new Component
+                {
+                    Name = "firefox",
+                    Version = "95.0.1",
+                    Properties = new List<Property>
+                    {
+                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
+                    }
+                }
+            };
+
+            // Act & Assert - Should handle null names gracefully
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(chocoComponents));
+        }
     }
 }

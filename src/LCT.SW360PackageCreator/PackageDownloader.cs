@@ -13,6 +13,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -248,6 +249,25 @@ namespace LCT.SW360PackageCreator
                $"fetch --prune --progress --depth=1 origin refs/tags/{taggedVersion}",
                $"archive --format=tar.gz --output={compressedFilePath} FETCH_HEAD"
            };
+        }
+
+        /// <summary>
+        /// Retrieves a list of tags from the operating system-specific output in the provided result.
+        /// </summary>
+        /// <param name="result">The result object containing the standard output to parse. Can be null.</param>
+        /// <returns>An array of strings representing the tags extracted from the standard output.  Returns an empty array if
+        /// <paramref name="result"/> is null or its standard output is null.</returns>
+        [ExcludeFromCodeCoverage]
+        private static string[] GettagListFromOS(Result result)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return result?.StdOut?.Split("\r\n") ?? Array.Empty<string>();
+            }
+            else
+            {
+                return result?.StdOut?.Split("\n") ?? Array.Empty<string>();
+            }
         }
     }
 }

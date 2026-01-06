@@ -26,6 +26,11 @@ namespace LCT.Common.Logging
         private static IAnsiConsole _console;
         private static readonly object _consoleLock = new();
 
+        // Constants for repeated string literals
+        private const string AlertConstant = "Alert";
+        private const string BlueVersionMarkup = "[blue]Version[/]";
+        private const string GreenNameMarkup = "[green]Name[/]";
+
         public static IAnsiConsole ConsoleInstance
         {
             get
@@ -143,7 +148,7 @@ namespace LCT.Common.Logging
                     var environmentHelper = new EnvironmentHelper();
                     environmentHelper.CallEnvironmentExit(2);
 
-                }, "Components Without Download URL", "Alert");
+                }, "Components Without Download URL", AlertConstant);
             }
         }
         private static void DisplayDuplicateComponentsByPurlId(List<Components> duplicateComponents, string sw360URL)
@@ -168,8 +173,8 @@ namespace LCT.Common.Logging
                 .Title("[yellow]Invalid / Duplicate Components (PurlId Mismatch)[/]")
                 .Expand();
 
-            table.AddColumn(new TableColumn("[green]Name[/]").Width(nameWidth).NoWrap());
-            table.AddColumn(new TableColumn("[blue]Version[/]").Width(versionWidth).NoWrap());
+            table.AddColumn(new TableColumn(GreenNameMarkup).Width(nameWidth).NoWrap());
+            table.AddColumn(new TableColumn(BlueVersionMarkup).Width(versionWidth).NoWrap());
             table.AddColumn(new TableColumn("[cyan]SW360 Component URL[/]").Width(urlWidth).NoWrap());
 
             foreach (var item in duplicateComponents)
@@ -231,8 +236,8 @@ namespace LCT.Common.Logging
             const int nameWidth = 50;
             const int versionWidth = 20;
             int linkWidth = includeUrl ? totalWidth - (nameWidth + versionWidth + 10) : 0;
-            table.AddColumn(new TableColumn("[green]Name[/]").Width(nameWidth).NoWrap());
-            table.AddColumn(new TableColumn("[blue]Version[/]").Width(versionWidth).NoWrap());
+            table.AddColumn(new TableColumn(GreenNameMarkup).Width(nameWidth).NoWrap());
+            table.AddColumn(new TableColumn(BlueVersionMarkup).Width(versionWidth).NoWrap());
             if (includeUrl)
             {
                 table.AddColumn(new TableColumn("[cyan]SW360 Release URL[/]")
@@ -286,8 +291,8 @@ namespace LCT.Common.Logging
                         .Width(Math.Min(consoleWidth, 120));
 
                     table.AddColumns(
-                        new TableColumn("[green]Name[/]").Width(45),
-                        new TableColumn("[blue]Version[/]").Width(35)
+                        new TableColumn(GreenNameMarkup).Width(45),
+                        new TableColumn(BlueVersionMarkup).Width(35)
                     );
 
                     foreach (var item in components)
@@ -307,7 +312,7 @@ namespace LCT.Common.Logging
                     EnvironmentHelper environmentHelper = new EnvironmentHelper();
                     environmentHelper.CallEnvironmentExit(2);
 
-                }, "Components Not Linked", "Alert");
+                }, "Components Not Linked", AlertConstant);
             }
         }
         public static void WriteComponentsNotLinkedListInConsole(List<Components> components)
@@ -694,8 +699,8 @@ namespace LCT.Common.Logging
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Package Creater execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input parameters used in Package Creater[/]\n\n");
+                .Append($"Start of Package Creator execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [green]Input parameters used in Package Creator[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendCreatorSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
@@ -1208,7 +1213,7 @@ namespace LCT.Common.Logging
 
                     ConsoleInstance.Write(table);
                     WriteLine();
-                }, "* Internal Components Identified which will not be sent for clearing:", "Alert");
+                }, "* Internal Components Identified which will not be sent for clearing:", AlertConstant);
             }
         }
         public static void WriteInternalComponentsListToKpi(List<Component> internalComponents)
@@ -1393,5 +1398,61 @@ namespace LCT.Common.Logging
             }
         }
 
+        public static void WriteChocoManualStepsNotification(List<Component> components)
+        {
+            if (components == null || components.Count == 0)
+                return;
+
+            // Get all Choco components to display in the table
+            var chocoComponents = components.Where(c => 
+                c.Properties?.Any(p => 
+                    string.Equals(p.Name, Dataconstant.Cdx_ProjectType, StringComparison.OrdinalIgnoreCase) && 
+                    string.Equals(p.Value, "CHOCO", StringComparison.OrdinalIgnoreCase)) == true).ToList();
+
+            if (chocoComponents.Count == 0)
+                return;
+
+            WriteChocoManualStepsNotificationWithSpectre(chocoComponents);
+        }
+
+        private static void WriteChocoManualStepsNotificationWithSpectre(List<Component> chocoComponents)
+        {
+            SafeSpectreAction(() =>
+            {
+                // Display warning message first (outside box)
+                WriteLine();
+                WriteInfoWithMarkup("[bold yellow]⚠️ ATTENTION: Manual License Clearing Required for Chocolatey Packages[/] \n");
+                WriteInfoWithMarkup("[yellow] * Chocolatey packages have been identified in your project.[/]");
+                WriteInfoWithMarkup("[yellow]Please note that manual license clearing steps are required for these packages.[/]");
+                WriteInfoWithMarkup("[yellow]Please ensure all Chocolatey packages are properly reviewed and cleared according to your organization's license policies.[/]");
+                WriteLine();
+
+                // Create and display table with Choco components (inside box)
+                var table = new Table()
+                    .BorderColor(Color.Yellow)
+                    .Border(TableBorder.Rounded)
+                    .Title("[yellow]Chocolatey Packages Requiring Manual License Clearing[/]")
+                    .Expand();
+
+
+              
+                table.AddColumn(new TableColumn(GreenNameMarkup).Width(60).NoWrap());
+                table.AddColumn(new TableColumn(BlueVersionMarkup).Width(30).NoWrap());
+
+                foreach (var item in chocoComponents)
+                {
+                    string name = string.IsNullOrWhiteSpace(item.Name) ? "N/A" : item.Name;
+                    string version = string.IsNullOrWhiteSpace(item.Version) ? "N/A" : item.Version;
+
+                    table.AddRow(
+                        $"[white]{Markup.Escape(name)}[/]",
+                        $"[white]{Markup.Escape(version)}[/]"
+                    );
+                }
+
+                ConsoleInstance.Write(table);
+                WriteLine();
+            }, "Manual License Clearing Required for Chocolatey Packages", AlertConstant);
+        }
     }
 }
