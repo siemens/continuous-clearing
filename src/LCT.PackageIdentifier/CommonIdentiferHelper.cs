@@ -38,21 +38,7 @@ namespace LCT.PackageIdentifier
             {
                 return aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
             }
-        }
-        public static string GetBomFileName(CommonAppSettings appSettings)
-        {
-            string bomFileName;
-            if (appSettings.SW360 != null)
-            {
-                bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
-            }
-            else
-            {
-                bomFileName = FileConstant.basicSBOMName;
-            }
-
-            return bomFileName;
-        }
+        }        
         public static string GetDefaultProjectName(CommonAppSettings appSettings)
         {
             string projectName;
