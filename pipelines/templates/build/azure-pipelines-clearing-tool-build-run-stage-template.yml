@@ -55,27 +55,20 @@ stages:
         parameters:
           jobName: binaryRun
           jobDisplayName: "Execute Binary Job"
-          templatePath: azure-pipelines-clearing-tool-build-run-binary-step-template.yml
-          sw360Url: ${{ parameters.sw360Url }}
-          sw360Token: ${{ parameters.sw360Token }}
-          sw360ProjectId: ${{ parameters.sw360ProjectId }}
-          sw360ProjectName: ${{ parameters.sw360ProjectName }}
+          templatePath: azure-pipelines-clearing-tool-build-run-binary-step-template.yml          
           fossologyUrl: ${{ parameters.fossologyUrl }}
           JfrogUrl: ${{ parameters.JfrogUrl }}
           JfrogToken: ${{ parameters.JfrogToken }}
           projectDefinitions: ${{ parameters.projectDefinitions }}
           outputFolder: ${{ parameters.outputFolder }}
           appSettingsPath: ${{ parameters.appSettingsPath }}
+          Sw360Connection: false
 
       - template: azure-pipelines-clearing-tool-build-run-job-template.yml
         parameters:
           jobName: imageRun
           jobDisplayName: "Execute Image Job"
-          templatePath: azure-pipelines-clearing-tool-build-run-image-step-template.yml
-          sw360Url: ${{ parameters.sw360Url }}
-          sw360Token: ${{ parameters.sw360Token }}
-          sw360ProjectId: ${{ parameters.sw360ProjectId }}
-          sw360ProjectName: ${{ parameters.sw360ProjectName }}
+          templatePath: azure-pipelines-clearing-tool-build-run-image-step-template.yml          
           fossologyUrl: ${{ parameters.fossologyUrl }}
           JfrogUrl: ${{ parameters.JfrogUrl }}
           JfrogToken: ${{ parameters.JfrogToken }}
@@ -83,3 +76,4 @@ stages:
           projectDefinitions: ${{ parameters.projectDefinitions }}
           outputFolder: ${{ parameters.outputFolder }}
           appSettingsPath: ${{ parameters.appSettingsPath }}
+          Sw360Connection: false
