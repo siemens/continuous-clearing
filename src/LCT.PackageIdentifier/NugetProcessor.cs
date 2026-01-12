@@ -501,7 +501,7 @@ namespace LCT.PackageIdentifier
 
             Logger.Debug($"ParsingInputFileForBOM():FileName: {filepath}");
 
-            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) &&
+            if ((filepath.EndsWith(FileConstant.CycloneDXFileExtension) || filepath.EndsWith(FileConstant.DependencyFileExtension)) &&
                 !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");

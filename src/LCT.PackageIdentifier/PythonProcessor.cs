@@ -59,7 +59,7 @@ namespace LCT.PackageIdentifier
                     listofComponents=ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
                     ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents));
                 }
-                else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
+                else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.DependencyFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents=ExtractDetailsFromJson(config, appSettings, ref dependencies);

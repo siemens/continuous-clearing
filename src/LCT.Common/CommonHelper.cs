@@ -63,11 +63,17 @@ namespace LCT.Common
                 Logger.Warn("   Can you please provide the cdxgen-generated SBOM data to get more accurate dependencies");
                 return null;
             }
+            bool onlyDependencyFiles = configFiles.Count > 0 &&
+               configFiles.All(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
 
-            // Remove the dependency file so it is not processed again later in the pipeline
+            if (onlyDependencyFiles)
+            {
+                return null;
+            }
+           
             configFiles.Remove(dependencyFilePath);
 
-            // Parse via delegate (so this helper does not depend on PackageIdentifier types)
+            
             var cdxGenBomData = parseCycloneDxBom?.Invoke(dependencyFilePath);
 
             if (cdxGenBomData?.Components != null)

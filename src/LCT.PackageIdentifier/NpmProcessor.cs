@@ -81,25 +81,7 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"ParsePackageFile():End");
             return bom;
         }
-
-        public static void AddSiemensDirectProperty(ref Bom bom)
-        {
-            List<string> npmDirectDependencies = new List<string>();
-            npmDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
-            var bomComponentsList = bom.Components;
-
-            foreach (var component in bomComponentsList)
-            {
-                string siemensDirectValue = npmDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version))
-                    ? "true"
-                    : "false";
-                component.Properties ??= new List<Property>();
-                var properties = component.Properties;
-                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_SiemensDirect, siemensDirectValue);
-                component.Properties = properties;
-            }
-            bom.Components = bomComponentsList;
-        }
+        
         public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
@@ -521,7 +503,7 @@ namespace LCT.PackageIdentifier
         }
         private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies, ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
         {
-            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
+            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) || filepath.EndsWith(FileConstant.DependencyFileExtension))
             {
                 ProcessCycloneDXFile(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
             }
@@ -531,7 +513,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                ProcessPackageFile(filepath, appSettings,ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
+                ProcessPackageFile(filepath, appSettings, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
         }
 
@@ -577,14 +559,15 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
 
-        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Dependency> dependencies,ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofdependenciesFromLockFile)
+        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings,ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofdependenciesFromLockFile)
         {
             Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
             var components = ParsePackageLockJson(filepath, appSettings);
+            var dependenciesFromPackageFiles = new List<Dependency>();
             AddingIdentifierType(components, "PackageFile", filepath);
             ListofComponentsFromLockFile.AddRange(components);
-            GetDependencyDetails(components, dependencies);
-            ListofdependenciesFromLockFile.AddRange(dependencies);
+            GetDependencyDetails(components, dependenciesFromPackageFiles);
+            ListofdependenciesFromLockFile.AddRange(dependenciesFromPackageFiles);
         }
 
         public static void GetDependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
