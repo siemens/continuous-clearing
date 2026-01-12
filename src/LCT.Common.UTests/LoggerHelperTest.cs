@@ -720,25 +720,19 @@ namespace LCT.Common.UTest
         public void WriteChocoManualStepsNotification_WithChocoComponents_DisplaysWarningAndTable()
         {
             // Arrange
-            var chocoComponents = new List<Component>
+            var chocoComponents = new List<Components>
             {
-                new Component
+                new Components
                 {
                     Name = "7zip",
                     Version = "19.0.0",
-                    Properties = new List<Property>
-                    {
-                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
-                    }
+                    ProjectType = "CHOCO"
                 },
-                new Component
+                new Components
                 {
                     Name = "firefox",
                     Version = "95.0.1",
-                    Properties = new List<Property>
-                    {
-                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
-                    }
+                    ProjectType = "CHOCO"
                 }
             };
 
@@ -750,25 +744,19 @@ namespace LCT.Common.UTest
         public void WriteChocoManualStepsNotification_WithMixedComponents_OnlyDisplaysChocoComponents()
         {
             // Arrange
-            var mixedComponents = new List<Component>
+            var mixedComponents = new List<Components>
             {
-                new Component
+                new Components
                 {
                     Name = "7zip",
                     Version = "19.0.0",
-                    Properties = new List<Property>
-                    {
-                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
-                    }
+                    ProjectType = "CHOCO"
                 },
-                new Component
+                new Components
                 {
                     Name = "npm-package",
                     Version = "1.0.0",
-                    Properties = new List<Property>
-                    {
-                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "NPM" }
-                    }
+                    ProjectType = "NPM"
                 }
             };
 
@@ -780,16 +768,13 @@ namespace LCT.Common.UTest
         public void WriteChocoManualStepsNotification_WithNoChocoComponents_DoesNotDisplay()
         {
             // Arrange
-            var nonChocoComponents = new List<Component>
+            var nonChocoComponents = new List<Components>
             {
-                new Component
+                new Components
                 {
                     Name = "npm-package",
                     Version = "1.0.0",
-                    Properties = new List<Property>
-                    {
-                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "NPM" }
-                    }
+                    ProjectType = "NPM"
                 }
             };
 
@@ -808,32 +793,26 @@ namespace LCT.Common.UTest
         public void WriteChocoManualStepsNotification_WithEmptyComponents_DoesNotThrow()
         {
             // Act & Assert
-            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(new List<Component>()));
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(new List<Components>()));
         }
 
         [Test]
         public void WriteChocoManualStepsNotification_WithChocoComponentsHavingNullNames_HandlesGracefully()
         {
             // Arrange
-            var chocoComponents = new List<Component>
+            var chocoComponents = new List<Components>
             {
-                new Component
+                new Components
                 {
                     Name = null,
                     Version = null,
-                    Properties = new List<Property>
-                    {
-                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
-                    }
+                    ProjectType = "CHOCO"
                 },
-                new Component
+                new Components
                 {
                     Name = "firefox",
                     Version = "95.0.1",
-                    Properties = new List<Property>
-                    {
-                        new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CHOCO" }
-                    }
+                    ProjectType = "CHOCO"
                 }
             };
 

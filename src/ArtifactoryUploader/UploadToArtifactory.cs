@@ -88,7 +88,15 @@ namespace LCT.ArtifactoryUploader
 
         private static string GetComponentType(Component item)
         {
+            var projectTypeProp = item.Properties
+                                       ?.Find(p => p.Name == Dataconstant.Cdx_ProjectType)
+                                       ?.Value;
 
+            if (!string.IsNullOrEmpty(projectTypeProp) &&
+                projectTypeProp.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "CHOCO";
+            }
             if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
                 return "NPM";
@@ -96,10 +104,6 @@ namespace LCT.ArtifactoryUploader
             else if (item.Purl.Contains("nuget", StringComparison.OrdinalIgnoreCase))
             {
                 return "NUGET";
-            }
-            else if (item.Purl.Contains("choco", StringComparison.OrdinalIgnoreCase))
-            {
-                return "CHOCO";
             }
             else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
             {
@@ -242,16 +246,10 @@ namespace LCT.ArtifactoryUploader
                $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
 
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == "NUGET" || component.ComponentType == "CHOCO")
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
-            }
-            else if (component.ComponentType == "CHOCO")
-            {
-                // Choco package copy URL (similar to NuGet)
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}.nupkg" +
-               $"?to=/{component.DestRepoName}/{component.Name}.{component.Version}.nupkg";
             }
             else if (component.ComponentType == "MAVEN")
             {
@@ -297,7 +295,7 @@ namespace LCT.ArtifactoryUploader
               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
 
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == "NUGET" || component.ComponentType == "CHOCO")
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
@@ -343,6 +341,7 @@ namespace LCT.ArtifactoryUploader
             {
                 "NPM" => component.PypiOrNpmCompName,
                 "NUGET" => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
+                "CHOCO" => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 "DEBIAN" => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
                 "CARGO" => $"{component.PackageName}.{component.Version}{ApiConstant.CargoExtension}",
                 "POETRY" => component.PypiOrNpmCompName,
@@ -388,6 +387,9 @@ namespace LCT.ArtifactoryUploader
                     break;
                 case "CARGO":
                     displayPackagesInfo.UnknownPackagesCargo.Add(component);
+                    break;
+                case "CHOCO":
+                    displayPackagesInfo.UnknownPackagesChoco.Add(component);
                     break;
             }
         }
@@ -455,7 +457,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
                 }
-            }
+            }          
 
             return null;
         }
@@ -603,6 +605,21 @@ namespace LCT.ArtifactoryUploader
             }
 
             return PackageType.Unknown;
+        }
+        private static String GetProjectType(Component item)
+        {
+            string GetPropertyValue(string propertyName) =>
+                    item.Properties
+                        .Find(p => p.Name == propertyName)?
+                        .Value?
+                        .ToUpperInvariant();
+
+            if (GetPropertyValue(Dataconstant.Cdx_ProjectType) == "Choco")
+            {
+                return "CHOCO";
+            }           
+
+            return null;
         }
 
     }
