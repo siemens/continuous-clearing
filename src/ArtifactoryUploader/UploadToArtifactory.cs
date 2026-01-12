@@ -91,7 +91,6 @@ namespace LCT.ArtifactoryUploader
             var projectTypeProp = item.Properties
                                        ?.Find(p => p.Name == Dataconstant.Cdx_ProjectType)
                                        ?.Value;
-
             if (!string.IsNullOrEmpty(projectTypeProp) &&
                 projectTypeProp.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
             {
