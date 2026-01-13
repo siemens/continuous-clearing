@@ -291,15 +291,7 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
         {
-            // Check if any components are CHOCO (this method is only called for non-CHOCO components now)
-            bool hasChocoComponents = componentsToBoms.Any(component => 
-                string.Equals(component.ComponentStatus, "Not Processed for CHOCO", StringComparison.OrdinalIgnoreCase));
-
-            if (!hasChocoComponents)
-            {
-                Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BoM = {componentsToBoms.Count} ", null);
-            }
-
+            Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BoM = {componentsToBoms.Count} ", null);
             try
             {
                 foreach (ComparisonBomData item in componentsToBoms)
