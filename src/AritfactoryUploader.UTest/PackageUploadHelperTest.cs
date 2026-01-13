@@ -229,6 +229,7 @@ namespace AritfactoryUploader.UTest
             displayPackagesInfo.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesChoco = new List<ComponentsToArtifactory>();
 
             // Act
             await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
@@ -239,7 +240,7 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesNpm[0], Is.Not.Null);
             }
-            else if (item.ComponentType == "NUGET" || item.ComponentType == "CHOCO")
+            else if (item.ComponentType == "NUGET")
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesNuget[0], Is.Not.Null);
@@ -269,6 +270,11 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesCargo[0], Is.Not.Null);
             }
+            else if (item.ComponentType == "CHOCO")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesChoco.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesChoco[0], Is.Not.Null);
+            }
         }
 
         [Test]
@@ -293,6 +299,7 @@ namespace AritfactoryUploader.UTest
             displayPackagesInfo.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesChoco = new List<ComponentsToArtifactory>();
             var operationType = "operationType";
             var responseMessage = new HttpResponseMessage();
             var dryRunSuffix = "dryRunSuffix";
@@ -306,7 +313,7 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesNpm.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesNpm[0], Is.Not.Null);
             }
-            else if (item.ComponentType == "NUGET" || item.ComponentType == "CHOCO")
+            else if (item.ComponentType == "NUGET")
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesNuget.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesNuget[0], Is.Not.Null);
@@ -335,6 +342,11 @@ namespace AritfactoryUploader.UTest
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesCargo.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesCargo[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "CHOCO")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesChoco.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesChoco[0], Is.Not.Null);
             }
         }
 
