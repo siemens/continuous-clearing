@@ -228,31 +228,29 @@ namespace LCT.Common
             }
             CopyInitialLogsToCurrentLoggerAndDelete(defaultLogFilePath);
             return FolderPath;
-        }
+        } 
         private static void CopyInitialLogsToCurrentLoggerAndDelete(string defaultLogFilePath)
         {
             try
             {
+                Logger.Debug("====================<<<<< Start >>>>>====================");
                 if (!string.IsNullOrEmpty(defaultLogFilePath) && File.Exists(defaultLogFilePath))
                 {
-                    foreach (var line in File.ReadLines(defaultLogFilePath))
+                    foreach (var line in File.ReadLines(defaultLogFilePath).Where(l => !string.IsNullOrWhiteSpace(l)))
                     {
-                        if (!string.IsNullOrWhiteSpace(line))
-                        {
-                            var messageOnly = TrimLogHeader(line);
-                            Logger.Debug(messageOnly);
-                        }
+                        var messageOnly = TrimLogHeader(line);
+                        Logger.Debug(messageOnly);
                     }
                     File.Delete(defaultLogFilePath);
                 }
             }
             catch (IOException ioEx)
-            {
-                Logger.Debug($"IO Exception while Copying initial logs: {ioEx.Message}");
+            {                
+                Logger.Debug("IO Exception while Copying initial logs.", ioEx);
             }
             catch (UnauthorizedAccessException uaEx)
             {
-                Logger.Debug($"Unauthorized Access while Copying initial logs: {uaEx.Message}");
+                Logger.Debug("Unauthorized Access while Copying initial logs.", uaEx);
             }
         }
         private static string TrimLogHeader(string line)
@@ -268,13 +266,13 @@ namespace LCT.Common
 
             // Return content after the third pipe, trimming leading spaces
             return line[(third + 1)..].TrimStart();
-        }       
+        }
         public static string DefaultLogFolderInitialization(string logFileName, bool m_Verbose)
         {
             string localPathforSourceRepo = string.Empty;
             try
-            {                
-                localPathforSourceRepo = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
+            {
+                localPathforSourceRepo = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
                 if (!System.IO.Directory.Exists(localPathforSourceRepo))
                 {
                     System.IO.Directory.CreateDirectory(localPathforSourceRepo);
