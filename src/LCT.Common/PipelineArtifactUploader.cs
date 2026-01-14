@@ -47,6 +47,10 @@ namespace LCT.Common
                 Logger.Warn($"Uploading of logs is not supported.");
                 Logger.Debug("====================<<<<< Exit >>>>>====================");
             }
+            else
+            {
+                Logger.Debug("====================<<<<< Exit >>>>>====================");
+            }
 
         }
 

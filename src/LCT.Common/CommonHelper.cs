@@ -205,55 +205,105 @@ namespace LCT.Common
         }
         public static string LogFolderInitialization(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
-            string FolderPath = DefaultLogPath;
+            string FolderPath;
+            string defaultLogFilePath = Log4Net.CatoolLogPath;
+            LoggerManager.Shutdown();
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
-                string defaultLogFilePath = Log4Net.CatoolLogPath;
-
-                if (File.Exists(defaultLogFilePath))
-                {
-                    LoggerManager.Shutdown();
-                    FolderPath = appSettings.Directory.LogFolder;
-                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
-                    string currentLogFilePath = Log4Net.CatoolLogPath;
-                    string currentlogFileName = Path.GetFileName(Log4Net.CatoolLogPath);
-                    LoggerManager.Shutdown();
-                    try
-                    {
-                        File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
-                    }
-                    catch (IOException ioEx)
-                    {
-                        Logger.Debug($"IO Exception during log file copy: {ioEx.Message}");
-                    }
-                    catch (UnauthorizedAccessException uaEx)
-                    {
-                        Logger.Debug($"Unauthorized Access Exception during log file copy: {uaEx.Message}");
-                    }
-                    Thread.Sleep(2000);
-                    Log4Net.Init(currentlogFileName, FolderPath, m_Verbose);
-                }
-                else
-                {
-                    FolderPath = appSettings.Directory.LogFolder;
-                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
-                }
-            }
-            return FolderPath;
-        }
-        public static void DefaultLogFolderInitialization(string logFileName, bool m_Verbose)
-        {
-            string FolderPath;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                FolderPath = FileConstant.LogFolder;
+                FolderPath = appSettings.Directory.LogFolder;
+                Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
             }
             else
             {
-                FolderPath = "/var/log";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    FolderPath = FileConstant.LogFolder;
+                }
+                else
+                {
+                    FolderPath = "/var/log";
+                }
+
+                Log4Net.Init(logFileName, FolderPath, m_Verbose);
             }
-            Log4Net.Init(logFileName, FolderPath, m_Verbose);
-            DefaultLogPath = FolderPath;
+            CopyInitialLogsToCurrentLoggerAndDelete(defaultLogFilePath);
+            return FolderPath;
+        }
+        private static void CopyInitialLogsToCurrentLoggerAndDelete(string defaultLogFilePath)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(defaultLogFilePath) && File.Exists(defaultLogFilePath))
+                {
+                    foreach (var line in File.ReadLines(defaultLogFilePath))
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            var messageOnly = TrimLogHeader(line);
+                            Logger.Debug(messageOnly);
+                        }
+                    }
+                    File.Delete(defaultLogFilePath);
+                }
+            }
+            catch (IOException ioEx)
+            {
+                Logger.Debug($"IO Exception while Copying initial logs: {ioEx.Message}");
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                Logger.Debug($"Unauthorized Access while Copying initial logs: {uaEx.Message}");
+            }
+        }
+        private static string TrimLogHeader(string line)
+        {
+            int first = line.IndexOf('|');
+            if (first < 0) return line;
+
+            int second = line.IndexOf('|', first + 1);
+            if (second < 0) return line;
+
+            int third = line.IndexOf('|', second + 1);
+            if (third < 0) return line;
+
+            // Return content after the third pipe, trimming leading spaces
+            return line[(third + 1)..].TrimStart();
+        }       
+        public static string DefaultLogFolderInitialization(string logFileName, bool m_Verbose)
+        {
+            string localPathforSourceRepo = string.Empty;
+            try
+            {
+                string tempRoot = Path.GetTempPath();
+                localPathforSourceRepo = Path.Combine(tempRoot, "DefaultLogFiles");
+
+                if (!System.IO.Directory.Exists(localPathforSourceRepo))
+                {
+                    System.IO.Directory.CreateDirectory(localPathforSourceRepo);
+                }
+
+                Log4Net.Init(logFileName, localPathforSourceRepo, m_Verbose);
+                DefaultLogPath = localPathforSourceRepo;
+            }
+            catch (IOException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling(
+                    "DefaultLogFolderInitialization",
+                    "MethodName:DefaultLogFolderInitialization()",
+                    ex,
+                    "An I/O error occurred while trying to create or access the temp directory.");
+                Logger.Error("DefaultLogFolderInitialization() ", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling(
+                    "DefaultLogFolderInitialization",
+                    "MethodName:DefaultLogFolderInitialization()",
+                    ex,
+                    "Unauthorized access occurred while trying to create or access the temp directory.");
+                Logger.Error("DefaultLogFolderInitialization() ", ex);
+            }
+            return localPathforSourceRepo;
         }
         public static bool ContainsInvalidCharacters(string projectName, out string invalidChars)
         {
