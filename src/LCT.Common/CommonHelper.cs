@@ -273,10 +273,8 @@ namespace LCT.Common
         {
             string localPathforSourceRepo = string.Empty;
             try
-            {
-                string tempRoot = Path.GetTempPath();
-                localPathforSourceRepo = Path.Combine(tempRoot, "DefaultLogFiles");
-
+            {                
+                localPathforSourceRepo = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/";
                 if (!System.IO.Directory.Exists(localPathforSourceRepo))
                 {
                     System.IO.Directory.CreateDirectory(localPathforSourceRepo);

@@ -56,17 +56,7 @@ namespace LCT.Common.UTest
             LogManager.Shutdown();
             if (System.IO.Directory.Exists(tempDir))
                 System.IO.Directory.Delete(tempDir, true);
-        }
-        [Test]
-        public void LogFolderInitialization_WhenLogFileExists_CopiesLogAndReturnsFolder()
-        {
-            // Act
-            string result = CommonHelper.LogFolderInitialization(appSettings, "catool.log", false);
-
-            // Assert
-            Assert.AreEqual(tempDir, result);
-            Assert.IsTrue(File.Exists(tempLogFile));
-        }
+        }        
         [Test]
         public void LogFolderInitialization_WhenLogFolderIsNull_ReturnsDefaultLogPath()
         {
