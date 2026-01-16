@@ -81,13 +81,11 @@ namespace LCT.SW360PackageCreator
                         ProjectType = componentsData.ProjectType                       
                     });
                 }
-                else if (isInternalComponent)
+                else if (isInternalComponent
+                    || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)
+                    || componentsData.ExcludeComponent == "true")
                 {
-                    Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
-                }
-                else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true" )
-                {
-                    //do nothing
+                    LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);                    
                 }
                 else
                 {
@@ -118,6 +116,23 @@ namespace LCT.SW360PackageCreator
             return lstOfBomDataToBeCompared;
         }
 
+        private static void LogSkippedComponent(Component item, Components componentsData, CommonAppSettings appSettings, bool isInternalComponent)
+        {
+            if (isInternalComponent)
+            {
+                Logger.Debug($"{item.Name}-{item.Version} found as internal component.");
+                return;
+            }
+            if (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)
+            {
+                Logger.Debug($"{item.Name}-{item.Version} found as development component.");
+                return;
+            }
+            if (componentsData.ExcludeComponent == "true")
+            {
+                Logger.Debug($"{item.Name}-{item.Version} skipped (component marked as excluded).");
+            }
+        }
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
