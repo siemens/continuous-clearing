@@ -81,9 +81,7 @@ namespace LCT.SW360PackageCreator
                         ProjectType = componentsData.ProjectType                       
                     });
                 }
-                else if (isInternalComponent
-                    || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)
-                    || componentsData.ExcludeComponent == "true")
+                else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
                 {
                     LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);                    
                 }
