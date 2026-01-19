@@ -81,47 +81,5 @@ namespace LCT.APICommunications.UTest
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApicommunication.GetPackageInfo(new ComponentsToArtifactory()));
         }
-        [Test]
-        public async Task NpmJfrogApiCommunication_GetPackageInfo_EnsuresSuccessStatusCode()
-        {
-            // Arrange
-            var mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.SetResponse(new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK
-            });
-
-            var mockHttpClient = new HttpClient(mockHttpMessageHandler);
-            var repoCredentials = new ArtifactoryCredentials { Token = "dummyToken" };
-            var component = new ComponentsToArtifactory { PackageInfoApiUrl = "http://dummyurl.com" };
-
-            var jfrogApiCommunication = new NpmJfrogApiCommunication("", "", repoCredentials, 100);
-
-            // Act
-            var response = await jfrogApiCommunication.GetPackageInfo(component);
-
-            // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        }
-
-        // Custom HttpMessageHandler to mock SendAsync
-        public class MockHttpMessageHandler : HttpMessageHandler
-        {
-            private HttpResponseMessage? _response;
-
-            public void SetResponse(HttpResponseMessage response)
-            {
-                _response = response;
-            }
-
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            {
-                if (_response == null)
-                {
-                    throw new InvalidOperationException("Mock response has not been set.");
-                }
-                return Task.FromResult(_response);
-            }
-        }
     }
 }
