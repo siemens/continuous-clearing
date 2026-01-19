@@ -41,7 +41,7 @@ namespace LCT.PackageIdentifier
         {
             List<string> configFiles;
             List<DebianPackage> listofComponents = new List<DebianPackage>();
-            Bom bom = new Bom();
+            Bom bom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             List<Component> listComponentForBOM;
 
             configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Debian);
@@ -67,17 +67,14 @@ namespace LCT.PackageIdentifier
             bom.Components = listComponentForBOM;
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
-
             bom = RemoveExcludedComponents(appSettings, bom);
-            CommonHelper.UpdateDependencyRefsToComponentBomRef(ref bom,appSettings);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
-
+            CycloneDXBomParser.CheckValidDependenciesForProjectType(bom.Dependencies, appSettings.ProjectType);
             if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
             }
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
-            bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
@@ -194,7 +191,9 @@ namespace LCT.PackageIdentifier
         public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom, CommonAppSettings appSettings)
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
-            bom = ExtractDetailsForJson(filePath, ref debianPackages, appSettings);
+            Bom sbom = ExtractDetailsForJson(filePath, ref debianPackages, appSettings);
+            bom.Components.AddRange(sbom.Components);
+            bom.Dependencies.AddRange(sbom.Dependencies);
             return debianPackages;
         }
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,

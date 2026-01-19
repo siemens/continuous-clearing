@@ -71,8 +71,8 @@ namespace LCT.PackageIdentifier
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
 
             bom = RemoveExcludedComponents(appSettings, bom);
-            CommonHelper.UpdateDependencyRefsToComponentBomRef(ref bom, appSettings);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            CycloneDXBomParser.CheckValidDependenciesForProjectType(bom.Dependencies, appSettings.ProjectType);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;

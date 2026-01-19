@@ -33,6 +33,8 @@ namespace LCT.Common
         public static string ProjectSummaryLink { get; set; }
         public static string DefaultLogPath { get; set; }
 
+        public static bool DependencyFileNotFound { get; set; }=true;
+
         #region public
         public static bool IsAzureDevOpsDebugEnabled()
         {
@@ -56,18 +58,13 @@ namespace LCT.Common
         public static Bom GetCdxGenBomData(List<string> configFiles, Func<string, Bom> parseCycloneDxBom)
         {
             var dependencyFilePath = configFiles
-                .FirstOrDefault(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
-
-            if (string.IsNullOrEmpty(dependencyFilePath))
-            {
-                Logger.Warn("   Can you please provide the cdxgen-generated SBOM data to get more accurate dependencies");
-                return null;
-            }
+                .FirstOrDefault(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));           
             bool onlyDependencyFiles = configFiles.Count > 0 &&
                configFiles.All(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
 
             if (onlyDependencyFiles)
             {
+                DependencyFileNotFound = false;
                 return null;
             }
            
@@ -111,7 +108,18 @@ namespace LCT.Common
                     cdxGenBomData);
             }
         }
-
+        /// <summary>
+        /// Logs a warning asking for cdxgen-generated SBOM data, controlled by the DependencyFileGiven flag.
+        /// Call this when you want to prompt the user to provide the dependency SBOM.
+        /// </summary>
+        public static void WarnIfDependencyFileRequired()
+        {
+            if (!DependencyFileNotFound)
+            {
+                DependencyFileNotFound=true;
+                Logger.Warn("   Can you please provide the cdxgen-generated SBOM to get more accurate dependencies");
+            }
+        }
         public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
         {
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
@@ -400,7 +408,6 @@ namespace LCT.Common
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
                 componentForBOM = RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 updateKpiCallback?.Invoke(noOfExcludedComponents);
             }
 
@@ -652,54 +659,26 @@ namespace LCT.Common
         }
         private static void EnrichComponentsFromCdxGen(ref List<Component> componentsForBOM, List<Component> cdxComponents)
         {
-            // Index existing by Purl and by Name+Version
+           
             var byPurl = new Dictionary<string, Component>(StringComparer.OrdinalIgnoreCase);
             foreach (var c in componentsForBOM.Where(c => !string.IsNullOrEmpty(c.Purl)))
             {
-                byPurl[c.Purl] = c; // overwrite if key exists
+                byPurl[c.Purl] = c;
             }
 
-            // Index existing by Name+Version with overwrite semantics
             var byNameVer = new Dictionary<string, Component>(StringComparer.OrdinalIgnoreCase);
             foreach (var c in componentsForBOM.Where(c => !string.IsNullOrEmpty(c.Name) && !string.IsNullOrEmpty(c.Version)))
             {
                 var key = $"{c.Name}|{c.Version}";
-                byNameVer[key] = c; // overwrite if key exists
+                byNameVer[key] = c;
             }
 
             foreach (var cdx in cdxComponents)
             {
-                Component? existing = null;
-
-                if (!string.IsNullOrEmpty(cdx.Purl) && byPurl.TryGetValue(cdx.Purl, out var matchByPurl))
-                {
-                    existing = matchByPurl;
-                }
-                else
-                {
-                    var key = (!string.IsNullOrEmpty(cdx.Name) && !string.IsNullOrEmpty(cdx.Version))
-                        ? $"{cdx.Name}|{cdx.Version}"
-                        : null;
-
-                    if (key != null && byNameVer.TryGetValue(key, out var matchByNameVer))
-                    {
-                        existing = matchByNameVer;
-                    }
-                }
-
-                // Safely merge properties only when an existing component with properties is found
-                if (existing != null && existing.Properties != null && existing.Properties.Count > 0)
-                {
-                    cdx.Properties = [.. existing.Properties.Select(p => new Property { Name = p.Name, Value = p.Value })];
-                }
-                else
-                {
-                    // Preserve any properties that may already exist on cdx, otherwise initialize
-                    cdx.Properties ??= new List<Property>();
-                }
+                MergeExistingPropertiesIntoCdx(cdx, byPurl, byNameVer);
             }
         }
-        public static void UpdateDependencyRefsToComponentBomRef(ref Bom bom, CommonAppSettings appSettings)
+        public static void UpdateDependencyRefsToComponentBoMRef(ref Bom bom, CommonAppSettings appSettings)
         {
             if (bom == null || bom.Dependencies == null || bom.Components == null) return;
 
@@ -726,8 +705,6 @@ namespace LCT.Common
                     }
                     else
                     {
-                        // For NPM, NuGet, Maven: keep core without '?arch=source'
-                        // For Debian (and others): default to '?arch=source'
                         if (appSettings.ProjectType.Equals("NPM", StringComparison.OrdinalIgnoreCase) ||
                             appSettings.ProjectType.Equals("NUGET", StringComparison.OrdinalIgnoreCase) ||
                             appSettings.ProjectType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
@@ -755,6 +732,38 @@ namespace LCT.Common
                 NormalizeRef(d);
             }
         }
+        private static void MergeExistingPropertiesIntoCdx(
+            Component cdx,
+            Dictionary<string, Component> byPurl,
+            Dictionary<string, Component> byNameVer)
+        {
+            Component existing = null;
+
+            if (!string.IsNullOrEmpty(cdx.Purl) && byPurl.TryGetValue(cdx.Purl, out var matchByPurl))
+            {
+                existing = matchByPurl;
+            }
+            else
+            {
+                var key = (!string.IsNullOrEmpty(cdx.Name) && !string.IsNullOrEmpty(cdx.Version))
+                    ? $"{cdx.Name}|{cdx.Version}"
+                    : null;
+
+                if (key != null && byNameVer.TryGetValue(key, out var matchByNameVer))
+                {
+                    existing = matchByNameVer;
+                }
+            }
+
+            if (existing != null && existing.Properties != null && existing.Properties.Count > 0)
+            {
+                cdx.Properties = [.. existing.Properties.Select(p => new Property { Name = p.Name, Value = p.Value })];
+            }
+            else
+            {
+                cdx.Properties ??= new List<Property>();
+            }
+        }        
         #endregion
     }
 }

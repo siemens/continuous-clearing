@@ -709,6 +709,7 @@ namespace LCT.PackageIdentifier
 
         private void ParseInputFiles(CommonAppSettings appSettings, string filepath, List<NugetPackage> listofComponents)
         {
+            CommonHelper.WarnIfDependencyFileRequired();
             if (filepath.EndsWith(FileConstant.NugetAssetFile))
             {
                 listofComponents.AddRange(ParseAssetFile(filepath));

@@ -63,7 +63,6 @@ namespace LCT.PackageIdentifier
             if (appSettings.SW360?.ExcludeComponents != null)
             {
                 componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentsForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             }
 

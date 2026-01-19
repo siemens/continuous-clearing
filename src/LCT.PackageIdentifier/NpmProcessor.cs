@@ -562,6 +562,7 @@ namespace LCT.PackageIdentifier
         private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings,ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofdependenciesFromLockFile)
         {
             Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+            CommonHelper.WarnIfDependencyFileRequired();
             var components = ParsePackageLockJson(filepath, appSettings);
             var dependenciesFromPackageFiles = new List<Dependency>();
             AddingIdentifierType(components, "PackageFile", filepath);

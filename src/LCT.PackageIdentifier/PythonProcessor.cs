@@ -153,7 +153,7 @@ namespace LCT.PackageIdentifier
             List<KeyValuePair<string, TomlNode>> keyValuePair = new();
             FileParser fileParser = new();
             TomlTable tomlTable = fileParser.ParseTomlFile(filePath);
-
+            CommonHelper.WarnIfDependencyFileRequired();
             foreach (TomlNode node in tomlTable["package"])
             {
                 PythonPackage pythonPackage = new()
