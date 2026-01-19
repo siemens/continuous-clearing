@@ -120,17 +120,17 @@ namespace LCT.SW360PackageCreator
         {
             if (isInternalComponent)
             {
-                Logger.Debug($"{item.Name}-{item.Version} found as internal component.");
+                Logger.DebugFormat("{0}-{1} found as internal component.", item.Name, item.Version);
                 return;
             }
             if (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)
             {
-                Logger.Debug($"{item.Name}-{item.Version} found as development component.");
+                Logger.DebugFormat("{0}-{1} found as development component.", item.Name, item.Version);
                 return;
             }
             if (componentsData.ExcludeComponent == "true")
             {
-                Logger.Debug($"{item.Name}-{item.Version} skipped (component marked as excluded).");
+                Logger.DebugFormat("{0}-{1} skipped (component marked as excluded).", item.Name, item.Version);
             }
         }
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
