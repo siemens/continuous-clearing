@@ -23,9 +23,24 @@ namespace LCT.Common
     /// </summary>
     public class FileOperations : IFileOperations
     {
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Properties
+
         public static string CatoolBomFilePath { get; set; }
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Validates that the file path exists and is not null or whitespace.
+        /// </summary>
+        /// <param name="filePath">The file path to validate.</param>
         public void ValidateFilePath(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -43,11 +58,12 @@ namespace LCT.Common
         /// <summary>
         /// writes the content to the specified file
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dataToWrite">dataToWrite</param>
-        /// <param name="folderPath">folderPath</param>
-        /// <param name="fileNameWithExtension">fileNameWithExtension</param>
-        /// <param name="projectName">projectName</param>
+        /// <typeparam name="T">The type of data to write.</typeparam>
+        /// <param name="dataToWrite">The data to write to the file.</param>
+        /// <param name="folderPath">The folder path where the file will be written.</param>
+        /// <param name="fileNameWithExtension">The file name with extension.</param>
+        /// <param name="projectName">The project name to prefix the file name.</param>
+        /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
             try
@@ -84,6 +100,16 @@ namespace LCT.Common
             return "success";
 
         }
+
+        /// <summary>
+        /// Writes the content to the output BOM file.
+        /// </summary>
+        /// <typeparam name="T">The type of data to write.</typeparam>
+        /// <param name="dataToWrite">The data to write to the BOM file.</param>
+        /// <param name="folderPath">The folder path where the file will be written.</param>
+        /// <param name="fileNameWithExtension">The file name with extension.</param>
+        /// <param name="projectName">The project name to prefix the file name.</param>
+        /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
             try
@@ -119,6 +145,12 @@ namespace LCT.Common
 
         }
 
+        /// <summary>
+        /// Combines components from an existing BOM file with new components.
+        /// </summary>
+        /// <param name="components">The new BOM components to combine.</param>
+        /// <param name="filePath">The file path of the existing BOM file.</param>
+        /// <returns>A BOM containing the combined components and dependencies.</returns>
         public Bom CombineComponentsFromExistingBOM(Bom components, string filePath)
         {
             Bom comparisonData = new Bom();
@@ -178,6 +210,15 @@ namespace LCT.Common
             }
             return comparisonData;
         }
+
+        /// <summary>
+        /// Writes the content to a CycloneDX file.
+        /// </summary>
+        /// <typeparam name="T">The type of data to write.</typeparam>
+        /// <param name="dataToWrite">The data to write to the file.</param>
+        /// <param name="filePath">The folder path where the file will be written.</param>
+        /// <param name="fileNameWithExtension">The file name with extension to copy and write.</param>
+        /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToCycloneDXFile<T>(T dataToWrite, string filePath, string fileNameWithExtension)
         {
             try
@@ -211,6 +252,11 @@ namespace LCT.Common
 
         }
 
+        /// <summary>
+        /// Backs up the given file by moving it with a timestamp prefix.
+        /// </summary>
+        /// <param name="folderPath">The folder path containing the file to backup.</param>
+        /// <param name="fileName">The file name to backup.</param>
         private static void BackupTheGivenFile(string folderPath, string fileName)
         {
             string oldFile = Path.Combine(folderPath, fileName);
@@ -241,6 +287,15 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Writes the content to a report file for not approved items.
+        /// </summary>
+        /// <typeparam name="T">The type of data to write.</typeparam>
+        /// <param name="dataToWrite">The data to write to the file.</param>
+        /// <param name="folderPath">The folder path where the file will be written.</param>
+        /// <param name="fileNameWithExtension">The file name with extension.</param>
+        /// <param name="name">The name to prefix the file name.</param>
+        /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToReportNotApprovedFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string name)
         {
             try
@@ -274,6 +329,16 @@ namespace LCT.Common
             return "success";
 
         }
+
+        /// <summary>
+        /// Writes the content to a file for tracking multiple versions.
+        /// </summary>
+        /// <typeparam name="T">The type of data to write.</typeparam>
+        /// <param name="dataToWrite">The data to write to the file.</param>
+        /// <param name="folderPath">The folder path where the file will be written.</param>
+        /// <param name="fileNameWithExtension">The file name with extension.</param>
+        /// <param name="projectName">The project name to prefix the file name.</param>
+        /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToMultipleVersionsFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
             try
@@ -309,6 +374,11 @@ namespace LCT.Common
 
         }
 
+        /// <summary>
+        /// Updates the compositions section by merging source and target BOM compositions.
+        /// </summary>
+        /// <param name="components">The source BOM with compositions to merge.</param>
+        /// <param name="comparisonData">The target BOM to update with compositions.</param>
         private static void UpdateCompositions(ref Bom components, ref Bom comparisonData)
         {
             // Early return if there are no compositions to process
@@ -340,6 +410,12 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Finds a matching composition in the compositions list based on assembly equality.
+        /// </summary>
+        /// <param name="compositions">The list of compositions to search.</param>
+        /// <param name="sourceComposition">The source composition to match.</param>
+        /// <returns>The matching composition if found; otherwise, null.</returns>
         private static Composition FindMatchingComposition(List<Composition> compositions, Composition sourceComposition)
         {
             return compositions.FirstOrDefault(c =>
@@ -348,6 +424,11 @@ namespace LCT.Common
                 c.Assemblies.SequenceEqual(sourceComposition.Assemblies));
         }
 
+        /// <summary>
+        /// Merges dependencies from source composition to target composition.
+        /// </summary>
+        /// <param name="source">The source composition with dependencies to merge.</param>
+        /// <param name="target">The target composition to receive dependencies.</param>
         private static void MergeDependencies(Composition source, Composition target)
         {
             if (source.Dependencies == null || source.Dependencies.Count == 0)
@@ -362,5 +443,7 @@ namespace LCT.Common
             var newDependencies = source.Dependencies.Where(d => !target.Dependencies.Contains(d));
             target.Dependencies.AddRange(newDependencies);
         }
+
+        #endregion
     }
 }

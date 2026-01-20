@@ -15,11 +15,35 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
+    /// <summary>
+    /// A delegating handler that implements retry logic for HTTP requests using Polly policies.
+    /// </summary>
     public class RetryHttpClientHandler : DelegatingHandler
     {
+        #region Fields
+
+        /// <summary>
+        /// The asynchronous retry policy for handling transient HTTP failures.
+        /// </summary>
         private readonly AsyncPolicy<HttpResponseMessage> _retryPolicy;
+
+        /// <summary>
+        /// The logger instance for logging retry attempts and related information.
+        /// </summary>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /// <summary>
+        /// Flag indicating whether the initial retry has been logged.
+        /// </summary>
         private bool _initialRetryLogged = false;
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RetryHttpClientHandler"/> class with a default retry policy.
+        /// </summary>
         public RetryHttpClientHandler()
         {
             // Define the retry policy (retry on 5xx, 408, and transient errors)
@@ -38,6 +62,17 @@ namespace LCT.APICommunications
                     OnRetry);
         }
 
+        #endregion Constructors
+
+        #region Methods
+
+        /// <summary>
+        /// Handles the retry callback when a retry attempt occurs.
+        /// </summary>
+        /// <param name="outcome">The result of the failed request attempt.</param>
+        /// <param name="timespan">The time span to wait before the next retry.</param>
+        /// <param name="attempt">The current retry attempt number.</param>
+        /// <param name="context">The context containing request metadata.</param>
         private void OnRetry(DelegateResult<HttpResponseMessage> outcome, TimeSpan timespan, int attempt, Context context)
         {
             var httpMethod = context.ContainsKey("HttpMethod") ? context["HttpMethod"] : "Unknown Method";
@@ -55,6 +90,13 @@ namespace LCT.APICommunications
             context["RetryAttempt"] = attempt;
             _initialRetryLogged = true;
         }
+
+        /// <summary>
+        /// Asynchronously sends an HTTP request with retry logic applied.
+        /// </summary>
+        /// <param name="request">The HTTP request message to send.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>An HttpResponseMessage representing the response from the server.</returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
             var context = new Context
@@ -79,6 +121,12 @@ namespace LCT.APICommunications
 
             return response;
         }
+
+        /// <summary>
+        /// Asynchronously executes an action with retry logic for handling WebException failures.
+        /// </summary>
+        /// <param name="action">The asynchronous action to execute with retry support.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         public static async Task ExecuteWithRetryAsync(Func<Task> action)
         {
             var retryPolicy = Policy
@@ -92,6 +140,12 @@ namespace LCT.APICommunications
 
             await retryPolicy.ExecuteAsync(action);
         }
+
+        /// <summary>
+        /// Gets the retry interval for a given attempt number.
+        /// </summary>
+        /// <param name="attempt">The current retry attempt number.</param>
+        /// <returns>A TimeSpan representing the wait duration before the next retry.</returns>
         private static TimeSpan GetRetryInterval(int attempt)
         {
             if (attempt >= 1 && attempt <= ApiConstant.APIRetryIntervals.Count)
@@ -99,5 +153,6 @@ namespace LCT.APICommunications
             return TimeSpan.Zero; // Default if out of range
         }
 
+        #endregion Methods
     }
 }

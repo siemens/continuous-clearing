@@ -19,13 +19,25 @@ using Level = log4net.Core.Level;
 
 namespace LCT.Common.Logging
 {
+    /// <summary>
+    /// Provides helper methods for logging with Spectre.Console integration and fallback support.
+    /// </summary>
     public static class LoggerHelper
     {
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static IAnsiConsole _console;
         private static readonly object _consoleLock = new();
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the singleton Spectre.Console instance with thread-safe initialization.
+        /// </summary>
         public static IAnsiConsole ConsoleInstance
         {
             get
@@ -44,6 +56,15 @@ namespace LCT.Common.Logging
                 return _console;
             }
         }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the automatic console width based on the current environment.
+        /// </summary>
+        /// <returns>The console width in characters.</returns>
         private static int GetAutoConsoleWidth()
         {
 
@@ -63,6 +84,11 @@ namespace LCT.Common.Logging
                 return 200;
             }
         }
+
+        /// <summary>
+        /// Builds ANSI console settings based on the runtime environment.
+        /// </summary>
+        /// <returns>The configured ANSI console settings.</returns>
         private static AnsiConsoleSettings BuildAnsiConsoleSettings()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
@@ -78,6 +104,12 @@ namespace LCT.Common.Logging
             };
             return settings;
         }
+
+        /// <summary>
+        /// Gets the color system support based on the environment type.
+        /// </summary>
+        /// <param name="envType">The environment type.</param>
+        /// <returns>The color system support level.</returns>
         private static ColorSystemSupport GetColorSystem(EnvironmentType envType)
         {
             // User override
@@ -100,7 +132,10 @@ namespace LCT.Common.Logging
             return ColorSystemSupport.TrueColor;
         }
 
-        // Wrapper helper so existing code only changes AnsiConsole.* to ConsoleInstance.*
+        /// <summary>
+        /// Wraps a console write action for consistent console instance usage.
+        /// </summary>
+        /// <param name="writeAction">The write action to execute.</param>
         private static void ConsoleWrite(Action<IAnsiConsole> writeAction)
         {
             writeAction(ConsoleInstance);
@@ -109,6 +144,12 @@ namespace LCT.Common.Logging
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
 
+        /// <summary>
+        /// Executes a Spectre.Console action with exception handling and fallback logging.
+        /// </summary>
+        /// <param name="spectreAction">The Spectre action to execute.</param>
+        /// <param name="fallbackMessage">The fallback message to log if the action fails.</param>
+        /// <param name="fallbackType">The type of fallback message.</param>
         public static void SafeSpectreAction(Action spectreAction, string fallbackMessage, string fallbackType = "Info")
         {
             try
@@ -128,6 +169,14 @@ namespace LCT.Common.Logging
                 Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Writes components without download URL using Spectre.Console tables for KPI display.
+        /// </summary>
+        /// <param name="componentInfo">The list of components without download URLs.</param>
+        /// <param name="lstReleaseNotCreated">The list of releases not created.</param>
+        /// <param name="sw360URL">The SW360 base URL.</param>
+        /// <param name="duplicateComponentsByPurlId">The list of duplicate components by PURL ID.</param>
         public static void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> duplicateComponentsByPurlId)
         {
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0 || duplicateComponentsByPurlId.Count > 0)
@@ -146,6 +195,12 @@ namespace LCT.Common.Logging
                 }, "Components Without Download URL", "Alert");
             }
         }
+
+        /// <summary>
+        /// Displays duplicate components by PURL ID in a formatted table.
+        /// </summary>
+        /// <param name="duplicateComponents">The list of duplicate components.</param>
+        /// <param name="sw360URL">The SW360 base URL.</param>
         private static void DisplayDuplicateComponentsByPurlId(List<Components> duplicateComponents, string sw360URL)
         {
             if (duplicateComponents == null || duplicateComponents.Count == 0)
@@ -188,6 +243,12 @@ namespace LCT.Common.Logging
             ConsoleInstance.Write(table);
             WriteLine();
         }
+
+        /// <summary>
+        /// Displays components without source URLs in a formatted table.
+        /// </summary>
+        /// <param name="componentInfo">The list of components without URLs.</param>
+        /// <param name="sw360URL">The SW360 base URL.</param>
         private static void DisplayComponentsWithoutUrl(List<ComparisonBomData> componentInfo, string sw360URL)
         {
             if (componentInfo.Count <= 0) return;
@@ -204,6 +265,10 @@ namespace LCT.Common.Logging
             WriteLine();
         }
 
+        /// <summary>
+        /// Displays components that were not created in SW360 in a formatted table.
+        /// </summary>
+        /// <param name="lstReleaseNotCreated">The list of components not created.</param>
         private static void DisplayNotCreatedComponents(List<Components> lstReleaseNotCreated)
         {
             if (lstReleaseNotCreated.Count <= 0) return;
@@ -220,6 +285,11 @@ namespace LCT.Common.Logging
             WriteLine();
         }
 
+        /// <summary>
+        /// Creates a component table with specified columns.
+        /// </summary>
+        /// <param name="includeUrl">Whether to include a URL column.</param>
+        /// <returns>The configured table.</returns>
         private static Table CreateComponentTable(bool includeUrl)
         {
             var table = new Table()
@@ -243,6 +313,12 @@ namespace LCT.Common.Logging
         }
 
 
+        /// <summary>
+        /// Populates a component info table with data.
+        /// </summary>
+        /// <param name="table">The table to populate.</param>
+        /// <param name="componentInfo">The component information.</param>
+        /// <param name="sw360URL">The SW360 base URL.</param>
         private static void PopulateComponentInfoTable(Table table, List<ComparisonBomData> componentInfo, string sw360URL)
         {
             foreach (var item in componentInfo)
@@ -256,6 +332,11 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Populates a table with components that were not created.
+        /// </summary>
+        /// <param name="table">The table to populate.</param>
+        /// <param name="components">The list of components.</param>
         private static void PopulateNotCreatedComponentsTable(Table table, List<Components> components)
         {
             foreach (var item in components)
@@ -266,6 +347,11 @@ namespace LCT.Common.Logging
                 );
             }
         }
+
+        /// <summary>
+        /// Writes a table of components not linked to project using Spectre.Console.
+        /// </summary>
+        /// <param name="components">The list of unlinked components.</param>
         public static void WriteComponentsNotLinkedListTableWithSpectre(List<Components> components)
         {
             if (components.Count > 0)
@@ -310,6 +396,11 @@ namespace LCT.Common.Logging
                 }, "Components Not Linked", "Alert");
             }
         }
+
+        /// <summary>
+        /// Writes components not linked to project in console using log4net.
+        /// </summary>
+        /// <param name="components">The list of unlinked components.</param>
         public static void WriteComponentsNotLinkedListInConsole(List<Components> components)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -339,6 +430,13 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Writes components without download URL to KPI using either Spectre or log4net.
+        /// </summary>
+        /// <param name="componentInfo">The list of components without download URLs.</param>
+        /// <param name="lstReleaseNotCreated">The list of releases not created.</param>
+        /// <param name="sw360URL">The SW360 base URL.</param>
+        /// <param name="DuplicateComponentsByPurlId">The list of duplicate components by PURL ID.</param>
         public static void WriteComponentsWithoutDownloadURLToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> DuplicateComponentsByPurlId)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -393,6 +491,12 @@ namespace LCT.Common.Logging
             }
             LogDuplicateComponentsByPurlId(DuplicateComponentsByPurlId, sw360URL);
         }
+
+        /// <summary>
+        /// Displays all application settings for the detected project types.
+        /// </summary>
+        /// <param name="componentsInBOM">The list of components in the BOM.</param>
+        /// <param name="appSettings">The application settings.</param>
         public static void DisplayAllSettings(List<Component> componentsInBOM, CommonAppSettings appSettings)
         {
             var projectTypes = GetProjectTypes(componentsInBOM);
@@ -408,6 +512,11 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Gets the list of project types from the components in the BOM.
+        /// </summary>
+        /// <param name="componentsInBOM">The list of components.</param>
+        /// <returns>The list of unique project types.</returns>
         private static List<string> GetProjectTypes(List<Component> componentsInBOM)
         {
             if (componentsInBOM == null || componentsInBOM.Count == 0)
@@ -421,6 +530,11 @@ namespace LCT.Common.Logging
                 .Distinct(StringComparer.OrdinalIgnoreCase)];
         }
 
+        /// <summary>
+        /// Creates a dictionary mapping project types to their configurations.
+        /// </summary>
+        /// <param name="appSettings">The application settings.</param>
+        /// <returns>The project configuration map.</returns>
         private static Dictionary<string, Config> CreateProjectConfigMap(CommonAppSettings appSettings)
         {
             return new Dictionary<string, Config>(StringComparer.OrdinalIgnoreCase)
@@ -435,6 +549,11 @@ namespace LCT.Common.Logging
     };
         }
 
+        /// <summary>
+        /// Displays settings using Spectre.Console formatting.
+        /// </summary>
+        /// <param name="projectTypes">The list of project types.</param>
+        /// <param name="projectConfigMap">The project configuration map.</param>
         private static void DisplaySettingsWithSpectre(List<string> projectTypes, Dictionary<string, Config> projectConfigMap)
         {
             SafeSpectreAction(() =>
@@ -451,6 +570,12 @@ namespace LCT.Common.Logging
             }, "Current Application Settings", "Info");
         }
 
+        /// <summary>
+        /// Appends project type-specific settings to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="projectType">The project type.</param>
+        /// <param name="projectConfigMap">The project configuration map.</param>
         private static void AppendProjectTypeSettings(StringBuilder content, string projectType, Dictionary<string, Config> projectConfigMap)
         {
             content.AppendLine($"[green]-[/] [green]{projectType}[/]\n");
@@ -468,12 +593,22 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Appends configuration settings to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="config">The configuration.</param>
         private static void AppendConfigSettings(StringBuilder content, Config config)
         {
             AppendRepoSettings(content, config);
             AppendIncludeExcludeSettings(content, config);
         }
 
+        /// <summary>
+        /// Appends repository settings to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="config">The configuration.</param>
         private static void AppendRepoSettings(StringBuilder content, Config config)
         {
             content
@@ -486,12 +621,22 @@ namespace LCT.Common.Logging
                 .AppendLine($"  [cyan]Config[/]");
         }
 
+        /// <summary>
+        /// Gets the third-party repository name from configuration.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <returns>The third-party repository name.</returns>
         private static string GetThirdPartyRepoName(Config config)
         {
             return config.Artifactory?.ThirdPartyRepos?
                 .FirstOrDefault(repo => repo.Upload)?.Name ?? Dataconstant.NotConfigured;
         }
 
+        /// <summary>
+        /// Appends include and exclude settings to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="config">The configuration.</param>
         private static void AppendIncludeExcludeSettings(StringBuilder content, Config config)
         {
             var excludeList = GetFormattedList(config.Exclude);
@@ -504,6 +649,11 @@ namespace LCT.Common.Logging
                 .AppendLine($"      └──> {excludeList}\n");
         }
 
+        /// <summary>
+        /// Gets a formatted list from string array.
+        /// </summary>
+        /// <param name="items">The items array.</param>
+        /// <returns>The formatted list string.</returns>
         private static string GetFormattedList(string[] items)
         {
             return !string.IsNullOrEmpty(items?.FirstOrDefault())
@@ -511,6 +661,11 @@ namespace LCT.Common.Logging
                 : Dataconstant.NotConfigured;
         }
 
+        /// <summary>
+        /// Displays settings using log4net logger.
+        /// </summary>
+        /// <param name="projectTypes">The list of project types.</param>
+        /// <param name="projectConfigMap">The project configuration map.</param>
         private static void DisplaySettingsWithLogger(List<string> projectTypes, Dictionary<string, Config> projectConfigMap)
         {
             Logger.Info("Current Application Settings:");
@@ -529,6 +684,11 @@ namespace LCT.Common.Logging
                 }
             }
         }
+
+        /// <summary>
+        /// Displays package settings using log4net logger.
+        /// </summary>
+        /// <param name="project">The project configuration.</param>
         private static void DisplayPackageSettings(Config project)
         {
             if (project == null)
@@ -566,12 +726,24 @@ namespace LCT.Common.Logging
                 $"\t\tExclude:\t\t{excludeList}\n" +
                 $"\t\tInclude:\t\t{includeList}\n", null);
         }
+        /// <summary>
+        /// Displays input parameters using Spectre.Console.
+        /// </summary>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="listofPerameters">The list of parameters for CLI.</param>
+        /// <param name="exeType">The execution type.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
         public static void DisplayInputParametersWithSpectreConsole(CatoolInfo caToolInformation, CommonAppSettings appSettings,
     ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
             string content = GenerateContentByExeType(caToolInformation, appSettings, listofPerameters, exeType, bomFilePath);
             InitialDataPanel(content);
         }
+        /// <summary>
+        /// Displays initial data panel with formatted content.
+        /// </summary>
+        /// <param name="content">The content to display.</param>
         public static void InitialDataPanel(string content)
         {
             SafeSpectreAction(() =>
@@ -592,6 +764,15 @@ namespace LCT.Common.Logging
             }, "Input Parameters", "Panel");
         }
 
+        /// <summary>
+        /// Generates content based on execution type.
+        /// </summary>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="listofPerameters">The list of parameters for CLI.</param>
+        /// <param name="exeType">The execution type.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
+        /// <returns>The generated content string.</returns>
         private static string GenerateContentByExeType(CatoolInfo caToolInformation, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
@@ -604,6 +785,12 @@ namespace LCT.Common.Logging
             };
         }
 
+        /// <summary>
+        /// Appends directory information to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="maxPathLength">The maximum path length for wrapping.</param>
         private static void AppendDirectoryInfo(StringBuilder content, CommonAppSettings appSettings, int maxPathLength)
         {
             content
@@ -613,6 +800,12 @@ namespace LCT.Common.Logging
                 .Append($"  └──> {WrapPath(appSettings.Directory.OutputFolder, maxPathLength)}\n\n");
         }
 
+        /// <summary>
+        /// Appends basic information to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="maxPathLength">The maximum path length for wrapping.</param>
         private static void AppendBasicInfo(StringBuilder content, CatoolInfo caToolInformation, int maxPathLength)
         {
             content
@@ -622,6 +815,13 @@ namespace LCT.Common.Logging
                 .Append($"  └──> {WrapPath(caToolInformation.CatoolRunningLocation, maxPathLength)}\n\n");
         }
 
+        /// <summary>
+        /// Appends SW360 information to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="listofPerameters">The list of parameters for CLI.</param>
+        /// <param name="maxPathLength">The maximum path length for wrapping.</param>
         private static void AppendSw360Info(StringBuilder content, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters, int maxPathLength)
         {
@@ -636,6 +836,13 @@ namespace LCT.Common.Logging
                 .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.ExcludeComponents) ? "None" : listofPerameters.ExcludeComponents, maxPathLength)}\n\n");
         }
 
+        /// <summary>
+        /// Appends common information to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="listofPerameters">The list of parameters for CLI.</param>
+        /// <param name="maxPathLength">The maximum path length for wrapping.</param>
         private static void AppendCommonInfo(StringBuilder content, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters, int maxPathLength)
         {
@@ -650,6 +857,13 @@ namespace LCT.Common.Logging
                 .Append($"  └──> {WrapPath(string.IsNullOrEmpty(listofPerameters.Exclude) ? "None" : listofPerameters.Exclude, maxPathLength)}");
         }
 
+        /// <summary>
+        /// Generates identifier content for display.
+        /// </summary>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="listofPerameters">The list of parameters for CLI.</param>
+        /// <returns>The generated identifier content string.</returns>
         private static string GenerateIdentifierContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters)
         {
@@ -687,6 +901,13 @@ namespace LCT.Common.Logging
             return content.ToString();
         }
 
+        /// <summary>
+        /// Generates creator content for display.
+        /// </summary>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
+        /// <returns>The generated creator content string.</returns>
         private static string GenerateCreatorContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
             int consoleWidth = GetAutoConsoleWidth();
@@ -703,6 +924,13 @@ namespace LCT.Common.Logging
             return content.ToString();
         }
 
+        /// <summary>
+        /// Generates uploader content for display.
+        /// </summary>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
+        /// <returns>The generated uploader content string.</returns>
         private static string GenerateUploaderContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
             int consoleWidth = GetAutoConsoleWidth();
@@ -719,6 +947,13 @@ namespace LCT.Common.Logging
             return content.ToString();
         }
 
+        /// <summary>
+        /// Appends creator-specific information to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
+        /// <param name="maxPathLength">The maximum path length for wrapping.</param>
         private static void AppendCreatorSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
     string bomFilePath, int maxPathLength)
         {
@@ -748,6 +983,13 @@ namespace LCT.Common.Logging
         }
 
 
+        /// <summary>
+        /// Appends uploader-specific information to the content builder.
+        /// </summary>
+        /// <param name="content">The string builder.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
+        /// <param name="maxPathLength">The maximum path length for wrapping.</param>
         private static void AppendUploaderSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
     string bomFilePath, int maxPathLength)
         {
@@ -761,6 +1003,14 @@ namespace LCT.Common.Logging
                 .Append($"[green]-[/] [cyan]Log FolderPath[/]\n")
                 .Append($"  └──> {WrapPath(Log4Net.CatoolLogPath, maxPathLength)}");
         }
+        /// <summary>
+        /// Logs input parameters using appropriate logging mechanism.
+        /// </summary>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="listofPerameters">The list of parameters for CLI.</param>
+        /// <param name="exeType">The execution type.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
         public static void LogInputParameters(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType = null, string bomFilePath = null)
         {
 
@@ -773,6 +1023,14 @@ namespace LCT.Common.Logging
                 LogInputParametersWithLog4net(caToolInformation, appSettings, listofPerameters, exeType, bomFilePath);
             }
         }
+        /// <summary>
+        /// Logs input parameters using log4net logger.
+        /// </summary>
+        /// <param name="caToolInformation">The CA tool information.</param>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="listofPerameters">The list of parameters for CLI.</param>
+        /// <param name="exeType">The execution type.</param>
+        /// <param name="bomFilePath">The BOM file path.</param>
         private static void LogInputParametersWithLog4net(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
             if (exeType == Dataconstant.Identifier)
@@ -837,6 +1095,13 @@ namespace LCT.Common.Logging
                     $"Log FolderPath:\t\t {Log4Net.CatoolLogPath}\n", null);
             }
         }
+        /// <summary>
+        /// Wraps a path string to fit within the specified maximum length.
+        /// </summary>
+        /// <param name="path">The path to wrap.</param>
+        /// <param name="maxLength">The maximum length per line.</param>
+        /// <param name="prefix">The prefix to add to wrapped lines.</param>
+        /// <returns>The wrapped path string.</returns>
         public static string WrapPath(string path, int maxLength = 80, string prefix = "        ")
         {
             if (string.IsNullOrEmpty(path) || path.Length <= maxLength)
@@ -866,6 +1131,13 @@ namespace LCT.Common.Logging
             return string.Join($"\n{prefix}", lines);
         }
 
+        /// <summary>
+        /// Writes a styled panel with content using Spectre.Console.
+        /// </summary>
+        /// <param name="content">The content to display.</param>
+        /// <param name="title">The optional panel title.</param>
+        /// <param name="borderStyle">The border style.</param>
+        /// <param name="headerStyle">The header style.</param>
         public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = "yellow")
         {
             SafeSpectreAction(() =>
@@ -890,6 +1162,10 @@ namespace LCT.Common.Logging
                 ConsoleWrite(c => c.Write(panel));
             }, content, title ?? "Panel");
         }
+        /// <summary>
+        /// Writes a summary header with centered title.
+        /// </summary>
+        /// <param name="title">The header title.</param>
         public static void WriteSummaryHeader(string title)
         {
             SafeSpectreAction(() =>
@@ -909,6 +1185,10 @@ namespace LCT.Common.Logging
                 });
             }, title, "Header");
         }
+        /// <summary>
+        /// Writes a header with title.
+        /// </summary>
+        /// <param name="title">The header title.</param>
         public static void WriteHeader(string title)
         {
             SafeSpectreAction(() =>
@@ -919,6 +1199,11 @@ namespace LCT.Common.Logging
             }, title, "Header");
         }
 
+        /// <summary>
+        /// Writes a fallback message using log4net when Spectre.Console is not available.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
+        /// <param name="messageType">The message type.</param>
         public static void WriteFallback(string message, string messageType = "Info")
         {
             string prefix = messageType.ToLower() switch
@@ -948,6 +1233,14 @@ namespace LCT.Common.Logging
                     break;
             }
         }
+        /// <summary>
+        /// Writes data to console table using appropriate logging mechanism.
+        /// </summary>
+        /// <param name="printData">The data to print.</param>
+        /// <param name="printTimingData">The timing data to print.</param>
+        /// <param name="ProjectSummaryLink">The project summary link.</param>
+        /// <param name="exeType">The execution type.</param>
+        /// <param name="KpiNames">The KPI names.</param>
         public static void WriteToConsoleTable(Dictionary<string, int> printData, Dictionary<string, double> printTimingData, string ProjectSummaryLink, string exeType, KpiNames KpiNames)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -981,6 +1274,11 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Logs a table row with separator.
+        /// </summary>
+        /// <param name="key">The row key.</param>
+        /// <param name="value">The row value.</param>
         private static void LogTableRow(string key, int value)
         {
             string row = $"{"|",5}{key,-70} {"|",5} {value,5} {"|",5}";
@@ -998,6 +1296,14 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Writes data to console table using Spectre.Console formatting.
+        /// </summary>
+        /// <param name="printData">The data to print.</param>
+        /// <param name="printTimingData">The timing data to print.</param>
+        /// <param name="ProjectSummaryLink">The project summary link.</param>
+        /// <param name="exeType">The execution type.</param>
+        /// <param name="KpiNames">The KPI names.</param>
         public static void WriteToSpectreConsoleTable(
     Dictionary<string, int> printData,
     Dictionary<string, double> printTimingData,
@@ -1024,6 +1330,10 @@ namespace LCT.Common.Logging
             }, "Package Summary Table", "Panel");
         }
 
+        /// <summary>
+        /// Writes project summary link if available.
+        /// </summary>
+        /// <param name="projectSummaryLink">The project summary link.</param>
         private static void WriteProjectSummary(string projectSummaryLink)
         {
             if (!string.IsNullOrWhiteSpace(projectSummaryLink))
@@ -1033,6 +1343,11 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Creates a summary table with configured columns.
+        /// </summary>
+        /// <param name="consoleWidth">The console width.</param>
+        /// <returns>The configured table instance.</returns>
         private static Table CreateSummaryTable(int consoleWidth)
         {
             var table = new Table()
@@ -1047,6 +1362,14 @@ namespace LCT.Common.Logging
             return table;
         }
 
+        /// <summary>
+        /// Adds summary rows to the table with visual bars.
+        /// </summary>
+        /// <param name="table">The table instance.</param>
+        /// <param name="printData">The data to add.</param>
+        /// <param name="maxValue">The maximum value for bar scaling.</param>
+        /// <param name="barMaxWidth">The maximum bar width.</param>
+        /// <param name="KpiNames">The KPI names.</param>
         private static void AddSummaryRows(
             Table table,
             Dictionary<string, int> printData,
@@ -1069,6 +1392,10 @@ namespace LCT.Common.Logging
 
 
 
+        /// <summary>
+        /// Writes timing data to console.
+        /// </summary>
+        /// <param name="printTimingData">The timing data to write.</param>
         private static void WriteTimingData(Dictionary<string, double> printTimingData)
         {
             if (printTimingData.Count == 0)
@@ -1083,6 +1410,13 @@ namespace LCT.Common.Logging
             WriteLine();
         }
 
+        /// <summary>
+        /// Gets the appropriate color for a KPI item based on its key and value.
+        /// </summary>
+        /// <param name="key">The item key.</param>
+        /// <param name="value">The item value.</param>
+        /// <param name="kpiNames">The KPI names configuration.</param>
+        /// <returns>The color string for the item.</returns>
         private static string GetColorForItem(string key, int value, KpiNames kpiNames)
         {
             if (string.IsNullOrWhiteSpace(key) || kpiNames == null)
@@ -1162,6 +1496,10 @@ namespace LCT.Common.Logging
             _colorIndex++;
             return assigned;
         }
+        /// <summary>
+        /// Writes internal components table to CLI using appropriate logging mechanism.
+        /// </summary>
+        /// <param name="internalComponents">The list of internal components.</param>
         public static void WriteInternalComponentsTableInCli(List<Component> internalComponents)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1174,6 +1512,10 @@ namespace LCT.Common.Logging
                 WriteInternalComponentsListToKpi(internalComponents);
             }
         }
+        /// <summary>
+        /// Writes internal components list table to KPI using Spectre.Console.
+        /// </summary>
+        /// <param name="internalComponents">The list of internal components.</param>
         public static void WriteInternalComponentsListTableToKpi(List<Component> internalComponents)
         {
             if (internalComponents?.Count > 0)
@@ -1211,6 +1553,10 @@ namespace LCT.Common.Logging
                 }, "* Internal Components Identified which will not be sent for clearing:", "Alert");
             }
         }
+        /// <summary>
+        /// Writes internal components list to KPI using log4net.
+        /// </summary>
+        /// <param name="internalComponents">The list of internal components.</param>
         public static void WriteInternalComponentsListToKpi(List<Component> internalComponents)
         {
             const string Name = "Name";
@@ -1231,6 +1577,10 @@ namespace LCT.Common.Logging
                 Logger.Info("\n");
             }
         }
+        /// <summary>
+        /// Writes a telemetry message using appropriate logging mechanism.
+        /// </summary>
+        /// <param name="message">The telemetry message.</param>
         public static void WriteTelemetryMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1248,6 +1598,10 @@ namespace LCT.Common.Logging
                 Logger.Warn(message);
             }
         }
+        /// <summary>
+        /// Writes an initial message using Spectre.Console or log4net.
+        /// </summary>
+        /// <param name="message">The initial message.</param>
         public static void SpectreConsoleInitialMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1261,6 +1615,10 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Displays valid file information in CLI.
+        /// </summary>
+        /// <param name="configFile">The configuration file path.</param>
         public static void ValidFilesInfoDisplayForCli(string configFile)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1273,6 +1631,9 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Displays JFrog connection information in CLI.
+        /// </summary>
         public static void JfrogConnectionInfoDisplayForCli()
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1285,15 +1646,27 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Writes a blank line to console.
+        /// </summary>
         public static void WriteLine()
         {
             SafeSpectreAction(() => ConsoleWrite(c => c.WriteLine()), "", "Info");
         }
 
+        /// <summary>
+        /// Writes an info message with markup formatting.
+        /// </summary>
+        /// <param name="message">The message with markup.</param>
         public static void WriteInfoWithMarkup(string message)
         {
             SafeSpectreAction(() => ConsoleWrite(c => c.MarkupLine(message)), message, "Info");
         }
+        /// <summary>
+        /// Writes FOSSology process initialization message.
+        /// </summary>
+        /// <param name="formattedName">The formatted component name.</param>
+        /// <param name="item">The comparison BOM data item.</param>
         public static void WriteFossologyProcessInitializeMessage(string formattedName, ComparisonBomData item)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1305,6 +1678,10 @@ namespace LCT.Common.Logging
                 Logger.Logger.Log(null, Level.Notice, $"\tInitiating FOSSology process for: Release : Name - {formattedName} , version - {item.Version}", null);
             }
         }
+        /// <summary>
+        /// Writes FOSSology status message.
+        /// </summary>
+        /// <param name="message">The status message.</param>
         public static void WriteFossologyStatusMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1317,6 +1694,10 @@ namespace LCT.Common.Logging
                 Logger.Warn($"\t{message}");
             }
         }
+        /// <summary>
+        /// Writes FOSSology exception message.
+        /// </summary>
+        /// <param name="message">The exception message.</param>
         public static void WriteFossologyExceptionMessage(string message)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1329,6 +1710,11 @@ namespace LCT.Common.Logging
                 Logger.Error($"\t{message}");
             }
         }
+        /// <summary>
+        /// Writes component status message.
+        /// </summary>
+        /// <param name="message">The status message.</param>
+        /// <param name="item">The comparison BOM data item.</param>
         public static void WriteComponentStatusMessage(string message, ComparisonBomData item)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1341,6 +1727,12 @@ namespace LCT.Common.Logging
             }
         }
 
+        /// <summary>
+        /// Writes FOSSology success status message.
+        /// </summary>
+        /// <param name="message">The success message.</param>
+        /// <param name="formattedName">The formatted component name.</param>
+        /// <param name="item">The comparison BOM data item.</param>
         public static void WriteFossologySucessStatusMessage(string message, string formattedName, ComparisonBomData item)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1352,6 +1744,11 @@ namespace LCT.Common.Logging
                 Logger.Logger.Log(null, Level.Info, $"\n{message} : Name - {formattedName}, version - {item.Version}", null);
             }
         }
+        /// <summary>
+        /// Displays MSBuild version information.
+        /// </summary>
+        /// <param name="message">The display message.</param>
+        /// <param name="version">The version string.</param>
         public static void MSBuildVersionDisplay(string message, string version)
         {
             if (LoggerFactory.UseSpectreConsole)
@@ -1363,6 +1760,11 @@ namespace LCT.Common.Logging
                 Logger.Info($"{message}{version}");
             }
         }
+        /// <summary>
+        /// Logs duplicate components by PURL ID using log4net.
+        /// </summary>
+        /// <param name="duplicateComponents">The list of duplicate components.</param>
+        /// <param name="sw360URL">The SW360 base URL.</param>
         private static void LogDuplicateComponentsByPurlId(List<Components> duplicateComponents, string sw360URL)
         {
             if (duplicateComponents.Count > 0)
@@ -1393,5 +1795,6 @@ namespace LCT.Common.Logging
             }
         }
 
+        #endregion
     }
 }

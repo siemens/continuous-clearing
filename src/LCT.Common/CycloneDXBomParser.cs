@@ -17,9 +17,24 @@ using System.Reflection;
 
 namespace LCT.Common
 {
+    /// <summary>
+    /// Provides parsing functionality for CycloneDX BOM files.
+    /// </summary>
     public class CycloneDXBomParser : ICycloneDXBomParser
     {
+        #region Fields
+
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Parses a CycloneDX BOM file and returns the BOM object.
+        /// </summary>
+        /// <param name="filePath">The file path of the CycloneDX BOM file.</param>
+        /// <returns>A BOM object containing the parsed data.</returns>
         public Bom ParseCycloneDXBom(string filePath)
         {
             Bom bom = new Bom();
@@ -56,6 +71,11 @@ namespace LCT.Common
             return bom;
         }
 
+        /// <summary>
+        /// Extracts SBOM details from a template BOM, filtering valid components.
+        /// </summary>
+        /// <param name="template">The template BOM to extract details from.</param>
+        /// <returns>A BOM object containing extracted components, metadata, and dependencies.</returns>
         public static Bom ExtractSBOMDetailsFromTemplate(Bom template)
         {
             Bom bom = new Bom();
@@ -81,6 +101,11 @@ namespace LCT.Common
             return bom;
         }
 
+        /// <summary>
+        /// Checks and removes invalid components from the BOM based on project type.
+        /// </summary>
+        /// <param name="bom">The list of components to validate.</param>
+        /// <param name="projectType">The project type to validate against.</param>
         public static void CheckValidComponentsForProjectType(List<Component> bom, string projectType)
         {
             foreach (var component in bom.ToList())
@@ -100,5 +125,6 @@ namespace LCT.Common
             }
         }
 
+        #endregion
     }
 }

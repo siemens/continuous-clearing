@@ -14,12 +14,21 @@ namespace LCT.Common
 {
     public static class PipelineArtifactUploader
     {
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public const string LogArtifactFolderName = "ContinuousClearing_Log";
         public const string BomArtifactFolderName = "ContinuousClearing_Bom";
         public const string LogContainerFolderName = "Container_Log";
         public const string BomContainerFolderName = "Container_Bom";
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Uploads both logs and BOM artifacts to the pipeline.
+        /// </summary>
         public static void UploadArtifacts()
         {
             UploadLogs();
@@ -83,5 +92,7 @@ namespace LCT.Common
                 Console.WriteLine($"##[warning]{content}");
             }
         }
+
+        #endregion
     }
 }

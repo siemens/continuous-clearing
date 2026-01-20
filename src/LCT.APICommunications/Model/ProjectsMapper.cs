@@ -14,7 +14,14 @@ namespace LCT.APICommunications.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ProjectsMapper
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the embedded project information.
+        /// </summary>
         [JsonProperty("_embedded")]
         public ProjectEmbedded Embedded { get; set; }
+
+        #endregion Properties
     }
 }

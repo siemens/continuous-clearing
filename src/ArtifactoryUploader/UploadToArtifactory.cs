@@ -25,9 +25,28 @@ namespace LCT.ArtifactoryUploader
 {
     public static class UploadToArtifactory
     {
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static IJFrogService JFrogService { get; set; }
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
+
+        #endregion
+
+        #region Properties
+
+        public static IJFrogService JFrogService { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously retrieves the list of components to be uploaded to Artifactory.
+        /// </summary>
+        /// <param name="comparisonBomData">The list of components from the BOM data.</param>
+        /// <param name="appSettings">The common application settings.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A list of components prepared for upload to Artifactory.</returns>
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData,
                                                                                                       CommonAppSettings appSettings,
                                                                                                       DisplayPackagesInfo displayPackagesInfo)
@@ -86,6 +105,11 @@ namespace LCT.ArtifactoryUploader
             return componentsToBeUploaded;
         }
 
+        /// <summary>
+        /// Gets the component type from the component's PURL.
+        /// </summary>
+        /// <param name="item">The component to analyze.</param>
+        /// <returns>The component type as a string.</returns>
         private static string GetComponentType(Component item)
         {
 
@@ -123,6 +147,12 @@ namespace LCT.ArtifactoryUploader
             }
             return string.Empty;
         }
+
+        /// <summary>
+        /// Gets the JFrog repository path for the specified component.
+        /// </summary>
+        /// <param name="component">The component to generate the path for.</param>
+        /// <returns>The JFrog repository path.</returns>
         public static string GetJfrogRepPath(ComponentsToArtifactory component)
         {
             string jfrogRepPath = string.Empty;
@@ -160,6 +190,13 @@ namespace LCT.ArtifactoryUploader
             }
             return jfrogRepPath;
         }
+
+        /// <summary>
+        /// Gets the destination repository name based on the component and application settings.
+        /// </summary>
+        /// <param name="item">The component to evaluate.</param>
+        /// <param name="appSettings">The common application settings.</param>
+        /// <returns>The destination repository name.</returns>
         private static string GetDestinationRepo(Component item, CommonAppSettings appSettings)
         {
             var packageType = GetPackageType(item);
@@ -189,6 +226,13 @@ namespace LCT.ArtifactoryUploader
             return string.Empty;
         }
 
+        /// <summary>
+        /// Gets the package path for the specified component.
+        /// </summary>
+        /// <param name="component">The component to generate the path for.</param>
+        /// <param name="aqlResult">The AQL query result.</param>
+        /// <param name="item">The source component.</param>
+        /// <returns>The package path.</returns>
         private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult, Component item)
         {
             switch (component.ComponentType)
@@ -228,6 +272,12 @@ namespace LCT.ArtifactoryUploader
                     return string.Empty;
             }
         }
+
+        /// <summary>
+        /// Gets the copy API URL for copying the component to the destination repository.
+        /// </summary>
+        /// <param name="component">The component to generate the URL for.</param>
+        /// <returns>The copy API URL.</returns>
         public static string GetCopyURL(ComponentsToArtifactory component)
         {
             string url = string.Empty;
@@ -277,6 +327,11 @@ namespace LCT.ArtifactoryUploader
             return component.DryRun ? $"{url}&dry=1" : url;
         }
 
+        /// <summary>
+        /// Gets the move API URL for moving the component to the destination repository.
+        /// </summary>
+        /// <param name="component">The component to generate the URL for.</param>
+        /// <returns>The move API URL.</returns>
         public static string GetMoveURL(ComponentsToArtifactory component)
         {
             string url = string.Empty;
@@ -326,6 +381,11 @@ namespace LCT.ArtifactoryUploader
             return component.DryRun ? $"{url}&dry=1" : url;
         }
 
+        /// <summary>
+        /// Gets the JFrog package name for the specified component.
+        /// </summary>
+        /// <param name="component">The component to generate the package name for.</param>
+        /// <returns>The JFrog package name.</returns>
         private static string GetJfrogPackageName(ComponentsToArtifactory component)
         {
             return component.ComponentType switch
@@ -339,6 +399,12 @@ namespace LCT.ArtifactoryUploader
             };
         }
 
+        /// <summary>
+        /// Asynchronously adds unknown packages to the display packages information.
+        /// </summary>
+        /// <param name="item">The component to add as an unknown package.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private static async Task AddUnknownPackagesAsync(Component item, DisplayPackagesInfo displayPackagesInfo)
         {
             string GetPropertyValue(string propertyName) =>
@@ -352,7 +418,12 @@ namespace LCT.ArtifactoryUploader
             AddUnknownComponentToDisplayList(projectType, components, displayPackagesInfo);
         }
 
-        // Helper to reduce code duplication for adding unknown components to display lists
+        /// <summary>
+        /// Adds an unknown component to the appropriate display list based on project type.
+        /// </summary>
+        /// <param name="projectType">The type of the project.</param>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
         private static void AddUnknownComponentToDisplayList(string projectType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo)
         {
             switch (projectType)
@@ -381,6 +452,11 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Gets the unknown package information from a component.
+        /// </summary>
+        /// <param name="item">The component to extract information from.</param>
+        /// <returns>A task containing the unknown package information.</returns>
         private static Task<ComponentsToArtifactory> GetUnknownPackageinfo(Component item)
         {
 
@@ -393,6 +469,14 @@ namespace LCT.ArtifactoryUploader
 
         }
 
+        /// <summary>
+        /// Gets the repository name based on the package type.
+        /// </summary>
+        /// <param name="packageType">The type of the package.</param>
+        /// <param name="internalRepo">The internal repository name.</param>
+        /// <param name="developmentRepo">The development repository name.</param>
+        /// <param name="clearedThirdPartyRepo">The cleared third-party repository name.</param>
+        /// <returns>The repository name corresponding to the package type.</returns>
         private static string GetRepoName(PackageType packageType, string internalRepo, string developmentRepo, string clearedThirdPartyRepo)
         {
             switch (packageType)
@@ -407,6 +491,12 @@ namespace LCT.ArtifactoryUploader
                     return string.Empty;
             }
         }
+
+        /// <summary>
+        /// Asynchronously gets the source repository details for a component.
+        /// </summary>
+        /// <param name="item">The component to retrieve repository details for.</param>
+        /// <returns>The AQL result containing repository details, or null if not found.</returns>
         public async static Task<AqlResult> GetSrcRepoDetailsForComponent(Component item)
         {
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
@@ -449,6 +539,13 @@ namespace LCT.ArtifactoryUploader
             return null;
         }
 
+        /// <summary>
+        /// Asynchronously gets the list of components from repositories based on package type.
+        /// </summary>
+        /// <param name="repoList">The list of repository names.</param>
+        /// <param name="jFrogService">The JFrog service instance.</param>
+        /// <param name="packageType">The type of package (npm or cargo).</param>
+        /// <returns>A list of AQL results for the specified package type.</returns>
         public static async Task<List<AqlResult>> GetPackageTypeBased_ListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService, string packageType)
         {
             var aqlResultList = new List<AqlResult>();
@@ -480,6 +577,12 @@ namespace LCT.ArtifactoryUploader
             return aqlResultList;
         }
 
+        /// <summary>
+        /// Asynchronously gets the list of internal components from repositories.
+        /// </summary>
+        /// <param name="repoList">The list of repository names.</param>
+        /// <param name="jFrogService">The JFrog service instance.</param>
+        /// <returns>A list of AQL results for internal components.</returns>
         public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             var aqlResultList = new List<AqlResult>();
@@ -502,6 +605,12 @@ namespace LCT.ArtifactoryUploader
             return aqlResultList;
         }
 
+        /// <summary>
+        /// Gets the Artifactory repository name by matching component properties.
+        /// </summary>
+        /// <param name="aqlResultList">The list of AQL results to search.</param>
+        /// <param name="component">The component to find.</param>
+        /// <returns>The matching AQL result, or an empty result if not found.</returns>
         private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogpackageName = GetFullNameOfComponent(component);
@@ -526,6 +635,11 @@ namespace LCT.ArtifactoryUploader
             return new AqlResult();
         }
 
+        /// <summary>
+        /// Gets the full name of a component, including group if present.
+        /// </summary>
+        /// <param name="item">The component to get the full name for.</param>
+        /// <returns>The full component name.</returns>
         private static string GetFullNameOfComponent(Component item)
         {
             if (!string.IsNullOrEmpty(item.Group))
@@ -538,6 +652,12 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Gets the Artifactory repository name for Conan packages.
+        /// </summary>
+        /// <param name="aqlResultList">The list of AQL results to search.</param>
+        /// <param name="component">The component to find.</param>
+        /// <returns>The matching AQL result, or null if not found.</returns>
         private static AqlResult GetArtifactoryRepoNameForConan(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
@@ -548,6 +668,12 @@ namespace LCT.ArtifactoryUploader
             return repoName;
         }
 
+        /// <summary>
+        /// Asynchronously gets the list of PyPI components from repositories.
+        /// </summary>
+        /// <param name="repoList">The list of repository names.</param>
+        /// <param name="jFrogService">The JFrog service instance.</param>
+        /// <returns>A list of AQL results for PyPI components.</returns>
         public static async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             var aqlResultList = new List<AqlResult>();
@@ -570,6 +696,12 @@ namespace LCT.ArtifactoryUploader
             }
             return aqlResultList;
         }
+
+        /// <summary>
+        /// Gets the package type from the component's properties.
+        /// </summary>
+        /// <param name="item">The component to evaluate.</param>
+        /// <returns>The package type.</returns>
         private static PackageType GetPackageType(Component item)
         {
             string GetPropertyValue(string propertyName) =>
@@ -594,5 +726,6 @@ namespace LCT.ArtifactoryUploader
             return PackageType.Unknown;
         }
 
+        #endregion
     }
 }

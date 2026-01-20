@@ -14,7 +14,14 @@ namespace LCT.APICommunications.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class LinkedReleases
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the release identifier.
+        /// </summary>
         [JsonProperty("release")]
         public string Release { get; set; }
+
+        #endregion Properties
     }
 }

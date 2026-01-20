@@ -21,7 +21,19 @@ namespace LCT.Common
 {
     public class SpdxBomParser : ISpdxBomParser
     {
+        #region Fields
+
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Parses an SPDX BOM file and converts it to CycloneDX BOM format.
+        /// </summary>
+        /// <param name="filePath">The file path of the SPDX BOM file.</param>
+        /// <returns>A BOM object containing components and dependencies.</returns>
         public Bom ParseSPDXBom(string filePath)
         {
             Logger.Debug($"Starting SPDX BOM parsing for file: {filePath}");
@@ -65,6 +77,12 @@ namespace LCT.Common
             Logger.Debug($"SPDX BOM parsing completed. Final BOM contains {bom.Components?.Count ?? 0} components and {bom.Dependencies?.Count ?? 0} dependencies");
             return bom;
         }
+
+        /// <summary>
+        /// Validates the SPDX version to ensure it matches the expected version.
+        /// </summary>
+        /// <param name="spdxData">The SPDX BOM data to validate.</param>
+        /// <returns>True if the SPDX version is valid; otherwise, false.</returns>
         private static bool IsValidSpdxVersion(SpdxBomData spdxData)
         {
             if (spdxData == null)
@@ -89,6 +107,12 @@ namespace LCT.Common
             }
             return isValid;
         }
+
+        /// <summary>
+        /// Converts SPDX data to BOM format including components and dependencies.
+        /// </summary>
+        /// <param name="spdxData">The SPDX BOM data to convert.</param>
+        /// <param name="bom">The BOM object to populate.</param>
         private static void ConvertSpdxDataToBom(SpdxBomData spdxData, ref Bom bom)
         {
             Logger.Debug("Starting SPDX data to BOM conversion...");
@@ -105,6 +129,13 @@ namespace LCT.Common
             bom.Dependencies = dependencies;
             Logger.Debug($"BOM conversion completed. Components: {components.Count}, Dependencies: {dependencies.Count}");
         }
+
+        /// <summary>
+        /// Adds development property to components based on SPDX relationships.
+        /// </summary>
+        /// <param name="components">The list of components to update.</param>
+        /// <param name="relationships">The SPDX relationships to analyze.</param>
+        /// <param name="componentIndex">The component index for lookups.</param>
         private static void AddDevelopmentPropertyToComponents(List<Component> components, IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
         {
             var devDependencyBomRefs = relationships
@@ -126,11 +157,21 @@ namespace LCT.Common
                 SpdxSbomHelper.AddDevelopmentProperty(component, isDevDependency);
             }
         }
+
+        /// <summary>
+        /// Cleans up manufacturer data by setting it to null for all components.
+        /// </summary>
+        /// <param name="components">The list of components to clean up.</param>
         private static void CleanupComponentManufacturerData(List<Component> components)
         {
             components.ForEach(component => component.Manufacturer = null);
         }
 
+        /// <summary>
+        /// Processes SPDX packages and converts them to components with an index.
+        /// </summary>
+        /// <param name="packages">The SPDX packages to process.</param>
+        /// <returns>A tuple containing the list of components and a component index.</returns>
         private static (List<Component> components, Dictionary<string, Component> componentIndex) ProcessSpdxPackages(IEnumerable<Package> packages)
         {
             Logger.Debug("ProcessSpdxPackages():Starting SPDX package processing...");
@@ -151,6 +192,11 @@ namespace LCT.Common
             return (components, componentIndex);
         }
 
+        /// <summary>
+        /// Creates a CycloneDX component from an SPDX package.
+        /// </summary>
+        /// <param name="package">The SPDX package to convert.</param>
+        /// <returns>A Component object if successful; otherwise, null.</returns>
         private static Component CreateComponentFromPackage(Package package)
         {
             Logger.Debug($"CreateComponentFromPackage():Creating component from package: {package.Name}");
@@ -186,6 +232,11 @@ namespace LCT.Common
             return component;
         }
 
+        /// <summary>
+        /// Gets the PURL reference from external references.
+        /// </summary>
+        /// <param name="externalRefs">The external references to search.</param>
+        /// <returns>The external reference containing the PURL; otherwise, null.</returns>
         private static ExternalRef GetPurlReference(IEnumerable<ExternalRef> externalRefs)
         {
             return externalRefs.FirstOrDefault(er =>
@@ -193,6 +244,12 @@ namespace LCT.Common
                 er.ReferenceType?.Equals("purl", StringComparison.OrdinalIgnoreCase) == true);
         }
 
+        /// <summary>
+        /// Processes SPDX relationships and converts them to CycloneDX dependencies.
+        /// </summary>
+        /// <param name="relationships">The SPDX relationships to process.</param>
+        /// <param name="componentIndex">The component index for lookups.</param>
+        /// <returns>A list of CycloneDX dependencies.</returns>
         private static List<Dependency> ProcessSpdxRelationships(IEnumerable<Relationship> relationships, Dictionary<string, Component> componentIndex)
         {
             if (relationships == null)
@@ -207,6 +264,10 @@ namespace LCT.Common
             return ConvertDependencyMapToCycloneDx(dependencyMap);
         }
 
+        /// <summary>
+        /// Gets the set of supported SPDX relationship types.
+        /// </summary>
+        /// <returns>A HashSet containing supported relationship type names.</returns>
         private static HashSet<string> GetSupportedRelationshipTypes()
         {
             return new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -218,6 +279,13 @@ namespace LCT.Common
     };
         }
 
+        /// <summary>
+        /// Builds a dependency map from SPDX relationships.
+        /// </summary>
+        /// <param name="relationships">The SPDX relationships to process.</param>
+        /// <param name="componentIndex">The component index for lookups.</param>
+        /// <param name="supportedRelationshipTypes">The set of supported relationship types.</param>
+        /// <returns>A dictionary mapping component references to their dependencies.</returns>
         private static Dictionary<string, List<(string bomRef, string relationshipType)>> BuildDependencyMap(
             IEnumerable<Relationship> relationships,
             Dictionary<string, Component> componentIndex,
@@ -240,6 +308,13 @@ namespace LCT.Common
             return dependencyMap;
         }
 
+        /// <summary>
+        /// Validates whether a relationship is valid and supported.
+        /// </summary>
+        /// <param name="relationship">The relationship to validate.</param>
+        /// <param name="supportedTypes">The set of supported relationship types.</param>
+        /// <param name="componentIndex">The component index for lookups.</param>
+        /// <returns>True if the relationship is valid; otherwise, false.</returns>
         private static bool IsValidRelationship(Relationship relationship, HashSet<string> supportedTypes, Dictionary<string, Component> componentIndex)
         {
             return supportedTypes.Contains(relationship.RelationshipType) &&
@@ -247,6 +322,12 @@ namespace LCT.Common
                    componentIndex.ContainsKey(relationship.RelatedSpdxElement);
         }
 
+        /// <summary>
+        /// Gets the dependency references from a relationship.
+        /// </summary>
+        /// <param name="relationship">The relationship to extract references from.</param>
+        /// <param name="componentIndex">The component index for lookups.</param>
+        /// <returns>A tuple containing the dependent reference and dependency reference.</returns>
         private static (string dependentRef, string dependencyRef) GetDependencyRefs(Relationship relationship, Dictionary<string, Component> componentIndex)
         {
             var parentComponent = componentIndex[relationship.SpdxElementId];
@@ -261,6 +342,13 @@ namespace LCT.Common
             return (dependentRef: childBomRef, dependencyRef: parentBomRef);
         }
 
+        /// <summary>
+        /// Adds a dependency entry to the dependency map.
+        /// </summary>
+        /// <param name="dependencyMap">The dependency map to update.</param>
+        /// <param name="dependentRef">The dependent component reference.</param>
+        /// <param name="dependencyRef">The dependency component reference.</param>
+        /// <param name="relationshipType">The type of relationship.</param>
         private static void AddToDependencyMap(
             Dictionary<string, List<(string bomRef, string relationshipType)>> dependencyMap,
             string dependentRef,
@@ -279,6 +367,11 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Converts the dependency map to CycloneDX dependency format.
+        /// </summary>
+        /// <param name="dependencyMap">The dependency map to convert.</param>
+        /// <returns>A list of CycloneDX dependencies.</returns>
         private static List<Dependency> ConvertDependencyMapToCycloneDx(Dictionary<string, List<(string bomRef, string relationshipType)>> dependencyMap)
         {
             return [.. dependencyMap.Select(kvp => new Dependency
@@ -288,5 +381,6 @@ namespace LCT.Common
             })];
         }
 
+        #endregion
     }
 }

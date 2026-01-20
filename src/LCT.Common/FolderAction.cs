@@ -20,14 +20,20 @@ namespace LCT.Common
     /// </summary>
     public class FolderAction : IFolderAction
     {
+        #region Fields
+
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Copies source directory content to target directory content
         /// </summary>
-        /// <param name="sourceDirectory"></param>
-        /// <param name="targetDirectory"></param>
-        /// <returns>bool</returns>
+        /// <param name="sourceDirectory">The source directory path.</param>
+        /// <param name="targetDirectory">The target directory path.</param>
+        /// <returns>True if the copy operation succeeded; otherwise, false.</returns>
         public bool CopyToTargetDirectory(string sourceDirectory, string targetDirectory)
         {
             Logger.Debug("FolderAction.CopyToTargetDirectory():Start");
@@ -61,7 +67,7 @@ namespace LCT.Common
         /// <summary>
         /// Validates the folder path given
         /// </summary>
-        /// <param name="folderPath"></param>
+        /// <param name="folderPath">The folder path to validate.</param>
         public void ValidateFolderPath(string folderPath)
         {
             if (string.IsNullOrWhiteSpace(folderPath))
@@ -78,8 +84,8 @@ namespace LCT.Common
         /// <summary>
         /// Zip Files To Target Directory
         /// </summary>
-        /// <param name="targetDirectory"></param>
-        /// <returns>bool</returns>
+        /// <param name="targetDirectory">The target directory to create a zip file from.</param>
+        /// <returns>True if the zip operation succeeded; otherwise, false.</returns>
         public bool ZipFileToTargetDirectory(string targetDirectory)
         {
             Logger.Debug("FolderAction.ZipFileToTargetDirectory():Start");
@@ -118,6 +124,11 @@ namespace LCT.Common
             return isZiped;
         }
 
+        /// <summary>
+        /// Recursively copies all files and subdirectories from source to target directory.
+        /// </summary>
+        /// <param name="source">The source directory information.</param>
+        /// <param name="target">The target directory information.</param>
         private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
             Logger.Debug("FolderAction.CopyAll():Start");
@@ -154,5 +165,7 @@ namespace LCT.Common
             }
             Logger.Debug("FolderAction.CopyAll():End");
         }
+
+        #endregion
     }
 }

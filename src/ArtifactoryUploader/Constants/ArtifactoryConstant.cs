@@ -14,6 +14,10 @@ namespace ArtifactoryUploader.Constants
     [ExcludeFromCodeCoverage]
     public static class ArtifactoryConstant
     {
+        #region Fields
+
         public const string Log4netArtifactoryUploaderConfigFileName = "log4netArtifactoryUploader.config";
+
+        #endregion
     }
 }

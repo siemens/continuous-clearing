@@ -11,7 +11,8 @@ namespace LCT.Common.Interface
         /// <summary>
         /// Prints a specific recommendation message.
         /// </summary>
-        /// param name="content">The content of the recommendation message to be printed.</param>
+        /// <param name="content">The content of the recommendation message to be printed.</param>
+        /// <returns>void.</returns>
         void PrintRecommendation(string content);
     }
 }

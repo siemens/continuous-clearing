@@ -12,24 +12,25 @@ namespace LCT.Common.Interface
     public interface IFolderAction
     {
         /// <summary>
-        /// Copies source directory content to target directory content
+        /// Copies the contents of the source directory to the target directory.
         /// </summary>
-        /// <param name="sourceDirectory"></param>
-        /// <param name="targetDirectory"></param>
-        /// <returns>bool</returns>
+        /// <param name="sourceDirectory">The path of the source directory.</param>
+        /// <param name="targetDirectory">The path of the target directory.</param>
+        /// <returns>True if the copy was successful; otherwise, false.</returns>
         public bool CopyToTargetDirectory(string sourceDirectory, string targetDirectory);
 
         /// <summary>
-        /// Zip Files To Target Directory
+        /// Zips files to the specified target directory.
         /// </summary>
-        /// <param name="targetDirectory"></param>
-        /// <returns>bool</returns>
+        /// <param name="targetDirectory">The path of the target directory where files will be zipped.</param>
+        /// <returns>True if the zip operation was successful; otherwise, false.</returns>
         public bool ZipFileToTargetDirectory(string targetDirectory);
 
         /// <summary>
-        /// Validates the given folder path
+        /// Validates the given folder path.
         /// </summary>
-        /// <param name="filePath"></param>
+        /// <param name="folderPath">The path of the folder to validate.</param>
+        /// <returns>void.</returns>
         public void ValidateFolderPath(string folderPath);
     }
 }

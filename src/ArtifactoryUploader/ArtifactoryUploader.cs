@@ -24,10 +24,28 @@ namespace LCT.ArtifactoryUploader
 {
     public static class ArtfactoryUploader
     {
-        //ConfigurationAttribute
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Properties
+
         public static IJFrogService JFrogService { get; set; }
         public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously uploads a package to the repository.
+        /// </summary>
+        /// <param name="component">The component to upload.</param>
+        /// <param name="timeout">The timeout value in seconds.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task containing the HTTP response message.</returns>
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
@@ -87,6 +105,12 @@ namespace LCT.ArtifactoryUploader
             return responsemessage;
         }
 
+        /// <summary>
+        /// Asynchronously gets package information with retry logic for lowercase names.
+        /// </summary>
+        /// <param name="jFrogService">The JFrog service instance.</param>
+        /// <param name="component">The component to get information for.</param>
+        /// <returns>A task containing the AQL result with package information, or null if not found.</returns>
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
             async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)
@@ -119,6 +143,11 @@ namespace LCT.ArtifactoryUploader
 
             return packageInfo;
         }
+
+        /// <summary>
+        /// Gets the path for Artifactory upload directory.
+        /// </summary>
+        /// <returns>The local path for Artifactory upload.</returns>
         public static string GettPathForArtifactoryUpload()
         {
             string localPathforartifactory = string.Empty;
@@ -143,5 +172,6 @@ namespace LCT.ArtifactoryUploader
             return localPathforartifactory;
         }
 
+        #endregion
     }
 }

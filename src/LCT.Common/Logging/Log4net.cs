@@ -22,11 +22,39 @@ namespace LCT.Common
     /// </summary>
     public static class Log4Net
     {
+        #region Fields
+        // No fields present.
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets or sets the logger repository.
+        /// </summary>
         public static ILoggerRepository LoggerRepository { get; set; }
 
+        /// <summary>
+        /// Gets or sets the path to the log file.
+        /// </summary>
         public static string CatoolLogPath { get; set; }
-        public static string CatoolCurrentDirectory { get; set; }
 
+        /// <summary>
+        /// Gets or sets the current directory for the tool.
+        /// </summary>
+        public static string CatoolCurrentDirectory { get; set; }
+        #endregion
+
+        #region Constructors
+        // No constructors present.
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Initializes the log4net logger with the specified log file name, folder, and verbosity.
+        /// </summary>
+        /// <param name="logFileName">The name of the log file.</param>
+        /// <param name="logFolder">The folder where the log file will be stored.</param>
+        /// <param name="verbose">If true, sets verbose logging level.</param>
+        /// <returns>void.</returns>
         public static void Init(string logFileName, string logFolder, bool verbose)
         {
             LoggerRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
@@ -49,6 +77,13 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Activates the file appender for logging, setting verbosity and log path.
+        /// </summary>
+        /// <param name="verbose">If true, sets verbose logging level.</param>
+        /// <param name="logPath">The path to the log file.</param>
+        /// <param name="appenders">The array of appenders to configure.</param>
+        /// <returns>void.</returns>
         public static void ActivateFileAppender(bool verbose, string logPath, IAppender[] appenders)
         {
             foreach (IAppender appender in appenders)
@@ -66,6 +101,10 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Gets the default log4net configuration file path based on the environment.
+        /// </summary>
+        /// <returns>The path to the default log4net config file.</returns>
         public static string GetDefaultLogConfigFile()
         {
             EnvironmentType envType = RuntimeEnvironment.GetEnvironment();
@@ -78,6 +117,11 @@ namespace LCT.Common
 
             return Path.Combine(appFolder, "log4net.color.config");
         }
+        #endregion
+
+        #region Events
+        // No events present.
+        #endregion
     }
 }
 

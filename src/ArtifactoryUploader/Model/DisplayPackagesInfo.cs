@@ -16,6 +16,8 @@ namespace LCT.ArtifactoryUploader.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DisplayPackagesInfo
     {
+        #region Properties
+
         public List<ComponentsToArtifactory> UnknownPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesConan { get; set; }
@@ -45,10 +47,17 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesCargo { get; set; }
 
+        #endregion
     }
+
+    /// <summary>
+    /// The Model class for ProjectResponse
+    /// </summary>
     public class ProjectResponse
     {
-        [JsonProperty("npm")]
+        #region Properties
+
+        [JsonProperty("npm")]]
         public List<JsonComponents> Npm { get; set; }
         [JsonProperty("nuget")]
         public List<JsonComponents> Nuget { get; set; }
@@ -62,13 +71,22 @@ namespace LCT.ArtifactoryUploader.Model
         public List<JsonComponents> Maven { get; set; }
         [JsonProperty("cargo")]
         public List<JsonComponents> Cargo { get; set; }
+
+        #endregion
     }
 
+    /// <summary>
+    /// The Model class for JsonComponents
+    /// </summary>
     public class JsonComponents
     {
-        [JsonProperty("name")]
+        #region Properties
+
+        [JsonProperty("name")]]
         public string Name { get; set; }
         [JsonProperty("version")]
         public string Version { get; set; }
+
+        #endregion
     }
 }

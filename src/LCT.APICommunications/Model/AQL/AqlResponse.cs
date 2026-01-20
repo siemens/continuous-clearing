@@ -15,7 +15,14 @@ namespace LCT.APICommunications.Model.AQL
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class AqlResponse
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the list of AQL query results.
+        /// </summary>
         [JsonProperty("results")]
         public IList<AqlResult> Results { get; set; }
+
+        #endregion Properties
     }
 }
