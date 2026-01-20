@@ -462,5 +462,44 @@ namespace AritfactoryUploader.UTest
             // Cleanup
             File.Delete(filename);
         }
+        [Test]
+        public void GetNotApprovedChocoPackages_FileExists_ShouldUpdateDebianComponents()
+        {
+            // Arrange
+            var unknownPackages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "Package1", Version = "1.0.0" },
+                new ComponentsToArtifactory { Name = "Package2", Version = "2.0.0" }
+            };
+            var projectResponse = new ProjectResponse();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var filepath = Path.GetTempPath();
+            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
+
+            var existingProjectResponse = new ProjectResponse
+            {
+                Choco = new List<JsonComponents>
+                {
+                    new JsonComponents { Name = "ExistingPackage", Version = "1.0.0" }
+                }
+            };
+            var json = JsonConvert.SerializeObject(existingProjectResponse);
+            File.WriteAllText(filename, json);
+
+            // Act
+            PackageUploadInformation.GetNotApprovedChocoPackages(unknownPackages, projectResponse, mockFileOperations.Object, filepath, filename);
+
+            // Assert
+            mockFileOperations.Verify(m => m.WriteContentToReportNotApprovedFile(It.Is<ProjectResponse>(pr =>
+                pr.Choco.Count == 2 &&
+                pr.Choco[0].Name == "Package1" &&
+                pr.Choco[0].Version == "1.0.0" &&
+                pr.Choco[1].Name == "Package2" &&
+                pr.Choco[1].Version == "2.0.0"
+            ), filepath, FileConstant.artifactoryReportNotApproved, "Artifactory"), Times.Once);
+
+            // Cleanup
+            File.Delete(filename);
+        }
     }
 }
