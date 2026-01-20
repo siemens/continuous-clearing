@@ -178,8 +178,8 @@ stages:
       displayName: "B&R CA Tool CARGO"
       sw360Url: $(SW360_URL)
       sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: a331b8488fa140b6a8714d003a0d3a79
-      sw360ProjectName: "Test-Poetry"
+      sw360ProjectId: 3e4e30ddfa82419091a0208b39f51db2
+      sw360ProjectName: "Test-Cargo"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
       JfrogToken: $(JFROG_TOKEN)
@@ -200,8 +200,8 @@ stages:
       displayName: "B&R CA Tool CHOCO"
       sw360Url: $(SW360_URL)
       sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: cb0dfd43b35748d880d4c9f201ca7139
-      sw360ProjectName: "Test-Nuget"
+      sw360ProjectId: 28b0f7b4c77f4dfaa071e0a8772c8cf3
+      sw360ProjectName: "Test-Choco"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
       JfrogToken: $(JFROG_TOKEN)
