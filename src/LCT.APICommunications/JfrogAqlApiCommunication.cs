@@ -131,7 +131,7 @@ namespace LCT.APICommunications
             {
                 return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@pypi.normalized.name", component.Name), ("@pypi.version", component.Version) });
             }
-            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase))
+            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase) || component.ComponentType.Equals("Choco", StringComparison.InvariantCultureIgnoreCase))
             {
                 // NuGet: $and for repo, $or for id (case), and version
                 return $"items.find({{\"$and\": [{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},{{ \"$or\":[{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name}\" }} }},{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}]}},{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}]}}).include(\"repo\", \"path\", \"name\").limit(1)";

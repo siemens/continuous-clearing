@@ -436,7 +436,8 @@ namespace LCT.Common.Logging
         { "Debian", appSettings.Debian },
         { "Poetry", appSettings.Poetry },
         { "Cargo",appSettings.Cargo },
-        { "Conan", appSettings.Conan }
+        { "Conan", appSettings.Conan },
+        { "Choco", appSettings.Choco }
     };
         }
 
@@ -1398,24 +1399,14 @@ namespace LCT.Common.Logging
             }
         }
 
-        public static void WriteChocoManualStepsNotification(List<Component> components)
+        public static void WriteChocoManualStepsNotification(List<Components> components)
         {
             if (components == null || components.Count == 0)
                 return;
-
-            // Get all Choco components to display in the table
-            var chocoComponents = components.Where(c => 
-                c.Properties?.Any(p => 
-                    string.Equals(p.Name, Dataconstant.Cdx_ProjectType, StringComparison.OrdinalIgnoreCase) && 
-                    string.Equals(p.Value, "CHOCO", StringComparison.OrdinalIgnoreCase)) == true).ToList();
-
-            if (chocoComponents.Count == 0)
-                return;
-
-            WriteChocoManualStepsNotificationWithSpectre(chocoComponents);
+            WriteChocoManualStepsNotificationWithSpectre(components);
         }
 
-        private static void WriteChocoManualStepsNotificationWithSpectre(List<Component> chocoComponents)
+        private static void WriteChocoManualStepsNotificationWithSpectre(List<Components> chocoComponents)
         {
             SafeSpectreAction(() =>
             {

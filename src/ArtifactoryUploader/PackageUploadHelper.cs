@@ -139,8 +139,10 @@ namespace LCT.ArtifactoryUploader
                     AddToNpmList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "NUGET":
-                case "CHOCO":
                     AddToNugetList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "CHOCO":
+                    AddToChocoList(component, displayPackagesInfo, notFound, success);
                     break;
                 case "MAVEN":
                     AddToMavenList(component, displayPackagesInfo, notFound, success);
@@ -229,7 +231,15 @@ namespace LCT.ArtifactoryUploader
             else
                 displayPackagesInfo.JfrogFoundPackagesCargo.Add(component);
         }
-
+        private static void AddToChocoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesChoco.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesChoco.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesChoco.Add(component);
+        }
         // Properly wrap UploadingThePackages as a method
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {

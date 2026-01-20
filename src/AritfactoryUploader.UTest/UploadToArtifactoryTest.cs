@@ -798,7 +798,6 @@ namespace AritfactoryUploader.UTest
     {
         [TestCase("pkg:npm/foo@1.0.0", "NPM")]
         [TestCase("pkg:nuget/foo@1.0.0", "NUGET")]
-        [TestCase("pkg:choco/foo@1.0.0", "CHOCO")]
         [TestCase("pkg:maven/foo@1.0.0", "MAVEN")]
         [TestCase("pkg:pypi/foo@1.0.0", "POETRY")]
         [TestCase("pkg:conan/foo@1.0.0", "CONAN")]
@@ -813,7 +812,24 @@ namespace AritfactoryUploader.UTest
                 .Invoke(null, new object[] { component }) as string;
             Assert.AreEqual(expected, result);
         }
+        [Test]
+        public void GetComponentType_ReturnsChoco_WhenProjectTypeIsChoco()
+        {
+            var component = new Component
+            {
+                Purl = "pkg:nuget/newtonsoft@3.1.18", // purl suggests NUGET, but ProjectType should override to CHOCO
+                Properties = new List<Property>
+        {
+            new Property { Name = Dataconstant.Cdx_ProjectType, Value = "choco" }
+        }
+            };
 
+            var result = typeof(UploadToArtifactory)
+                .GetMethod("GetComponentType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .Invoke(null, new object[] { component }) as string;
+
+            Assert.AreEqual("CHOCO", result);
+        }
         [Test]
         public void AddUnknownComponentToDisplayList_AddsToCorrectList()
         {

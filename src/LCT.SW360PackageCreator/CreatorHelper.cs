@@ -43,7 +43,6 @@ namespace LCT.SW360PackageCreator
         List<Components> componentsAvailableInSw360 = new List<Components>();
         List<Components> DuplicateComponentsByPurlId = new List<Components>();
         private const string SOURCE = "SOURCE";
-        private const string ChocoNotProcessedStatus = "Not Processed for CHOCO";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
         public List<ComparisonBomData> GetDownloadUrlNotFoundList(List<ComparisonBomData> comparisionBomDataList)
@@ -259,19 +258,7 @@ namespace LCT.SW360PackageCreator
 
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
-
-            Logger.Debug($"SetContentsForComparisonBOM():Starting to identify available components data in SW360");            
-            // Check if all components are Choco packages
-            bool allChocoComponents = lstComponentForBOM.All(component => 
-                string.Equals(component.ProjectType, "CHOCO", StringComparison.OrdinalIgnoreCase));
-
-            if (allChocoComponents && lstComponentForBOM.Count > 0)
-            {
-                Logger.Debug($"SetContentsForComparisonBOM(): All components are CHOCO type, skipping SW360 processing");
-                // Return minimal comparison data for CHOCO components without SW360 processing
-                return CreateMinimalComparisonDataForChoco(lstComponentForBOM);
-            }
-
+            Logger.Debug($"SetContentsForComparisonBOM():Starting to identify available components data in SW360");
             Logger.Logger.Log(null, Level.Notice, $"Collecting BoM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
             DuplicateComponentsByPurlId = sw360Service.GetDuplicateComponentsByPurlId();
@@ -281,40 +268,7 @@ namespace LCT.SW360PackageCreator
             LogHandlingHelper.SW360AvailableComponentsList(componentsAvailableInSw360);
             Logger.Debug($"SetContentsForComparisonBOM():Completed of the sw360 data for available components");
             return comparisonBomData;
-        }
-
-        private static List<ComparisonBomData> CreateMinimalComparisonDataForChoco(List<Components> lstComponentForBOM)
-        {
-            var chocoComparisonData = new List<ComparisonBomData>();
-
-            foreach (var component in lstComponentForBOM)
-            {
-                var chocoData = new ComparisonBomData
-                {
-                    Name = component.Name,
-                    Version = component.Version,
-                    Group = component.Group,
-                    ComponentExternalId = component.ComponentExternalId,
-                    ReleaseExternalId = component.ReleaseExternalId,
-                    SourceUrl = component.SourceUrl,
-                    DownloadUrl = component.DownloadUrl,
-                    ComponentStatus = ChocoNotProcessedStatus,
-                    ReleaseStatus = ChocoNotProcessedStatus,
-                    ApprovedStatus = "Not Applicable",
-                    IsComponentCreated = "Not Created",
-                    IsReleaseCreated = "Not Created",
-                    FossologyUploadStatus = "Not Applicable",
-                    ReleaseAttachmentLink = string.Empty,
-                    ReleaseLink = string.Empty,
-                    FossologyLink = string.Empty,
-                    ReleaseCreatedBy = string.Empty
-                };
-
-                chocoComparisonData.Add(chocoData);
-            }
-
-            return chocoComparisonData;
-        }
+        }       
 
         private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
@@ -509,45 +463,24 @@ namespace LCT.SW360PackageCreator
                 ComponentCreator.TotalComponentsFromPackageIdentifier - updatedCompareBomData.Count : 0
             };
 
-            // Check if all components are CHOCO packages
-            bool allChocoComponents = updatedCompareBomData.All(component => 
-                string.Equals(component.ComponentStatus, ChocoNotProcessedStatus, StringComparison.OrdinalIgnoreCase));
-
-            if (allChocoComponents && updatedCompareBomData.Count > 0)
+            foreach (ComparisonBomData item in updatedCompareBomData)
             {
-                // For CHOCO components, these metrics should reflect the actual count of CHOCO packages
-                creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360 = 0;
-                creatorKpiData.ComponentsOrReleasesExistingInSw360 = 0;
-                creatorKpiData.ComponentsOrReleasesNotCreatedInSw360 = updatedCompareBomData.Count; // Count of CHOCO packages not created in SW360
-                creatorKpiData.ComponentsWithoutSourceDownloadUrl = 0;
-                creatorKpiData.ComponentsWithSourceDownloadUrl = 0;
-                creatorKpiData.ComponentsWithoutPackageUrl = 0;
-                creatorKpiData.ComponentsWithoutSourceAndPackageUrl = 0;
-                creatorKpiData.ComponentsUploadedInFossology = 0;
-                creatorKpiData.ComponentsNotUploadedInFossology = updatedCompareBomData.Count; // Count of CHOCO packages not uploaded to Fossology
-            }
-            else
-            {
-                // Normal processing for non-CHOCO components
-                foreach (ComparisonBomData item in updatedCompareBomData)
+                if (IsComponentNewlyCreated(item))
                 {
-                    if (IsComponentNewlyCreated(item))
-                    {
-                        creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360++;
-                    }
-
-                    if (IsComponentCreated(item))
-                    {
-                        creatorKpiData.ComponentsOrReleasesExistingInSw360++;
-                    }
-
-                    if (IsComponentNotCreated(item))
-                    {
-                        creatorKpiData.ComponentsOrReleasesNotCreatedInSw360++;
-                    }
-
-                    ComponentsWithAndWithOutSourceDownloadUrl(ref creatorKpiData, item);
+                    creatorKpiData.ComponentsOrReleasesCreatedNewlyInSw360++;
                 }
+
+                if (IsComponentCreated(item))
+                {
+                    creatorKpiData.ComponentsOrReleasesExistingInSw360++;
+                }
+
+                if (IsComponentNotCreated(item))
+                {
+                    creatorKpiData.ComponentsOrReleasesNotCreatedInSw360++;
+                }
+
+                ComponentsWithAndWithOutSourceDownloadUrl(ref creatorKpiData, item);
             }
 
             Program.CreatorStopWatch.Stop();
@@ -689,16 +622,7 @@ namespace LCT.SW360PackageCreator
         }
 
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
-        {
-            // Check if all components are Choco packages
-            bool allChocoComponents = comparisionBomDataList.All(component => 
-                string.Equals(component.ComponentStatus, ChocoNotProcessedStatus, StringComparison.OrdinalIgnoreCase));
-
-            if (allChocoComponents && comparisionBomDataList.Count > 0)
-            {
-                Logger.Debug("WriteSourceNotFoundListToConsole(): Skipping Action Item table for CHOCO components");
-                return;
-            }
+        {          
 
             List<ComparisonBomData> sourceNotAvailable = GetDownloadUrlNotFoundList(comparisionBomDataList);
             foreach (var item in comparisionBomDataList)

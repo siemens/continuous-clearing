@@ -28,6 +28,8 @@ namespace LCT.ArtifactoryUploader
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
+        private const string Choco = "CHOCO";
+        private const string Nuget = "NUGET";
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData,
                                                                                                       CommonAppSettings appSettings,
                                                                                                       DisplayPackagesInfo displayPackagesInfo)
@@ -114,18 +116,21 @@ namespace LCT.ArtifactoryUploader
         }
         private static string GetComponentType(Component item)
         {
-
+            var projectTypeProp = item.Properties
+                                       ?.Find(p => p.Name == Dataconstant.Cdx_ProjectType)
+                                       ?.Value;
+            if (!string.IsNullOrEmpty(projectTypeProp) &&
+                projectTypeProp.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return Choco;
+            }
             if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
                 return "NPM";
             }
             else if (item.Purl.Contains("nuget", StringComparison.OrdinalIgnoreCase))
             {
-                return "NUGET";
-            }
-            else if (item.Purl.Contains("choco", StringComparison.OrdinalIgnoreCase))
-            {
-                return "CHOCO";
+                return Nuget;
             }
             else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
             {
@@ -160,7 +165,7 @@ namespace LCT.ArtifactoryUploader
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == Nuget)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
             }
@@ -268,16 +273,10 @@ namespace LCT.ArtifactoryUploader
                $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
 
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == Nuget || component.ComponentType == Choco)
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
-            }
-            else if (component.ComponentType == "CHOCO")
-            {
-                // Choco package copy URL (similar to NuGet)
-                url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}.nupkg" +
-               $"?to=/{component.DestRepoName}/{component.Name}.{component.Version}.nupkg";
             }
             else if (component.ComponentType == "MAVEN")
             {
@@ -323,7 +322,7 @@ namespace LCT.ArtifactoryUploader
               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
 
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == Nuget || component.ComponentType == Choco)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
@@ -368,7 +367,8 @@ namespace LCT.ArtifactoryUploader
             return component.ComponentType switch
             {
                 "NPM" => component.PypiOrNpmCompName,
-                "NUGET" => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
+                Nuget => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
+                Choco => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 "DEBIAN" => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
                 "CARGO" => $"{component.PackageName}.{component.Version}{ApiConstant.CargoExtension}",
                 "POETRY" => component.PypiOrNpmCompName,
@@ -397,7 +397,7 @@ namespace LCT.ArtifactoryUploader
                 case "NPM":
                     displayPackagesInfo.UnknownPackagesNpm.Add(component);
                     break;
-                case "NUGET":
+                case Nuget:
                     displayPackagesInfo.UnknownPackagesNuget.Add(component);
                     break;
                 case "MAVEN":
@@ -414,6 +414,9 @@ namespace LCT.ArtifactoryUploader
                     break;
                 case "CARGO":
                     displayPackagesInfo.UnknownPackagesCargo.Add(component);
+                    break;
+                case Choco:
+                    displayPackagesInfo.UnknownPackagesChoco.Add(component);
                     break;
             }
         }
@@ -481,7 +484,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
                 }
-            }
+            }          
 
             return null;
         }
@@ -632,7 +635,7 @@ namespace LCT.ArtifactoryUploader
             }
             Logger.Debug($"GetPackageType(): Package type determined as Unknown");
             return PackageType.Unknown;
-        }
+        }       
 
     }
 }
