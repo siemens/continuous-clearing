@@ -108,12 +108,10 @@ namespace LCT.SW360PackageCreator
 
             foreach (string item in taglist)
             {
-                Logger.DebugFormat("GetCorrectVersion - Current Item:{0}", item);
-
                 if (!string.IsNullOrWhiteSpace(item))
                 {
                     string tag = item[(item.IndexOf("tags/") + 5)..];
-                    Logger.DebugFormat("baseobject - {0},tag -{1}", item, tag);
+                    Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
 
                     if (tag.Contains(component.Version, StringComparison.OrdinalIgnoreCase) &&
                 tag.Contains(component.Name, StringComparison.OrdinalIgnoreCase))
@@ -124,12 +122,10 @@ namespace LCT.SW360PackageCreator
             }
             foreach (string item in taglist)
             {
-                Logger.DebugFormat("GetCorrectVersion - Current Item:{0}", item);
-
                 if (!string.IsNullOrWhiteSpace(item))
                 {
                     string tag = item[(item.IndexOf("tags/") + 5)..];
-                    Logger.DebugFormat("baseobject - {0},tag -{1}", item, tag);
+                    Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
 
                     if (tag.Contains(component.Version))
                     {

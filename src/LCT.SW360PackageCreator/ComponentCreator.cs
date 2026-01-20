@@ -77,6 +77,7 @@ namespace LCT.SW360PackageCreator
                 bool isInternalComponent = GetPackageType(item, ref componentsData);
                 if (componentsData.ProjectType.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
                 {
+                    Logger.DebugFormat("{0}-{1} found as Choco component.", item.Name, item.Version);
                     ListofChocoComponents.Add(new Components
                     {
                         Name = item.Name,
