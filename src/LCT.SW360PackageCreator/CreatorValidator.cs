@@ -64,6 +64,11 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// Finds Valid Release
+        /// </summary>
+        /// <param name="sW360ApicommunicationFacade"></param>
+        /// <returns></returns>
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             int page = 0;
@@ -101,6 +106,13 @@ namespace LCT.SW360PackageCreator
             return null;
         }
 
+        /// <summary>
+        /// Moves To Next Page
+        /// </summary>
+        /// <param name="releaseResponse"></param>
+        /// <param name="page"></param>
+        /// <param name="pageCount"></param>
+        /// <returns>boolean value</returns>
         private static bool MoveToNextPage(ReleasesAllDetails releaseResponse, ref int page, ref int pageCount)
         {
             int currentPage = page;
@@ -116,6 +128,13 @@ namespace LCT.SW360PackageCreator
             return false;
         }
 
+        /// <summary>
+        /// Triggers Fossology Process For Release
+        /// </summary>
+        /// <param name="validRelease"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         private static async Task TriggerFossologyProcessForRelease(ReleasesAllDetails.Sw360Release validRelease, CommonAppSettings appSettings, ISw360CreatorService sw360CreatorService)
         {
             var releaseUrl = validRelease?.Links?.Self?.Href;
@@ -132,6 +151,13 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// Gets All Releases Details
+        /// </summary>
+        /// <param name="sW360ApicommunicationFacade"></param>
+        /// <param name="page"></param>
+        /// <param name="pageEntries"></param>
+        /// <returns>release details</returns>
         private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries)
         {
             ReleasesAllDetails releaseResponse = null;
@@ -160,6 +186,13 @@ namespace LCT.SW360PackageCreator
 
             return releaseResponse;
         }
+        /// <summary>
+        /// Fossology Url Validation
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <param name="client"></param>
+        /// <param name="environmentHelper"></param>
+        /// <returns>task that represents asynchronous operation</returns>
         public static async Task<bool> FossologyUrlValidation(CommonAppSettings appSettings, HttpClient client, IEnvironmentHelper environmentHelper)
         {
             string url = appSettings.SW360.Fossology.URL;

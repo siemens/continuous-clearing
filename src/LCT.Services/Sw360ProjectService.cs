@@ -78,6 +78,11 @@ namespace LCT.Services
             return sw360ProjectName;
         }
 
+        /// <summary>
+        /// Gets Already Linked Releases By ProjectId
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns>release id</returns>
         public async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId)
         {
             List<ReleaseLinked> alreadyLinkedReleases = new List<ReleaseLinked>();

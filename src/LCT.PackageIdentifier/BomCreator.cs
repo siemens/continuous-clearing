@@ -37,29 +37,46 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomCreator : IBomCreator
     {
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public readonly static BomKpiData bomKpiData = new();
         ComponentIdentification componentData;
         private readonly ICycloneDXBomParser CycloneDXBomParser;
         private readonly ISpdxBomParser SpdxBomParser;
-        public IJFrogService JFrogService { get; set; }
-        public IBomHelper BomHelper { get; set; }
-
         private readonly IFrameworkPackages _frameworkPackages;
         private readonly ICompositionBuilder _compositionBuilder;
         private readonly IRuntimeIdentifier _runtimeIdentifier;
 
         public static Jfrog jfrog { get; set; } = new Jfrog();
         public static SW360 sw360 { get; set; } = new SW360();
+        #endregion
+
+        #region Properties
+        public IJFrogService JFrogService { get; set; }
+        public IBomHelper BomHelper { get; set; }
+        #endregion
+
+        #region Constructors
         public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser, IRuntimeIdentifier runtimeIdentifier)
         {
             CycloneDXBomParser = cycloneDXBomParser;
-            _frameworkPackages = frameworkPackages;
+            _frameworkPackages = frameworkPackages; 
             _compositionBuilder = compositionBuilder;
             SpdxBomParser = spdxBomParser;
             _runtimeIdentifier = runtimeIdentifier;
         }
+        #endregion
+       
 
+        /// <summary>
+        /// Asynchronously generates a CycloneDX BOM from configured inputs and writes outputs (BOM, KPI files).
+        /// </summary>
+        /// <param name="appSettings">Application settings used for generation.</param>
+        /// <param name="bomHelper">BOM helper utilities.</param>
+        /// <param name="fileOperations">File operations helper used to write outputs.</param>
+        /// <param name="projectReleases">Project releases data used to enrich metadata.</param>
+        /// <param name="caToolInformation">CA tool information for telemetry/metadata.</param>
+        /// <returns>Asynchronously completes when generation finishes.</returns>
         public async Task GenerateBom(CommonAppSettings appSettings,
                                       IBomHelper bomHelper,
                                       IFileOperations fileOperations,
@@ -124,11 +141,25 @@ namespace LCT.PackageIdentifier
             Logger.Debug($"GenerateBom():End");
         }
 
+        /// <summary>
+        /// Writes contents to BOM by delegating to CycloneDX writer.
+        /// </summary>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="bomKpiData">KPI data structure to update.</param>
+        /// <param name="listOfComponentsToBom">BOM to write.</param>
+        /// <param name="defaultProjectName">Default project name used in file naming.</param>
         private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom, string defaultProjectName)
         {
             WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData, defaultProjectName);
         }
 
+        /// <summary>
+        /// Writes a CycloneDX BOM file to the output folder, optionally merging with existing BOMs when configured.
+        /// </summary>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="listOfComponentsToBom">BOM object containing components and metadata.</param>
+        /// <param name="bomKpiData">KPI data reference that can be modified.</param>
+        /// <param name="defaultProjectName">Default project name used for file naming.</param>
         private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData, string defaultProjectName)
         {
             FileOperations fileOperations = new FileOperations();
@@ -154,6 +185,11 @@ namespace LCT.PackageIdentifier
 
         }
 
+        /// <summary>
+        /// Asynchronously selects and invokes the appropriate package parser based on project type.
+        /// </summary>
+        /// <param name="appSettings">Application settings which include ProjectType.</param>
+        /// <returns>Asynchronously returns the generated BOM from the selected parser.</returns>
         private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
         {
             IParser parser;
@@ -194,6 +230,12 @@ namespace LCT.PackageIdentifier
             return new Bom();
         }
 
+        /// <summary>
+        /// Asynchronously runs component identification and enrichment using the provided parser.
+        /// </summary>
+        /// <param name="appSettings">Application settings used by the parser.</param>
+        /// <param name="parser">Parser that will parse package files and identify components.</param>
+        /// <returns>Asynchronously returns the composed BOM.</returns>
         private async Task<Bom> ComponentIdentification(CommonAppSettings appSettings, IParser parser)
         {
             ComponentIdentification lstOfComponents;
@@ -246,6 +288,12 @@ namespace LCT.PackageIdentifier
             bom.Dependencies.AddRange(unSupportedBomList.Dependencies);
             return bom;
         }
+
+        /// <summary>
+        /// Asynchronously checks connectivity to JFrog using the configured JFrog service.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing JFrog configuration.</param>
+        /// <returns>Asynchronously returns true when connection is successful or JFrog is not configured; otherwise false.</returns>
         public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
         {
             if (appSettings.Jfrog != null)
@@ -276,5 +324,9 @@ namespace LCT.PackageIdentifier
             return true;
 
         }
+        
+
+        #region Events
+        #endregion
     }
 }

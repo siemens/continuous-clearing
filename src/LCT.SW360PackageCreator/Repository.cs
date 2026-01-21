@@ -63,6 +63,13 @@ namespace LCT.SW360PackageCreator
             return downloadUrl;
         }
 
+        /// <summary>
+        /// form git clone url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="componentName"></param>
+        /// <param name="version"></param>
+        /// <returns>url</returns>
         public string FormGitCloneUrl(string url, string componentName, string version)
         {
             Logger.Debug($"FormGitCloneUrl():Start");
@@ -80,6 +87,11 @@ namespace LCT.SW360PackageCreator
             return downloadUrl;
         }
 
+        /// <summary>
+        /// get repo name from url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns>repo name</returns>
         private string GetRepoName(string url)
         {
             string repoUrl = string.Empty;

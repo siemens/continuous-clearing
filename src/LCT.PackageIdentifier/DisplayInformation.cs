@@ -9,7 +9,22 @@ namespace LCT.PackageIdentifier
 {
     public static class DisplayInformation
     {
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
+
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Returns a comma separated list of include file patterns for the configured project type.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing project-type specific include lists.</param>
+        /// <returns>Comma separated include file patterns or an empty string.</returns>
         public static string DisplayIncludeFiles(CommonAppSettings appSettings)
         {
             string totalString = string.Empty;
@@ -41,6 +56,12 @@ namespace LCT.PackageIdentifier
 
             return totalString;
         }
+
+        /// <summary>
+        /// Returns a comma separated list of exclude file patterns for the configured project type.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing project-type specific exclude lists.</param>
+        /// <returns>Comma separated exclude file patterns or an empty string.</returns>
         public static string DisplayExcludeFiles(CommonAppSettings appSettings)
         {
             string totalString = string.Empty;
@@ -73,6 +94,11 @@ namespace LCT.PackageIdentifier
             return totalString;
         }
 
+        /// <summary>
+        /// Returns a comma separated list of components excluded via SW360 configuration.
+        /// </summary>
+        /// <param name="appSettings">Application settings that may contain SW360 exclusion configuration.</param>
+        /// <returns>Comma separated excluded components or an empty string.</returns>
         public static string DisplayExcludeComponents(CommonAppSettings appSettings)
         {
 
@@ -84,6 +110,11 @@ namespace LCT.PackageIdentifier
             return totalString;
         }
 
+        /// <summary>
+        /// Returns a comma separated list of internal Artifactory repositories for the configured project type.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing Artifactory repository lists.</param>
+        /// <returns>Comma separated internal repository names or an empty string.</returns>
         public static string GetInternalRepolist(CommonAppSettings appSettings)
         {
             string listOfInternalRepoList = string.Empty;
@@ -116,6 +147,12 @@ namespace LCT.PackageIdentifier
 
             return listOfInternalRepoList;
         }
+
+        /// <summary>
+        /// Logs warnings to indicate missing SW360 or JFrog configuration used during BOM generation.
+        /// </summary>
+        /// <param name="appSettings">Application settings to inspect for SW360 and JFrog configuration.</param>
+        /// <returns>void.</returns>
         public static void LogBomGenerationWarnings(CommonAppSettings appSettings)
         {
             if (appSettings.SW360 == null && appSettings.Jfrog == null)
@@ -131,5 +168,9 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"CycloneDX BoM file generated without using JFrog details.");
             }
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

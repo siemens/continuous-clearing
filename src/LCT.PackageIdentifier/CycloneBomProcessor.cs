@@ -18,8 +18,25 @@ namespace LCT.PackageIdentifier
     public static class CycloneBomProcessor
     {
 
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
 
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Adds metadata and definitions to the comparison BOM.
+        /// </summary>
+        /// <param name="bom">BOM to update.</param>
+        /// <param name="appSettings">Application settings used to populate metadata.</param>
+        /// <param name="projectReleases">Project releases used for metadata versioning.</param>
+        /// <param name="caToolInformation">CA tool information for tool metadata.</param>
+        /// <returns>The updated BOM containing metadata and definitions.</returns>
         public static Bom SetMetadataInComparisonBOM(Bom bom,
                                                      CommonAppSettings appSettings,
                                                      ProjectReleases projectReleases,
@@ -40,6 +57,13 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
+        /// <summary>
+        /// Creates the CycloneDX metadata object including tools, properties and component.
+        /// </summary>
+        /// <param name="appSettings">Application settings used to populate metadata component.</param>
+        /// <param name="projectReleases">Project release information used for version metadata.</param>
+        /// <param name="caToolInformation">CA tool information used to describe the tool.</param>
+        /// <returns>A populated Metadata instance.</returns>
         private static Metadata CreateMetadata(CommonAppSettings appSettings, ProjectReleases projectReleases, CatoolInfo caToolInformation)
         {
             Metadata metadata = new Metadata
@@ -54,6 +78,11 @@ namespace LCT.PackageIdentifier
             return metadata;
         }
 
+        /// <summary>
+        /// Builds the tool choices section describing the CA tool used to create the BOM.
+        /// </summary>
+        /// <param name="caToolInformation">CA tool information providing version details.</param>
+        /// <returns>ToolChoices containing tool component information.</returns>
         private static ToolChoices CreateToolChoices(CatoolInfo caToolInformation)
         {
             return new ToolChoices
@@ -82,6 +111,10 @@ namespace LCT.PackageIdentifier
             };
         }
 
+        /// <summary>
+        /// Creates a list of default properties included in metadata.
+        /// </summary>
+        /// <returns>List of property objects for metadata.</returns>
         private static List<Property> CreateProperties()
         {
             return new List<Property>
@@ -93,6 +126,13 @@ namespace LCT.PackageIdentifier
         }
     };
         }
+
+        /// <summary>
+        /// Creates the metadata component entry for the BOM using SW360 project info and release version.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing SW360 project information.</param>
+        /// <param name="projectReleases">Project release information containing a version.</param>
+        /// <returns>A Component instance used in metadata.</returns>
         private static Component CreateMetadataComponent(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             return new Component
@@ -102,6 +142,11 @@ namespace LCT.PackageIdentifier
                 Type = Component.Classification.Application
             };
         }
+
+        /// <summary>
+        /// Constructs definitions used in the BOM such as standards and their metadata.
+        /// </summary>
+        /// <returns>Definitions object populated with standard information.</returns>
         private static Definitions AddDefinitionsToBom()
         {
             Definitions definitions = new Definitions
@@ -129,6 +174,14 @@ namespace LCT.PackageIdentifier
 
             return definitions;
         }
+
+        /// <summary>
+        /// Sets a collection of standard properties on a component and adds it to the output list.
+        /// </summary>
+        /// <param name="appSettings">Application settings to determine project type property.</param>
+        /// <param name="component">Component to update with properties.</param>
+        /// <param name="componentForBOM">Reference list where the component will be added.</param>
+        /// <param name="repo">Optional repository name to set as a property.</param>
         public static void SetProperties(CommonAppSettings appSettings, Component component, ref List<Component> componentForBOM, string repo = "Not Found in JFrogRepo")
         {
             component.Properties ??= new List<Property>();
@@ -144,5 +197,9 @@ namespace LCT.PackageIdentifier
             component.Description = null;
             componentForBOM.Add(component);
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

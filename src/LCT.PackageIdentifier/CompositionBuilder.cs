@@ -20,10 +20,16 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class CompositionBuilder : ICompositionBuilder
     {
+        #region Fields
         private readonly ComponentConfig _config;
         private readonly string _basePurl;
         private RuntimeInfo _runtimeInfo;
+        #endregion
 
+        #region Properties
+        #endregion
+
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositionBuilder"/> class.
         /// </summary>
@@ -33,12 +39,16 @@ namespace LCT.PackageIdentifier
             _config = config ?? new ComponentConfig();
             _basePurl = Dataconstant.PurlCheck()["NUGET"];
         }
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Adds compositions to the provided BOM based on the framework packages.
         /// </summary>
         /// <param name="bom">The BOM to which compositions will be added.</param>
         /// <param name="frameworkPackages">Framework packages grouped by framework moniker.</param>
+        /// <param name="runtimeInfo">Runtime information used to determine runtime package versions.</param>
+        /// <returns>void.</returns>
         public void AddCompositionsToBom(Bom bom, Dictionary<string, Dictionary<string, NuGetVersion>> frameworkPackages, RuntimeInfo runtimeInfo)
         {
             _runtimeInfo = runtimeInfo;
@@ -122,6 +132,10 @@ namespace LCT.PackageIdentifier
                 _ => version
             };
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 
     /// <summary>

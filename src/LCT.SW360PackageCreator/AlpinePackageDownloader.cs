@@ -31,7 +31,13 @@ namespace LCT.SW360PackageCreator
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-
+        /// <summary>
+        /// Downloads the source package for the specified component and returns the local file path to the downloaded
+        /// archive.
+        /// </summary>
+        /// <param name="component">The component metadata containing information about the package to download. Cannot be null.</param>
+        /// <param name="localPathforDownload">The local directory path where the package should be downloaded. Must be a valid, writable path.</param>
+        /// <returns>A string containing the full local file path to the downloaded package archive.</returns>
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
             string localPathforSourceRepo = UrlHelper.GetDownloadPathForAlpineRepo();
@@ -43,6 +49,13 @@ namespace LCT.SW360PackageCreator
 
         }
 
+        /// <summary>
+        /// copies the build files from source repo to download folder
+        /// </summary>
+        /// <param name="localPathforDownload"></param>
+        /// <param name="component"></param>
+        /// <param name="sourceData"></param>
+        /// <param name="localPathforSourceRepo"></param>
         private static void CopyBuildFilesFromSourceRepo(string localPathforDownload, ComparisonBomData component, string sourceData, string localPathforSourceRepo)
         {
             if (sourceData != null)
@@ -64,12 +77,26 @@ namespace LCT.SW360PackageCreator
 
         }
 
+        /// <summary>
+        /// gets the current download folder path
+        /// </summary>
+        /// <param name="localPathforDownload"></param>
+        /// <param name="component"></param>
+        /// <returns>folder path</returns>
         private static string GetCurrentDownloadFolderPath(string localPathforDownload, ComparisonBomData component)
         {
             return $"{localPathforDownload}{component.Name}--{DateTime.Now.ToString("yyyyMMddHHmmss")}{Dataconstant.ForwardSlash}";
         }
 
-
+        /// <summary>
+        /// downloads the tar file and get the path
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="SourceUrl"></param>
+        /// <param name="localPathforDownload"></param>
+        /// <param name="sourceData"></param>
+        /// <param name="localPathforSourceRepo"></param>
+        /// <returns>file and path</returns>
         private static async Task<string> DownloadTarFileAndGetPath(ComparisonBomData component, string SourceUrl, string localPathforDownload, string sourceData, string localPathforSourceRepo)
         {
             string downloadPath = string.Empty;
@@ -100,6 +127,15 @@ namespace LCT.SW360PackageCreator
 
             return downloadPath;
         }
+
+        /// <summary>
+        /// applies the patch files to source code
+        /// </summary>
+        /// <param name="downloadPath"></param>
+        /// <param name="sourceData"></param>
+        /// <param name="localPathforSourceRepo"></param>
+        /// <param name="component"></param>
+        /// <param name="localPathforDownload"></param>
         private static void ApplyPatchFilesToSourceCode(string downloadPath, string sourceData, string localPathforSourceRepo, ComparisonBomData component, string localPathforDownload)
         {
             string[] buildFilesList = sourceData.Split("\n");
@@ -158,7 +194,13 @@ namespace LCT.SW360PackageCreator
 
         }
 
-
+        /// <summary>
+        /// package folder ungzip
+        /// </summary>
+        /// <param name="localPathforDownload"></param>
+        /// <param name="component"></param>
+        /// <param name="sourceCodezippedFolder"></param>
+        /// <param name="downloadPath"></param>
         public static void PackageFolderUnGzip(string localPathforDownload, ComparisonBomData component, string sourceCodezippedFolder, string downloadPath)
         {
             DirectoryInfo directorySelected = new DirectoryInfo(localPathforDownload);
@@ -211,6 +253,13 @@ namespace LCT.SW360PackageCreator
 
         }
 
+        /// <summary>
+        /// packages the folder gzip
+        /// </summary>
+        /// <param name="localPathforDownload"></param>
+        /// <param name="component"></param>
+        /// <param name="sourceCodezippedFolder"></param>
+        /// <returns>package zip folder</returns>
         public static string PackageFolderGzip(string localPathforDownload, ComparisonBomData component, string sourceCodezippedFolder)
         {
             string tarArchivePath;
@@ -240,6 +289,11 @@ namespace LCT.SW360PackageCreator
 
             return tarArchivePath;
         }
+        /// <summary>
+        /// gets the correct file extension
+        /// </summary>
+        /// <param name="sourceURL"></param>
+        /// <returns>file extension</returns>
         private static string GetCorrectFileExtension(string sourceURL)
         {
             int idx = sourceURL.LastIndexOf(Dataconstant.ForwardSlash);
@@ -253,6 +307,11 @@ namespace LCT.SW360PackageCreator
             return fullname;
         }
 
+        /// <summary>
+        /// applies the patchs to source code
+        /// </summary>
+        /// <param name="patchFileFolder"></param>
+        /// <param name="sourceCodezippedFolder"></param>
         public static void ApplyPatchsToSourceCode(string patchFileFolder, string sourceCodezippedFolder)
         {
             Process p = new Process();

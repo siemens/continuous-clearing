@@ -97,6 +97,13 @@ namespace LCT.Services
             return sw360components;
         }
 
+        /// <summary>
+        /// Retrieves a list of SW360 components that match the specified external ID combination.
+        /// </summary>       
+        /// <param name="externalIdUriString">The URI string representing the external ID value used to query components. Cannot be null or empty.</param>
+        /// <param name="externalIdKey">The key identifying the type of external ID to match against components. Cannot be null or empty.</param>
+        /// <returns>A list of SW360 components that correspond to the given external ID combination. Returns an empty list if no
+        /// matching components are found.</returns>
         private async Task<IList<Sw360Components>> GetCompListFromExternalIDCombinations(string externalIdUriString, string externalIdKey)
         {
             HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetComponentByExternalId(externalIdUriString, externalIdKey);
@@ -207,6 +214,16 @@ namespace LCT.Services
 
         #region PrivateMethods
 
+        /// <summary>
+        /// Determines the existence status of a release by matching the specified release name and external ID key
+        /// against a collection of SW360 release data.
+        /// </summary>
+        /// <param name="name">The name of the release to search for within the provided release data. Cannot be null.</param>
+        /// <param name="externlaIdKey">The external ID key used to identify and match releases. Cannot be null.</param>
+        /// <param name="sw360releasesdata">A collection of SW360 release data to be searched. Cannot be null and must contain at least one element.</param>
+        /// <returns>A Releasestatus object containing information about the matched release and its existence status. The
+        /// returned object will indicate whether a release with the specified name and external ID exists in the
+        /// provided data.</returns>
         private static Releasestatus GetReleaseExistStatus(
             string name, string externlaIdKey, IList<Sw360Releases> sw360releasesdata)
         {
@@ -244,7 +261,13 @@ namespace LCT.Services
             return releasestatus;
         }
 
-
+        /// <summary>
+        /// gets component exist status
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="externlaIdKey"></param>
+        /// <param name="sw360components"></param>
+        /// <returns>comonent status</returns>
         private static ComponentStatus GetComponentExistStatus(string name, string externlaIdKey, IList<Sw360Components> sw360components)
         {
             Dictionary<int, Sw360Components> componentCollection = new Dictionary<int, Sw360Components>();
@@ -282,7 +305,13 @@ namespace LCT.Services
 
         }
 
-
+        /// <summary>
+        /// gets package url
+        /// </summary>
+        /// <param name="externlaIdKey"></param>
+        /// <param name="release"></param>
+        /// <param name="packageUrl"></param>
+        /// <returns>value</returns>
         private static string GetPackageUrlValue(string externlaIdKey, Sw360Releases release, string packageUrl)
         {
             if (externlaIdKey.Contains("purl"))
@@ -302,6 +331,13 @@ namespace LCT.Services
             return packageUrl;
         }
 
+        /// <summary>
+        /// gets package url value
+        /// </summary>
+        /// <param name="externlaIdKey"></param>
+        /// <param name="components"></param>
+        /// <param name="packageUrl"></param>
+        /// <returns>value</returns>
         private static string GetPackageUrlValue(string externlaIdKey, Sw360Components components, string packageUrl)
         {
             if (externlaIdKey.Contains("purl"))
@@ -321,6 +357,12 @@ namespace LCT.Services
             return packageUrl;
         }
 
+        /// <summary>
+        /// update collections
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="componentCollection"></param>
+        /// <param name="components"></param>
         private static void UpdateCollection(string name, ref Dictionary<int, Sw360Components> componentCollection, Sw360Components components)
         {
             if (componentCollection.TryGetValue(1, out Sw360Components value) && value.Name.ToLower().Equals(name.ToLower()))
@@ -333,6 +375,12 @@ namespace LCT.Services
             }
         }
 
+        /// <summary>
+        /// update collections
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="releaseCollection"></param>
+        /// <param name="release"></param>
         private static void UpdateCollection(string name, ref Dictionary<int, Sw360Releases> releaseCollection, Sw360Releases release)
         {
             if (releaseCollection.TryGetValue(1, out Sw360Releases value) && value.Name.ToLower().Equals(name.ToLower()))

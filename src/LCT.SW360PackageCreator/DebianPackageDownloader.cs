@@ -29,6 +29,12 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly IDebianPatcher _debianPatcher = debianPatcher;
 
+        /// <summary>
+        /// Download Package
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="localPathforDownload"></param>
+        /// <returns>download path</returns>
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
             string downloadPath = string.Empty;
@@ -76,6 +82,12 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
+        /// <summary>
+        /// Gets File Details
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="currentDownloadFolder"></param>
+        /// <returns></returns>
         private static async Task<Dictionary<string, string>> GetFileDetails(ComparisonBomData component, string currentDownloadFolder)
         {
             Dictionary<string, string> fileInfo = new Dictionary<string, string>();
@@ -115,6 +127,11 @@ namespace LCT.SW360PackageCreator
             return fileInfo;
         }
 
+        /// <summary>
+        /// Gets Correct File Extension
+        /// </summary>
+        /// <param name="sourceURL"></param>
+        /// <returns>name of the file</returns>
         private static string GetCorrectFileExtension(string sourceURL)
         {
             int idx = sourceURL.LastIndexOf(Dataconstant.ForwardSlash);
@@ -128,11 +145,24 @@ namespace LCT.SW360PackageCreator
             return fullname;
         }
 
+        /// <summary>
+        /// Gets Current Download Folder Path
+        /// </summary>
+        /// <param name="localPathforDownload"></param>
+        /// <param name="component"></param>
+        /// <returns></returns>
         private static string GetCurrentDownloadFolderPath(string localPathforDownload, ComparisonBomData component)
         {
             return $"{localPathforDownload}{component.Name}--{DateTime.Now.ToString("yyyyMMddHHmmss")}{Dataconstant.ForwardSlash}";
         }
 
+        /// <summary>
+        /// Download Tar File And Get Path
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="SourceUrl"></param>
+        /// <param name="localPathforDownload"></param>
+        /// <returns>path name</returns>
         private static async Task<string> DownloadTarFileAndGetPath(ComparisonBomData component, string SourceUrl, string localPathforDownload)
         {
             string downloadPath = string.Empty;
@@ -160,6 +190,13 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
+        /// <summary>
+        /// Apply Patch for Components
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="localDownloadPath"></param>
+        /// <param name="fileName"></param>
+        /// <returns>patch file</returns>
         public string ApplyPatchforComponents(ComparisonBomData component, string localDownloadPath, string fileName)
         {
             Result result;
@@ -195,6 +232,13 @@ namespace LCT.SW360PackageCreator
             return patchedFile;
         }
 
+        /// <summary>
+        /// Gets Patched File Path By Retrying
+        /// </summary>
+        /// <param name="currentDownloadFolder"></param>
+        /// <param name="component"></param>
+        /// <param name="dscFileName"></param>
+        /// <returns>file path</returns>
         private string GetPatchedFilePathByRetrying(string currentDownloadFolder, ComparisonBomData component, string dscFileName)
         {
             string patchedFilePath = string.Empty;
@@ -222,6 +266,11 @@ namespace LCT.SW360PackageCreator
             return patchedFilePath;
         }
 
+        /// <summary>
+        /// Delete Patched Folder And File
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="downloadPath"></param>
         private static void DeletePatchedFolderAndFile(string folderPath, string downloadPath)
         {
             try
@@ -250,6 +299,11 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// Gets Patched File From Downloaded Folder
+        /// </summary>
+        /// <param name="currentDownloadFolder"></param>
+        /// <returns></returns>
         public static string GetPatchedFileFromDownloadedFolder(string currentDownloadFolder)
         {
             string patchedFilePath = string.Empty;

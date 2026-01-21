@@ -45,6 +45,11 @@ namespace LCT.SW360PackageCreator
         private const string SOURCE = "SOURCE";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
+        /// <summary>
+        /// Get Download Url Not Found List
+        /// </summary>
+        /// <param name="comparisionBomDataList"></param>
+        /// <returns>BOM data</returns>
         public List<ComparisonBomData> GetDownloadUrlNotFoundList(List<ComparisonBomData> comparisionBomDataList)
         {
             List<ComparisonBomData> downloadUrlNotFoundList = new List<ComparisonBomData>();
@@ -67,6 +72,11 @@ namespace LCT.SW360PackageCreator
             return downloadUrlNotFoundList;
         }
 
+        /// <summary>
+        /// Download Release Attachment Source
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns>url list</returns>
         public async Task<Dictionary<string, string>> DownloadReleaseAttachmentSource(ComparisonBomData component)
         {
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
@@ -96,6 +106,13 @@ namespace LCT.SW360PackageCreator
             return AttachmentUrlList;
         }
 
+        /// <summary>
+        /// get attachment url list
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="AttachmentUrlList"></param>
+        /// <param name="localPathforDownload"></param>
+        /// <returns>path</returns>
         private async Task<string> GetAttachmentUrlList(ComparisonBomData component, Dictionary<string, string> AttachmentUrlList, string localPathforDownload)
         {
             string downloadPath = string.Empty;
@@ -139,6 +156,12 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
+        /// <summary>
+        /// Download Cargo Source
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="localPathforDownload"></param>
+        /// <returns>data</returns>
         private static async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
         {
             if (!string.IsNullOrEmpty(component.DownloadUrl))
@@ -163,6 +186,11 @@ namespace LCT.SW360PackageCreator
             }
             return "";
         }
+        /// <summary>
+        /// Convert Zip To TarGz If Needed
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns>file path</returns>
         private static string ConvertZipToTarGzIfNeeded(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
@@ -175,6 +203,12 @@ namespace LCT.SW360PackageCreator
             }
             return filePath;
         }
+
+        /// <summary>
+        /// Download  Dependency List
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
             string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
@@ -203,6 +237,12 @@ namespace LCT.SW360PackageCreator
             await processResult;
         }
 
+        /// <summary>
+        /// Gets Attachment Url List For Mvn
+        /// </summary>
+        /// <param name="localPathforDownload"></param>
+        /// <param name="component"></param>
+        /// <param name="attachmentUrlList"></param>
         public static void GetAttachmentUrlListForMvn(string localPathforDownload, ComparisonBomData component,
                                                       ref Dictionary<string, string> attachmentUrlList)
         {
@@ -215,6 +255,12 @@ namespace LCT.SW360PackageCreator
 
         }
 
+        /// <summary>
+        /// Gets Attachment Url List
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="localPathforDownload"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         private static async Task<string> GetAttachmentUrlList(ComparisonBomData component, string localPathforDownload)
         {
             string downloadPath = string.Empty;
@@ -242,7 +288,12 @@ namespace LCT.SW360PackageCreator
             return downloadPath;
         }
 
-
+        /// <summary>
+        /// Sets Contents For Comparison BOM
+        /// </summary>
+        /// <param name="lstComponentForBOM"></param>
+        /// <param name="sw360Service"></param>
+        /// <returns>BOM data</returns>
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             Logger.Debug($"SetContentsForComparisonBOM():Start");           
@@ -257,6 +308,12 @@ namespace LCT.SW360PackageCreator
             return comparisonBomData;
         }       
 
+        /// <summary>
+        /// Gets Comparision Bom Items
+        /// </summary>
+        /// <param name="lstComponentForBOM"></param>
+        /// <param name="sw360Service"></param>
+        /// <returns>BOM data</returns>
         private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
             List<ComparisonBomData> comparisonBomData = new();
@@ -302,6 +359,12 @@ namespace LCT.SW360PackageCreator
             return comparisonBomData;
         }
 
+        /// <summary>
+        /// Sets Debia nUrls
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="releasesInfo"></param>
+        /// <param name="mapper"></param>
         private static void SetDebianUrls(Components item, ReleasesInfo releasesInfo, ComparisonBomData mapper)
         {
             if ((string.IsNullOrEmpty(item.SourceUrl) || item.SourceUrl == Dataconstant.SourceUrlNotFound) && !string.IsNullOrEmpty(releasesInfo.SourceCodeDownloadUrl))
@@ -313,6 +376,11 @@ namespace LCT.SW360PackageCreator
             mapper.PatchURls = item.PatchURLs;
         }
 
+        /// <summary>
+        /// package type
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>boolean value</returns>
         private static bool IsOtherPackageType(Components item)
         {
             return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) ||
@@ -321,6 +389,11 @@ namespace LCT.SW360PackageCreator
                    item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]);
         }
 
+        /// <summary>
+        /// Sets Mapper Status
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="releasesInfo"></param>
         private void SetMapperStatus(ComparisonBomData mapper, ReleasesInfo releasesInfo)
         {
             mapper.ApprovedStatus = GetApprovedStatus(mapper.ComponentStatus, mapper.ReleaseStatus, releasesInfo);
@@ -332,6 +405,14 @@ namespace LCT.SW360PackageCreator
             mapper.FossologyLink = releasesInfo?.AdditionalData?.TryGetValue("fossology url", out string fossologyUrl) == true ? fossologyUrl : string.Empty;
             mapper.ReleaseCreatedBy = releasesInfo?.CreatedBy ?? string.Empty;
         }
+
+        /// <summary>
+        /// Gets Maven Download Url
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="item"></param>
+        /// <param name="releasesInfo"></param>
+        /// <returns></returns>
         public static string GetMavenDownloadUrl(ComparisonBomData mapper, Components item, ReleasesInfo releasesInfo)
         {
             string sourceURL = string.Empty;
@@ -350,6 +431,14 @@ namespace LCT.SW360PackageCreator
             return sourceURL;
         }
 
+        /// <summary>
+        /// Gets Updated Components Details
+        /// </summary>
+        /// <param name="ListofBomComponents"></param>
+        /// <param name="updatedCompareBomData"></param>
+        /// <param name="sw360Service"></param>
+        /// <param name="bom"></param>
+        /// <returns>bom data</returns>
         public async Task<Bom> GetUpdatedComponentsDetails(List<Components> ListofBomComponents, List<ComparisonBomData> updatedCompareBomData,
             ISW360Service sw360Service, Bom bom)
         {
@@ -378,6 +467,13 @@ namespace LCT.SW360PackageCreator
             }
             return bom;
         }
+
+        /// <summary>
+        /// Finds Matching Component
+        /// </summary>
+        /// <param name="bom"></param>
+        /// <param name="comBom"></param>
+        /// <returns>component data</returns>
         private static Component FindMatchingComponent(Bom bom, ComparisonBomData comBom)
         {
             if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
@@ -392,6 +488,11 @@ namespace LCT.SW360PackageCreator
                 return bom.Components.Find(com => com.Name == comBom.Name && com.Version.Contains(comBom.Version));
             }
         }
+
+        /// <summary>
+        /// Updates Release Link
+        /// </summary>
+        /// <param name="comBom"></param>
         private void UpdateReleaseLink(ComparisonBomData comBom)
         {
             if (string.IsNullOrEmpty(comBom.ReleaseLink))
@@ -399,6 +500,12 @@ namespace LCT.SW360PackageCreator
                 comBom.ReleaseLink = GetReleaseLink(componentsAvailableInSw360, comBom.Name, comBom.Version);
             }
         }
+
+        /// <summary>
+        /// Add Or Update Properties
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="listOfProperties"></param>
         private static void AddOrUpdateProperties(Component component, Dictionary<string, string> listOfProperties)
         {
             if (component == null) return;
@@ -410,6 +517,12 @@ namespace LCT.SW360PackageCreator
             }
 
         }
+
+        /// <summary>
+        /// Gets Download Path For Componet Type
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns>local path</returns>
         private static string GetDownloadPathForComponetType(ComparisonBomData component)
         {
             string localPathforDownload = string.Empty;
@@ -440,6 +553,11 @@ namespace LCT.SW360PackageCreator
             return localPathforDownload;
         }
 
+        /// <summary>
+        /// Gets Creator Kpi Data
+        /// </summary>
+        /// <param name="updatedCompareBomData"></param>
+        /// <returns>kpi data</returns>
         public CreatorKpiData GetCreatorKpiData(List<ComparisonBomData> updatedCompareBomData)
         {
             CreatorKpiData creatorKpiData = new CreatorKpiData
@@ -476,6 +594,11 @@ namespace LCT.SW360PackageCreator
             return creatorKpiData;
         }
 
+        /// <summary>
+        /// Components With And With Out Source Download Url
+        /// </summary>
+        /// <param name="creatorKpiData"></param>
+        /// <param name="item"></param>
         public static void ComponentsWithAndWithOutSourceDownloadUrl(ref CreatorKpiData creatorKpiData, ComparisonBomData item)
         {
             if (item.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(item.DownloadUrl))
@@ -507,22 +630,42 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// Is Component Not Created
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>boolean value</returns>
         private static bool IsComponentNotCreated(ComparisonBomData item)
         {
             return item.IsComponentCreated == Dataconstant.NotCreated || item.IsReleaseCreated == Dataconstant.NotCreated;
         }
 
+        /// <summary>
+        /// Is component created
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>boolean value</returns>
         private static bool IsComponentCreated(ComparisonBomData item)
         {
             return item.IsComponentCreated == Dataconstant.Created && item.IsReleaseCreated == Dataconstant.Created;
         }
 
+        /// <summary>
+        /// Is Component Newly Created
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>boolean value</returns>
         private static bool IsComponentNewlyCreated(ComparisonBomData item)
         {
             return (item.IsComponentCreated == Dataconstant.NewlyCreated && item.IsReleaseCreated == Dataconstant.NewlyCreated)
                                 || (item.IsComponentCreated == Dataconstant.Created && item.IsReleaseCreated == Dataconstant.NewlyCreated);
         }
 
+        /// <summary>
+        /// Initialize Sw360 Creator Service
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <returns>sw360 creator service</returns>
         public static ISw360CreatorService InitializeSw360CreatorService(CommonAppSettings appSettings)
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
@@ -537,6 +680,11 @@ namespace LCT.SW360PackageCreator
             return new Sw360CreatorService(sw360ApicommunicationFacade);
         }
 
+        /// <summary>
+        /// initialize project service
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <returns>project service</returns>
         public static ISw360ProjectService InitializeSw360ProjectService(CommonAppSettings appSettings)
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
@@ -552,6 +700,10 @@ namespace LCT.SW360PackageCreator
             return new Sw360ProjectService(sW360ApicommunicationFacade);
         }
 
+        /// <summary>
+        /// write creator kpt data to console
+        /// </summary>
+        /// <param name="creatorKpiData"></param>
         public void WriteCreatorKpiDataToConsole(CreatorKpiData creatorKpiData)
         {
             Logger.Warn("Todo: Default component type is OSS. User is expected to manually change the component type from OSS to COTS.");
@@ -588,6 +740,12 @@ namespace LCT.SW360PackageCreator
 
             LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Creator, createrKpiNames);
         }
+
+        /// <summary>
+        /// identify kpi names
+        /// </summary>
+        /// <param name="creatorKpiData"></param>
+        /// <returns>kpi names</returns>
         private static KpiNames IdentifyKpiNames(CreatorKpiData creatorKpiData)
         {
             KpiNames createrKpiNames = new KpiNames();
@@ -607,6 +765,11 @@ namespace LCT.SW360PackageCreator
             return createrKpiNames;
         }
 
+        /// <summary>
+        /// Write Source Not Found List To Console
+        /// </summary>
+        /// <param name="comparisionBomDataList"></param>
+        /// <param name="appSetting"></param>
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
         {          
 
@@ -630,12 +793,25 @@ namespace LCT.SW360PackageCreator
             LoggerHelper.WriteComponentsWithoutDownloadURLToKpi(sourceNotAvailable, lstReleaseNotCreated, appSetting.SW360.URL, DuplicateComponentsByPurlId);
         }
 
+        /// <summary>
+        /// Gets Component Availability Status
+        /// </summary>
+        /// <param name="componentsAvailable"></param>
+        /// <param name="component"></param>
+        /// <returns></returns>
         private static string GetComponentAvailabilityStatus(List<Components> componentsAvailable, Components component)
         {
             return componentsAvailable.Exists(x => x.Name.Equals(component.Name, StringComparison.InvariantCultureIgnoreCase)
             || x.ComponentExternalId.Equals(component.ComponentExternalId, StringComparison.InvariantCultureIgnoreCase)) ? Dataconstant.Available : Dataconstant.NotAvailable;
         }
 
+        /// <summary>
+        /// Is Release Available
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componentVersion"></param>
+        /// <param name="releaseExternalId"></param>
+        /// <returns>data</returns>
         private string IsReleaseAvailable(string componentName, string componentVersion, string releaseExternalId)
         {
             if (componentsAvailableInSw360.Exists(
@@ -647,6 +823,15 @@ namespace LCT.SW360PackageCreator
 
             return Dataconstant.NotAvailable;
         }
+
+        /// <summary>
+        /// Gets Component Download Url
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="item"></param>
+        /// <param name="repo"></param>
+        /// <param name="releasesInfo"></param>
+        /// <returns>data</returns>
         public static string GetComponentDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo, ReleasesInfo releasesInfo)
         {
 
@@ -657,6 +842,13 @@ namespace LCT.SW360PackageCreator
             return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
         }
 
+        /// <summary>
+        /// Gets Approved Status
+        /// </summary>
+        /// <param name="componentAvailabelStatus"></param>
+        /// <param name="releaseAvailbilityStatus"></param>
+        /// <param name="releasesInfo"></param>
+        /// <returns>data</returns>
         public static string GetApprovedStatus(string componentAvailabelStatus, string releaseAvailbilityStatus, ReleasesInfo releasesInfo)
         {
 
@@ -668,17 +860,34 @@ namespace LCT.SW360PackageCreator
             return Dataconstant.NotAvailable;
         }
 
+        /// <summary>
+        /// Gets Created Status
+        /// </summary>
+        /// <param name="availabilityStatus"></param>
+        /// <returns>status</returns>
         public static string GetCreatedStatus(string availabilityStatus)
         {
             return availabilityStatus == Dataconstant.Available ? Dataconstant.Created : Dataconstant.NotCreated;
         }
 
+        /// <summary>
+        /// Gets Fossology Upload Status
+        /// </summary>
+        /// <param name="ComponentApprovedStatus"></param>
+        /// <returns>status</returns>
         public static string GetFossologyUploadStatus(string ComponentApprovedStatus)
         {
             return (ComponentApprovedStatus == Dataconstant.NotAvailable ||
                      ComponentApprovedStatus == Dataconstant.NewClearing) ? Dataconstant.NotUploaded : Dataconstant.AlreadyUploaded;
         }
 
+        /// <summary>
+        /// Gets Release Link
+        /// </summary>
+        /// <param name="componentsAvailableInSw360"></param>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns>release link</returns>
         public static string GetReleaseLink(List<Components> componentsAvailableInSw360, string name, string version)
         {
             string releaseLink = componentsAvailableInSw360.Where(x => x.Name.Trim().Equals(name.Trim(), StringComparison.CurrentCultureIgnoreCase)
@@ -703,6 +912,13 @@ namespace LCT.SW360PackageCreator
             return releaseLink ?? string.Empty;
         }
 
+        /// <summary>
+        /// Gets Release Info From Sw360
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="componentsAvailableInSw360"></param>
+        /// <param name="sw360Service"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         private static async Task<ReleasesInfo> GetReleaseInfoFromSw360(Components item, List<Components> componentsAvailableInSw360, ISW360Service sw360Service)
         {
             ReleasesInfo releasesInfo = new ReleasesInfo();
@@ -718,6 +934,11 @@ namespace LCT.SW360PackageCreator
 
             return releasesInfo;
         }
+
+        /// <summary>
+        /// Log Source And Download Url Warnings
+        /// </summary>
+        /// <param name="component"></param>
         private static void LogSourceAndDownloadUrlWarnings(ComparisonBomData component)
         {
             bool isSourceUrlMissing = string.IsNullOrEmpty(component.SourceUrl) ||

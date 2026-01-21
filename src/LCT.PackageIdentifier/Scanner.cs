@@ -24,8 +24,25 @@ namespace LCT.PackageIdentifier
     public static class FolderScanner
     {
 
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+        #endregion
+
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Scans the specified rootPath for files matching include patterns from the config and returns the matching file paths,
+        /// excluding those that match any exclusion patterns.
+        /// </summary>
+        /// <param name="rootPath">Root directory to scan for package files.</param>
+        /// <param name="config">Configuration containing Include and Exclude patterns.</param>
+        /// <returns>List of discovered file paths that match include patterns and are not excluded.</returns>
         public static List<string> FileScanner(string rootPath, Config config)
         {
 
@@ -76,6 +93,13 @@ namespace LCT.PackageIdentifier
 
         }
 
+        /// <summary>
+        /// Validates a discovered file against the exclusion patterns and, when not excluded, logs and validates the file path.
+        /// </summary>
+        /// <param name="config">Config instance containing Exclude patterns.</param>
+        /// <param name="fileOperations">File operations helper used to validate the file path.</param>
+        /// <param name="allFoundConfigFiles">Accumulator list of discovered files to add to.</param>
+        /// <param name="configFile">Path of the discovered file to check.</param>
         private static void CheckingForExcludedFiles(Config config, IFileOperations fileOperations, List<string> allFoundConfigFiles, string configFile)
         {
             if (!IsExcluded(configFile, config.Exclude))
@@ -90,6 +114,12 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Determines whether the provided file path matches any of the exclusion regular expressions.
+        /// </summary>
+        /// <param name="filePath">File path to evaluate.</param>
+        /// <param name="exclusionPatterns">Array of regex patterns to test against. When null or empty, no exclusion is applied.</param>
+        /// <returns>True if the file path matches any exclusion pattern; otherwise false.</returns>
         internal static bool IsExcluded(string filePath, string[] exclusionPatterns)
         {
             if (exclusionPatterns == null || exclusionPatterns.Length == 0)
@@ -106,5 +136,9 @@ namespace LCT.PackageIdentifier
 
             return false;
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

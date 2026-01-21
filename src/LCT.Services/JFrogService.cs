@@ -32,6 +32,13 @@ namespace LCT.Services
         {
             m_JFrogApiCommunicationFacade = jFrogApiCommunicationFacade;
         }
+
+        /// <summary>
+        /// gets component data by repo
+        /// </summary>
+        /// <param name="apiCall"></param>
+        /// <param name="repoName"></param>
+        /// <returns>list of result</returns>
         private static async Task<IList<AqlResult>> GetComponentDataByRepo(Func<string, Task<HttpResponseMessage>> apiCall, string repoName)
         {
             HttpResponseMessage httpResponseMessage = null;
@@ -65,26 +72,54 @@ namespace LCT.Services
             return aqlResult;
         }
 
+        /// <summary>
+        /// gets internal component data by repo
+        /// </summary>
+        /// <param name="repoName"></param>
+        /// <returns>list of result</returns>
         public async Task<IList<AqlResult>> GetInternalComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(m_JFrogApiCommunicationFacade.GetInternalComponentDataByRepo, repoName);
         }
 
+        /// <summary>
+        /// gets npm component data by repo
+        /// </summary>
+        /// <param name="repoName"></param>
+        /// <returns>list of aql result</returns>
         public async Task<IList<AqlResult>> GetNpmComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(m_JFrogApiCommunicationFacade.GetNpmComponentDataByRepo, repoName);
         }
 
+        /// <summary>
+        /// gets pypi component data by repo
+        /// </summary>
+        /// <param name="repoName"></param>
+        /// <returns>list of aql result</returns>
         public async Task<IList<AqlResult>> GetPypiComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(m_JFrogApiCommunicationFacade.GetPypiComponentDataByRepo, repoName);
         }
 
+        /// <summary>
+        /// Retrieves a collection of Cargo component data for the specified repository.
+        /// </summary>
+        /// <param name="repoName">The name of the repository from which to retrieve Cargo component data. Cannot be null or empty.</param>
+        /// <returns>A list of <see cref="AqlResult"/> objects containing Cargo component data for the specified repository. The
+        /// list will be empty if no components are found.</returns>
         public async Task<IList<AqlResult>> GetCargoComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(m_JFrogApiCommunicationFacade.GetCargoComponentDataByRepo, repoName);
         }
 
+        /// <summary>
+        /// Retrieves package information from Artifactory for the specified component.
+        /// </summary>       
+        /// <param name="component">The component for which to retrieve package information. Must specify valid identifiers for the target
+        /// Artifactory package.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="AqlResult"/>
+        /// instance with package details if found; otherwise, <see langword="null"/>.</returns>
 #nullable enable
         public async Task<AqlResult?> GetPackageInfo(ComponentsToArtifactory component)
         {
@@ -115,6 +150,10 @@ namespace LCT.Services
             return aqlResult;
         }
 
+        /// <summary>
+        /// checks jfrog connectivity
+        /// </summary>
+        /// <returns>task that represents operation</returns>
         public async Task<HttpResponseMessage> CheckJFrogConnectivity()
         {
             HttpResponseMessage? httpResponseMessage = null;

@@ -26,13 +26,27 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+        #endregion
 
-        #region public method
+        #region Properties
+        #endregion
 
+        #region Constructors
+        // Primary constructor parameters are declared on the class.
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Parses Alpine package files from the configured input folder and builds a BOM.
+        /// </summary>
+        /// <param name="appSettings">Application settings with input and processing options.</param>
+        /// <param name="unSupportedBomList">Reference BOM that will be populated with unsupported components.</param>
+        /// <returns>BOM built from discovered Alpine packages.</returns>
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             List<string> configFiles;
@@ -77,12 +91,26 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
+        /// <summary>
+        /// Removes components excluded in settings from the provided BOM.
+        /// </summary>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="cycloneDXBOM">BOM to filter.</param>
+        /// <returns>Filtered BOM.</returns>
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
             return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
+        /// <summary>
+        /// Asynchronously retrieves repository details for the provided components and returns a modified list.
+        /// </summary>
+        /// <param name="componentsForBOM">List of components to enrich.</param>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="jFrogService">JFrog service to query (may be null).</param>
+        /// <param name="bomhelper">BOM helper utilities.</param>
+        /// <returns>Asynchronously returns the modified list of components.</returns>
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings,
                                                           IJFrogService jFrogService,
                                                           IBomHelper bomhelper)
@@ -97,6 +125,14 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
+        /// <summary>
+        /// Asynchronously identifies internal components using JFrog and BOM helper; returns input unchanged in current implementation.
+        /// </summary>
+        /// <param name="componentData">Component identification data to analyze.</param>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="jFrogService">JFrog service to query.</param>
+        /// <param name="bomhelper">BOM helper utilities.</param>
+        /// <returns>Asynchronously returns the (possibly modified) component identification data.</returns>
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
@@ -104,10 +140,13 @@ namespace LCT.PackageIdentifier
             return componentData;
         }
 
-        #endregion
-
-        #region private methods
-
+        /// <summary>
+        /// Parses a CycloneDX SBOM file and returns a list of AlpinePackage entries.
+        /// </summary>
+        /// <param name="filePath">Path to the CycloneDX/ SPDX file.</param>
+        /// <param name="dependenciesForBOM">List to collect BOM dependencies.</param>
+        /// <param name="appSettings">Application settings.</param>
+        /// <returns>List of parsed AlpinePackage instances.</returns>
         public List<AlpinePackage> ParseCycloneDX(string filePath, List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
         {
             List<AlpinePackage> alpinePackages = new List<AlpinePackage>();
@@ -115,6 +154,13 @@ namespace LCT.PackageIdentifier
             return alpinePackages;
         }
 
+        /// <summary>
+        /// Extracts package details from a BOM file and populates provided collections with packages and dependencies.
+        /// </summary>
+        /// <param name="filePath">Path to the BOM file.</param>
+        /// <param name="alpinePackages">Reference list to append discovered Alpine packages.</param>
+        /// <param name="dependenciesForBOM">List to collect dependencies discovered in the BOM.</param>
+        /// <param name="appSettings">Application settings.</param>
         private void ExtractDetailsForJson(string filePath, ref List<AlpinePackage> alpinePackages, List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
         {
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
@@ -151,6 +197,10 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
 
+        /// <summary>
+        /// Removes duplicate components from the provided list and updates KPI data.
+        /// </summary>
+        /// <param name="listofComponents">Reference to the component list to deduplicate.</param>
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
             int initialCount = listofComponents.Count;
@@ -160,6 +210,12 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
         }
 
+        /// <summary>
+        /// Builds a release external id (purl) for the specified name and version.
+        /// </summary>
+        /// <param name="name">Package name.</param>
+        /// <param name="version">Package version.</param>
+        /// <returns>Release external id as a PURL string.</returns>
         private static string GetReleaseExternalId(string name, string version)
         {
             version = WebUtility.UrlEncode(version);
@@ -168,6 +224,11 @@ namespace LCT.PackageIdentifier
             return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
+        /// <summary>
+        /// Extracts the distro query portion from an Alpine package PURL if present.
+        /// </summary>
+        /// <param name="alpinePackage">Alpine package to inspect.</param>
+        /// <returns>Distro query string including leading token, or empty string if not found.</returns>
         private static string GetDistro(AlpinePackage alpinePackage)
         {
             var distroIndex = alpinePackage.PurlID.LastIndexOf("distro");
@@ -178,6 +239,11 @@ namespace LCT.PackageIdentifier
             return alpinePackage.PurlID[distroIndex..];
         }
 
+        /// <summary>
+        /// Forms a list of CycloneDX Component objects from parsed Alpine packages, adding PURLs and properties.
+        /// </summary>
+        /// <param name="listOfComponents">List of parsed Alpine packages.</param>
+        /// <returns>List of components ready for BOM insertion.</returns>
         private static List<Component> FormComponentReleaseExternalID(List<AlpinePackage> listOfComponents)
         {
             List<Component> listComponentForBOM = new List<Component>();
@@ -198,6 +264,12 @@ namespace LCT.PackageIdentifier
             }
             return listComponentForBOM;
         }
+
+        /// <summary>
+        /// Adds properties to a CycloneDX component based on SPDX information or discovery metadata.
+        /// </summary>
+        /// <param name="prop">Parsed Alpine package information.</param>
+        /// <param name="component">Component to enrich.</param>
         private static void AddComponentProperties(AlpinePackage prop, Component component)
         {
             if (prop.SpdxComponentDetails.SpdxComponent)
@@ -213,6 +285,13 @@ namespace LCT.PackageIdentifier
                 component.Properties.Add(identifierType);
             }
         }
+
+        /// <summary>
+        /// Sets SPDX related details on an AlpinePackage when the source file is an SPDX file.
+        /// </summary>
+        /// <param name="filePath">Source file path.</param>
+        /// <param name="package">Alpine package to update.</param>
+        /// <param name="componentInfo">Component information parsed from the BOM.</param>
         private static void SetSpdxComponentDetails(string filePath, AlpinePackage package, Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
@@ -223,6 +302,9 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        #endregion
+
+        #region Events
         #endregion
     }
 }
