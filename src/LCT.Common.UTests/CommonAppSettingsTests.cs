@@ -18,7 +18,7 @@ namespace LCT.Common.UTest
         {
 
             // Override to always throw DirectoryNotFoundException
-            protected new void ValidateFolderPath(string value)
+            protected static void ValidateFolderPath(string value)
             {
                 throw new DirectoryNotFoundException("Test exception");
             }
@@ -32,10 +32,11 @@ namespace LCT.Common.UTest
             bool exitCalled = false;
             envHelperMock.Setup(e => e.CallEnvironmentExit(It.IsAny<int>())).Callback(() => exitCalled = true);
 
-            var testDirectory = new TestDirectory(envHelperMock.Object);
-
-            // Act
-            testDirectory.InputFolder = "nonexistent_path";
+            var testDirectory = new TestDirectory(envHelperMock.Object)
+            {
+                // Act
+                InputFolder = "nonexistent_path"
+            };
 
             // Assert
             Assert.IsTrue(exitCalled, "Environment exit should be called on DirectoryNotFoundException.");

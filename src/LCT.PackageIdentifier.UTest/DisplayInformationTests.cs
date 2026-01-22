@@ -67,7 +67,6 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual(string.Empty, result);
         }
         private CommonAppSettings appSettings;
-        private CatoolInfo caToolInformation;
         private MemoryAppender memoryAppender;
 
         [SetUp]
