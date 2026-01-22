@@ -91,11 +91,10 @@ namespace LCT.ArtifactoryUploader
         }
 
         /// <summary>
-        /// Asynchronously gets package information with retry logic for lowercase names.
+        /// Gets the operation type for the component based on package type.
         /// </summary>
-        /// <param name="jFrogService">The JFrog service instance.</param>
-        /// <param name="component">The component to get information for.</param>
-        /// <returns>A task containing the AQL result with package information, or null if not found.</returns>
+        /// <param name="component">The component to determine operation type for.</param>
+        /// <returns>The operation type as a string ("copy" or "move").</returns>
         private static string GetOperationType(ComponentsToArtifactory component)
         {
             if (component.ComponentType == "CHOCO")
@@ -105,6 +104,11 @@ namespace LCT.ArtifactoryUploader
             return (component.PackageType == PackageType.ClearedThirdParty || component.PackageType == PackageType.Development) ? "copy" : "move";
         }
 
+        /// <summary>
+        /// Asynchronously gets the repository operation response based on package type.
+        /// </summary>
+        /// <param name="component">The component to perform the operation on.</param>
+        /// <returns>A task containing the HTTP response message.</returns>
         private static async Task<HttpResponseMessage> GetRepoOperationResponse(ComponentsToArtifactory component)
         {
             return component.PackageType switch
@@ -117,6 +121,11 @@ namespace LCT.ArtifactoryUploader
             };
         }
 
+        /// <summary>
+        /// Creates a not found HTTP response message.
+        /// </summary>
+        /// <param name="reasonPhrase">The reason phrase for the response.</param>
+        /// <returns>An HTTP response message with not found status.</returns>
         private static HttpResponseMessage CreateNotFoundResponse(string reasonPhrase)
         {
             return new HttpResponseMessage(HttpStatusCode.NotFound)
@@ -125,6 +134,12 @@ namespace LCT.ArtifactoryUploader
             };
         }
 
+        /// <summary>
+        /// Handles upload exceptions and returns an error response.
+        /// </summary>
+        /// <param name="ex">The exception that occurred.</param>
+        /// <param name="responsemessage">The response message to update.</param>
+        /// <returns>An HTTP response message with error information.</returns>
         private static HttpResponseMessage HandleUploadException(Exception ex, HttpResponseMessage responsemessage)
         {
             Logger.Error("Error has occurred in UploadPackageToArtifactory--{Exception}", ex);
@@ -132,6 +147,12 @@ namespace LCT.ArtifactoryUploader
             return responsemessage;
         }
 
+        /// <summary>
+        /// Asynchronously gets package information with retry logic for lowercase names.
+        /// </summary>
+        /// <param name="jFrogService">The JFrog service instance.</param>
+        /// <param name="component">The component to get information for.</param>
+        /// <returns>A task containing the AQL result with package information, or null if not found.</returns>
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
             async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)

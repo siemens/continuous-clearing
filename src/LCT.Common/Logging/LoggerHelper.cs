@@ -27,9 +27,13 @@ namespace LCT.Common.Logging
         #region Fields
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private static IAnsiConsole _console;
         private static readonly object _consoleLock = new();
+        private const string AlertConstant = "Alert";
+        private const string BlueVersionMarkup = "[blue]Version[/]";
+        private const string GreenNameMarkup = "[green]Name[/]";
+        private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
+        private static int _colorIndex = 0;
 
         #endregion
 
@@ -38,11 +42,6 @@ namespace LCT.Common.Logging
         /// <summary>
         /// Gets the singleton Spectre.Console instance with thread-safe initialization.
         /// </summary>
-        // Constants for repeated string literals
-        private const string AlertConstant = "Alert";
-        private const string BlueVersionMarkup = "[blue]Version[/]";
-        private const string GreenNameMarkup = "[green]Name[/]";
-
         public static IAnsiConsole ConsoleInstance
         {
             get
@@ -145,9 +144,6 @@ namespace LCT.Common.Logging
         {
             writeAction(ConsoleInstance);
         }
-
-        private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
-        private static int _colorIndex = 0;
 
         /// <summary>
         /// Executes a Spectre.Console action with exception handling and fallback logging.

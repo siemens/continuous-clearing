@@ -29,6 +29,8 @@ namespace LCT.ArtifactoryUploader
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
+        private const string Choco = "CHOCO";
+        private const string Nuget = "NUGET";
 
         #endregion
 
@@ -47,8 +49,6 @@ namespace LCT.ArtifactoryUploader
         /// <param name="appSettings">The common application settings.</param>
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <returns>A list of components prepared for upload to Artifactory.</returns>
-        private const string Choco = "CHOCO";
-        private const string Nuget = "NUGET";
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData,
                                                                                                       CommonAppSettings appSettings,
                                                                                                       DisplayPackagesInfo displayPackagesInfo)

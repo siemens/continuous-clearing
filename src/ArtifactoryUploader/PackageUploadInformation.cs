@@ -28,6 +28,7 @@ namespace LCT.ArtifactoryUploader
         #region Fields
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private const string ReportFileName = "Artifactory";
 
         #endregion
 
@@ -37,7 +38,6 @@ namespace LCT.ArtifactoryUploader
         /// Gets the components to be packaged with initialized display information.
         /// </summary>
         /// <returns>A DisplayPackagesInfo object with initialized package lists.</returns>
-        private const string ReportFileName = "Artifactory";
         public static DisplayPackagesInfo GetComponentsToBePackages()
         {
             DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo();
@@ -755,6 +755,15 @@ namespace LCT.ArtifactoryUploader
             }
             WarningMessageForNoPackages(filename);
         }
+
+        /// <summary>
+        /// Gets not approved Chocolatey packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown Chocolatey packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         public static void GetNotApprovedChocoPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))

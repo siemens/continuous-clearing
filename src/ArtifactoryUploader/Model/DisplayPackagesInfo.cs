@@ -61,7 +61,7 @@ namespace LCT.ArtifactoryUploader.Model
     {
         #region Properties
 
-        [JsonProperty("npm")]]
+        [JsonProperty("npm")]
         public List<JsonComponents> Npm { get; set; }
         [JsonProperty("nuget")]
         public List<JsonComponents> Nuget { get; set; }
@@ -75,10 +75,10 @@ namespace LCT.ArtifactoryUploader.Model
         public List<JsonComponents> Maven { get; set; }
         [JsonProperty("cargo")]
         public List<JsonComponents> Cargo { get; set; }
-
-        #endregion
         [JsonProperty("choco")]
         public List<JsonComponents> Choco { get; set; }
+
+        #endregion
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ namespace LCT.ArtifactoryUploader.Model
     {
         #region Properties
 
-        [JsonProperty("name")]]
+        [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("version")]
         public string Version { get; set; }
