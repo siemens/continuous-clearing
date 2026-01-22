@@ -245,7 +245,8 @@ namespace LCT.SW360PackageCreator
 
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
-            Logger.Debug($"SetContentsForComparisonBOM():Start");
+            Logger.Debug($"SetContentsForComparisonBOM():Start");           
+
             Logger.Logger.Log(null, Level.Notice, $"Collecting BoM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
             DuplicateComponentsByPurlId = sw360Service.GetDuplicateComponentsByPurlId();
@@ -254,7 +255,7 @@ namespace LCT.SW360PackageCreator
 
             Logger.Debug($"SetContentsForComparisonBOM():End");
             return comparisonBomData;
-        }
+        }       
 
         private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
@@ -607,7 +608,8 @@ namespace LCT.SW360PackageCreator
         }
 
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
-        {
+        {          
+
             List<ComparisonBomData> sourceNotAvailable = GetDownloadUrlNotFoundList(comparisionBomDataList);
             foreach (var item in comparisionBomDataList)
             {

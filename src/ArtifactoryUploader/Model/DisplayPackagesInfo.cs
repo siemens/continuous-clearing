@@ -25,6 +25,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> UnknownPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> UnknownPackagesChoco { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesConan { get; set; }
@@ -32,6 +33,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesChoco { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesConan { get; set; }
@@ -39,6 +41,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> JfrogFoundPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> JfrogFoundPackagesChoco { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesConan { get; set; }
@@ -46,6 +49,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> SuccessfullPackagesChoco { get; set; }
 
         #endregion
     }
@@ -73,6 +77,8 @@ namespace LCT.ArtifactoryUploader.Model
         public List<JsonComponents> Cargo { get; set; }
 
         #endregion
+        [JsonProperty("choco")]
+        public List<JsonComponents> Choco { get; set; }
     }
 
     /// <summary>

@@ -184,6 +184,9 @@ namespace LCT.PackageIdentifier
                 case "CARGO":
                     parser = new CargoProcessor(CycloneDXBomParser, SpdxBomParser);
                     return await ComponentIdentification(appSettings, parser);
+                case "CHOCO":
+                    parser = new ChocoProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
                 default:
                     Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
                     break;

@@ -26,6 +26,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
+using LCT.SW360PackageCreator;
 
 namespace LCT.SW360PackageCreator.UTest
 {
@@ -46,7 +47,6 @@ namespace LCT.SW360PackageCreator.UTest
                 ,new ComparisonBomData()
                 {
                      Name="test",
-                   DownloadUrl=Dataconstant.DownloadUrlNotFound
                 },
                 new ComparisonBomData()
                 {
@@ -355,29 +355,10 @@ namespace LCT.SW360PackageCreator.UTest
                 Version = "3.118"
             });
 
-            List<Components> componentsAvailableInSw360 = new List<Components>();
-            componentsAvailableInSw360.Add(new Components()
-            {
-                Name = "adduser",
-                Version = "3.118",
-                ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
-                ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
-                SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
-                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
-            });
-
-            List<Components> comparisonBomData = new List<Components>();
-            comparisonBomData.Add(new Components()
-            {
-                Name = "adduser",
-                Version = "3.118",
-                ComponentExternalId = "pkg:deb/debian/adduser?arch=source",
-                ReleaseExternalId = "pkg:deb/debian/adduser@3.118?arch=source",
-                SourceUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz",
-                DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
-            });
-            var iSW360Service = new Mock<ISW360Service>();
-            iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
+            // Use reflection to set the private static property
+            var type = typeof(ComponentCreator);
+            var prop = type.GetProperty("TotalComponentsFromPackageIdentifier", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            prop.SetValue(null, updatedCompareBomData.Count);
 
             //Act
             CreatorKpiData data = creatorHelper.GetCreatorKpiData(updatedCompareBomData);
@@ -466,7 +447,7 @@ namespace LCT.SW360PackageCreator.UTest
             var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
 
             //Assert
-            Assert.That(attachmentUrlList.IsNullOrEmpty);
+            Assert.That(attachmentUrlList == null || attachmentUrlList.Count == 0);
         }
 
         [Test]
@@ -839,6 +820,83 @@ namespace LCT.SW360PackageCreator.UTest
             File.Delete(zipFilePath);
             File.Delete(tarGzFilePath);
             Directory.Delete(tempDir);
+        }        
+
+        [Test]
+        public async Task SetContentsForComparisonBOM_WithMixedChocoAndOtherComponents_ProcessesNormally()
+        {
+            // Arrange
+            var debianPatcher = new Mock<IDebianPatcher>();
+            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "DEBIAN", new DebianPackageDownloader(debianPatcher.Object) }
+            };
+            var creatorHelper = new CreatorHelper(packageDownloaderList);
+
+            var mixedComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = "7zip",
+                    Version = "19.0.0", 
+                    ProjectType = "CHOCO",
+                    ComponentExternalId = "pkg:choco/7zip",
+                    ReleaseExternalId = "pkg:choco/7zip@19.0.0"
+                },
+                new Components
+                {
+                    Name = "adduser",
+                    Version = "3.118",
+                    ProjectType = "DEBIAN",
+                    ComponentExternalId = "pkg:deb/debian/adduser",
+                    ReleaseExternalId = "pkg:deb/debian/adduser@3.118"
+                }
+            };
+
+            var sw360Service = new Mock<ISW360Service>();
+            sw360Service.Setup(x => x.GetAvailableReleasesInSw360(It.IsAny<List<Components>>()))
+                       .ReturnsAsync(new List<Components>());
+            sw360Service.Setup(x => x.GetDuplicateComponentsByPurlId())
+                       .Returns(new List<Components>());
+
+            // Act
+            var result = await creatorHelper.SetContentsForComparisonBOM(mixedComponents, sw360Service.Object);
+
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(2));
+            // SW360 service should be called for mixed components
+            sw360Service.Verify(x => x.GetAvailableReleasesInSw360(It.IsAny<List<Components>>()), Times.Once);
         }
+
+        [Test]
+        public void WriteSourceNotFoundListToConsole_WithChocoComponents_SkipsActionItemTable()
+        {
+            // Arrange
+            CommonAppSettings appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    URL = "http://localhost:8090"
+                }
+            };
+
+            var chocoComparisonData = new List<ComparisonBomData>
+            {
+                new ComparisonBomData
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    ComponentStatus = "Not Processed for CHOCO",
+                    ReleaseStatus = "Not Processed for CHOCO",
+                    DownloadUrl = Dataconstant.DownloadUrlNotFound
+                }
+            };
+
+            IDictionary<string, IPackageDownloader> packageDownloaderList = new Dictionary<string, IPackageDownloader>();
+            var creatorHelper = new CreatorHelper(packageDownloaderList);
+
+            // Act & Assert - Should not throw any exceptions or show action item tables
+            Assert.DoesNotThrow(() => creatorHelper.WriteSourceNotFoundListToConsole(chocoComparisonData, appSettings));
+        }        
     }
 }

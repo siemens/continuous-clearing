@@ -198,6 +198,9 @@ namespace LCT.ArtifactoryUploader
                 case "NUGET":
                     AddToNugetList(component, displayPackagesInfo, notFound, success);
                     break;
+                case "CHOCO":
+                    AddToChocoList(component, displayPackagesInfo, notFound, success);
+                    break;
                 case "MAVEN":
                     AddToMavenList(component, displayPackagesInfo, notFound, success);
                     break;
@@ -343,6 +346,16 @@ namespace LCT.ArtifactoryUploader
         /// <param name="timeout">The timeout value in seconds.</param>
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
+        private static void AddToChocoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesChoco.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesChoco.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesChoco.Add(component);
+        }
+        // Properly wrap UploadingThePackages as a method
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
             Logger.Debug("Starting UploadingThePackages() method");
@@ -453,7 +466,7 @@ namespace LCT.ArtifactoryUploader
             {
                 packageNameEXtension = ".tgz";
             }
-            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase))
+            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase) || package.ComponentType.Equals("CHOCO", StringComparison.OrdinalIgnoreCase))
             {
                 packageNameEXtension = ".nupkg";
             }

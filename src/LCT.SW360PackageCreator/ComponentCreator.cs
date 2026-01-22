@@ -43,6 +43,7 @@ namespace LCT.SW360PackageCreator
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
         private Bom bom = new Bom();
         private List<Components> ListofBomComponents { get; set; } = new List<Components>();
+        private List<Components> ListofChocoComponents { get; set; } = new List<Components>();
         public static int TotalComponentsFromPackageIdentifier { get; private set; }
         public async Task<List<ComparisonBomData>> CycloneDxBomParser(CommonAppSettings appSettings,
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
@@ -71,14 +72,18 @@ namespace LCT.SW360PackageCreator
                 string currVersion = item.Version;
 
                 bool isInternalComponent = GetPackageType(item, ref componentsData);
-
-                if (isInternalComponent)
+                if (componentsData.ProjectType.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Logger.Debug($"{item.Name}-{item.Version} found as internal component. ");
+                    ListofChocoComponents.Add(new Components
+                    {
+                        Name = item.Name,
+                        Version = item.Version,
+                        ProjectType = componentsData.ProjectType                       
+                    });
                 }
-                else if ((componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
+                else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
                 {
-                    //do nothing
+                    LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);                    
                 }
                 else
                 {
@@ -109,6 +114,23 @@ namespace LCT.SW360PackageCreator
             return lstOfBomDataToBeCompared;
         }
 
+        private static void LogSkippedComponent(Component item, Components componentsData, CommonAppSettings appSettings, bool isInternalComponent)
+        {
+            if (isInternalComponent)
+            {
+                Logger.DebugFormat("{0}-{1} found as internal component.", item.Name, item.Version);
+                return;
+            }
+            if (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency)
+            {
+                Logger.DebugFormat("{0}-{1} found as development component.", item.Name, item.Version);
+                return;
+            }
+            if (componentsData.ExcludeComponent == "true")
+            {
+                Logger.DebugFormat("{0}-{1} skipped (component marked as excluded).", item.Name, item.Version);
+            }
+        }
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
@@ -233,7 +255,6 @@ namespace LCT.SW360PackageCreator
             string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.Debug($"BoM Generation Path - {bomGenerationPath}");
 
-            // create component in sw360
             await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
             var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
 
@@ -247,7 +268,7 @@ namespace LCT.SW360PackageCreator
             await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
 
             // update comparison bom data
-            bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
+            bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);           
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
 
@@ -273,6 +294,9 @@ namespace LCT.SW360PackageCreator
             //write list of components which are not linked
             LoggerHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
 
+            // Notify user about manual steps required for Choco packages
+            LoggerHelper.WriteChocoManualStepsNotification(ListofChocoComponents);
+
             Logger.Debug($"CreateComponentInSw360():End");
         }
 
@@ -281,7 +305,6 @@ namespace LCT.SW360PackageCreator
             string sw360Url, CommonAppSettings appSettings)
         {
             Logger.Logger.Log(null, Level.Notice, $"No of Unique and Valid components read from BoM = {componentsToBoms.Count} ", null);
-
             try
             {
                 foreach (ComparisonBomData item in componentsToBoms)

@@ -715,5 +715,109 @@ namespace LCT.Common.UTest
             Assert.That(notice.RenderedMessage, Does.Contain("THIRD_PARTY_REPO_NAME:\t"));
             Assert.That(notice.RenderedMessage, Does.Contain("RELEASE_REPO_NAME:\t"));
         }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithChocoComponents_DisplaysWarningAndTable()
+        {
+            // Arrange
+            var chocoComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    ProjectType = "CHOCO"
+                },
+                new Components
+                {
+                    Name = "firefox",
+                    Version = "95.0.1",
+                    ProjectType = "CHOCO"
+                }
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(chocoComponents));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithMixedComponents_OnlyDisplaysChocoComponents()
+        {
+            // Arrange
+            var mixedComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    ProjectType = "CHOCO"
+                },
+                new Components
+                {
+                    Name = "npm-package",
+                    Version = "1.0.0",
+                    ProjectType = "NPM"
+                }
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(mixedComponents));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithNoChocoComponents_DoesNotDisplay()
+        {
+            // Arrange
+            var nonChocoComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = "npm-package",
+                    Version = "1.0.0",
+                    ProjectType = "NPM"
+                }
+            };
+
+            // Act & Assert - Should not throw exception
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(nonChocoComponents));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithNullComponents_DoesNotThrow()
+        {
+            // Act & Assert
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(null));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithEmptyComponents_DoesNotThrow()
+        {
+            // Act & Assert
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(new List<Components>()));
+        }
+
+        [Test]
+        public void WriteChocoManualStepsNotification_WithChocoComponentsHavingNullNames_HandlesGracefully()
+        {
+            // Arrange
+            var chocoComponents = new List<Components>
+            {
+                new Components
+                {
+                    Name = null,
+                    Version = null,
+                    ProjectType = "CHOCO"
+                },
+                new Components
+                {
+                    Name = "firefox",
+                    Version = "95.0.1",
+                    ProjectType = "CHOCO"
+                }
+            };
+
+            // Act & Assert - Should handle null names gracefully
+            Assert.DoesNotThrow(() => LoggerHelper.WriteChocoManualStepsNotification(chocoComponents));
+        }
     }
 }

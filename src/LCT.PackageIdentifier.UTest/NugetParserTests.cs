@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace LCT.PackageIdentifier.UTest
 {
@@ -250,7 +251,7 @@ namespace LCT.PackageIdentifier.UTest
             var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
 
             // Act
-            NugetProcessor.AddSiemensDirectProperty(ref bom);
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
@@ -308,7 +309,7 @@ namespace LCT.PackageIdentifier.UTest
             var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
 
             // Act
-            NugetProcessor.AddSiemensDirectProperty(ref bom);
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             // Assert
@@ -395,7 +396,7 @@ namespace LCT.PackageIdentifier.UTest
             var nugetProcessor = new NugetProcessor(cycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
 
             // Act
-            NugetProcessor.AddSiemensDirectProperty(ref bom);
+            nugetProcessor.AddSiemensDirectProperty(ref bom);
 
             // Assert
             Assert.AreEqual(expectedBom.Components.Count, bom.Components.Count);
@@ -604,6 +605,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings()
             {
+                ProjectType="Nuget",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -654,6 +656,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings()
             {
+                ProjectType = "Nuget",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -703,7 +706,8 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
-            {
+            { 
+                ProjectType = "Nuget",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -1377,7 +1381,6 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual(0, bom.Dependencies.Count);
         }
 
-
         [Test]
         public void HandleConfigFile_WhenSPDXHasNullComponents_DoesNotThrowException()
         {
@@ -1393,9 +1396,9 @@ namespace LCT.PackageIdentifier.UTest
             {
                 Components = new List<Component>(),
                 Dependencies = new List<Dependency>
-        {
-            new Dependency { Ref = "spdx-dependency" }
-        }
+                {
+                    new Dependency { Ref = "spdx-dependency" }
+                }
             };
             mockSpdxBomParser.Setup(x => x.ParseSPDXBom(filepath)).Returns(testBom);
 
@@ -1415,6 +1418,87 @@ namespace LCT.PackageIdentifier.UTest
 
             Assert.AreEqual(0, bom.Dependencies.Count);
         }
+        [Test]
+        public void ReferenceTagDetails_WhenExtractLibraryDetailsThrowsArgumentException_CatchBlockIsCovered()
+        {
+            // Arrange: 
+            var doc = new XmlDocument();
+            var referenceNode = doc.CreateElement("Reference");
+            var hintPathNode = doc.CreateElement("HintPath");
+            hintPathNode.InnerText = "invalid";
+            referenceNode.AppendChild(hintPathNode);
 
+            // Act & Assert: 
+            Assert.DoesNotThrow(() =>
+            {
+                var result = typeof(LCT.PackageIdentifier.NugetProcessor)
+                    .GetMethod("ReferenceTagDetails", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                    .Invoke(null, new object[] { referenceNode });
+                Assert.IsNotNull(result);
+            });
+        }
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenAppSettingsIsNull()
+        {
+            var componentData = new ComponentIdentification();
+            var mockJfrogService = new Mock<IJFrogService>();
+            var mockBomHelper = new Mock<IBomHelper>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { componentData, null, mockJfrogService.Object, mockBomHelper.Object })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("appSettings cannot be null."));
+        }
+
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenComponentDataIsNull()
+        {
+            var appSettings = new CommonAppSettings();
+            var mockJfrogService = new Mock<IJFrogService>();
+            var mockBomHelper = new Mock<IBomHelper>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { null, appSettings, mockJfrogService.Object, mockBomHelper.Object })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("componentData cannot be null."));
+        }
+
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenJFrogServiceIsNull()
+        {
+            var appSettings = new CommonAppSettings();
+            var componentData = new ComponentIdentification();
+            var mockBomHelper = new Mock<IBomHelper>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { componentData, appSettings, null, mockBomHelper.Object })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("jFrogService cannot be null."));
+        }
+
+        [Test]
+        public void ValidateIdentificationOfInternalComponentsParameters_ThrowsArgumentNullException_WhenBomHelperIsNull()
+        {
+            var appSettings = new CommonAppSettings();
+            var componentData = new ComponentIdentification();
+            var mockJfrogService = new Mock<IJFrogService>();
+
+            var ex = Assert.Throws<TargetInvocationException>(() =>
+                typeof(NugetProcessor)
+                    .GetMethod("ValidateIdentificationOfInternalComponentsParameters", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, new object[] { componentData, appSettings, mockJfrogService.Object, null })
+            );
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentNullException>());
+            Assert.That(ex.InnerException.Message, Does.Contain("bomhelper cannot be null."));
+        }
     }
 }
