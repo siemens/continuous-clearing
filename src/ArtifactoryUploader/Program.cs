@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -33,27 +33,10 @@ namespace ArtifactoryUploader
     [ExcludeFromCodeCoverage]
     public static class Program
     {
-        #region Fields
-
         private static bool m_Verbose = false;
+        public static Stopwatch UploaderStopWatch { get; set; }
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-
-        #endregion
-
-        #region Properties
-
-        public static Stopwatch UploaderStopWatch { get; set; }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Asynchronously executes the main entry point for the Artifactory Uploader application.
-        /// </summary>
-        /// <param name="args">Command-line arguments.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();
@@ -113,10 +96,6 @@ namespace ArtifactoryUploader
 
         }
 
-        /// <summary>
-        /// Gets the CA tool version information from the project file.
-        /// </summary>
-        /// <returns>CaTool version and location information.</returns>
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
             CatoolInfo catoolInfo = new CatoolInfo();
@@ -126,11 +105,6 @@ namespace ArtifactoryUploader
             return catoolInfo;
         }
 
-        /// <summary>
-        /// Gets the JFrog service instance configured with Artifactory credentials.
-        /// </summary>
-        /// <param name="appSettings">The common application settings.</param>
-        /// <returns>An instance of IJFrogService.</returns>
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
@@ -145,11 +119,6 @@ namespace ArtifactoryUploader
             return jFrogService;
         }
 
-        /// <summary>
-        /// Gets the BOM (Bill of Materials) file path from the output folder.
-        /// </summary>
-        /// <param name="appSettings">The common application settings.</param>
-        /// <returns>The full path to the BOM file, or empty string if not found.</returns>
         private static string GetBomFilePath(CommonAppSettings appSettings)
         {
             if (!string.IsNullOrWhiteSpace(appSettings.SW360.ProjectName))
@@ -178,7 +147,5 @@ namespace ArtifactoryUploader
 
             return string.Empty;
         }
-
-        #endregion
     }
 }
