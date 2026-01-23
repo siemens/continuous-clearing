@@ -41,6 +41,11 @@ namespace LCT.APICommunications
         /// </summary>
         private static int TimeoutInSec { get; set; }
 
+        /// <summary>
+        /// Gets the configured HttpClient instance for API communication.
+        /// </summary>
+        private readonly HttpClient _httpClient;
+
         #endregion Properties
 
         #region Constructors
@@ -55,6 +60,7 @@ namespace LCT.APICommunications
         public NpmJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
             TimeoutInSec = timeout;
+            _httpClient = GetHttpClient(repoCredentials);
         }
 
         #endregion Constructors
@@ -85,9 +91,8 @@ namespace LCT.APICommunications
         /// <returns>An HttpResponseMessage containing the API key response.</returns>
         public override async Task<HttpResponseMessage> GetApiKey()
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             string url = $"{DomainName}/api/security/apiKey";
-            return await httpClient.GetAsync(url);
+            return await _httpClient.GetAsync(url);
         }
 
         /// <summary>
@@ -97,9 +102,7 @@ namespace LCT.APICommunications
         /// <returns>An HttpResponseMessage indicating the result of the copy operation.</returns>
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            const HttpContent httpContent = null;
-            return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
+            return await _httpClient.PostAsync(component.CopyPackageApiUrl, null);
         }
 
         /// <summary>
@@ -109,9 +112,7 @@ namespace LCT.APICommunications
         /// <returns>An HttpResponseMessage indicating the result of the move operation.</returns>
         public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            const HttpContent httpContent = null;
-            return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
+            return await _httpClient.PostAsync(component.MovePackageApiUrl, null);
         }
 
         /// <summary>
@@ -125,8 +126,7 @@ namespace LCT.APICommunications
             var result = responseMessage;
             try
             {
-                HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-                result = await httpClient.GetAsync(component.PackageInfoApiUrl);
+                result = await _httpClient.GetAsync(component.PackageInfoApiUrl);
                 result.EnsureSuccessStatusCode();
             }
             catch (TaskCanceledException ex)
@@ -146,11 +146,9 @@ namespace LCT.APICommunications
         /// <param name="uploadArgs">The upload arguments containing package name, release name, and version.</param>
         public override void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs)
         {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            const HttpContent httpContent = null;
             string url = $"{DomainName}/api/storage/{destRepoName}/{uploadArgs.PackageName}/-/{uploadArgs.ReleaseName}-{uploadArgs.Version}.tgz?" +
               $"properties=sw360url={sw360releaseUrl}";
-            httpClient.PutAsync(url, httpContent);
+            _httpClient.PutAsync(url, null);
         }
 
         #endregion Methods
