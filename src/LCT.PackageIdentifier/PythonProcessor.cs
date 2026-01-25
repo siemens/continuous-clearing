@@ -74,9 +74,9 @@ namespace LCT.PackageIdentifier
                 ref dependencies,
                 cdxGenBomData);
 
-            int initialCount = listofComponents.Count;
+            int initialCount = listComponentForBOM.Count;
             int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
-            GetDistinctComponentList(ref listofComponents);            
+            listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;

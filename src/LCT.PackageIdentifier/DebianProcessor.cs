@@ -188,12 +188,27 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.UnofficialComponents++;
             }
         }
+        // Updates to method: ParseCycloneDX(string filePath, ref Bom bom, CommonAppSettings appSettings)
+        // Added comprehensive null checks for sbom and its properties before accessing or adding to collections.
+
         public List<DebianPackage> ParseCycloneDX(string filePath, ref Bom bom, CommonAppSettings appSettings)
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
             Bom sbom = ExtractDetailsForJson(filePath, ref debianPackages, appSettings);
-            bom.Components.AddRange(sbom.Components);
-            bom.Dependencies.AddRange(sbom.Dependencies);
+            
+            if (sbom == null)
+            {               
+                return debianPackages;
+            }
+            if (sbom.Components != null && sbom.Components.Count > 0)
+            {
+                bom.Components.AddRange(sbom.Components);
+            } 
+            if (sbom.Dependencies != null && sbom.Dependencies.Count > 0)
+            {
+                bom.Dependencies.AddRange(sbom.Dependencies);
+            }            
+
             return debianPackages;
         }
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
