@@ -21,9 +21,9 @@ namespace LCT.Common
         public const string BomContainerFolderName = "Container_Bom";
 
         public static void UploadArtifacts()
-        {
-            UploadLogs();
+        {            
             UploadBom();
+            UploadLogs();
         }
 
         /// <summary>
@@ -38,11 +38,18 @@ namespace LCT.Common
                             && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
             {
                 LogManager.Shutdown();
+                Logger.DebugFormat("Uploading artifact log file path: {0}", Log4Net.CatoolLogPath);
+                Logger.Debug("====================<<<<< Exit >>>>>====================");
                 Console.WriteLine($"##vso[artifact.upload containerfolder={LogContainerFolderName};artifactname={LogArtifactFolderName}]{Log4Net.CatoolLogPath}");
             }
             else if (envType == EnvironmentType.Unknown)
             {
                 Logger.Warn($"Uploading of logs is not supported.");
+                Logger.Debug("====================<<<<< Exit >>>>>====================");
+            }
+            else
+            {
+                Logger.Debug("====================<<<<< Exit >>>>>====================");
             }
 
         }
@@ -58,6 +65,7 @@ namespace LCT.Common
                             && File.Exists(FileOperations.CatoolBomFilePath)
                             && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
             {
+                Logger.DebugFormat("Uploading artifact Bom file path: {0}", FileOperations.CatoolBomFilePath);
                 Console.WriteLine($"##vso[artifact.upload containerfolder={BomContainerFolderName};artifactname={BomArtifactFolderName}]{FileOperations.CatoolBomFilePath}");
             }
             else if (envType == EnvironmentType.Unknown)

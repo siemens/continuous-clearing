@@ -31,7 +31,8 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting UploadPackageToArtifactory method");
+
+            Logger.Debug("UploadPackageToRepo(): Starting the upload package to Artifactory.");
             string operationType = GetOperationType(component);
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
@@ -45,7 +46,9 @@ namespace LCT.ArtifactoryUploader
                 }
 
                 // Perform Copy or Move operation
+
                 responsemessage = await GetRepoOperationResponse(component);
+                await LogHandlingHelper.HttpResponseHandling("Upload Package To Repo", $"MethodName:UploadPackageToRepo()", responsemessage, "");
 
                 // Check status code and handle errors
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
@@ -58,15 +61,17 @@ namespace LCT.ArtifactoryUploader
             }
             catch (HttpRequestException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An HTTP request error occurred while uploading the package to Artifactory.");
                 return HandleUploadException(ex, responsemessage);
             }
             catch (InvalidOperationException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An invalid operation occurred while uploading the package to Artifactory.");
                 return HandleUploadException(ex, responsemessage);
             }
             finally
             {
-                Logger.Debug("Ending UploadPackageToArtifactory method");
+                Logger.DebugFormat("UploadPackageToRepo(): Ending the upload process for component: {0}.", component.Name);
             }
 
             return responsemessage;
@@ -154,11 +159,11 @@ namespace LCT.ArtifactoryUploader
             }
             catch (IOException ex)
             {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Failed to create directory ", ex, "IOException occurred while creating the directory.");
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Unauthorized access while creating directory", ex, "UnauthorizedAccessException occurred while creating the directory.");
             }
 
             return localPathforartifactory;
