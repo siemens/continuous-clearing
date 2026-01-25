@@ -1,0 +1,252 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:a8b5abb6-9789-446c-84f6-18b89b6d4139",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-01-22T04:19:57Z",
+    "tools": {
+      "components": [
+        {
+          "group": "@cyclonedx",
+          "name": "cdxgen",
+          "version": "12.0.0",
+          "purl": "pkg:npm/%40cyclonedx/cdxgen@12.0.0",
+          "type": "application",
+          "bom-ref": "pkg:npm/@cyclonedx/cdxgen@12.0.0",
+          "publisher": "OWASP Foundation",
+          "authors": [ { "name": "OWASP Foundation" } ]
+        }
+      ]
+    },
+    "authors": [ { "name": "OWASP Foundation" } ],
+    "lifecycles": [ { "phase": "build" } ],
+    "component": {
+      "group": "",
+      "name": "Nuget",
+      "version": "latest",
+      "type": "application",
+      "bom-ref": "pkg:nuget/Nuget@latest",
+      "purl": "pkg:nuget/Nuget@latest"
+    },
+    "properties": [
+      {
+        "name": "cdx:bom:componentTypes",
+        "value": "nuget"
+      },
+      {
+        "name": "cdx:bom:componentSrcFiles",
+        "value": "packages.config"
+      }
+    ]
+  },
+  "components": [
+    {
+      "group": "",
+      "name": "Newtonsoft.Json",
+      "version": "12.0.3",
+      "purl": "pkg:nuget/Newtonsoft.Json@12.0.3",
+      "type": "library",
+      "bom-ref": "pkg:nuget/Newtonsoft.Json@12.0.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "packages.config"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 0.7,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 0.7,
+                "value": "packages.config"
+              }
+            ],
+            "concludedValue": "packages.config"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "System.Buffers",
+      "version": "4.5.1",
+      "purl": "pkg:nuget/System.Buffers@4.5.1",
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Buffers@4.5.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "packages.config"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 0.7,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 0.7,
+                "value": "packages.config"
+              }
+            ],
+            "concludedValue": "packages.config"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "System.Memory",
+      "version": "4.5.4",
+      "purl": "pkg:nuget/System.Memory@4.5.4",
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Memory@4.5.4",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "packages.config"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 0.7,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 0.7,
+                "value": "packages.config"
+              }
+            ],
+            "concludedValue": "packages.config"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "System.Numerics.Vectors",
+      "version": "4.5.0",
+      "purl": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "packages.config"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 0.7,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 0.7,
+                "value": "packages.config"
+              }
+            ],
+            "concludedValue": "packages.config"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "System.Threading.Tasks.Extensions",
+      "version": "4.5.4",
+      "purl": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "packages.config"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 0.7,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 0.7,
+                "value": "packages.config"
+              }
+            ],
+            "concludedValue": "packages.config"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "System.ValueTuple",
+      "version": "4.5.0",
+      "purl": "pkg:nuget/System.ValueTuple@4.5.0",
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.ValueTuple@4.5.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "packages.config"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 0.7,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 0.7,
+                "value": "packages.config"
+              }
+            ],
+            "concludedValue": "packages.config"
+          }
+        ]
+      }
+    }
+  ],
+  "services": [],
+  "dependencies": [
+    {
+      "ref": "pkg:nuget/Newtonsoft.Json@12.0.3",
+      "dependsOn": [ "pkg:nuget/System.Buffers@4.5.1", "pkg:nuget/System.Memory@4.5.4", "pkg:nuget/System.Numerics.Vectors@4.5.0", "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4", "pkg:nuget/System.ValueTuple@4.5.0" ]
+    }
+  ],
+  "annotations": [
+    {
+      "bom-ref": "metadata-annotations",
+      "subjects": [ "pkg:nuget/Nuget@latest" ],
+      "annotator": {
+        "component": {
+          "group": "@cyclonedx",
+          "name": "cdxgen",
+          "version": "12.0.0",
+          "purl": "pkg:npm/%40cyclonedx/cdxgen@12.0.0",
+          "type": "application",
+          "bom-ref": "pkg:npm/@cyclonedx/cdxgen@12.0.0",
+          "publisher": "OWASP Foundation",
+          "authors": [ { "name": "OWASP Foundation" } ]
+        }
+      },
+      "timestamp": "2026-01-22T04:19:57Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Thursday, January 22, 2026 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'Nuget'. There are 6 components."
+    }
+  ]
+}

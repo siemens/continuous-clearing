@@ -20,7 +20,8 @@
   "Npm": {
     "Include": [
       "p*-lock.json",
-      "*.cdx.json"
+      "*.cdx.json",
+      "cdx_dep.json"
     ],
     "Exclude": [
       "node_modules"
@@ -49,7 +50,8 @@
     "Include": [
       "packages.config",
       "p*.assets.json",
-      "*.cdx.json"
+      "*.cdx.json",
+      "cdx_dep.json"
     ],
     "Exclude": [],
     "Artifactory": {
@@ -146,7 +148,8 @@
   "Poetry": {
     "Include": [
       "poetry.lock",
-      "*.cdx.json"
+      "*.cdx.json",
+      "cdx_dep.json"
     ],
     "Exclude": [],
     "Artifactory": {

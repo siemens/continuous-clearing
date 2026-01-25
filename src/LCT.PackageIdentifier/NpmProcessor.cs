@@ -474,7 +474,6 @@ namespace LCT.PackageIdentifier
                     Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
                     ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile,ref ListofDependenciesFromLockFile);
                 }
-
             CommonHelper.EnrichCdxGenforPackagefilesData(
                 ref ListofComponentsFromLockFile,
                 ref ListofDependenciesFromLockFile,

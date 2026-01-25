@@ -58,16 +58,22 @@ namespace LCT.Common
         public static Bom GetCdxGenBomData(List<string> configFiles, Func<string, Bom> parseCycloneDxBom)
         {
             var dependencyFilePath = configFiles
-                .FirstOrDefault(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));           
+                .FirstOrDefault(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrEmpty(dependencyFilePath))
+            {
+                DependencyFileNotFound = false;
+                return null;
+            }
+
             bool onlyDependencyFiles = configFiles.Count > 0 &&
-               configFiles.All(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
+                configFiles.All(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
 
             if (onlyDependencyFiles)
             {
                 DependencyFileNotFound = false;
                 return null;
             }
-           
+
             configFiles.Remove(dependencyFilePath);
 
             
@@ -677,61 +683,7 @@ namespace LCT.Common
             {
                 MergeExistingPropertiesIntoCdx(cdx, byPurl, byNameVer);
             }
-        }
-        public static void UpdateDependencyRefsToComponentBoMRef(ref Bom bom, CommonAppSettings appSettings)
-        {
-            if (bom == null || bom.Dependencies == null || bom.Components == null) return;
-
-            var compMap = bom.Components
-                .Where(c => !string.IsNullOrWhiteSpace(c.Purl) && c.Purl.StartsWith(Dataconstant.PurlCheck()[appSettings.ProjectType.ToUpperInvariant()]))
-                .Select(c =>
-                {
-                    var core = c.Purl.Split('?', 2)[0];
-                    return (core, purl: c.Purl);
-                })
-                .GroupBy(x => x.core, StringComparer.Ordinal)
-                .ToDictionary(g => g.Key, g => g.First().purl, StringComparer.Ordinal);
-
-            void NormalizeRef(Dependency dep)
-            {
-                if (dep?.Ref == null) return;
-
-                if (dep.Ref.StartsWith(Dataconstant.PurlCheck()[appSettings.ProjectType.ToUpperInvariant()]))
-                {
-                    var core = dep.Ref.Split('?', 2)[0];
-                    if (compMap.TryGetValue(core, out var canonical))
-                    {
-                        dep.Ref = canonical;
-                    }
-                    else
-                    {
-                        if (appSettings.ProjectType.Equals("NPM", StringComparison.OrdinalIgnoreCase) ||
-                            appSettings.ProjectType.Equals("NUGET", StringComparison.OrdinalIgnoreCase) ||
-                            appSettings.ProjectType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
-                        {
-                            dep.Ref = core;
-                        }
-                        else
-                        {
-                            dep.Ref = $"{core}?arch=source";
-                        }
-                    }
-                }
-
-                if (dep.Dependencies != null)
-                {
-                    foreach (var child in dep.Dependencies)
-                    {
-                        NormalizeRef(child);
-                    }
-                }
-            }
-
-            foreach (var d in bom.Dependencies)
-            {
-                NormalizeRef(d);
-            }
-        }
+        }       
         private static void MergeExistingPropertiesIntoCdx(
             Component cdx,
             Dictionary<string, Component> byPurl,

@@ -68,7 +68,7 @@ namespace LCT.PackageIdentifier
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
             bom = RemoveExcludedComponents(appSettings, bom);
-            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();            
             CycloneDXBomParser.CheckValidDependenciesForProjectType(bom.Dependencies, appSettings.ProjectType);
             if (bom.Components != null)
             {

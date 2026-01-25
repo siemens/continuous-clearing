@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:167dc9b4-dd8d-4f55-926a-c0f96cabf035",
+  "serialNumber": "urn:uuid:4cad9fd3-fc1a-4118-b635-157a17e6a726",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-05-26T04:19:21Z",
+    "timestamp": "2026-01-20T09:02:53Z",
     "tools": {
       "components": [
         {
@@ -13,7 +13,7 @@
             "name": "Siemens AG"
           },
           "name": "Clearing Automation Tool",
-          "version": "8.0.0",
+          "version": "8.3.0",
           "externalReferences": [
             {
               "url": "https://github.com/siemens/continuous-clearing",
@@ -25,8 +25,8 @@
     },
     "component": {
       "type": "application",
-      "name": "continuous-clearing",
-      "version": "v9.0.x"
+      "name": "Test",
+      "version": "1.0"
     },
     "properties": [
       {
@@ -38,63 +38,22 @@
   "components": [
     {
       "type": "library",
-      "bom-ref": "pkg:deb/debian/adduser@3.118?arch=source",
-      "name": "adduser",
-      "version": "3.118",
-      "purl": "pkg:deb/debian/adduser@3.118?arch=source",
-      "properties": [
-        {
-          "name": "internal:siemens:clearing:identifier-type",
-          "value": "Discovered"
-        },
-        {
-          "name": "internal:siemens:clearing:development",
-          "value": "false"
-        },
-        {
-          "name": "internal:siemens:clearing:siemens:direct",
-          "value": "false"
-        },
-        {
-          "name": "internal:siemens:clearing:is-internal",
-          "value": "false"
-        },
-        {
-          "name": "internal:siemens:clearing:jfrog-repo-name",
-          "value": "Not Found in JFrogRepo"
-        },
-        {
-          "name": "internal:siemens:clearing:project-type",
-          "value": "Debian"
-        },
-        {
-          "name": "internal:siemens:clearing:siemens:filename",
-          "value": "Package name not found in Jfrog"
-        },
-        {
-          "name": "internal:siemens:clearing:jfrog-repo-path",
-          "value": "Jfrog repo path not found"
-        }
-      ]
-    },
-    {
-      "type": "library",
-      "bom-ref": "pkg:deb/debian/apt@1.8.2.3?arch=source",
+      "bom-ref": "pkg:deb/debian/apt@3.0.3?arch=source",
       "name": "apt",
-      "version": "1.8.2.3",
-      "purl": "pkg:deb/debian/apt@1.8.2.3?arch=source",
+      "version": "3.0.3",
+      "purl": "pkg:deb/debian/apt@3.0.3?arch=source",
       "properties": [
-        {
-          "name": "internal:siemens:clearing:identifier-type",
-          "value": "Discovered"
-        },
         {
           "name": "internal:siemens:clearing:development",
           "value": "false"
         },
         {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
           "name": "internal:siemens:clearing:siemens:direct",
-          "value": "false"
+          "value": "true"
         },
         {
           "name": "internal:siemens:clearing:is-internal",
@@ -102,7 +61,7 @@
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-name",
-          "value": "Not Found in JFrogRepo"
+          "value": "org1-debian-remote-cache"
         },
         {
           "name": "internal:siemens:clearing:project-type",
@@ -110,28 +69,28 @@
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "Package name not found in Jfrog"
+          "value": "apt_3.0.3_amd64.deb"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
-          "value": "Jfrog repo path not found"
+          "value": "org1-debian-remote-cache/pool/main/a/apt/apt_3.0.3_amd64.deb"
         }
       ]
     },
     {
       "type": "library",
-      "bom-ref": "pkg:deb/debian/base-files@10.3%2Bdeb10u10?arch=source",
+      "bom-ref": "pkg:deb/debian/base-files@13.8%2Bdeb13u2?arch=source",
       "name": "base-files",
-      "version": "10.3\u002Bdeb10u10",
-      "purl": "pkg:deb/debian/base-files@10.3%2Bdeb10u10?arch=source",
+      "version": "13.8\u002Bdeb13u2",
+      "purl": "pkg:deb/debian/base-files@13.8%2Bdeb13u2?arch=source",
       "properties": [
-        {
-          "name": "internal:siemens:clearing:identifier-type",
-          "value": "Discovered"
-        },
         {
           "name": "internal:siemens:clearing:development",
           "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
           "name": "internal:siemens:clearing:siemens:direct",
@@ -143,7 +102,7 @@
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-name",
-          "value": "Not Found in JFrogRepo"
+          "value": "org1-debian-remote-cache"
         },
         {
           "name": "internal:siemens:clearing:project-type",
@@ -151,28 +110,69 @@
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "Package name not found in Jfrog"
+          "value": "base-files_13.8\u002Bdeb13u2_amd64.deb"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
-          "value": "Jfrog repo path not found"
+          "value": "org1-debian-remote-cache/pool/main/b/base-files/base-files_13.8\u002Bdeb13u2_amd64.deb"
         }
       ]
     },
     {
       "type": "library",
-      "bom-ref": "pkg:deb/debian/base-passwd@3.5.46?arch=source",
+      "bom-ref": "pkg:deb/debian/base-passwd@3.6.7?arch=source",
       "name": "base-passwd",
-      "version": "3.5.46",
-      "purl": "pkg:deb/debian/base-passwd@3.5.46?arch=source",
+      "version": "3.6.7",
+      "purl": "pkg:deb/debian/base-passwd@3.6.7?arch=source",
       "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
         {
           "name": "internal:siemens:clearing:identifier-type",
           "value": "Discovered"
         },
         {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-debian-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Debian"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "base-passwd_3.6.7_amd64.deb"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-debian-remote-cache/pool/main/b/base-passwd/base-passwd_3.6.7_amd64.deb"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/bash@5.2.37-2%2Bb5?arch=source",
+      "name": "bash",
+      "version": "5.2.37-2\u002Bb5",
+      "purl": "pkg:deb/debian/bash@5.2.37-2%2Bb5?arch=source",
+      "properties": [
+        {
           "name": "internal:siemens:clearing:development",
           "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
         },
         {
           "name": "internal:siemens:clearing:siemens:direct",
@@ -184,7 +184,7 @@
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-name",
-          "value": "Not Found in JFrogRepo"
+          "value": "org1-debian-remote-cache"
         },
         {
           "name": "internal:siemens:clearing:project-type",
@@ -192,16 +192,251 @@
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "Package name not found in Jfrog"
+          "value": "bash_5.2.37-2\u002Bb5_amd64.deb"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
-          "value": "Jfrog repo path not found"
+          "value": "org1-debian-remote-cache/pool/main/b/bash/bash_5.2.37-2\u002Bb5_amd64.deb"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/bsdutils@1:2.41-5?arch=source",
+      "name": "bsdutils",
+      "version": "1:2.41-5",
+      "purl": "pkg:deb/debian/bsdutils@1:2.41-5?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-debian-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Debian"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "bsdutils_2.41-5_amd64.deb"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-debian-remote-cache/pool/main/u/util-linux/bsdutils_2.41-5_amd64.deb"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/coreutils@9.7-3?arch=source",
+      "name": "coreutils",
+      "version": "9.7-3",
+      "purl": "pkg:deb/debian/coreutils@9.7-3?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-debian-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Debian"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "coreutils_9.7-3_amd64.deb"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-debian-remote-cache/pool/main/c/coreutils/coreutils_9.7-3_amd64.deb"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/dash@0.5.12-12?arch=source",
+      "name": "dash",
+      "version": "0.5.12-12",
+      "purl": "pkg:deb/debian/dash@0.5.12-12?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-debian-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Debian"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "dash_0.5.12-12_amd64.deb"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-debian-remote-cache/pool/main/d/dash/dash_0.5.12-12_amd64.deb"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/debconf@1.5.91?arch=source",
+      "name": "debconf",
+      "version": "1.5.91",
+      "purl": "pkg:deb/debian/debconf@1.5.91?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-debian-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Debian"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "debconf_1.5.91_all.deb"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-debian-remote-cache/pool/main/d/debconf/debconf_1.5.91_all.deb"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/debian/debian-archive-keyring@2025.1?arch=source",
+      "name": "debian-archive-keyring",
+      "version": "2025.1",
+      "purl": "pkg:deb/debian/debian-archive-keyring@2025.1?arch=source",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "org1-debian-remote-cache"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Debian"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "debian-archive-keyring_2025.1_all.deb"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "org1-debian-remote-cache/pool/main/d/debian-archive-keyring/debian-archive-keyring_2025.1_all.deb"
         }
       ]
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "ref": "pkg:deb/debian/apt@3.0.3?arch=amd64\u0026distro=debian-13\u0026package-id=538a004ef5cf1609",
+      "dependsOn": [
+        "pkg:deb/debian/base-passwd@3.6.7?arch=amd64\u0026distro=debian-13\u0026package-id=2e32fd1cf9077c07",
+        "pkg:deb/debian/debian-archive-keyring@2025.1?arch=all\u0026distro=debian-13\u0026package-id=842a321cf672334d"
+      ]
+    },
+    {
+      "ref": "pkg:deb/debian/base-files@13.8%2Bdeb13u2?arch=amd64\u0026distro=debian-13\u0026package-id=dbf4c989f3107dca"
+    },
+    {
+      "ref": "pkg:deb/debian/base-passwd@3.6.7?arch=amd64\u0026distro=debian-13\u0026package-id=2e32fd1cf9077c07"
+    },
+    {
+      "ref": "pkg:deb/debian/bash@5.2.37-2%2Bb5?arch=amd64\u0026distro=debian-13\u0026package-id=2606d0645fc9dc37\u0026upstream=bash%405.2.37-2",
+      "dependsOn": [
+        "pkg:deb/debian/base-files@13.8%2Bdeb13u2?arch=amd64\u0026distro=debian-13\u0026package-id=dbf4c989f3107dca"
+      ]
+    },
+    {
+      "ref": "pkg:deb/debian/bsdutils@1%3A2.41-5?arch=amd64\u0026distro=debian-13\u0026package-id=fd6adc443bc5f69e\u0026upstream=util-linux%402.41-5"
+    },
+    {
+      "ref": "pkg:deb/debian/coreutils@9.7-3?arch=amd64\u0026distro=debian-13\u0026package-id=c987947b9ce08bac"
+    },
+    {
+      "ref": "pkg:deb/debian/dash@0.5.12-12?arch=amd64\u0026distro=debian-13\u0026package-id=c6f2fed47a8443e5"
+    }
+  ],
+  "compositions": [],
   "definitions": {
     "standards": [
       {
