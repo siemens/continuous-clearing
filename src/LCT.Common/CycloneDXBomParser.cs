@@ -110,10 +110,9 @@ namespace LCT.Common
             var prefix = Dataconstant.PurlCheck()[projectType.ToUpper()];
             dependencies.RemoveAll(dep => !IsValidDependencyForProjectType(dep, prefix));
 
-            foreach (var dep in dependencies)
+            foreach (var childList in dependencies.Select(d => d.Dependencies).Where(list => list != null))
             {
-                if (dep.Dependencies == null) continue;
-                dep.Dependencies.RemoveAll(child => !IsValidDependencyForProjectType(child, prefix));
+                childList.RemoveAll(child => !IsValidDependencyForProjectType(child, prefix));
             }
         }
 

@@ -232,7 +232,7 @@ namespace LCT.PackageIdentifier
                 string packageName = GetPackageName(properties, prop);
 
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
-                //string bomRefComponentName = packageName;
+                
                 SetComponentGroupAndName(components, packageName);
 
                 components.Type = Component.Classification.Library;
@@ -331,7 +331,7 @@ namespace LCT.PackageIdentifier
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
                 string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;
-                //string bomRefComponentName = prop.Name;
+                
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
 
                 if (prop.Name.Contains('@'))

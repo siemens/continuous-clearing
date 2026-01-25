@@ -620,7 +620,7 @@ namespace LCT.Common
                 _ => projectType.Trim(),
             };
         }
-        public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies,Bom? cdxGenBomData)
+        public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies,Bom cdxGenBomData)
         {
             if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
             {
