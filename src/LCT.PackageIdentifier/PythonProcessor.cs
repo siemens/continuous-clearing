@@ -102,18 +102,7 @@ namespace LCT.PackageIdentifier
         }
         private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
         {
-            var cdxGenBomData = CommonHelper.GetCdxGenBomData(configFiles, _cycloneDXBomParser.ParseCycloneDXBom);
-            if (cdxGenBomData?.Components != null)
-            {
-                cdxGenBomData.Components = [.. cdxGenBomData.Components.Where(c => c.Type != Component.Classification.Application)];
-                CycloneDXBomParser.CheckValidComponentsForProjectType(cdxGenBomData.Components, appSettings.ProjectType);
-            }
-            else
-            {
-                return null;
-            }
-
-                return cdxGenBomData;
+            return CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _cycloneDXBomParser.ParseCycloneDXBom);
         }
         public static void AddSiemensDirectProperty(ref Bom bom)
         {

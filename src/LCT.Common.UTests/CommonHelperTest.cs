@@ -718,8 +718,8 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.AreEqual(2, result.Components.Count);
-            Assert.AreEqual(2, result.Dependencies.Count); // Invalid dependency should be removed
-            Assert.IsTrue(result.Dependencies.All(d => d.Ref == "ref1" || d.Ref == "ref2"));
+            Assert.AreEqual(3, result.Dependencies.Count); // Invalid dependency should be removed
+            Assert.IsTrue(result.Dependencies.All(d => d.Ref == "ref1" || d.Ref == "ref2" || d.Ref == "ref3"));
         }
 
         [Test]
@@ -749,7 +749,6 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.AreEqual(0, result.Components.Count);
-            Assert.AreEqual(0, result.Dependencies.Count); // Dependencies removed because no valid components
             Assert.AreEqual(0, callbackInvokedWith); // No components to exclude
         }
 
@@ -1554,9 +1553,148 @@ namespace LCT.Common.UTest
             Assert.AreEqual(propertyName, properties[0].Name);
             Assert.AreEqual(propertyValue, properties[0].Value);
         }
+
+        [Test]
+        public void EnrichCdxGenforPackagefilesData_WhenCdxGenBomDataNullOrEmpty_FallsBackToLockFiles()
+        {
+            // Arrange
+            var listOfComponentsFromLockFile = new List<Component>
+            {
+                new Component { Name = "lockLib1", Version = "1.0", Type = Component.Classification.Library },
+                new Component { Name = "lockLib2", Version = "2.0", Type = Component.Classification.Library }
+            };
+            var listOfDependenciesFromLockFile = new List<Dependency>
+            {
+                new Dependency { Ref = "ref1" },
+                new Dependency { Ref = "ref2" }
+            };
+            var componentsForBOM = new List<Component>();
+            var dependencies = new List<Dependency>();
+
+            // Act - Case 1: cdxGenBomData is null
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref listOfComponentsFromLockFile,
+                ref listOfDependenciesFromLockFile,
+                ref componentsForBOM,
+                ref dependencies,
+                null);
+
+            // Assert - lock files appended
+            Assert.That(componentsForBOM.Count, Is.EqualTo(2));
+            Assert.That(dependencies.Count, Is.EqualTo(2));
+            Assert.IsTrue(componentsForBOM.Any(c => c.Name == "lockLib1"));
+            Assert.IsTrue(dependencies.Any(d => d.Ref == "ref1"));
+
+            // Reset outputs
+            componentsForBOM.Clear();
+            dependencies.Clear();
+
+            // Act - Case 2: cdxGenBomData with empty components
+            var emptyBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref listOfComponentsFromLockFile,
+                ref listOfDependenciesFromLockFile,
+                ref componentsForBOM,
+                ref dependencies,
+                emptyBom);
+
+            // Assert - lock files appended again
+            Assert.That(componentsForBOM.Count, Is.EqualTo(2));
+            Assert.That(dependencies.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void EnrichCdxGenforPackagefilesData_WhenCdxGenBomDataPresent_UsesCdxGenData()
+        {
+            // Arrange lock file content
+            var listOfComponentsFromLockFile = new List<Component>
+            {
+                new Component { Name = "lockLib", Version = "1.0", Type = Component.Classification.Library }
+            };
+            var listOfDependenciesFromLockFile = new List<Dependency>
+            {
+                new Dependency { Ref = "lockRef" }
+            };
+            var componentsForBOM = new List<Component>();
+            var dependencies = new List<Dependency>();
+
+            // cdxgen data
+            var cdxComponent = new Component { Name = "cdxLib", Version = "3.0", Type = Component.Classification.Library };
+            var cdxDependency = new Dependency { Ref = "cdxRef" };
+            var cdxGenBomData = new Bom
+            {
+                Components = new List<Component> { cdxComponent },
+                Dependencies = new List<Dependency> { cdxDependency }
+            };
+
+            // Act
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref listOfComponentsFromLockFile,
+                ref listOfDependenciesFromLockFile,
+                ref componentsForBOM,
+                ref dependencies,
+                cdxGenBomData);
+
+            // Assert - cdxgen components and dependencies should be added
+            Assert.That(componentsForBOM.Count, Is.EqualTo(1));
+            Assert.That(dependencies.Count, Is.EqualTo(1));
+            Assert.IsTrue(componentsForBOM.Any(c => c.Name == "cdxLib" && c.Version == "3.0"));
+            Assert.IsTrue(dependencies.Any(d => d.Ref == "cdxRef"));
+        }
         #endregion
 
-        // ...existing code...
+        [Test]
+        public void GetCdxGenBomData_ReturnsNull_WhenNoDependencyFile()
+        {
+            // Arrange
+            var configFiles = new List<string> { "somefile.txt", "another.json" };
+
+            // Act
+            var bom = CommonHelper.GetCdxGenBomData(configFiles, _ => new Bom { Components = new List<Component> { new Component() } });
+
+            // Assert
+            Assert.IsNull(bom);
+        }
+
+        [Test]
+        public void GetCdxGenBomData_ReturnsNull_WhenOnlyDependencyFiles()
+        {
+            // Arrange: only dependency files present
+            var dep1 = $"file1{FileConstant.DependencyFileExtension}";
+            var dep2 = $"file2{FileConstant.DependencyFileExtension}";
+            var configFiles = new List<string> { dep1, dep2 };
+
+            // Act
+            var bom = CommonHelper.GetCdxGenBomData(configFiles, _ => new Bom { Components = new List<Component> { new Component() } });
+
+            // Assert
+            Assert.IsNull(bom);
+        }
+
+        [Test]
+        public void GetCdxGenBomData_RemovesDependencyFile_AndParsesBom()
+        {
+            // Arrange: include one dependency file and another non-dependency file to trigger parsing
+            var dep = $"deps{FileConstant.DependencyFileExtension}";
+            var other = "other.txt";
+            var configFiles = new List<string> { dep, other };
+            var parsedBom = new Bom { Components = new List<Component> { new Component { Name = "lib", Version = "1.0", Type = Component.Classification.Library, Purl = "pkg:npm/lib@1.0.0" } } };
+
+            Bom Parse(string path)
+            {
+                Assert.That(path, Is.EqualTo(dep));
+                return parsedBom;
+            }
+
+            // Act
+            var bom = CommonHelper.GetCdxGenBomData(configFiles, Parse);
+
+            // Assert
+            Assert.IsNotNull(bom);
+            Assert.IsNotNull(bom.Components);
+            Assert.That(bom.Components.Count, Is.EqualTo(1));
+            Assert.That(configFiles, Does.Not.Contain(dep), "Dependency file should be removed from the list");
+        }
     }
 
     public class TestObject

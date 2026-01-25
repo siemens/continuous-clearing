@@ -627,22 +627,17 @@ namespace LCT.Common
                 return;
             }
 
-            // Merge properties into cdx components from discovered components
             EnrichComponentsFromCdxGen(ref ListofComponentsFromLockFile, cdxGenBomData.Components);
-
-            // Replace components list with cdxgen components (as per existing behavior)            
+            
             if (cdxGenBomData.Components != null && cdxGenBomData.Components.Count > 0)
             {
                 componentsForBOM.AddRange(cdxGenBomData.Components);
             }
 
-            // Replace dependencies with cdxgen dependencies if present
             if (cdxGenBomData.Dependencies != null && cdxGenBomData.Dependencies.Count > 0)
             {
                 dependencies.AddRange(cdxGenBomData.Dependencies);
-            }
-
-            // Add SiemensDirect property based on cdxgen dependency refs
+            }          
             AddSiemensDirectProperty(ref cdxGenBomData);
         }
         public static void AddSiemensDirectProperty(ref Bom bom)
