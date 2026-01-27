@@ -10,7 +10,7 @@ using TestUtilities;
 
 namespace SW360IntegrationTest.Python
 {
-    [TestFixture, Order(47)]
+    [TestFixture, Order(50)]
     public class PackageIdentifierDepSBOMPython
     {
         private string CCTLocalBomTestFile { get; set; }

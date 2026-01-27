@@ -11,7 +11,7 @@ using TestUtilities;
 
 namespace SW360IntegrationTest.Nuget
 {
-    [TestFixture, Order(46)]
+    [TestFixture, Order(49)]
     public class PackageIdentifierDepSBOMNuget
     {
 
@@ -36,7 +36,7 @@ namespace SW360IntegrationTest.Nuget
         [Test, Order(1)]
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
-            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Nuget"));
+            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "DependencyTestFiles", "Nuget"));
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs"));
 
             // Test BOM Creator ran with exit code 0

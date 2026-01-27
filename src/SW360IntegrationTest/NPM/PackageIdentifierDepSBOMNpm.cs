@@ -12,7 +12,7 @@ using TestUtilities;
 
 namespace SW360IntegrationTest.NPM
 {
-    [TestFixture, Order(46)]
+    [TestFixture, Order(48)]
     public class PackageIdentifierDepSBOMNpm
     {
         private string CCTLocalBomTestFile { get; set; }
