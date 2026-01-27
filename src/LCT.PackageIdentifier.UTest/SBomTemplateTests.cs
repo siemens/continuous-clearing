@@ -176,7 +176,7 @@ namespace LCT.PackageIdentifier.UTest
              new() {License=new() }};
 
             componentsForBOM.Add(component);
-
+            BomCreator.bomKpiData.ComponentsUpdatedFromSBOMTemplateFile = 0;
             //Act
             SbomTemplate.AddComponentDetails(componentsForBOM, templateDetails);
 

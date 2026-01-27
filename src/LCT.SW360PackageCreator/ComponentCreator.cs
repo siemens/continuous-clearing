@@ -49,7 +49,10 @@ namespace LCT.SW360PackageCreator
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
         {
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
+            Logger.DebugFormat("CycloneDxBomParser():Identified bom file with path:{0}", bomFilePath);
             bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
+            // Log the components in a tabular format
+            LogHandlingHelper.ListOfBomFileComponents(bomFilePath, bom?.Components ?? new List<Component>());
             TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
             ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(), appSettings);
 
@@ -74,6 +77,7 @@ namespace LCT.SW360PackageCreator
                 bool isInternalComponent = GetPackageType(item, ref componentsData);
                 if (componentsData.ProjectType.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
                 {
+                    Logger.DebugFormat("{0}-{1} found as Choco component.", item.Name, item.Version);
                     ListofChocoComponents.Add(new Components
                     {
                         Name = item.Name,
@@ -83,7 +87,7 @@ namespace LCT.SW360PackageCreator
                 }
                 else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
                 {
-                    LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);                    
+                    LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);
                 }
                 else
                 {
@@ -165,7 +169,7 @@ namespace LCT.SW360PackageCreator
             }
             else
             {
-                Logger.Debug($"Local Bom not updated for {currName}-{currVersion}.");
+                Logger.DebugFormat("UpdateToLocalBomFile():Local BoM not updated for {0}-{1}.\n", currName, currVersion);
             }
         }
 
@@ -251,9 +255,10 @@ namespace LCT.SW360PackageCreator
             ISw360CreatorService sw360CreatorService, ISW360Service sw360Service, ISw360ProjectService sw360ProjectService,
             IFileOperations fileOperations, ICreatorHelper creatorHelper, List<ComparisonBomData> parsedBomData)
         {
+            Logger.Debug("CreateComponentInSw360():Create component process started");
             string sw360Url = appSettings.SW360.URL;
             string bomGenerationPath = appSettings.Directory.OutputFolder;
-            Logger.Debug($"BoM Generation Path - {bomGenerationPath}");
+            Logger.DebugFormat("BoM Generation Path - {0}", bomGenerationPath);
 
             await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
             var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
@@ -297,7 +302,7 @@ namespace LCT.SW360PackageCreator
             // Notify user about manual steps required for Choco packages
             LoggerHelper.WriteChocoManualStepsNotification(ListofChocoComponents);
 
-            Logger.Debug($"CreateComponentInSw360():End");
+            Logger.Debug("CreateComponentInSw360():Create component process completed");
         }
 
         private async Task CreateComponent(ICreatorHelper creatorHelper,
@@ -328,7 +333,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.Debug($"CreateComponent()", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Createing Component in SW360", $"MethodName:CreateComponent()", ex, "");
             }
         }
 
@@ -363,7 +368,7 @@ namespace LCT.SW360PackageCreator
         private async Task CreateComponentAndRealease(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, ComparisonBomData item, string sw360Url, CommonAppSettings appSettings)
         {
-            Logger.Debug($"Reading Component Name - {item.Name} , version - {item.Version}");
+            Logger.DebugFormat("Reading Component Name - {0} , version - {1}", item.Name, item.Version);
 
             await CreateComponentAndReleaseWhenNotAvailable(item, sw360CreatorService, creatorHelper, appSettings);
 
@@ -410,6 +415,7 @@ namespace LCT.SW360PackageCreator
 
             if (appSettings.SW360.Fossology.EnableTrigger && (item.ApprovedStatus.Equals(Dataconstant.NewClearing) || item.ApprovedStatus.Equals("Not Available") || item.ApprovedStatus.Equals(Dataconstant.SentToClearingState) || item.ApprovedStatus.Equals(Dataconstant.ScanAvailableState)))
             {
+                Logger.DebugFormat("TriggeringFossologyUploadAndUpdateAdditionalData():Required details Name-{0}, Version-{1}, ReleaseId-{2}, ApprovedStatus-{3}", item.Name, item.Version, item.ReleaseID, item.ApprovedStatus);
                 var formattedName = GetFormattedName(item);
 
                 bool fossologyUpload = await UpdateFossologyStatus(item, sw360CreatorService, appSettings, formattedName);
@@ -512,7 +518,7 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error in TriggerFossologyProcess", $"MethodName:TriggerFossologyProcess()", ex, "");
             }
             return uploadId;
         }
@@ -550,20 +556,21 @@ namespace LCT.SW360PackageCreator
             }
             catch (AggregateException ex)
             {
-                Logger.DebugFormat("\tError in TriggerFossologyProcess--{0}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error in CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus()", ex, "");
             }
             return uploadId;
         }
 
         public static async Task<string> GetComponentId(ComparisonBomData item, ISw360CreatorService sw360CreatorService)
         {
+            Logger.Debug("GetComponentId(): start Identifying componentId for creating release");
             string componentId = await sw360CreatorService.GetComponentId(item.Name);
 
             if (string.IsNullOrEmpty(componentId))
             {
                 componentId = await sw360CreatorService.GetComponentIdUsingExternalId(item.Name, item.ComponentExternalId);
             }
-
+            Logger.DebugFormat("GetComponentId(): Identified componentId for creating release is :{0}", componentId);
             return componentId;
         }
         private static async Task<bool> UpdateFossologyLinkAndStatus(ComparisonBomData item, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, string formattedName, string uploadId, string logPrefix)
@@ -650,6 +657,7 @@ namespace LCT.SW360PackageCreator
         {
             if (releasesInfo == null)
             {
+                Logger.Debug("GetUploadIdWhenReleaseExists(): releasesInformation is null.");
                 return Task.CompletedTask;
             }
 
@@ -659,13 +667,14 @@ namespace LCT.SW360PackageCreator
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
-
+            
             if (releasesInfo.AdditionalData != null &&
                 releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
                 fossologyUrl.Contains(appSettings?.SW360?.Fossology?.URL))
             {
                 item.FossologyLink = fossologyUrl;
                 item.FossologyUploadId = uploadId;
+                Logger.DebugFormat("GetUploadIdWhenReleaseExists(): FossologyLink identified from releasedata: {0}", item.FossologyLink);
             }
             else if (releasesInfo.AdditionalData == null || !releasesInfo.AdditionalData.ContainsKey(ApiConstant.AdditionalDataFossologyURL))
             {
@@ -730,10 +739,7 @@ namespace LCT.SW360PackageCreator
             else
             {
                 Environment.ExitCode = -1;
-                Logger.Fatal($"Linking release to the project is failed. " +
-                            $"Release version - {item.Version} not found under this component - {item.Name}. ");
-                Logger.Error($"Linking release to the project is failed. " +
-                          $"Release version - {item.Version} not found under this component - {item.Name}. ");
+                Logger.ErrorFormat("Linking release to the project is failed. Release version - {0} not found under this component - {1}. ", item.Version, item.Name);
             }
         }
 

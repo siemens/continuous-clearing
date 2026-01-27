@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -376,16 +377,29 @@ namespace LCT.PackageIdentifier
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
             {
+                Logger.DebugFormat("ParseBomFile():Spdx file detected: {0}", filePath);
                 Bom bom;
                 bom = spdxBomParser.ParseSPDXBom(filePath);
+                LogHandlingHelper.IdentifierInputFileComponents(filePath, bom.Components);
                 SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
                 SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filePath);
                 return bom;
             }
             else
             {
-                return cycloneDXBomParser.ParseCycloneDXBom(filePath);
+                Logger.DebugFormat("ParseBomFile():CycloneDX file detected: {0}", filePath);
+                Bom bom;
+                bom = cycloneDXBomParser.ParseCycloneDXBom(filePath);
+                LogHandlingHelper.IdentifierInputFileComponents(filePath, bom.Components);
+                return bom;
             }
+        }
+        public static string GetReleaseExternalId(string name, string version, string purlBase)
+        {
+            version = WebUtility.UrlEncode(version);
+            version = version.Replace("%3A", ":");
+
+            return $"{purlBase}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         /// <summary>
@@ -433,8 +447,7 @@ namespace LCT.PackageIdentifier
                     !string.IsNullOrEmpty(componentsInfo.Purl) &&
                     componentsInfo.Purl.Contains(purlPrefix))
                 {
-                    components.Add(componentsInfo);
-                    Logger.Debug($"GetExcludedComponentsList():ValidComponent For {projectType} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                    components.Add(componentsInfo);                    
                 }
                 else
                 {

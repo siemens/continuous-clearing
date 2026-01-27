@@ -81,16 +81,17 @@ namespace LCT.SW360PackageCreator
         {
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
             string localPathforDownload = GetDownloadPathForComponetType(component);
+            Logger.DebugFormat("DownloadReleaseAttachmentSource():local path for download release attachment:{0}", localPathforDownload);
             if (!component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
             {
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                Logger.Debug($"DownloadReleaseAttachmentSource()-Name-{component.Name},version-{component.Version},localPathforDownload-{localPathforDownload}");
+                Logger.DebugFormat("DownloadReleaseAttachmentSource()-Name-{0},version-{1},localPathforDownload-{2}", component.Name, component.Version, localPathforDownload);
                 LogSourceAndDownloadUrlWarnings(component);
 
                 if (component.DownloadUrl.Equals(Dataconstant.DownloadUrlNotFound))
                 {
-                    Logger.Debug($"DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
+                    Logger.DebugFormat("DownloadReleaseAttachmentSource():Source file is not attached,Release source Download Url is not Found for {0}-{1}", component.Name, component.Version);
                 }
                 else
                 {
@@ -102,6 +103,18 @@ namespace LCT.SW360PackageCreator
                 await DownloadDependencyList(component);
                 GetAttachmentUrlListForMvn(localPathforDownload, component, ref AttachmentUrlList);
 
+            }
+            if (AttachmentUrlList.Count > 0)
+            {
+                Logger.DebugFormat("Attachments found for ComponentName: {0}, Version: {1}", component.Name, component.Version);
+                foreach (var attachment in AttachmentUrlList)
+                {
+                    Logger.DebugFormat("DownloadReleaseAttachmentSource(): Attachment Key: {0}, Attachment URL: {1}", attachment.Key, attachment.Value);
+                }
+            }
+            else
+            {
+                Logger.DebugFormat("DownloadReleaseAttachmentSource(): No attachments found for ComponentName: {0}, Version: {1}", component.Name, component.Version);
             }
             return AttachmentUrlList;
         }
@@ -152,7 +165,7 @@ namespace LCT.SW360PackageCreator
             {
                 AttachmentUrlList.Add(SOURCE, downloadPath);
             }
-
+            Logger.DebugFormat("GetAttachmentUrlList():Downloaded release attachment path:Name-{0},Version-{1},DownloadPath-{2}", component.Name, component.Version, downloadPath);
             return downloadPath;
         }
 
@@ -219,18 +232,18 @@ namespace LCT.SW360PackageCreator
             p.StartInfo.RedirectStandardInput = true;
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-
+            Logger.DebugFormat("DownloadDependencyList(): Start - ComponentName: {0}, Version: {1}, Group: {2}", component.Name, component.Version, component.Group);
             if (isWindows)
             {
                 p.StartInfo.FileName = Path.Combine(@"cmd.exe");
                 p.StartInfo.Arguments = $"/c mvn org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-
+                Logger.DebugFormat("DownloadDependencyList(): Windows OS detected. Command: {0}", p.StartInfo.Arguments);
             }
             else
             {
                 p.StartInfo.FileName = Path.Combine(@"mvn");
                 p.StartInfo.Arguments = $"org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-
+                Logger.DebugFormat("DownloadDependencyList(): Non-Windows OS detected. Command: {0}", p.StartInfo.Arguments);
             }
 
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
@@ -278,11 +291,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (WebException ex)
             {
-                Logger.Debug($"GetAttachmentUrlListForPython :WebException :Release Name : {component.Name}@{component.Version}-PackageUrl: ,Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("GetAttachmentUrlList", $"MethodName:GetAttachmentUrlList(), Release Name: {component.Name}@{component.Version}, SourceUrl: {component.SourceUrl}", ex, "A network error occurred while trying to download the attachment.");
             }
             catch (UriFormatException ex)
             {
-                Logger.Debug($"GetAttachmentUrlListForPython:Release Name : {component.Name}@{component.Version}: Error {ex}");
+                LogHandlingHelper.ExceptionErrorHandling("GetAttachmentUrlList", $"MethodName:GetAttachmentUrlList(), Release Name: {component.Name}@{component.Version}, SourceUrl: {component.SourceUrl}", ex, "The provided URL is not in a valid format.");
             }
 
             return downloadPath;
@@ -296,15 +309,15 @@ namespace LCT.SW360PackageCreator
         /// <returns>BOM data</returns>
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
-            Logger.Debug($"SetContentsForComparisonBOM():Start");           
-
+            Logger.Debug($"SetContentsForComparisonBOM():Starting to identify available components data in SW360");
             Logger.Logger.Log(null, Level.Notice, $"Collecting BoM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
             DuplicateComponentsByPurlId = sw360Service.GetDuplicateComponentsByPurlId();
             //Checking components count before getting status of individual comp details
             List<ComparisonBomData> comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
 
-            Logger.Debug($"SetContentsForComparisonBOM():End");
+            LogHandlingHelper.SW360AvailableComponentsList(componentsAvailableInSw360);
+            Logger.Debug($"SetContentsForComparisonBOM():Completed of the sw360 data for available components");
             return comparisonBomData;
         }       
 
@@ -462,7 +475,7 @@ namespace LCT.SW360PackageCreator
                 }
                 catch (JsonSerializationException ex)
                 {
-                    Logger.Debug($"GetUpdatedComponentsDetails() For Component = {comBom.Name} : {ex}");
+                    LogHandlingHelper.ExceptionErrorHandling("GetUpdatedComponentsDetails", $"MethodName:GetUpdatedComponentsDetails(), ComponentName:{comBom.Name}, Version:{comBom.Version}", ex, "An error occurred while serializing or deserializing JSON data for the component.");
                 }
             }
             return bom;
@@ -543,10 +556,11 @@ namespace LCT.SW360PackageCreator
             }
             catch (IOException ex)
             {
-                Logger.Error($"GetDownloadPathForComponetType() ", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GetDownloadPathForComponetType", $"MethodName:GetDownloadPathForComponetType(), ComponentName:{component.Name}, ReleaseExternalId:{component.ReleaseExternalId}", ex, "An I/O error occurred while determining the download path for the component.");
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetDownloadPathForComponetType", $"MethodName:GetDownloadPathForComponetType(), ComponentName:{component.Name}, ReleaseExternalId:{component.ReleaseExternalId}", ex, "Unauthorized access occurred while determining the download path for the component.");
                 Logger.Error($"GetDownloadPathForComponetType() ", ex);
             }
 

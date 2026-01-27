@@ -7,8 +7,10 @@
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using log4net;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace LCT.PackageIdentifier
 {
@@ -16,6 +18,7 @@ namespace LCT.PackageIdentifier
     {
         #region Fields
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region Properties
@@ -32,27 +35,38 @@ namespace LCT.PackageIdentifier
         /// <returns>Repository name matching the preferred order or a sentinel when not found.</returns>
         public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults)
         {
+            Logger.Debug("GetRepodetailsFromPerticularOrder(): Starting repository details retrieval from AQL results.");
+
             if (aqlResults == null)
             {
+                Logger.Debug("GetRepodetailsFromPerticularOrder(): No repositories identified from aqlresult. Returning 'Not Found in Repo'.");
                 return NotFoundInRepo;
             }
 
-            if (aqlResults.Find(x => x.Repo.Contains("release"))?.Repo != null)
+            Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): Total repositories identified from AQL result: {0}", aqlResults.Count);
+            var repoKeywords = new[] { "release", "devdep", "dev" };
+            string repo = FindRepositoryByKeywords(aqlResults, repoKeywords);
+
+            if (repo != null)
             {
-                return aqlResults.Find(x => x.Repo.Contains("release"))?.Repo;
+                Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): Found repository: {0}", repo);
+                return repo;
             }
-            else if (aqlResults.Find(x => x.Repo.Contains("devdep"))?.Repo != null)
+            repo = aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
+            Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): No specific repository found. Returning repository or 'Not Found in Repo': {0}", repo);
+            return repo;
+        }
+        private static string FindRepositoryByKeywords(List<AqlResult> aqlResults, string[] keywords)
+        {
+            foreach (var keyword in keywords)
             {
-                return aqlResults.Find(x => x.Repo.Contains("devdep"))?.Repo;
+                var repo = aqlResults.Find(x => x.Repo.Contains(keyword))?.Repo;
+                if (repo != null)
+                {
+                    return repo;
+                }
             }
-            else if (aqlResults.Find(x => x.Repo.Contains("dev"))?.Repo != null)
-            {
-                return aqlResults.Find(x => x.Repo.Contains("dev"))?.Repo;
-            }
-            else
-            {
-                return aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
-            }
+            return null;
         }
 
         /// <summary>

@@ -42,7 +42,7 @@ namespace LCT.PackageIdentifier
                                                      ProjectReleases projectReleases,
                                                      CatoolInfo caToolInformation)
         {
-            Logger.Debug("Starting to add metadata info into the BOM");
+            Logger.Debug("SetMetadataInComparisonBOM():Starting the process of adding metadata information to the BOM.");
 
             // Create metadata
             Metadata metadata = CreateMetadata(appSettings, projectReleases, caToolInformation);
@@ -53,7 +53,7 @@ namespace LCT.PackageIdentifier
 
             // Add definitions to BOM
             bom.Definitions = definitions;
-
+            Logger.Debug("SetMetadataInComparisonBOM():Successfully added metadata information to the BOM.\n");
             return bom;
         }
 

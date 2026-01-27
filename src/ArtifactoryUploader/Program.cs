@@ -49,13 +49,17 @@ namespace ArtifactoryUploader
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ArtifactoryUploaderLog, m_Verbose);
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            string logFileNameWithTimestamp = $"{FileConstant.ArtifactoryUploaderLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
+            Logger.Debug($"====================<<<<< Artifactory Uploader >>>>>====================");            
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
+            Log4Net.AppendVerboseValue(appSettings);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ArtifactoryUploaderLog, m_Verbose);
+            string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
 
             settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Uploader);
             string bomFilePath = GetBomFilePath(appSettings);
+            Logger.DebugFormat("Main(): Identified bom file with path: {0}", bomFilePath);
             LoggerHelper.SpectreConsoleInitialMessage("Artifactory Uploader");
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Uploader, bomFilePath: bomFilePath);

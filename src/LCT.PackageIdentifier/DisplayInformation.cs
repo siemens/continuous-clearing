@@ -27,6 +27,7 @@ namespace LCT.PackageIdentifier
         /// <returns>Comma separated include file patterns or an empty string.</returns>
         public static string DisplayIncludeFiles(CommonAppSettings appSettings)
         {
+            Logger.Debug("DisplayIncludeFiles():Starting to getting include files list based on project type.");
             string totalString = string.Empty;
             var includeMappings = new Dictionary<string, Func<IEnumerable<string>>>(StringComparer.OrdinalIgnoreCase)
     {
@@ -48,12 +49,14 @@ namespace LCT.PackageIdentifier
                 {
                     totalString = string.Join(",", includeList);
                 }
+                Logger.DebugFormat("DisplayIncludeFiles():Include files for project type {0}: {1}", appSettings.ProjectType, totalString);
             }
             else
             {
+                LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "DisplayIncludeFiles()", $"Unable to retrieve exclude files because an invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
                 Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
             }
-
+            Logger.Debug("DisplayIncludeFiles():Completed getting include files list.\n");
             return totalString;
         }
 
@@ -64,6 +67,7 @@ namespace LCT.PackageIdentifier
         /// <returns>Comma separated exclude file patterns or an empty string.</returns>
         public static string DisplayExcludeFiles(CommonAppSettings appSettings)
         {
+            Logger.Debug("DisplayExcludeFiles():Starting to getting exclude files list based on project type.");
             string totalString = string.Empty;
             var excludeMappings = new Dictionary<string, Func<IEnumerable<string>>>(StringComparer.OrdinalIgnoreCase)
     {
@@ -85,12 +89,14 @@ namespace LCT.PackageIdentifier
                 {
                     totalString = string.Join(",", excludeList);
                 }
+                Logger.DebugFormat("DisplayExcludeFiles():Exclude files for project type {0}: {1}", appSettings.ProjectType, totalString);
             }
             else
             {
+                LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "DisplayExcludeFiles()", $"Unable to retrieve exclude files because an invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
                 Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
             }
-
+            Logger.Debug("DisplayExcludeFiles():Completed getting exclude files list.\n");
             return totalString;
         }
 
@@ -101,12 +107,13 @@ namespace LCT.PackageIdentifier
         /// <returns>Comma separated excluded components or an empty string.</returns>
         public static string DisplayExcludeComponents(CommonAppSettings appSettings)
         {
-
+            Logger.Debug("DisplayExcludeComponents():Starting to retrieve the list of excluded components.");
             string totalString = string.Empty;
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
                 totalString = string.Join(",", appSettings.SW360?.ExcludeComponents?.ToList());
             }
+            Logger.Debug("DisplayExcludeComponents():Completed retrieving the list of excluded components.\n");
             return totalString;
         }
 
@@ -117,6 +124,7 @@ namespace LCT.PackageIdentifier
         /// <returns>Comma separated internal repository names or an empty string.</returns>
         public static string GetInternalRepolist(CommonAppSettings appSettings)
         {
+            Logger.Debug("GetInternalRepolist():Starting to retrieve the internal repository list based on project type.");
             string listOfInternalRepoList = string.Empty;
 
             var repoMapping = new Dictionary<string, Func<IEnumerable<string>>>(StringComparer.OrdinalIgnoreCase)
@@ -138,13 +146,15 @@ namespace LCT.PackageIdentifier
                 if (repos != null)
                 {
                     listOfInternalRepoList = string.Join(",", repos);
+                    Logger.DebugFormat("GetInternalRepolist():Internal repositories for project type {0}: {1}", appSettings.ProjectType, listOfInternalRepoList);
                 }
             }
             else
             {
+                LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "GetInternalRepolist()", $"Unable to retrieve exclude files because an invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
                 Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
             }
-
+            Logger.Debug("GetInternalRepolist():Completed retrieving the internal repository list.\n");
             return listOfInternalRepoList;
         }
 
