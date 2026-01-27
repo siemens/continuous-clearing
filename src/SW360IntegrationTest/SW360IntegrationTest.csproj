@@ -41,6 +41,15 @@
 		<None Update="PackageIdentifierTestFiles\CCTLocalBOMTemplateNugetInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="PackageIdentifierTestFiles\DepNpm\CCTLocalBOMNpmInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="PackageIdentifierTestFiles\DepNuget\CCTLocalBOMNugetInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="PackageIdentifierTestFiles\DepPython\CCTLocalBOMPythonInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="PackageIdentifierTestFiles\Maven\CCTLocalBOMMavenInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
@@ -92,6 +101,9 @@
 		<Folder Include="Maven\" />
 		<Folder Include="PackageCreatorTestFiles\Alpine\" />
 		<Folder Include="PackageIdentifierTestFiles\Alpine\" />
+		<Folder Include="PackageIdentifierTestFiles\DepNpm\" />
+		<Folder Include="PackageIdentifierTestFiles\DepNuget\" />
+		<Folder Include="PackageIdentifierTestFiles\DepPython\" />
 	</ItemGroup>
 
 </Project>

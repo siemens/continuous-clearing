@@ -1,0 +1,6927 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:28174692-6256-4511-8cd8-443b74ab1751",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-01-27T07:07:47Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.3.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aiomysql@0.2.0",
+      "group": "",
+      "name": "aiomysql",
+      "version": "0.2.0",
+      "purl": "pkg:pypi/aiomysql@0.2.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/annotated-doc@0.0.4",
+      "group": "",
+      "name": "annotated-doc",
+      "version": "0.0.4",
+      "purl": "pkg:pypi/annotated-doc@0.0.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/annotated-types@0.7.0",
+      "group": "",
+      "name": "annotated-types",
+      "version": "0.7.0",
+      "purl": "pkg:pypi/annotated-types@0.7.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/anyio@3.7.1",
+      "group": "",
+      "name": "anyio",
+      "version": "3.7.1",
+      "purl": "pkg:pypi/anyio@3.7.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "event"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/apscheduler@3.10.4",
+      "group": "",
+      "name": "apscheduler",
+      "version": "3.10.4",
+      "purl": "pkg:pypi/apscheduler@3.10.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/astroid@3.3.11",
+      "group": "",
+      "name": "astroid",
+      "version": "3.3.11",
+      "purl": "pkg:pypi/astroid@3.3.11",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/black@24.10.0",
+      "group": "",
+      "name": "black",
+      "version": "24.10.0",
+      "purl": "pkg:pypi/black@24.10.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/certifi@2025.11.12",
+      "group": "",
+      "name": "certifi",
+      "version": "2025.11.12",
+      "purl": "pkg:pypi/certifi@2025.11.12",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "bundle"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cffi@2.0.0",
+      "group": "",
+      "name": "cffi",
+      "version": "2.0.0",
+      "purl": "pkg:pypi/cffi@2.0.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "native"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cfgv@3.5.0",
+      "group": "",
+      "name": "cfgv",
+      "version": "3.5.0",
+      "purl": "pkg:pypi/cfgv@3.5.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/charset-normalizer@3.4.4",
+      "group": "",
+      "name": "charset-normalizer",
+      "version": "3.4.4",
+      "purl": "pkg:pypi/charset-normalizer@3.4.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/click@8.3.1",
+      "group": "",
+      "name": "click",
+      "version": "8.3.1",
+      "purl": "pkg:pypi/click@8.3.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/colorama@0.4.6",
+      "group": "",
+      "name": "colorama",
+      "version": "0.4.6",
+      "purl": "pkg:pypi/colorama@0.4.6",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/coverage@7.12.0",
+      "group": "",
+      "name": "coverage",
+      "version": "7.12.0",
+      "purl": "pkg:pypi/coverage@7.12.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cryptography@46.0.1",
+      "group": "",
+      "name": "cryptography",
+      "version": "46.0.1",
+      "purl": "pkg:pypi/cryptography@46.0.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/dill@0.4.0",
+      "group": "",
+      "name": "dill",
+      "version": "0.4.0",
+      "purl": "pkg:pypi/dill@0.4.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/distlib@0.4.0",
+      "group": "",
+      "name": "distlib",
+      "version": "0.4.0",
+      "purl": "pkg:pypi/distlib@0.4.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/et-xmlfile@2.0.0",
+      "group": "",
+      "name": "et-xmlfile",
+      "version": "2.0.0",
+      "purl": "pkg:pypi/et-xmlfile@2.0.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "framework",
+      "bom-ref": "pkg:pypi/fastapi@0.121.0",
+      "group": "",
+      "name": "fastapi",
+      "version": "0.121.0",
+      "purl": "pkg:pypi/fastapi@0.121.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "framework"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/filelock@3.20.0",
+      "group": "",
+      "name": "filelock",
+      "version": "3.20.0",
+      "purl": "pkg:pypi/filelock@3.20.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/fsspec@2025.10.0",
+      "group": "",
+      "name": "fsspec",
+      "version": "2025.10.0",
+      "purl": "pkg:pypi/fsspec@2025.10.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/h11@0.16.0",
+      "group": "",
+      "name": "h11",
+      "version": "0.16.0",
+      "purl": "pkg:pypi/h11@0.16.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/hf-xet@1.2.0",
+      "group": "",
+      "name": "hf-xet",
+      "version": "1.2.0",
+      "purl": "pkg:pypi/hf-xet@1.2.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpcore@1.0.9",
+      "group": "",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "purl": "pkg:pypi/httpcore@1.0.9",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpx@0.28.1",
+      "group": "",
+      "name": "httpx",
+      "version": "0.28.1",
+      "purl": "pkg:pypi/httpx@0.28.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "framework",
+      "bom-ref": "pkg:pypi/huggingface-hub@0.36.0",
+      "group": "",
+      "name": "huggingface-hub",
+      "version": "0.36.0",
+      "purl": "pkg:pypi/huggingface-hub@0.36.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "framework"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/identify@2.6.15",
+      "group": "",
+      "name": "identify",
+      "version": "2.6.15",
+      "purl": "pkg:pypi/identify@2.6.15",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/idna@3.11",
+      "group": "",
+      "name": "idna",
+      "version": "3.11",
+      "purl": "pkg:pypi/idna@3.11",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/iniconfig@2.3.0",
+      "group": "",
+      "name": "iniconfig",
+      "version": "2.3.0",
+      "purl": "pkg:pypi/iniconfig@2.3.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/isort@6.1.0",
+      "group": "",
+      "name": "isort",
+      "version": "6.1.0",
+      "purl": "pkg:pypi/isort@6.1.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/jinja2@3.1.6",
+      "group": "",
+      "name": "jinja2",
+      "version": "3.1.6",
+      "purl": "pkg:pypi/jinja2@3.1.6",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "template"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/joblib@1.5.2",
+      "group": "",
+      "name": "joblib",
+      "version": "1.5.2",
+      "purl": "pkg:pypi/joblib@1.5.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/markupsafe@3.0.3",
+      "group": "",
+      "name": "markupsafe",
+      "version": "3.0.3",
+      "purl": "pkg:pypi/markupsafe@3.0.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mccabe@0.7.0",
+      "group": "",
+      "name": "mccabe",
+      "version": "0.7.0",
+      "purl": "pkg:pypi/mccabe@0.7.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mpmath@1.3.0",
+      "group": "",
+      "name": "mpmath",
+      "version": "1.3.0",
+      "purl": "pkg:pypi/mpmath@1.3.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mypy-extensions@1.1.0",
+      "group": "",
+      "name": "mypy-extensions",
+      "version": "1.1.0",
+      "purl": "pkg:pypi/mypy-extensions@1.1.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mysql@0.0.3",
+      "group": "",
+      "name": "mysql",
+      "version": "0.0.3",
+      "purl": "pkg:pypi/mysql@0.0.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mysql-connector-python@9.4.0",
+      "group": "",
+      "name": "mysql-connector-python",
+      "version": "9.4.0",
+      "purl": "pkg:pypi/mysql-connector-python@9.4.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "api",
+        "database",
+        "mysql"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mysqlclient@2.2.7",
+      "group": "",
+      "name": "mysqlclient",
+      "version": "2.2.7",
+      "purl": "pkg:pypi/mysqlclient@2.2.7",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/networkx@3.6",
+      "group": "",
+      "name": "networkx",
+      "version": "3.6",
+      "purl": "pkg:pypi/networkx@3.6",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nodeenv@1.9.1",
+      "group": "",
+      "name": "nodeenv",
+      "version": "1.9.1",
+      "purl": "pkg:pypi/nodeenv@1.9.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "framework",
+      "bom-ref": "pkg:pypi/numpy@2.3.5",
+      "group": "",
+      "name": "numpy",
+      "version": "2.3.5",
+      "purl": "pkg:pypi/numpy@2.3.5",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "framework"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+      "group": "",
+      "name": "nvidia-cublas-cu12",
+      "version": "12.8.4.1",
+      "purl": "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90",
+      "group": "",
+      "name": "nvidia-cuda-cupti-cu12",
+      "version": "12.8.90",
+      "purl": "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93",
+      "group": "",
+      "name": "nvidia-cuda-nvrtc-cu12",
+      "version": "12.8.93",
+      "purl": "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90",
+      "group": "",
+      "name": "nvidia-cuda-runtime-cu12",
+      "version": "12.8.90",
+      "purl": "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21",
+      "group": "",
+      "name": "nvidia-cudnn-cu12",
+      "version": "9.10.2.21",
+      "purl": "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cufft-cu12@11.3.3.83",
+      "group": "",
+      "name": "nvidia-cufft-cu12",
+      "version": "11.3.3.83",
+      "purl": "pkg:pypi/nvidia-cufft-cu12@11.3.3.83",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cufile-cu12@1.13.1.3",
+      "group": "",
+      "name": "nvidia-cufile-cu12",
+      "version": "1.13.1.3",
+      "purl": "pkg:pypi/nvidia-cufile-cu12@1.13.1.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-curand-cu12@10.3.9.90",
+      "group": "",
+      "name": "nvidia-curand-cu12",
+      "version": "10.3.9.90",
+      "purl": "pkg:pypi/nvidia-curand-cu12@10.3.9.90",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90",
+      "group": "",
+      "name": "nvidia-cusolver-cu12",
+      "version": "11.7.3.90",
+      "purl": "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+      "group": "",
+      "name": "nvidia-cusparse-cu12",
+      "version": "12.5.8.93",
+      "purl": "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cusparselt-cu12@0.7.1",
+      "group": "",
+      "name": "nvidia-cusparselt-cu12",
+      "version": "0.7.1",
+      "purl": "pkg:pypi/nvidia-cusparselt-cu12@0.7.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nccl-cu12@2.27.5",
+      "group": "",
+      "name": "nvidia-nccl-cu12",
+      "version": "2.27.5",
+      "purl": "pkg:pypi/nvidia-nccl-cu12@2.27.5",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93",
+      "group": "",
+      "name": "nvidia-nvjitlink-cu12",
+      "version": "12.8.93",
+      "purl": "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nvshmem-cu12@3.3.20",
+      "group": "",
+      "name": "nvidia-nvshmem-cu12",
+      "version": "3.3.20",
+      "purl": "pkg:pypi/nvidia-nvshmem-cu12@3.3.20",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nvtx-cu12@12.8.90",
+      "group": "",
+      "name": "nvidia-nvtx-cu12",
+      "version": "12.8.90",
+      "purl": "pkg:pypi/nvidia-nvtx-cu12@12.8.90",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "tools"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/openpyxl@3.1.5",
+      "group": "",
+      "name": "openpyxl",
+      "version": "3.1.5",
+      "purl": "pkg:pypi/openpyxl@3.1.5",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/packaging@25.0",
+      "group": "",
+      "name": "packaging",
+      "version": "25.0",
+      "purl": "pkg:pypi/packaging@25.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "framework",
+      "bom-ref": "pkg:pypi/pandas@2.2.3",
+      "group": "",
+      "name": "pandas",
+      "version": "2.2.3",
+      "purl": "pkg:pypi/pandas@2.2.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "framework"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pathspec@0.12.1",
+      "group": "",
+      "name": "pathspec",
+      "version": "0.12.1",
+      "purl": "pkg:pypi/pathspec@0.12.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pillow@12.0.0",
+      "group": "",
+      "name": "pillow",
+      "version": "12.0.0",
+      "purl": "pkg:pypi/pillow@12.0.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/platformdirs@4.5.0",
+      "group": "",
+      "name": "platformdirs",
+      "version": "4.5.0",
+      "purl": "pkg:pypi/platformdirs@4.5.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pluggy@1.6.0",
+      "group": "",
+      "name": "pluggy",
+      "version": "1.6.0",
+      "purl": "pkg:pypi/pluggy@1.6.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "framework",
+      "bom-ref": "pkg:pypi/pre-commit@4.5.0",
+      "group": "",
+      "name": "pre-commit",
+      "version": "4.5.0",
+      "purl": "pkg:pypi/pre-commit@4.5.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "framework"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pycparser@2.23",
+      "group": "",
+      "name": "pycparser",
+      "version": "2.23",
+      "purl": "pkg:pypi/pycparser@2.23",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "parse"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic@2.11.7",
+      "group": "",
+      "name": "pydantic",
+      "version": "2.11.7",
+      "purl": "pkg:pypi/pydantic@2.11.7",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "validation"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic-core@2.33.2",
+      "group": "",
+      "name": "pydantic-core",
+      "version": "2.33.2",
+      "purl": "pkg:pypi/pydantic-core@2.33.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "validation"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pygments@2.19.2",
+      "group": "",
+      "name": "pygments",
+      "version": "2.19.2",
+      "purl": "pkg:pypi/pygments@2.19.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pylint@3.3.9",
+      "group": "",
+      "name": "pylint",
+      "version": "3.3.9",
+      "purl": "pkg:pypi/pylint@3.3.9",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pymysql@1.1.2",
+      "group": "",
+      "name": "pymysql",
+      "version": "1.1.2",
+      "purl": "pkg:pypi/pymysql@1.1.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "mysql"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest@8.4.2",
+      "group": "",
+      "name": "pytest",
+      "version": "8.4.2",
+      "purl": "pkg:pypi/pytest@8.4.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-asyncio@0.23.8",
+      "group": "",
+      "name": "pytest-asyncio",
+      "version": "0.23.8",
+      "purl": "pkg:pypi/pytest-asyncio@0.23.8",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-cov@4.1.0",
+      "group": "",
+      "name": "pytest-cov",
+      "version": "4.1.0",
+      "purl": "pkg:pypi/pytest-cov@4.1.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-dependency@0.6.0",
+      "group": "",
+      "name": "pytest-dependency",
+      "version": "0.6.0",
+      "purl": "pkg:pypi/pytest-dependency@0.6.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-html@4.1.1",
+      "group": "",
+      "name": "pytest-html",
+      "version": "4.1.1",
+      "purl": "pkg:pypi/pytest-html@4.1.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "html"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-metadata@3.1.1",
+      "group": "",
+      "name": "pytest-metadata",
+      "version": "3.1.1",
+      "purl": "pkg:pypi/pytest-metadata@3.1.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "test"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-mock@3.15.1",
+      "group": "",
+      "name": "pytest-mock",
+      "version": "3.15.1",
+      "purl": "pkg:pypi/pytest-mock@3.15.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "mock"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "group": "",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-dotenv@1.0.0",
+      "group": "",
+      "name": "python-dotenv",
+      "version": "1.0.0",
+      "purl": "pkg:pypi/python-dotenv@1.0.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytz@2025.2",
+      "group": "",
+      "name": "pytz",
+      "version": "2025.2",
+      "purl": "pkg:pypi/pytz@2025.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyyaml@6.0.3",
+      "group": "",
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "purl": "pkg:pypi/pyyaml@6.0.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/rapidfuzz@3.14.3",
+      "group": "",
+      "name": "rapidfuzz",
+      "version": "3.14.3",
+      "purl": "pkg:pypi/rapidfuzz@3.14.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/regex@2025.11.3",
+      "group": "",
+      "name": "regex",
+      "version": "2025.11.3",
+      "purl": "pkg:pypi/regex@2025.11.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/requests@2.31.0",
+      "group": "",
+      "name": "requests",
+      "version": "2.31.0",
+      "purl": "pkg:pypi/requests@2.31.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/responses@0.25.8",
+      "group": "",
+      "name": "responses",
+      "version": "0.25.8",
+      "purl": "pkg:pypi/responses@0.25.8",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/respx@0.21.1",
+      "group": "",
+      "name": "respx",
+      "version": "0.21.1",
+      "purl": "pkg:pypi/respx@0.21.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/safetensors@0.7.0",
+      "group": "",
+      "name": "safetensors",
+      "version": "0.7.0",
+      "purl": "pkg:pypi/safetensors@0.7.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "framework",
+      "bom-ref": "pkg:pypi/scikit-learn@1.7.2",
+      "group": "",
+      "name": "scikit-learn",
+      "version": "1.7.2",
+      "purl": "pkg:pypi/scikit-learn@1.7.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "framework"
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "pkg:pypi/scipy@1.16.3",
+      "group": "",
+      "name": "scipy",
+      "version": "1.16.3",
+      "purl": "pkg:pypi/scipy@1.16.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "framework"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sentence-transformers@5.1.2",
+      "group": "",
+      "name": "sentence-transformers",
+      "version": "5.1.2",
+      "purl": "pkg:pypi/sentence-transformers@5.1.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "transform"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/setuptools@80.9.0",
+      "group": "",
+      "name": "setuptools",
+      "version": "80.9.0",
+      "purl": "pkg:pypi/setuptools@80.9.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/six@1.17.0",
+      "group": "",
+      "name": "six",
+      "version": "1.17.0",
+      "purl": "pkg:pypi/six@1.17.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sniffio@1.3.1",
+      "group": "",
+      "name": "sniffio",
+      "version": "1.3.1",
+      "purl": "pkg:pypi/sniffio@1.3.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "native"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/starlette@0.49.3",
+      "group": "",
+      "name": "starlette",
+      "version": "0.49.3",
+      "purl": "pkg:pypi/starlette@0.49.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sympy@1.14.0",
+      "group": "",
+      "name": "sympy",
+      "version": "1.14.0",
+      "purl": "pkg:pypi/sympy@1.14.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/threadpoolctl@3.6.0",
+      "group": "",
+      "name": "threadpoolctl",
+      "version": "3.6.0",
+      "purl": "pkg:pypi/threadpoolctl@3.6.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tokenizers@0.22.1",
+      "group": "",
+      "name": "tokenizers",
+      "version": "0.22.1",
+      "purl": "pkg:pypi/tokenizers@0.22.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tomlkit@0.13.3",
+      "group": "",
+      "name": "tomlkit",
+      "version": "0.13.3",
+      "purl": "pkg:pypi/tomlkit@0.13.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/torch@2.9.1",
+      "group": "",
+      "name": "torch",
+      "version": "2.9.1",
+      "purl": "pkg:pypi/torch@2.9.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tqdm@4.67.1",
+      "group": "",
+      "name": "tqdm",
+      "version": "4.67.1",
+      "purl": "pkg:pypi/tqdm@4.67.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/transformers@4.57.3",
+      "group": "",
+      "name": "transformers",
+      "version": "4.57.3",
+      "purl": "pkg:pypi/transformers@4.57.3",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "transform"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/triton@3.5.1",
+      "group": "",
+      "name": "triton",
+      "version": "3.5.1",
+      "purl": "pkg:pypi/triton@3.5.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/typing-extensions@4.15.0",
+      "group": "",
+      "name": "typing-extensions",
+      "version": "4.15.0",
+      "purl": "pkg:pypi/typing-extensions@4.15.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "devel"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/typing-inspection@0.4.2",
+      "group": "",
+      "name": "typing-inspection",
+      "version": "0.4.2",
+      "purl": "pkg:pypi/typing-inspection@0.4.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "devel"
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tzdata@2025.2",
+      "group": "",
+      "name": "tzdata",
+      "version": "2025.2",
+      "purl": "pkg:pypi/tzdata@2025.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tzlocal@5.3.1",
+      "group": "",
+      "name": "tzlocal",
+      "version": "5.3.1",
+      "purl": "pkg:pypi/tzlocal@5.3.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/urllib3@2.5.0",
+      "group": "",
+      "name": "urllib3",
+      "version": "2.5.0",
+      "purl": "pkg:pypi/urllib3@2.5.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/uvicorn@0.24.0.post1",
+      "group": "",
+      "name": "uvicorn",
+      "version": "0.24.0.post1",
+      "purl": "pkg:pypi/uvicorn@0.24.0.post1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/virtualenv@20.35.4",
+      "group": "",
+      "name": "virtualenv",
+      "version": "20.35.4",
+      "purl": "pkg:pypi/virtualenv@20.35.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Poetry"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "Jfrog repo path not found"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 1,
+          "concludedValue": "poetry.lock",
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 1,
+              "value": "poetry.lock"
+            }
+          ]
+        }
+      },
+      "tags": [
+        "devel"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:pypi/aiomysql@0.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/annotated-doc@0.0.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/annotated-types@0.7.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/anyio@3.7.1",
+      "dependsOn": [
+        "pkg:pypi/idna@3.11",
+        "pkg:pypi/sniffio@1.3.1"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/apscheduler@3.10.4",
+      "dependsOn": [
+        "pkg:pypi/pytz@2025.2",
+        "pkg:pypi/six@1.17.0",
+        "pkg:pypi/tzlocal@5.3.1"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/astroid@3.3.11",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/black@24.10.0",
+      "dependsOn": [
+        "pkg:pypi/click@8.3.1",
+        "pkg:pypi/mypy-extensions@1.1.0",
+        "pkg:pypi/packaging@25.0",
+        "pkg:pypi/pathspec@0.12.1",
+        "pkg:pypi/platformdirs@4.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/certifi@2025.11.12",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/cffi@2.0.0",
+      "dependsOn": [
+        "pkg:pypi/pycparser@2.23"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/cfgv@3.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/charset-normalizer@3.4.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/click@8.3.1",
+      "dependsOn": [
+        "pkg:pypi/colorama@0.4.6"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/colorama@0.4.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/coverage@7.12.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/cryptography@46.0.1",
+      "dependsOn": [
+        "pkg:pypi/cffi@2.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/dill@0.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/distlib@0.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/et-xmlfile@2.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/fastapi@0.121.0",
+      "dependsOn": [
+        "pkg:pypi/annotated-doc@0.0.4",
+        "pkg:pypi/pydantic@2.11.7",
+        "pkg:pypi/starlette@0.49.3",
+        "pkg:pypi/typing-extensions@4.15.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/filelock@3.20.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/fsspec@2025.10.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/h11@0.16.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/hf-xet@1.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/httpcore@1.0.9",
+      "dependsOn": [
+        "pkg:pypi/certifi@2025.11.12",
+        "pkg:pypi/h11@0.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/httpx@0.28.1",
+      "dependsOn": [
+        "pkg:pypi/anyio@3.7.1",
+        "pkg:pypi/certifi@2025.11.12",
+        "pkg:pypi/httpcore@1.0.9",
+        "pkg:pypi/idna@3.11"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/huggingface-hub@0.36.0",
+      "dependsOn": [
+        "pkg:pypi/filelock@3.20.0",
+        "pkg:pypi/fsspec@2025.10.0",
+        "pkg:pypi/hf-xet@1.2.0",
+        "pkg:pypi/packaging@25.0",
+        "pkg:pypi/pyyaml@6.0.3",
+        "pkg:pypi/requests@2.31.0",
+        "pkg:pypi/tqdm@4.67.1",
+        "pkg:pypi/typing-extensions@4.15.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/identify@2.6.15",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/idna@3.11",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/iniconfig@2.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/isort@6.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/jinja2@3.1.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/joblib@1.5.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/markupsafe@3.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mccabe@0.7.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mpmath@1.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mypy-extensions@1.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mysql@0.0.3",
+      "dependsOn": [
+        "pkg:pypi/mysqlclient@2.2.7"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/mysql-connector-python@9.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mysqlclient@2.2.7",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/networkx@3.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nodeenv@1.9.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/numpy@2.3.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21",
+      "dependsOn": [
+        "pkg:pypi/nvidia-cublas-cu12@12.8.4.1"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cufft-cu12@11.3.3.83",
+      "dependsOn": [
+        "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cufile-cu12@1.13.1.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-curand-cu12@10.3.9.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90",
+      "dependsOn": [
+        "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+        "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+        "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+      "dependsOn": [
+        "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cusparselt-cu12@0.7.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nccl-cu12@2.27.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nvshmem-cu12@3.3.20",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nvtx-cu12@12.8.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/openpyxl@3.1.5",
+      "dependsOn": [
+        "pkg:pypi/et-xmlfile@2.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/packaging@25.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pandas@2.2.3",
+      "dependsOn": [
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/python-dateutil@2.9.0.post0",
+        "pkg:pypi/pytz@2025.2",
+        "pkg:pypi/tzdata@2025.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pathspec@0.12.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pillow@12.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/platformdirs@4.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pluggy@1.6.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pre-commit@4.5.0",
+      "dependsOn": [
+        "pkg:pypi/cfgv@3.5.0",
+        "pkg:pypi/identify@2.6.15",
+        "pkg:pypi/nodeenv@1.9.1",
+        "pkg:pypi/pyyaml@6.0.3",
+        "pkg:pypi/virtualenv@20.35.4"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pycparser@2.23",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pydantic@2.11.7",
+      "dependsOn": [
+        "pkg:pypi/annotated-types@0.7.0",
+        "pkg:pypi/pydantic-core@2.33.2",
+        "pkg:pypi/typing-extensions@4.15.0",
+        "pkg:pypi/typing-inspection@0.4.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pydantic-core@2.33.2",
+      "dependsOn": [
+        "pkg:pypi/typing-extensions@4.15.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pygments@2.19.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pylint@3.3.9",
+      "dependsOn": [
+        "pkg:pypi/astroid@3.3.11",
+        "pkg:pypi/colorama@0.4.6",
+        "pkg:pypi/dill@0.4.0",
+        "pkg:pypi/isort@6.1.0",
+        "pkg:pypi/mccabe@0.7.0",
+        "pkg:pypi/platformdirs@4.5.0",
+        "pkg:pypi/tomlkit@0.13.3"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pymysql@1.1.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pytest@8.4.2",
+      "dependsOn": [
+        "pkg:pypi/colorama@0.4.6",
+        "pkg:pypi/iniconfig@2.3.0",
+        "pkg:pypi/packaging@25.0",
+        "pkg:pypi/pluggy@1.6.0",
+        "pkg:pypi/pygments@2.19.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-asyncio@0.23.8",
+      "dependsOn": [
+        "pkg:pypi/pytest@8.4.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-cov@4.1.0",
+      "dependsOn": [
+        "pkg:pypi/coverage@7.12.0",
+        "pkg:pypi/pytest@8.4.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-dependency@0.6.0",
+      "dependsOn": [
+        "pkg:pypi/pytest@8.4.2",
+        "pkg:pypi/setuptools@80.9.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-html@4.1.1",
+      "dependsOn": [
+        "pkg:pypi/jinja2@3.1.6",
+        "pkg:pypi/pytest-metadata@3.1.1",
+        "pkg:pypi/pytest@8.4.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-metadata@3.1.1",
+      "dependsOn": [
+        "pkg:pypi/pytest@8.4.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-mock@3.15.1",
+      "dependsOn": [
+        "pkg:pypi/pytest@8.4.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "dependsOn": [
+        "pkg:pypi/six@1.17.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/python-dotenv@1.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pytz@2025.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pyyaml@6.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/rapidfuzz@3.14.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/regex@2025.11.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/requests@2.31.0",
+      "dependsOn": [
+        "pkg:pypi/certifi@2025.11.12",
+        "pkg:pypi/charset-normalizer@3.4.4",
+        "pkg:pypi/idna@3.11",
+        "pkg:pypi/urllib3@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/responses@0.25.8",
+      "dependsOn": [
+        "pkg:pypi/pyyaml@6.0.3",
+        "pkg:pypi/requests@2.31.0",
+        "pkg:pypi/urllib3@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/respx@0.21.1",
+      "dependsOn": [
+        "pkg:pypi/httpx@0.28.1"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/safetensors@0.7.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/scikit-learn@1.7.2",
+      "dependsOn": [
+        "pkg:pypi/joblib@1.5.2",
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/scipy@1.16.3",
+        "pkg:pypi/threadpoolctl@3.6.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/scipy@1.16.3",
+      "dependsOn": [
+        "pkg:pypi/numpy@2.3.5"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/sentence-transformers@5.1.2",
+      "dependsOn": [
+        "pkg:pypi/huggingface-hub@0.36.0",
+        "pkg:pypi/scikit-learn@1.7.2",
+        "pkg:pypi/scipy@1.16.3",
+        "pkg:pypi/torch@2.9.1",
+        "pkg:pypi/tqdm@4.67.1",
+        "pkg:pypi/transformers@4.57.3"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/setuptools@80.9.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/six@1.17.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/sniffio@1.3.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/starlette@0.49.3",
+      "dependsOn": [
+        "pkg:pypi/anyio@3.7.1"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/sympy@1.14.0",
+      "dependsOn": [
+        "pkg:pypi/mpmath@1.3.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/threadpoolctl@3.6.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/tokenizers@0.22.1",
+      "dependsOn": [
+        "pkg:pypi/huggingface-hub@0.36.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/tomlkit@0.13.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/torch@2.9.1",
+      "dependsOn": [
+        "pkg:pypi/filelock@3.20.0",
+        "pkg:pypi/fsspec@2025.10.0",
+        "pkg:pypi/jinja2@3.1.6",
+        "pkg:pypi/networkx@3.6",
+        "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+        "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90",
+        "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93",
+        "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90",
+        "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21",
+        "pkg:pypi/nvidia-cufft-cu12@11.3.3.83",
+        "pkg:pypi/nvidia-cufile-cu12@1.13.1.3",
+        "pkg:pypi/nvidia-curand-cu12@10.3.9.90",
+        "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90",
+        "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+        "pkg:pypi/nvidia-cusparselt-cu12@0.7.1",
+        "pkg:pypi/nvidia-nccl-cu12@2.27.5",
+        "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93",
+        "pkg:pypi/nvidia-nvshmem-cu12@3.3.20",
+        "pkg:pypi/nvidia-nvtx-cu12@12.8.90",
+        "pkg:pypi/setuptools@80.9.0",
+        "pkg:pypi/sympy@1.14.0",
+        "pkg:pypi/triton@3.5.1",
+        "pkg:pypi/typing-extensions@4.15.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/tqdm@4.67.1",
+      "dependsOn": [
+        "pkg:pypi/colorama@0.4.6"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/transformers@4.57.3",
+      "dependsOn": [
+        "pkg:pypi/filelock@3.20.0",
+        "pkg:pypi/huggingface-hub@0.36.0",
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/packaging@25.0",
+        "pkg:pypi/pyyaml@6.0.3",
+        "pkg:pypi/regex@2025.11.3",
+        "pkg:pypi/requests@2.31.0",
+        "pkg:pypi/safetensors@0.7.0",
+        "pkg:pypi/tokenizers@0.22.1",
+        "pkg:pypi/tqdm@4.67.1"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/triton@3.5.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/typing-extensions@4.15.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/typing-inspection@0.4.2",
+      "dependsOn": [
+        "pkg:pypi/typing-extensions@4.15.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/tzdata@2025.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/tzlocal@5.3.1",
+      "dependsOn": [
+        "pkg:pypi/tzdata@2025.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/urllib3@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/uvicorn@0.24.0.post1",
+      "dependsOn": [
+        "pkg:pypi/click@8.3.1",
+        "pkg:pypi/h11@0.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/virtualenv@20.35.4",
+      "dependsOn": [
+        "pkg:pypi/distlib@0.4.0",
+        "pkg:pypi/filelock@3.20.0",
+        "pkg:pypi/platformdirs@4.5.0"
+      ]
+    }
+  ],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}
