@@ -750,7 +750,7 @@ namespace LCT.PackageIdentifier
             }
         }
 
-        private static void ConvertToCycloneDXModel(List<NugetPackage> listofComponents, ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile)
+        public static void ConvertToCycloneDXModel(List<NugetPackage> listofComponents, ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile)
 
         {
             foreach (var prop in listofComponents)
@@ -848,6 +848,7 @@ namespace LCT.PackageIdentifier
                 LogHandlingHelper.BasicErrorHandling("FileNotFound", "ParseInputFiles()", $"Input file not found or unsupported: {filepath}", $"provide {FileConstant.NugetAssetFile} or packages.config filesin this path :{filepath} ");
                 Logger.Warn($"Input file NOT_FOUND :{filepath}");
             }
+            IdentifiedNugetPackages(filepath, listofComponents);
         }
 
         private static void CheckForMultipleVersions(CommonAppSettings appSettings, List<Component> componentsWithMultipleVersions)
