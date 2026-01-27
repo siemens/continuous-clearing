@@ -19,9 +19,27 @@ using System.Reflection;
 
 namespace LCT.Common
 {
+    /// <summary>
+    /// Parses SPDX BOM files and converts them to CycloneDX format.
+    /// </summary>
     public class SpdxBomParser : ISpdxBomParser
     {
+        #region Fields
+
+        /// <summary>
+        /// The logger instance for logging messages and errors.
+        /// </summary>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion Fields
+
+        #region Methods
+
+        /// <summary>
+        /// Parses an SPDX BOM file and converts it to CycloneDX BOM format.
+        /// </summary>
+        /// <param name="filePath">The path to the SPDX BOM file to parse.</param>
+        /// <returns>A CycloneDX BOM object containing parsed components and dependencies.</returns>
         public Bom ParseSPDXBom(string filePath)
         {
             Logger.DebugFormat("ParseSPDXBom():Starting SPDX BOM parsing for file: {0}", filePath);
@@ -378,6 +396,6 @@ namespace LCT.Common
             })];
         }
 
-        #endregion
+        #endregion Methods
     }
 }

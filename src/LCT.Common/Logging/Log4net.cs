@@ -43,6 +43,8 @@ namespace LCT.Common
         public static string CatoolCurrentDirectory { get; set; }
         public static bool Verbose { get; set; }
 
+        #endregion Properties
+
         #region Constructors
         // No constructors present.
         #endregion
@@ -128,6 +130,8 @@ namespace LCT.Common
                 Verbose = false;
             }
         }
+
+        #endregion Methods
     }
 }
 
