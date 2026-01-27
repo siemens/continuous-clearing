@@ -15,18 +15,61 @@ using System.Threading.Tasks;
 
 namespace LCT.APICommunications
 {
+    /// <summary>
+    /// Provides Debian-specific JFrog Artifactory API communication operations.
+    /// </summary>
     public class DebianJfrogAPICommunication : JfrogApicommunication
     {
+        #region Fields
 
-
+        /// <summary>
+        /// Logger instance for this class.
+        /// </summary>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /// <summary>
+        /// Environment helper instance for exit handling.
+        /// </summary>
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the timeout in seconds for HTTP requests.
+        /// </summary>
         private static int TimeoutInSec { get; set; }
+
+        #endregion
+
+        #region Constructors
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DebianJfrogAPICommunication"/> class.
+        /// </summary>
+        /// <param name="repoDomainName">The repository domain name.</param>
+        /// <param name="srcrepoName">The source repository name.</param>
+        /// <param name="repoCredentials">The repository credentials.</param>
+        /// <param name="timeout">The timeout in seconds.</param>
         public DebianJfrogAPICommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
             TimeoutInSec = timeout;
         }
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Creates and configures an HTTP client with authentication.
+        /// </summary>
+        /// <param name="credentials">The artifactory credentials.</param>
+        /// <returns>A configured HTTP client instance.</returns>
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             var handler = new RetryHttpClientHandler()
@@ -40,6 +83,10 @@ namespace LCT.APICommunications
             return httpClient;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves the API key from Artifactory.
+        /// </summary>
+        /// <returns>An HTTP response message containing the API key.</returns>
         public override async Task<HttpResponseMessage> GetApiKey()
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
@@ -47,6 +94,11 @@ namespace LCT.APICommunications
             return await httpClient.GetAsync(url);
         }
 
+        /// <summary>
+        /// Asynchronously copies a component from a remote repository.
+        /// </summary>
+        /// <param name="component">The component to copy.</param>
+        /// <returns>An HTTP response message indicating the result of the copy operation.</returns>
         public override async Task<HttpResponseMessage> CopyFromRemoteRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
@@ -54,6 +106,11 @@ namespace LCT.APICommunications
             return await httpClient.PostAsync(component.CopyPackageApiUrl, httpContent);
         }
 
+        /// <summary>
+        /// Asynchronously moves a component from one repository to another.
+        /// </summary>
+        /// <param name="component">The component to move.</param>
+        /// <returns>An HTTP response message indicating the result of the move operation.</returns>
         public override async Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
@@ -61,6 +118,11 @@ namespace LCT.APICommunications
             return await httpClient.PostAsync(component.MovePackageApiUrl, httpContent);
         }
 
+        /// <summary>
+        /// Asynchronously retrieves package information from Artifactory.
+        /// </summary>
+        /// <param name="component">The component to retrieve information for.</param>
+        /// <returns>An HTTP response message containing the package information.</returns>
         public override async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
@@ -80,6 +142,12 @@ namespace LCT.APICommunications
             return result;
         }
 
+        /// <summary>
+        /// Updates the package properties in JFrog Artifactory with the SW360 release URL.
+        /// </summary>
+        /// <param name="sw360releaseUrl">The SW360 release URL.</param>
+        /// <param name="destRepoName">The destination repository name.</param>
+        /// <param name="uploadArgs">The upload arguments containing package information.</param>
         public override void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
@@ -88,5 +156,7 @@ namespace LCT.APICommunications
               $"properties=sw360url={sw360releaseUrl}";
             httpClient.PutAsync(url, httpContent);
         }
+
+        #endregion
     }
 }
