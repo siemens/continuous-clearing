@@ -52,21 +52,7 @@ namespace LCT.PackageIdentifier
                 }
             }
             return null;
-        }
-        public static string GetBomFileName(CommonAppSettings appSettings)
-        {
-            string bomFileName;
-            if (appSettings.SW360 != null)
-            {
-                bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
-            }
-            else
-            {
-                bomFileName = FileConstant.basicSBOMName + "_Bom.cdx.json";
-            }
-
-            return bomFileName;
-        }
+        }        
         public static string GetDefaultProjectName(CommonAppSettings appSettings)
         {
             string projectName;
