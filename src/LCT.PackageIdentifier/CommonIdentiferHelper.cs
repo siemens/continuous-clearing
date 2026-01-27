@@ -16,7 +16,22 @@ namespace LCT.PackageIdentifier
 {
     public static class CommonIdentiferHelper
     {
+        #region Fields
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        #endregion
+
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Returns the repository name for a prioritized order (release, devdep, dev) from AQL results.
+        /// </summary>
+        /// <param name="aqlResults">List of AQL results to inspect.</param>
+        /// <returns>Repository name matching the preferred order or a sentinel when not found.</returns>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults)
         {
@@ -53,6 +68,12 @@ namespace LCT.PackageIdentifier
             }
             return null;
         }
+
+        /// <summary>
+        /// Builds the BOM file name based on SW360 project settings or falls back to the basic SBOM name.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing SW360 configuration.</param>
+        /// <returns>Filename to use for the BOM output.</returns>
         public static string GetBomFileName(CommonAppSettings appSettings)
         {
             string bomFileName;
@@ -67,6 +88,12 @@ namespace LCT.PackageIdentifier
 
             return bomFileName;
         }
+
+        /// <summary>
+        /// Returns the default project name to use in file naming based on SW360 configuration or a fallback.
+        /// </summary>
+        /// <param name="appSettings">Application settings which may contain SW360 project info.</param>
+        /// <returns>Project name string for use as default.</returns>
         public static string GetDefaultProjectName(CommonAppSettings appSettings)
         {
             string projectName;
@@ -81,5 +108,9 @@ namespace LCT.PackageIdentifier
 
             return projectName;
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

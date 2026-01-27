@@ -31,6 +31,12 @@ namespace LCT.SW360PackageCreator
         private static readonly string[] WindowsLineSeparators = ["\r\n"];
         private static readonly string[] UnixLineSeparators = ["\n"];
 
+        /// <summary>
+        /// Download Package
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="localPathforDownload"></param>
+        /// <returns>task that represents asynchronous operation</returns>
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
             Logger.DebugFormat("DownloadPackage():Start downloading process of source code for this component , Name-{0},version-{1}", component.Name, component.Version);
@@ -40,6 +46,12 @@ namespace LCT.SW360PackageCreator
             return path;
         }
 
+        /// <summary>
+        /// donwload
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="downloadPath"></param>
+        /// <returns>compressed file path</returns>
         private string Download(ComparisonBomData component, string downloadPath)
         {
             string downloadedPackageName = string.Empty;
@@ -77,6 +89,13 @@ namespace LCT.SW360PackageCreator
             component.DownloadUrl = GetSourceRepositoryUrl(component, taggedVersion);
             return compressedFilePath;
         }
+
+        /// <summary>
+        /// Gets Source Repository Url
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="tag"></param>
+        /// <returns>url path</returns>
         private static string GetSourceRepositoryUrl(ComparisonBomData component, string tag)
         {
             if (!string.IsNullOrEmpty(component.SourceUrl) && component.SourceUrl.Contains("github.com", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(tag))
@@ -88,6 +107,12 @@ namespace LCT.SW360PackageCreator
             }
             return component.DownloadUrl;
         }
+
+        /// <summary>
+        /// Sanitize File Name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>file name</returns>
         private static string SanitizeFileName(string name)
         {
             foreach (char c in Path.GetInvalidFileNameChars())
@@ -97,6 +122,12 @@ namespace LCT.SW360PackageCreator
             name = name.Replace('/', '_').Replace('\\', '_');
             return name;
         }
+
+        /// <summary>
+        /// Gets Correct Version
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns>version name</returns>
         private static string GetCorrectVersion(ComparisonBomData component)
         {
             Logger.DebugFormat("GetCorrectVersion():Start identifying correct version for this component , Name-{0},version-{1}", component.Name, component.Version);
@@ -140,6 +171,12 @@ namespace LCT.SW360PackageCreator
             Logger.DebugFormat("GetCorrectVersion():Completed identifying correct version for this component ,given version:{0}, correct Version:{1}", component.Version, correctVersion);
             return correctVersion;
         }
+
+        /// <summary>
+        /// Gets Tag List From Result
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns>result</returns>
         private static string[] GetTagListFromResult(Result result)
         {
             if (result == null || string.IsNullOrEmpty(result.StdOut))
@@ -156,6 +193,12 @@ namespace LCT.SW360PackageCreator
                 return result.StdOut.Split(UnixLineSeparators, StringSplitOptions.None);
             }
         }
+
+        /// <summary>
+        /// Gets Base Version
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns>version name</returns>
         private static string GetBaseVersion(string version)
         {
             if (string.IsNullOrWhiteSpace(version))
@@ -172,6 +215,14 @@ namespace LCT.SW360PackageCreator
             }
             return version;
         }
+
+        /// <summary>
+        /// Checks If Already Downloaded
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="tagVersion"></param>
+        /// <param name="downloadedPath"></param>
+        /// <returns>boolean value</returns>
         private bool CheckIfAlreadyDownloaded(ComparisonBomData component, string tagVersion, out string downloadedPath)
         {
             downloadedPath = string.Empty;
@@ -187,6 +238,11 @@ namespace LCT.SW360PackageCreator
             return false;
         }
 
+        /// <summary>
+        /// List Tags Of Component
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns>result</returns>
         private static Result ListTagsOfComponent(ComparisonBomData component)
         {
             Logger.DebugFormat("ListTagsOfComponent():Start git process for identifying list of tags for this component , Name-{0},version-{1}", component.Name, component.Version);
@@ -210,6 +266,14 @@ namespace LCT.SW360PackageCreator
             return result;
         }
 
+        /// <summary>
+        /// Clone Source
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="downloadPath"></param>
+        /// <param name="taggedVersion"></param>
+        /// <param name="compressedFilePath"></param>
+        /// <returns>result</returns>
         private static Result CloneSource(ComparisonBomData component, string downloadPath, string taggedVersion, string compressedFilePath)
         {
             const int timeoutInMs = 200 * 60 * 1000;
@@ -238,6 +302,13 @@ namespace LCT.SW360PackageCreator
             return result;
         }
 
+        /// <summary>
+        /// Gets Git Clone Commands
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="taggedVersion"></param>
+        /// <param name="compressedFilePath"></param>
+        /// <returns>list of commands</returns>
         private static List<string> GetGitCloneCommands(ComparisonBomData component, string taggedVersion, string compressedFilePath)
         {
             return new List<string>()
