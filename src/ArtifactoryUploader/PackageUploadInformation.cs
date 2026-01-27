@@ -26,6 +26,7 @@ namespace LCT.ArtifactoryUploader
     public static class PackageUploadInformation
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private const string ReportFileName = "Artifactory";
         public static DisplayPackagesInfo GetComponentsToBePackages()
         {
             DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo();
@@ -36,6 +37,7 @@ namespace LCT.ArtifactoryUploader
             displayPackagesInfo.UnknownPackagesPython = new List<ComponentsToArtifactory>();
             displayPackagesInfo.UnknownPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.UnknownPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.UnknownPackagesChoco = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>();
@@ -43,6 +45,7 @@ namespace LCT.ArtifactoryUploader
             displayPackagesInfo.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesChoco = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesPython = new List<ComponentsToArtifactory>();
@@ -50,6 +53,7 @@ namespace LCT.ArtifactoryUploader
             displayPackagesInfo.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesChoco = new List<ComponentsToArtifactory>();
             displayPackagesInfo.SuccessfullPackagesNpm = new List<ComponentsToArtifactory>();
             displayPackagesInfo.SuccessfullPackagesNuget = new List<ComponentsToArtifactory>();
             displayPackagesInfo.SuccessfullPackagesPython = new List<ComponentsToArtifactory>();
@@ -57,6 +61,7 @@ namespace LCT.ArtifactoryUploader
             displayPackagesInfo.SuccessfullPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.SuccessfullPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.SuccessfullPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SuccessfullPackagesChoco = new List<ComponentsToArtifactory>();
 
 
             return displayPackagesInfo;
@@ -106,6 +111,7 @@ namespace LCT.ArtifactoryUploader
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Poetry", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesCargo, displayPackagesInfo.JfrogNotFoundPackagesCargo, displayPackagesInfo.SuccessfullPackagesCargo, displayPackagesInfo.JfrogFoundPackagesCargo, "Cargo", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesChoco, displayPackagesInfo.JfrogNotFoundPackagesChoco, displayPackagesInfo.SuccessfullPackagesChoco, displayPackagesInfo.JfrogFoundPackagesChoco, "Choco", localPathforartifactory);
 
         }
         private static void DisplaySortedForeachComponents(
@@ -327,7 +333,8 @@ namespace LCT.ArtifactoryUploader
             { "Debian", GetNotApprovedDebianPackages },
             { "Maven", GetNotApprovedMavenPackages },
             { "Poetry", GetNotApprovedPythonPackages },
-                    { "Cargo", GetNotApprovedCargoPackages   }
+            { "Choco", GetNotApprovedChocoPackages   },
+            { "Cargo", GetNotApprovedCargoPackages   }
         };
 
                 if (packageHandlers.TryGetValue(name, out var handler))
@@ -351,7 +358,7 @@ namespace LCT.ArtifactoryUploader
                     npmComponents.Add(jsonComponents);
                 }
                 myDeserializedClass.Npm = npmComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
 
             }
             else
@@ -364,7 +371,7 @@ namespace LCT.ArtifactoryUploader
                     jsonComponents.Version = npmpackage.Version;
                     projectResponse.Npm.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             WarningMessageForNoPackages(filename);
         }
@@ -383,7 +390,7 @@ namespace LCT.ArtifactoryUploader
                     nugetComponents.Add(jsonComponents);
                 }
                 myDeserializedClass.Nuget = nugetComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             else
             {
@@ -395,7 +402,7 @@ namespace LCT.ArtifactoryUploader
                     jsonComponents.Version = nugetpackage.Version;
                     projectResponse.Nuget.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             WarningMessageForNoPackages(filename);
         }
@@ -415,7 +422,7 @@ namespace LCT.ArtifactoryUploader
                     cargoComponents.Add(jsonComponents);
                 }
                 myDeserializedClass.Cargo = cargoComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             else
             {
@@ -427,7 +434,7 @@ namespace LCT.ArtifactoryUploader
                     jsonComponents.Version = cargoPackage.Version;
                     projectResponse.Cargo.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             WarningMessageForNoPackages(filename);
         }
@@ -448,7 +455,7 @@ namespace LCT.ArtifactoryUploader
                     conanComponents.Add(jsonComponents);
                 }
                 myDeserializedClass.Conan = conanComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
 
 
             }
@@ -462,7 +469,7 @@ namespace LCT.ArtifactoryUploader
                     jsonComponents.Version = conanpackage.Version;
                     projectResponse.Conan.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             WarningMessageForNoPackages(filename);
 
@@ -483,7 +490,7 @@ namespace LCT.ArtifactoryUploader
                     pythonComponents.Add(jsonComponents);
                 }
                 myDeserializedClass.Python = pythonComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
 
 
             }
@@ -497,7 +504,7 @@ namespace LCT.ArtifactoryUploader
                     jsonComponents.Version = pythonPackage.Version;
                     projectResponse.Python.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             WarningMessageForNoPackages(filename);
         }
@@ -517,7 +524,7 @@ namespace LCT.ArtifactoryUploader
                     debianComponents.Add(jsonComponents);
                 }
                 myDeserializedClass.Debian = debianComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
 
 
             }
@@ -531,7 +538,7 @@ namespace LCT.ArtifactoryUploader
                     jsonComponents.Version = debianPackage.Version;
                     projectResponse.Debian.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             WarningMessageForNoPackages(filename);
         }
@@ -551,7 +558,7 @@ namespace LCT.ArtifactoryUploader
                     mavenComponents.Add(jsonComponents);
                 }
                 myDeserializedClass.Maven = mavenComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
 
 
             }
@@ -565,7 +572,39 @@ namespace LCT.ArtifactoryUploader
                     jsonComponents.Version = mavenPackage.Version;
                     projectResponse.Maven.Add(jsonComponents);
                 }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, "Artifactory");
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
+            }
+            WarningMessageForNoPackages(filename);
+        }
+        public static void GetNotApprovedChocoPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
+        {
+            if (File.Exists(filename))
+            {
+                string json = File.ReadAllText(filename);
+
+                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
+                List<JsonComponents> chocoComponents = new List<JsonComponents>();
+                foreach (var chocoPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = chocoPackage.Name;
+                    jsonComponents.Version = chocoPackage.Version;
+                    chocoComponents.Add(jsonComponents);
+                }
+                myDeserializedClass.Choco = chocoComponents;
+                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
+            }
+            else
+            {
+                projectResponse.Choco = new List<JsonComponents>();
+                foreach (var chocoPackage in unknownPackages)
+                {
+                    JsonComponents jsonComponents = new JsonComponents();
+                    jsonComponents.Name = chocoPackage.Name;
+                    jsonComponents.Version = chocoPackage.Version;
+                    projectResponse.Choco.Add(jsonComponents);
+                }
+                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
             }
             WarningMessageForNoPackages(filename);
         }

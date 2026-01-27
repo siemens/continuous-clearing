@@ -8,52 +8,52 @@ using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
+using log4net;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace LCT.PackageIdentifier
 {
     public static class CommonIdentiferHelper
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults)
         {
+            Logger.Debug("GetRepodetailsFromPerticularOrder(): Starting repository details retrieval from AQL results.");
+
             if (aqlResults == null)
             {
+                Logger.Debug("GetRepodetailsFromPerticularOrder(): No repositories identified from aqlresult. Returning 'Not Found in Repo'.");
                 return NotFoundInRepo;
             }
 
-            if (aqlResults.Find(x => x.Repo.Contains("release"))?.Repo != null)
-            {
-                return aqlResults.Find(x => x.Repo.Contains("release"))?.Repo;
-            }
-            else if (aqlResults.Find(x => x.Repo.Contains("devdep"))?.Repo != null)
-            {
-                return aqlResults.Find(x => x.Repo.Contains("devdep"))?.Repo;
-            }
-            else if (aqlResults.Find(x => x.Repo.Contains("dev"))?.Repo != null)
-            {
-                return aqlResults.Find(x => x.Repo.Contains("dev"))?.Repo;
-            }
-            else
-            {
-                return aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
-            }
-        }
-        public static string GetBomFileName(CommonAppSettings appSettings)
-        {
-            string bomFileName;
-            if (appSettings.SW360 != null)
-            {
-                bomFileName = $"{appSettings.SW360.ProjectName}_Bom.cdx.json";
-            }
-            else
-            {
-                bomFileName = FileConstant.basicSBOMName;
-            }
+            Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): Total repositories identified from AQL result: {0}", aqlResults.Count);
+            var repoKeywords = new[] { "release", "devdep", "dev" };
+            string repo = FindRepositoryByKeywords(aqlResults, repoKeywords);
 
-            return bomFileName;
+            if (repo != null)
+            {
+                Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): Found repository: {0}", repo);
+                return repo;
+            }
+            repo = aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
+            Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): No specific repository found. Returning repository or 'Not Found in Repo': {0}", repo);
+            return repo;
         }
+        private static string FindRepositoryByKeywords(List<AqlResult> aqlResults, string[] keywords)
+        {
+            foreach (var keyword in keywords)
+            {
+                var repo = aqlResults.Find(x => x.Repo.Contains(keyword))?.Repo;
+                if (repo != null)
+                {
+                    return repo;
+                }
+            }
+            return null;
+        }        
         public static string GetDefaultProjectName(CommonAppSettings appSettings)
         {
             string projectName;

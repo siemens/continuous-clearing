@@ -1,0 +1,347 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:fcce0f84-0452-472d-ac2d-5a872b177f74",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-09-22T10:53:48Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "supplier": {
+            "name": "Siemens AG"
+          },
+          "name": "Clearing Automation Tool",
+          "version": "8.2.0",
+          "externalReferences": [
+            {
+              "url": "https://github.com/siemens/continuous-clearing",
+              "type": "website"
+            }
+          ]
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "Test",
+      "version": "1.0"
+    },
+    "properties": [
+      {
+        "name": "siemens:profile",
+        "value": "clearing"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/chocolatey-windowsupdate.extension@1.0.4",
+      "name": "chocolatey-windowsupdate.extension",
+      "version": "1.0.4",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "4b43cf7b5ae8f641c5b49b901409e0d6"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "6227b809760908dc5a802fb8cd5c9f28bb9ea47d"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "aa09ad0fdaf5659d090eb79f047d6bb1907d002f1e34069b991cb872e0a5d89a"
+        }
+      ],
+      "purl": "pkg:nuget/chocolatey-windowsupdate.extension@1.0.4",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "siparty_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "chocolatey-windowsupdate.extension.1.0.4.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "siparty_choco-release-nuget-egll/chocolatey-windowsupdate.extension.1.0.4.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/git@2.42.0",
+      "name": "git",
+      "version": "2.42.0",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "980bada61c42dc255fdc3232657a54d8"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "2cc557de87ac8884e40487cf5fdbd345155c0bdd"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "dd2a38a288e1e917ac146fd93e4f6fbde489984829951249f86997fd72212c2f"
+        }
+      ],
+      "purl": "pkg:nuget/git@2.42.0",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "siparty_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "git.2.42.0.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "siparty_choco-release-nuget-egll/git.2.42.0.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/nodejs@20.5.1",
+      "name": "nodejs",
+      "version": "20.5.1",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "7d09a69bb7f3c4cd34378bb8b73f79b4"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "5ad172362367e66647a3068d39aef5188cf92d54"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "26e91b2d5e626413876faa697c574edd12c8c43e386319886b3ac8892b663de4"
+        }
+      ],
+      "purl": "pkg:nuget/nodejs@20.5.1",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "siparty_choco-release-nuget-egll"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "nodejs.20.5.1.nupkg"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": "siparty_choco-release-nuget-egll/nodejs.20.5.1.nupkg"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/googlechrome@117.0.5938.92",
+      "name": "googlechrome",
+      "version": "117.0.5938.92",
+      "purl": "pkg:nuget/googlechrome@117.0.5938.92",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/vscode@1.82.2",
+      "name": "vscode",
+      "version": "1.82.2",
+      "purl": "pkg:nuget/vscode@1.82.2",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/7zip@23.01",
+      "name": "7zip",
+      "version": "23.01",
+      "purl": "pkg:nuget/7zip@23.01",
+      "properties": [
+        {
+          "name": "internal:siemens:clearing:development",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:identifier-type",
+          "value": "Discovered"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:direct",
+          "value": "true"
+        },
+        {
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-name",
+          "value": "Not Found in JFrogRepo"
+        },
+        {
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Choco"
+        },
+        {
+          "name": "internal:siemens:clearing:siemens:filename",
+          "value": "Package name not found in Jfrog"
+        },
+        {
+          "name": "internal:siemens:clearing:jfrog-repo-path",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "compositions": [],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "standard-bom",
+        "name": "Standard BOM",
+        "version": "3.0.0",
+        "description": "The Standard for Software Bills of Materials in Siemens",
+        "owner": "Siemens AG",
+        "externalReferences": [
+          {
+            "url": "https://sbom.siemens.io/",
+            "type": "website"
+          }
+        ]
+      }
+    ]
+  }
+}

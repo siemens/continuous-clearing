@@ -62,6 +62,7 @@ namespace LCT.Services
 
         public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom)
         {
+            Logger.Debug("GetAvailableReleasesInSw360():Starting to get available releases in sw360");
             List<Components> availableComponentsList = new List<Components>();
             Sw360ServiceStopWatch = new Stopwatch();
             try
@@ -69,8 +70,7 @@ namespace LCT.Services
                 Sw360ServiceStopWatch.Start();
                 string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
                 Sw360ServiceStopWatch.Stop();
-                Logger.Debug($"GetAvailableReleasesInSw360():Time taken to in GetReleases() call" +
-                    $"-{TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds}");
+                Logger.DebugFormat("GetAvailableReleasesInSw360():Time taken for Get all Releases api call-{0}", TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds);
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
 
                 if (modelMappedObject != null && modelMappedObject.Embedded?.Sw360Releases?.Count > 0)
@@ -79,24 +79,24 @@ namespace LCT.Services
                 }
                 else
                 {
-                    Logger.Debug("GetAvailableReleasesInSw360() : Releases list found empty from the SW360 Server !!");
+                    LogHandlingHelper.BasicErrorHandling("Releases list found empty from the SW360 Server", "GetAvailableReleasesInSw360()", $"Releases list found empty from the SW360 Server", "");
                     Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again");
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }
             catch (HttpRequestException ex)
             {
-                Logger.Debug($"GetAvailableReleasesInSw360():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Available Releases", "GetAvailableReleasesInSw360()", ex, "");
                 Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"GetAvailableReleasesInSw360():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Get Available Releases", "GetAvailableReleasesInSw360()", ex, "");
                 Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
+            Logger.Debug("GetAvailableReleasesInSw360():Completed to getting available releases in sw360");
             return availableComponentsList;
         }
 
@@ -118,6 +118,9 @@ namespace LCT.Services
             catch (AggregateException e)
             {
                 Environment.ExitCode = -1;
+                LogHandlingHelper.ExceptionErrorHandling(
+                 "Get Release Data Of Component",
+                 $"MethodName:GetReleaseDataOfComponent()", e, "");
                 Logger.Error($"GetComponentsClearingStatus():", e);
             }
 
@@ -132,10 +135,12 @@ namespace LCT.Services
             try
             {
                 responseBody = await m_SW360ApiCommunicationFacade.GetReleaseById(releaseId);
+                await LogHandlingHelper.HttpResponseHandling("Response of get release data by releaseId", $"MethodName:GetReleaseInfoByReleaseId()", responseBody);
             }
             catch (HttpRequestException ex)
             {
                 Environment.ExitCode = -1;
+                LogHandlingHelper.ExceptionErrorHandling("Get release data by releaseId", $"MethodName:GetReleaseInfoByReleaseId()", ex, "");
                 Logger.Error($"GetReleaseInfoByReleaseId():", ex);
             }
 
@@ -148,6 +153,7 @@ namespace LCT.Services
             try
             {
                 string response = await m_SW360ApiCommunicationFacade.GetReleaseByCompoenentName(componentName);
+                LogHandlingHelper.HttpResponseOfStringContent("Response of Get Component ReleaseID", $"MethodName:GetComponentReleaseID()", response);
                 var responseData = JsonConvert.DeserializeObject<ComponentsRelease>(response);
                 for (int index = 0; index < responseData?.Embedded?.Sw360Releases?.Count; index++)
                 {
@@ -163,6 +169,7 @@ namespace LCT.Services
             }
             catch (HttpRequestException e)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Get component releaseId", $"MethodName:GetComponentReleaseID()", e, "");
                 Logger.Error($"GetComponentReleaseID():", e);
             }
 
@@ -197,11 +204,11 @@ namespace LCT.Services
             }
             catch (HttpRequestException e)
             {
-                Logger.Debug($"GetAttachmentDownloadLink():", e);
+                LogHandlingHelper.ExceptionErrorHandling("Get attachment download link", "MethodName:GetAttachmentDownloadLink()", e, "");
             }
             catch (AggregateException e)
             {
-                Logger.Debug($"GetAttachmentDownloadLink():", e);
+                LogHandlingHelper.ExceptionErrorHandling("Get attachment download link", $"MethodName:GetAttachmentDownloadLink()", e, "");
             }
 
             return attachmentHash;
@@ -231,8 +238,8 @@ namespace LCT.Services
 
             if (string.IsNullOrEmpty(attachmentHash.SourceDownloadUrl))
             {
-                Logger.Debug($"DownloadReleaseSourceCode():Fossology Upload unsuccessful, Component source is not Found for {fileName}-{version} under sw360 attachments");
-                Logger.Warn($"Fossology Upload unsuccessful, Component source is not Found for {fileName}-{version} under sw360 attachments");
+                Logger.DebugFormat("DownloadReleaseSourceCode():Fossology Upload unsuccessful, Component source is not Found for {0}-{1} under sw360 attachments", fileName, version);
+                Logger.WarnFormat("Fossology Upload unsuccessful, Component source is not Found for {0}-{1} under sw360 attachments", fileName, version);
                 return componentName;
             }
             try
@@ -250,14 +257,14 @@ namespace LCT.Services
             }
             catch (IOException ex)
             {
-                Logger.Debug($"DownloadReleaseSourceCode:", ex);
+                LogHandlingHelper.ExceptionErrorHandling("DownloadReleaseSourceCode", $"MethodName:DownloadReleaseSourceCode(), ComponentName:{componentName}, Version:{version}", ex, "An I/O error occurred while trying to download the component source.");
                 Logger.Warn($"Component download failed :{componentName}");
 
                 return componentName;
             }
             catch (WebException e)
             {
-                Logger.Debug($"DownloadReleaseSourceCode:", e);
+                LogHandlingHelper.ExceptionErrorHandling("DownloadReleaseSourceCode", $"MethodName:DownloadReleaseSourceCode(), ComponentName:{componentName}, Version:{version}", e, "A network error occurred while trying to download the component source.");
                 Logger.Warn($"Component download failed :{componentName}");
 
                 return componentName;
@@ -279,6 +286,7 @@ namespace LCT.Services
                 string releaseurl;
                 string releaseid = string.Empty;
                 var response = await m_SW360ApiCommunicationFacade.GetReleaseByCompoenentName(componentName);
+                LogHandlingHelper.HttpResponseOfStringContent("Response of Get Upload Description from SW360", $"MethodName:GetUploadDescriptionfromSW360()", response);
                 var responseData = JsonConvert.DeserializeObject<ComponentsRelease>(response);
 
                 for (int index = 0; index < responseData?.Embedded?.Sw360Releases?.Count; index++)
@@ -290,13 +298,14 @@ namespace LCT.Services
                         href = responseData.Embedded.Sw360Releases[index].Links.Self.Href;
                         releaseid = CommonHelper.GetSubstringOfLastOccurance(href, "/");
                         releaseurl = sw360url + ApiConstant.Sw360ReleaseUrlApiSuffix + releaseid + "#/tab-Summary";
-                        Logger.Debug($"GetUploadDescriptionfromSW360:ComponentName-{componentName}:{componetVersion} : {href}");
+                        Logger.DebugFormat("GetUploadDescriptionfromSW360:ComponentName-{0}:{1} : {2}", componentName, componetVersion, href);
                         return releaseurl;
                     }
                 }
             }
             catch (HttpRequestException e)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Get Upload Description from SW360", $"MethodName:GetUploadDescriptionfromSW360()", e, "");
                 Logger.Error($"GetUploadDescriptionfromSW360():", e);
             }
             return "";
@@ -316,12 +325,12 @@ namespace LCT.Services
                 if (await CheckReleaseExistenceByExternalId(component) ||
                        CheckAvailabilityByNameAndVersion(sw360Releases, component, sw360ComponentList))
                 {
-                    Logger.Debug($"GetAvailableComponenentsList():  Release Exist : Release name - {component.Name}, version - {component.Version}");
+                    Logger.DebugFormat("GetAvailableComponenentsList():  Release Exist : Release name - {0}, version - {1}", component.Name, component.Version);
                 }
                 else if (await CheckComponentExistenceByExternalId(component) ||
                          CheckAvailabilityByName(sw360ComponentList, component))
                 {
-                    Logger.Debug($"GetAvailableComponenentsList():  Component Exist : Release name - {component.Name}, version - {component.Version}");
+                    Logger.DebugFormat("GetAvailableComponenentsList():  Component Exist : Component name - {0}, version - {1}", component.Name, component.Version);
                 }
                 else
                 {
@@ -345,7 +354,7 @@ namespace LCT.Services
         }
         private static bool CheckAvailabilityByNameAndVersion(IList<Sw360Releases> sw360Releases, Components component, IList<Sw360Components> sw360ComponentList)
         {
-            Logger.Debug($"CheckAvailabilityByNameAndVersion(): Starting check for component '{component?.Name}' version '{component?.Version}'");
+            Logger.DebugFormat("CheckAvailabilityByNameAndVersion(): Starting check for component '{0}' version '{1}'", component?.Name, component?.Version);
 
             var sw360Release = FindMatchingRelease(sw360Releases, component);
             if (sw360Release == null)
@@ -396,8 +405,7 @@ namespace LCT.Services
                 return true;
             }
 
-            Logger.Debug($"GetAvailableComponenentsList(): Component Name - {component.Name}, Version - {component.Version} " +
-                        $"validating Externalids list - {sw360Component.ExternalIds?.Package_Url},{sw360Component.ExternalIds?.Purl_Id}");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Component Name - {0}, Version - {1} validating Externalids list - {2},{3}", component.Name, component.Version, sw360Component.ExternalIds?.Package_Url, sw360Component.ExternalIds?.Purl_Id);
 
             if (!ValidateProjectTypePurl(sw360Component, component))
             {
@@ -416,7 +424,7 @@ namespace LCT.Services
                 return false;
             }
 
-            Logger.Debug($"GetAvailableComponenentsList(): Validating with PURL ID: {projectPurlCheckId}");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Validating with PURL ID: {0}", projectPurlCheckId);
 
             bool hasMatchingExternalId = sw360Component.ExternalIds.Package_Url?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true
                 || sw360Component.ExternalIds.Purl_Id?.Contains(projectPurlCheckId, StringComparison.OrdinalIgnoreCase) == true;
@@ -427,14 +435,14 @@ namespace LCT.Services
                 return false;
             }
 
-            Logger.Debug($"GetAvailableComponenentsList(): Component Name'{component.Name}' PURL check ID matched with SW360 component PURL ID");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Component Name'{0}' PURL check ID matched with SW360 component PURL ID", component.Name);
             return true;
         }
 
         private static void HandleMismatchedPurlId(Sw360Components sw360Component, Components component)
         {
-            Logger.Debug($"GetAvailableComponenentsList(): Component Name '{component.Name}' PURL ID mismatched with SW360 component PURL ID");
-            Logger.Warn($"Component Name '{component.Name}' already exists in SW360 with different package type PURL ID. Skipping this component.");
+            Logger.DebugFormat("GetAvailableComponenentsList(): Component Name '{0}' PURL ID mismatched with SW360 component PURL ID", component.Name);
+            Logger.WarnFormat("Component Name '{0}' already exists in SW360 with different package type PURL ID. Skipping this component.", component.Name);
 
             component.InvalidComponentByPurlId = true;
             component.ComponentLink = sw360Component.Links?.Self?.Href;
@@ -460,11 +468,13 @@ namespace LCT.Services
             try
             {
                 string responseBody = await m_SW360ApiCommunicationFacade.GetComponents();
+                LogHandlingHelper.HttpResponseOfStringContent("Response of get Components data", $"MethodName:GetAvailableComponenentsListFromSw360()", responseBody);
                 var componentsDataModel = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
                 componentsList = componentsDataModel?.Embedded?.Sw360components;
             }
             catch (HttpRequestException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Response of get Components data", $"MethodName:GetAvailableComponenentsListFromSw360()", ex, "An HTTP request error occurred while trying to fetch release data");
                 Environment.ExitCode = -1;
                 Logger.Error($"GetAvailableComponenentsListFromSw360():", ex);
             }
@@ -474,6 +484,7 @@ namespace LCT.Services
         private static bool CheckAvailabilityByName(IList<Sw360Components> sw360Components, Components component)
         {
             //checking for component existance with name 
+            Logger.DebugFormat("CheckAvailabilityByName():Starting to identifying component through name: Component name - {0}", component.Name);
             bool isComponentAvailable = false;
             Sw360Components sw360Component =
                 sw360Components.FirstOrDefault(x => x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant());
@@ -489,12 +500,14 @@ namespace LCT.Services
                 });
                 isComponentAvailable = true;
             }
+            Logger.DebugFormat("CheckAvailabilityByName():Identified Component status through name :{0}", isComponentAvailable);
+            Logger.DebugFormat("CheckAvailabilityByName():Completed to identifying component through name: component exist-{0},Component name - {1}", isComponentAvailable, component.Name);
             return isComponentAvailable;
         }
 
         private async Task<bool> CheckComponentExistenceByExternalId(Components componentToBomData)
         {
-            Logger.Debug($"CheckComponentExistenceByExternalId(): Component - {componentToBomData.Name}");
+            Logger.DebugFormat("CheckComponentExistenceByExternalId(): Starting to identifying component through ExternalId - {0}", componentToBomData.Name);
             ComponentStatus componentstatus = new ComponentStatus();
 
             try
@@ -512,24 +525,27 @@ namespace LCT.Services
                         ReleaseExternalId = string.Empty
                     });
                 }
+                Logger.DebugFormat("CheckComponentExistenceByExternalId():Identified Component status through External Id :{0}", componentstatus.isComponentExist);
             }
             catch (HttpRequestException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("CheckComponentExistenceByExternalId", $"MethodName:CheckComponentExistenceByExternalId()", ex, "An HTTP request error occurred while trying to fetch release data.");
                 componentstatus.isComponentExist = false;
                 Logger.Error($"CheckComponentExistenceByExternalId():", ex);
             }
             catch (AggregateException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("CheckComponentExistenceByExternalId", $"MethodName:CheckComponentExistenceByExternalId()", ex, "");
                 componentstatus.isComponentExist = false;
                 Logger.Error($"CheckComponentExistenceByExternalId():", ex);
             }
-
+            
             return componentstatus.isComponentExist;
         }
 
         private async Task<bool> CheckReleaseExistenceByExternalId(Components componentToBomData)
         {
-            Logger.Debug($"CheckReleaseExistenceByExternalId():  start : Release name - {componentToBomData.Name}, version - {componentToBomData.Version}");
+            Logger.DebugFormat("CheckReleaseExistenceByExternalId():Starting to identifying release through External Id : Release name - {0}, version - {1},ExternalId - {2}", componentToBomData.Name, componentToBomData.Version, componentToBomData.ReleaseExternalId);
             Releasestatus releaseStatus = new Releasestatus();
 
             try
@@ -546,18 +562,21 @@ namespace LCT.Services
                         ComponentExternalId = componentToBomData.ComponentExternalId
                     });
                 }
+                Logger.DebugFormat("CheckReleaseExistenceByExternalId():Identified release status through External Id :{0}", releaseStatus.isReleaseExist);
             }
             catch (HttpRequestException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("CheckReleaseExistenceByExternalId", $"MethodName:CheckReleaseExistenceByExternalId()", ex, "An HTTP request error occurred while trying to fetch release data.");
                 releaseStatus.isReleaseExist = false;
                 Logger.Error($"CheckReleaseExistenceByExternalId():", ex);
             }
             catch (AggregateException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetReleaseDataByExternalId", $"MethodName:GetReleaseDataByExternalId()", ex, "Multiple errors occurred while processing the request. Please investigate the inner exceptions for more details.");
                 releaseStatus.isReleaseExist = false;
                 Logger.Error($"CheckReleaseExistenceByExternalId():", ex);
             }
-
+            Logger.DebugFormat("CheckReleaseExistenceByExternalId():Completed to identifying release through External Id :Name - {0}, version - {1},release exist status-{2}", componentToBomData.Name, componentToBomData.Version, releaseStatus.isReleaseExist);
             return releaseStatus.isReleaseExist;
         }
     }

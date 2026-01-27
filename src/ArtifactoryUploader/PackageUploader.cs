@@ -32,8 +32,10 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings)
         {
+            Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has started");
             //Reading the CycloneBOM data
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
+            Logger.DebugFormat("UploadPackageToArtifactory(): Identified bom file with path: {0}", bomFilePath);
             Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper);
 
             LoggerHelper.DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
@@ -72,7 +74,7 @@ namespace LCT.ArtifactoryUploader
                 (int)Program.UploaderStopWatch.Elapsed.TotalSeconds;
             PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);
 
-            Logger.Debug($"UploadPackageToArtifactory():End");
+            Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has completed");
 
             // set the error code
             if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)

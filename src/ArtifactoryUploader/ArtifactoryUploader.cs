@@ -31,31 +31,24 @@ namespace LCT.ArtifactoryUploader
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting UploadPackageToArtifactory method");
-            string operationType = component.PackageType == PackageType.ClearedThirdParty
-                || component.PackageType == PackageType.Development ? "copy" : "move";
+
+            Logger.Debug("UploadPackageToRepo(): Starting the upload package to Artifactory.");
+            string operationType = GetOperationType(component);
             string dryRunSuffix = component.DryRun ? " dry-run" : "";
             HttpResponseMessage responsemessage = new HttpResponseMessage();
             try
             {
-
                 // Package Information
                 var packageInfo = await GetPackageInfoWithRetry(JFrogService, component);
                 if (packageInfo == null)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound)
-                    {
-                        ReasonPhrase = ApiConstant.PackageNotFound
-                    };
+                    return CreateNotFoundResponse(ApiConstant.PackageNotFound);
                 }
 
                 // Perform Copy or Move operation
-                responsemessage = component.PackageType switch
-                {
-                    PackageType.ClearedThirdParty or PackageType.Development => await JFrogApiCommInstance.CopyFromRemoteRepo(component),
-                    PackageType.Internal => await JFrogApiCommInstance.MoveFromRepo(component),
-                    _ => new HttpResponseMessage(HttpStatusCode.NotFound)
-                };
+
+                responsemessage = await GetRepoOperationResponse(component);
+                await LogHandlingHelper.HttpResponseHandling("Upload Package To Repo", $"MethodName:UploadPackageToRepo()", responsemessage, "");
 
                 // Check status code and handle errors
                 if (responsemessage.StatusCode != HttpStatusCode.OK)
@@ -65,25 +58,58 @@ namespace LCT.ArtifactoryUploader
                 }
 
                 await PackageUploadHelper.JfrogFoundPackagesAsync(component, displayPackagesInfo, operationType, responsemessage, dryRunSuffix);
-
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
-                responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
-                return responsemessage;
+                LogHandlingHelper.ExceptionErrorHandling("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An HTTP request error occurred while uploading the package to Artifactory.");
+                return HandleUploadException(ex, responsemessage);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Error($"Error has occurred in UploadPackageToArtifactory--{ex}");
-                responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
-                return responsemessage;
+                LogHandlingHelper.ExceptionErrorHandling("UploadPackageToRepo", $"MethodName:UploadPackageToRepo(), ComponentName: {component.Name}", ex, "An invalid operation occurred while uploading the package to Artifactory.");
+                return HandleUploadException(ex, responsemessage);
             }
             finally
             {
-                Logger.Debug("Ending UploadPackageToArtifactory method");
+                Logger.DebugFormat("UploadPackageToRepo(): Ending the upload process for component: {0}.", component.Name);
             }
 
+            return responsemessage;
+        }
+
+        private static string GetOperationType(ComponentsToArtifactory component)
+        {
+            if (component.ComponentType == "CHOCO")
+            {
+                return component.PackageType == PackageType.Internal ? "move" : "copy";
+            }
+            return (component.PackageType == PackageType.ClearedThirdParty || component.PackageType == PackageType.Development) ? "copy" : "move";
+        }
+
+        private static async Task<HttpResponseMessage> GetRepoOperationResponse(ComponentsToArtifactory component)
+        {
+            return component.PackageType switch
+            {
+                PackageType.ClearedThirdParty or PackageType.Development =>
+                    await JFrogApiCommInstance.CopyFromRemoteRepo(component),
+                PackageType.Internal =>
+                    await JFrogApiCommInstance.MoveFromRepo(component),
+                _ => new HttpResponseMessage(HttpStatusCode.NotFound)
+            };
+        }
+
+        private static HttpResponseMessage CreateNotFoundResponse(string reasonPhrase)
+        {
+            return new HttpResponseMessage(HttpStatusCode.NotFound)
+            {
+                ReasonPhrase = reasonPhrase
+            };
+        }
+
+        private static HttpResponseMessage HandleUploadException(Exception ex, HttpResponseMessage responsemessage)
+        {
+            Logger.Error("Error has occurred in UploadPackageToArtifactory--{Exception}", ex);
+            responsemessage.ReasonPhrase = ApiConstant.ErrorInUpload;
             return responsemessage;
         }
 
@@ -133,11 +159,11 @@ namespace LCT.ArtifactoryUploader
             }
             catch (IOException ex)
             {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Failed to create directory ", ex, "IOException occurred while creating the directory.");
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Error($"GettPathForArtifactoryUpload() ", ex);
+                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Unauthorized access while creating directory", ex, "UnauthorizedAccessException occurred while creating the directory.");
             }
 
             return localPathforartifactory;
