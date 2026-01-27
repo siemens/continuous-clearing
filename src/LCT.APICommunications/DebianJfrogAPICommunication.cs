@@ -45,10 +45,6 @@ namespace LCT.APICommunications
 
         #region Constructors
 
-        #endregion
-
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DebianJfrogAPICommunication"/> class.
         /// </summary>
