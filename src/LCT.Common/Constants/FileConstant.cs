@@ -103,10 +103,6 @@ namespace LCT.Common.Constants
         /// <summary>
         /// File extension for tar.xz files.
         /// </summary>
-        public const string ComponentCreatorLog = "PackageCreator";
-        public const string BomCreatorLog = "PackageIdentifier";
-        public const string FossologyUploaderLog = "FossologyUploader.log";
-        public const string ArtifactoryUploaderLog = "ArtifactoryUploader";
         public const string XzFileExtension = ".tar.xz";
         /// <summary>
         /// File extension for tar.bz2 files.

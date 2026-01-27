@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -20,7 +20,7 @@ using Level = log4net.Core.Level;
 namespace LCT.APICommunications
 {
     /// <summary>
-    /// Provides helper methods for handling attachments in SW360.
+    /// AttachmentHelper class
     /// </summary>
     public class AttachmentHelper
     {
@@ -65,7 +65,22 @@ namespace LCT.APICommunications
         /// The form key used for file uploads.
         /// </summary>
         private const string fileFormKey = "file";
+
+        /// <summary>
+        /// Error message for attachment failures.
+        /// </summary>
         private const string AttachmentErrorMessage = "Not able to attachment";
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AttachmentHelper"/> class.
+        /// </summary>
+        /// <param name="sw360TokenType">The SW360 authentication token type.</param>
+        /// <param name="sw360Token">The SW360 authentication token.</param>
+        /// <param name="releaseApi">The SW360 release API endpoint URL.</param>
         public AttachmentHelper(string sw360TokenType, string sw360Token, string releaseApi)
         {
             sw360AuthToken = sw360Token;
@@ -162,6 +177,7 @@ namespace LCT.APICommunications
             return releaseAttachementApi;
         }
 
+
         /// <summary>
         /// Writes the attachments JSON file to the specified folder path.
         /// </summary>
@@ -224,5 +240,3 @@ namespace LCT.APICommunications
         #endregion Methods
     }
 }
-
-

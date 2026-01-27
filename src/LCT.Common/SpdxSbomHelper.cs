@@ -14,9 +14,28 @@ using System.Reflection;
 
 namespace LCT.Common
 {
+    /// <summary>
+    /// Provides helper methods for working with SPDX SBOM files.
+    /// </summary>
     public static class SpdxSbomHelper
     {
+        #region Fields
+
+        /// <summary>
+        /// The logger instance for logging messages and errors.
+        /// </summary>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion Fields
+
+        #region Methods
+
+        /// <summary>
+        /// Checks and separates valid components from unsupported components in an SPDX file based on project type.
+        /// </summary>
+        /// <param name="bom">The BOM to validate.</param>
+        /// <param name="projectType">The project type to validate against.</param>
+        /// <param name="listOfUnsupportedComponents">The BOM to populate with unsupported components.</param>
         public static void CheckValidComponentsFromSpdxfile(Bom bom, string projectType, ref Bom listOfUnsupportedComponents)
         {
             Logger.Debug("CheckValidComponentsFromSpdxfile():Start identifying Supported and unsupported packages from spdx input files");
@@ -149,6 +168,6 @@ namespace LCT.Common
             });
         }
 
-        #endregion
+        #endregion Methods
     }
 }

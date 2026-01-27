@@ -22,6 +22,9 @@ namespace LCT.Common
     {
         #region Fields
 
+        /// <summary>
+        /// The logger instance for logging messages and errors.
+        /// </summary>
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #endregion
@@ -66,9 +69,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Validates the folder path given
+        /// Validates the folder path to ensure it is not null and exists.
         /// </summary>
-        /// <param name="folderPath"></param>
+        /// <param name="folderPath">The folder path to validate.</param>
+        /// <param name="environmentHelper">The environment helper for exiting the application on validation failure.</param>
         public void ValidateFolderPath(string folderPath, IEnvironmentHelper environmentHelper)
         {
             if (string.IsNullOrWhiteSpace(folderPath))

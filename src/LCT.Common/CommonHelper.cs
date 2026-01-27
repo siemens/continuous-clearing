@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -30,24 +30,38 @@ namespace LCT.Common
     {
         #region Fields
 
+        /// <summary>
+        /// The logger instance for logging messages and errors.
+        /// </summary>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /// <summary>
+        /// Array of invalid characters for project names.
+        /// </summary>
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
 
-        #endregion
+        #endregion Fields
 
         #region Properties
 
+        /// <summary>
+        /// Gets or sets the project summary link.
+        /// </summary>
         public static string ProjectSummaryLink { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default log path.
+        /// </summary>
         public static string DefaultLogPath { get; set; }
 
-        #endregion
+        #endregion Properties
 
         #region Methods
 
         /// <summary>
-        /// Checks if Azure DevOps debug mode is enabled.
+        /// Determines whether Azure DevOps debug mode is enabled.
         /// </summary>
-        /// <returns>True if Azure DevOps debug mode is enabled; otherwise, false.</returns>
+        /// <returns>True if debug mode is enabled; otherwise, false.</returns>
         public static bool IsAzureDevOpsDebugEnabled()
         {
             string azureDevOpsDebug = System.Environment.GetEnvironmentVariable("System.Debug");
@@ -59,12 +73,12 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Removes excluded components from the component list based on PURL or name/version matching.
+        /// Removes excluded components from the component list.
         /// </summary>
-        /// <param name="ComponentList">The list of components to filter.</param>
-        /// <param name="ExcludedComponents">The list of excluded component identifiers.</param>
+        /// <param name="ComponentList">The list of components to process.</param>
+        /// <param name="ExcludedComponents">The list of components to exclude.</param>
         /// <param name="noOfExcludedComponents">The count of excluded components.</param>
-        /// <returns>The filtered component list.</returns>
+        /// <returns>The filtered list of components.</returns>
         public static List<Component> RemoveExcludedComponents(List<Component> ComponentList, List<string> ExcludedComponents, ref int noOfExcludedComponents)
         {
             List<string> ExcludedComponentsFromPurl = ExcludedComponents?.Where(ec => ec.StartsWith("pkg:")).ToList();
@@ -76,9 +90,9 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Removes invalid dependencies and references that don't match existing component BOM references.
+        /// Removes invalid dependencies and references that don't match component BOM references.
         /// </summary>
-        /// <param name="components">The list of valid components.</param>
+        /// <param name="components">The list of components.</param>
         /// <param name="dependencies">The list of dependencies to validate.</param>
         /// <returns>The cleaned list of dependencies.</returns>
         public static List<Dependency> RemoveInvalidDependenciesAndReferences(List<Component> components, List<Dependency> dependencies)
@@ -98,8 +112,8 @@ namespace LCT.Common
         /// <summary>
         /// Gets the substring after the last occurrence of a separator.
         /// </summary>
-        /// <param name="value">The string to search.</param>
-        /// <param name="separator">The separator string.</param>
+        /// <param name="value">The input string.</param>
+        /// <param name="separator">The separator to search for.</param>
         /// <returns>The substring after the last occurrence of the separator.</returns>
         public static string GetSubstringOfLastOccurance(string value, string separator)
         {
@@ -113,7 +127,7 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Trims the specified suffix from the end of the string if present.
+        /// Trims the specified suffix from the end of the input string if present.
         /// </summary>
         /// <param name="input">The input string.</param>
         /// <param name="suffixToRemove">The suffix to remove.</param>
@@ -130,11 +144,11 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Get display name for given instance type and property name
+        /// Gets the display name for the given instance type and property name.
         /// </summary>
-        /// <param name="objectValue">pass the object</param>
-        /// <param name="nameOfProperty">Property</param>
-        /// <returns>string</returns>
+        /// <param name="objectValue">The object instance.</param>
+        /// <param name="nameOfProperty">The property name.</param>
+        /// <returns>The display name attribute value, or empty string if not found.</returns>
         public static string Convert(object objectValue, object nameOfProperty)
         {
             var attribute = objectValue.GetType()
@@ -147,7 +161,7 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Checks if a string value is null or empty and throws an exception if invalid.
+        /// Checks if a string value is null, empty, or whitespace and logs an error if so.
         /// </summary>
         /// <param name="name">The name of the parameter being checked.</param>
         /// <param name="value">The value to check.</param>
@@ -161,10 +175,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Checks if a component has a property with the specified constant name.
+        /// Checks if a component has a property with the specified name.
         /// </summary>
         /// <param name="component">The component to check.</param>
-        /// <param name="constant">The property name constant to search for.</param>
+        /// <param name="constant">The property name to look for.</param>
         /// <returns>True if the property exists; otherwise, false.</returns>
         public static bool ComponentPropertyCheck(Component component, string constant)
         {
@@ -176,11 +190,11 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Gets and sets properties for manually added components based on file type.
+        /// Adds details for manually added components to the BOM list.
         /// </summary>
         /// <param name="componentsForBOM">The components to process.</param>
-        /// <param name="listComponentForBOM">The output list for processed components.</param>
-        /// <param name="filePath">The file path to determine component properties.</param>
+        /// <param name="listComponentForBOM">The target list to add processed components to.</param>
+        /// <param name="filePath">The file path to extract properties from.</param>
         public static void GetDetailsForManuallyAdded(List<Component> componentsForBOM, List<Component> listComponentForBOM, string filePath)
         {
             foreach (var component in componentsForBOM)
@@ -208,10 +222,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Adds specific metadata values to BOM format and serializes it.
+        /// Adds specific values to BOM format and serializes it to JSON.
         /// </summary>
-        /// <param name="listOfComponentsToBom">The BOM to update and serialize.</param>
-        /// <returns>The serialized BOM data as a JSON string.</returns>
+        /// <param name="listOfComponentsToBom">The BOM to format and serialize.</param>
+        /// <returns>The serialized BOM JSON string.</returns>
         public static string AddSpecificValuesToBOMFormat(Bom listOfComponentsToBom)
         {
             string guid = Guid.NewGuid().ToString();
@@ -225,9 +239,9 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Gets the list of repositories configured for the project type.
+        /// Gets the list of repositories based on the project type configuration.
         /// </summary>
-        /// <param name="appSettings">The application settings containing repository configuration.</param>
+        /// <param name="appSettings">The application settings containing repository configurations.</param>
         /// <returns>An array of repository names.</returns>
         public static string[] GetRepoList(CommonAppSettings appSettings)
         {
@@ -272,6 +286,14 @@ namespace LCT.Common
 
             return Array.Empty<string>();
         }
+
+        /// <summary>
+        /// Initializes the log folder based on application settings.
+        /// </summary>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="logFileName">The log file name.</param>
+        /// <param name="m_Verbose">Whether verbose logging is enabled.</param>
+        /// <returns>The log folder path.</returns>
         public static string LogFolderInitialization(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
             string FolderPath;
@@ -297,7 +319,12 @@ namespace LCT.Common
             }
             CopyInitialLogsToCurrentLoggerAndDelete(defaultLogFilePath);
             return FolderPath;
-        } 
+        }
+
+        /// <summary>
+        /// Copies initial logs to the current logger and deletes the original log file.
+        /// </summary>
+        /// <param name="defaultLogFilePath">The path to the default log file.</param>
         private static void CopyInitialLogsToCurrentLoggerAndDelete(string defaultLogFilePath)
         {
             try
@@ -324,11 +351,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Initializes the default log folder based on the operating system.
+        /// Trims the log header from a log line, returning only the message content.
         /// </summary>
-        /// <param name="logFileName">The log file name.</param>
-        /// <param name="m_Verbose">Whether verbose logging is enabled.</param>
-        public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
+        /// <param name="line">The log line to trim.</param>
+        /// <returns>The message content after the header.</returns>
         private static string TrimLogHeader(string line)
         {
             int first = line.IndexOf('|');
@@ -343,6 +369,13 @@ namespace LCT.Common
             // Return content after the third pipe, trimming leading spaces
             return line[(third + 1)..].TrimStart();
         }
+
+        /// <summary>
+        /// Initializes the default log folder in the temp directory.
+        /// </summary>
+        /// <param name="logFileName">The log file name.</param>
+        /// <param name="m_Verbose">Whether verbose logging is enabled.</param>
+        /// <returns>The local path for the source repository downloads.</returns>
         public static string DefaultLogFolderInitialization(string logFileName, bool m_Verbose)
         {
             string localPathforSourceRepo = string.Empty;
@@ -382,7 +415,7 @@ namespace LCT.Common
         /// Checks if a project name contains invalid characters.
         /// </summary>
         /// <param name="projectName">The project name to validate.</param>
-        /// <param name="invalidChars">The output string containing found invalid characters.</param>
+        /// <param name="invalidChars">Output parameter containing the invalid characters found.</param>
         /// <returns>True if invalid characters are found; otherwise, false.</returns>
         public static bool ContainsInvalidCharacters(string projectName, out string invalidChars)
         {
@@ -399,9 +432,9 @@ namespace LCT.Common
         /// </summary>
         /// <param name="sw360ProjectName">The SW360 project name.</param>
         /// <param name="clearingState">The clearing state of the project.</param>
-        /// <param name="Name">The project name.</param>
+        /// <param name="Name">The project name to validate.</param>
         /// <param name="appSettings">The application settings.</param>
-        /// <returns>0 if validation succeeds; -1 if validation fails.</returns>
+        /// <returns>0 if valid; -1 if invalid.</returns>
         public static int ValidateSw360Project(string sw360ProjectName, string clearingState, string Name, CommonAppSettings appSettings)
         {
             if (string.IsNullOrEmpty(sw360ProjectName))
@@ -428,10 +461,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Masks sensitive arguments (tokens) in the argument array for logging purposes.
+        /// Masks sensitive arguments like tokens in the argument array.
         /// </summary>
-        /// <param name="args">The command line arguments to mask.</param>
-        /// <returns>An array with sensitive values replaced by asterisks.</returns>
+        /// <param name="args">The array of arguments to mask.</param>
+        /// <returns>A new array with sensitive values masked.</returns>
         public static string[] MaskSensitiveArguments(string[] args)
         {
             if (args == null || args.Length == 0)
@@ -575,10 +608,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Adds SPDX SBOM file name property to all components in the BOM.
+        /// Adds SPDX SBOM filename properties to all components in the BOM.
         /// </summary>
         /// <param name="bom">The BOM to update.</param>
-        /// <param name="filePath">The file path of the SPDX file.</param>
+        /// <param name="filePath">The SPDX file path.</param>
         public static void AddSpdxSBomFileNameProperty(ref Bom bom, string filePath)
         {
             if (bom?.Components != null)
@@ -596,9 +629,9 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Removes duplicate properties with the same name and adds a new property.
+        /// Removes duplicate properties by name and adds a new property.
         /// </summary>
-        /// <param name="properties">The property list to update.</param>
+        /// <param name="properties">The list of properties to update.</param>
         /// <param name="propertyName">The property name.</param>
         /// <param name="propertyValue">The property value.</param>
         public static void RemoveDuplicateAndAddProperty(ref List<Property> properties, string propertyName, string propertyValue)
@@ -636,17 +669,17 @@ namespace LCT.Common
         /// Converts a wildcard pattern to a regular expression pattern.
         /// </summary>
         /// <param name="wildcard">The wildcard pattern.</param>
-        /// <returns>A regex pattern string.</returns>
+        /// <returns>The equivalent regex pattern.</returns>
         private static string WildcardToRegex(string wildcard)
         {
             return "^" + Regex.Escape(wildcard).Replace("\\*", ".*") + "$";
         }
 
         /// <summary>
-        /// Adds excluded component property for components matching PURL patterns.
+        /// Adds excluded component property based on PURL matching.
         /// </summary>
-        /// <param name="ComponentList">The list of components to check.</param>
-        /// <param name="ExcludedComponentsFromPurl">The list of excluded PURL patterns.</param>
+        /// <param name="ComponentList">The list of components.</param>
+        /// <param name="ExcludedComponentsFromPurl">The list of PURLs to exclude.</param>
         /// <param name="noOfExcludedComponents">The count of excluded components.</param>
         private static void AddExcludedComponentsPropertyFromPurl(List<Component> ComponentList, List<string> ExcludedComponentsFromPurl, ref int noOfExcludedComponents)
         {
@@ -683,10 +716,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Adds excluded component property for components matching name and version patterns.
+        /// Adds excluded component property based on name and version matching.
         /// </summary>
-        /// <param name="ComponentList">The list of components to check.</param>
-        /// <param name="otherExcludedComponents">The list of excluded component name:version patterns.</param>
+        /// <param name="ComponentList">The list of components.</param>
+        /// <param name="otherExcludedComponents">The list of excluded components by name:version.</param>
         /// <param name="noOfExcludedComponents">The count of excluded components.</param>
         private static void AddExcludedComponentsPropertyFromNameAndVersion(List<Component> ComponentList, List<string> otherExcludedComponents, ref int noOfExcludedComponents)
         {
@@ -715,12 +748,12 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Creates a new component with specified properties.
+        /// Creates a component with standard properties.
         /// </summary>
         /// <param name="name">The component name.</param>
         /// <param name="version">The component version.</param>
         /// <param name="releaseExternalId">The release external ID (PURL).</param>
-        /// <returns>A new Component object.</returns>
+        /// <returns>A new Component instance.</returns>
         public static Component CreateComponentWithProperties(string name, string version, string releaseExternalId)
         {
             Component component = new Component
@@ -735,7 +768,7 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Canonicalizes the project type to the standard format.
+        /// Canonicalizes the project type string to standardized format.
         /// </summary>
         /// <param name="projectType">The project type to canonicalize.</param>
         /// <returns>The canonicalized project type string.</returns>
@@ -758,6 +791,6 @@ namespace LCT.Common
             };
         }
 
-        #endregion
+        #endregion Methods
     }
 }
