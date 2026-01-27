@@ -26,11 +26,13 @@ namespace LCT.ArtifactoryUploader
             try
             {
                 responseMessage = await _JfrogAqlApiCommunication.CheckConnection();
+                await LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname-ValidateArtifactoryCredentials()", responseMessage, "");
                 responseMessage.EnsureSuccessStatusCode();
                 return 0;
             }
             catch (HttpRequestException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Get sw360 Project details for validating", $"MethodName-GetProjectById()", ex, "");
                 ExceptionHandling.HttpException(ex, responseMessage, "Artifactory");
                 return -1;
             }

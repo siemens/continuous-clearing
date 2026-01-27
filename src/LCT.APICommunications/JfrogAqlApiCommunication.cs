@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -40,6 +41,7 @@ namespace LCT.APICommunications
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             string url = $"{DomainName}/api/security/apiKey";
+            await LogHandlingHelper.HttpRequestHandling("JFrog Connection validation", $"Methodname:CheckConnection()", httpClient, url);
             return await httpClient.GetAsync(url);
         }
 
@@ -51,6 +53,7 @@ namespace LCT.APICommunications
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            await LogHandlingHelper.HttpRequestHandling("Get component data from jfrog repository", $"MethodName:GetComponentDataByRepo()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 
@@ -128,7 +131,7 @@ namespace LCT.APICommunications
             {
                 return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@pypi.normalized.name", component.Name), ("@pypi.version", component.Version) });
             }
-            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase))
+            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase) || component.ComponentType.Equals("Choco", StringComparison.InvariantCultureIgnoreCase))
             {
                 // NuGet: $and for repo, $or for id (case), and version
                 return $"items.find({{\"$and\": [{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},{{ \"$or\":[{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name}\" }} }},{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}]}},{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}]}}).include(\"repo\", \"path\", \"name\").limit(1)";
@@ -175,7 +178,7 @@ namespace LCT.APICommunications
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-
+            await LogHandlingHelper.HttpRequestHandling("Get package information from jfrog repository", $"MethodName:ExecuteSearchAqlAsync()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 

@@ -13,6 +13,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -32,7 +33,9 @@ namespace LCT.SW360PackageCreator
 
         public async Task<string> DownloadPackage(ComparisonBomData component, string localPathforDownload)
         {
+            Logger.DebugFormat("DownloadPackage():Start downloading process of source code for this component , Name-{0},version-{1}", component.Name, component.Version);
             string path = Download(component, localPathforDownload);
+            Logger.DebugFormat("DownloadPackage():Completed downloading process of source code for this component , Name-{0},version-{1}", component.Name, component.Version);
             await Task.Delay(10);
             return path;
         }
@@ -64,12 +67,12 @@ namespace LCT.SW360PackageCreator
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Debug($"DownloadSourceCodeUsingGitClone():{ex}");
+                LogHandlingHelper.ExceptionErrorHandling("Download", $"MethodName:Download(), Release Name: {component.Name}@{component.Version}, DownloadPath: {downloadPath}", ex, "Unauthorized access occurred while trying to create the download directory.");
                 return downloadedPackageName;
             }
             Result result = CloneSource(component, downloadPath, taggedVersion, compressedFilePath);
 
-            Logger.Debug($"DownloadSourceCodeUsingGitClone:Release Name : {component.Name}@{component.Version}, stdout:{result?.StdOut}, npm pack stdErr:{result?.StdErr}");
+            Logger.DebugFormat("DownloadSourceCodeUsingGitClone:Release Name : {0}@{1}, stdout:{2}, npm pack stdErr:{3}", component.Name, component.Version, result?.StdOut, result?.StdErr);
             m_downloadedSourceInfos.Add(new DownloadedSourceInfo() { Name = component.Name, Version = component.Version, DownloadedPath = compressedFilePath, SourceRepoUrl = component.DownloadUrl, TaggedVersion = taggedVersion });
             component.DownloadUrl = GetSourceRepositoryUrl(component, taggedVersion);
             return compressedFilePath;
@@ -96,6 +99,7 @@ namespace LCT.SW360PackageCreator
         }
         private static string GetCorrectVersion(ComparisonBomData component)
         {
+            Logger.DebugFormat("GetCorrectVersion():Start identifying correct version for this component , Name-{0},version-{1}", component.Name, component.Version);
             string correctVersion = string.Empty;
             Result result = ListTagsOfComponent(component);
 
@@ -104,12 +108,10 @@ namespace LCT.SW360PackageCreator
 
             foreach (string item in taglist)
             {
-                Logger.Debug($"GetCorrectVersion - Current Item:{item}");
-
                 if (!string.IsNullOrWhiteSpace(item))
                 {
                     string tag = item[(item.IndexOf("tags/") + 5)..];
-                    Logger.Debug($"baseobject - {item},tag -{tag}");
+                    Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
 
                     if (tag.Contains(component.Version, StringComparison.OrdinalIgnoreCase) &&
                 tag.Contains(component.Name, StringComparison.OrdinalIgnoreCase))
@@ -120,12 +122,10 @@ namespace LCT.SW360PackageCreator
             }
             foreach (string item in taglist)
             {
-                Logger.Debug($"GetCorrectVersion - Current Item:{item}");
-
                 if (!string.IsNullOrWhiteSpace(item))
                 {
                     string tag = item[(item.IndexOf("tags/") + 5)..];
-                    Logger.Debug($"baseobject - {item},tag -{tag}");
+                    Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
 
                     if (tag.Contains(component.Version))
                     {
@@ -137,7 +137,7 @@ namespace LCT.SW360PackageCreator
                     }
                 }
             }
-            Logger.Debug($"componentName - given version:{component.Version}, correctVersion:{correctVersion}");
+            Logger.DebugFormat("GetCorrectVersion():Completed identifying correct version for this component ,given version:{0}, correct Version:{1}", component.Version, correctVersion);
             return correctVersion;
         }
         private static string[] GetTagListFromResult(Result result)
@@ -158,20 +158,19 @@ namespace LCT.SW360PackageCreator
         }
         private static string GetBaseVersion(string version)
         {
-            try
+            if (string.IsNullOrWhiteSpace(version))
             {
-                var parsedVersion = Version.Parse(version);
-                if (parsedVersion.Build == 0 && parsedVersion.Revision == -1)
+                return version;
+            }  
+            if (Version.TryParse(version, out var parsed))
+            {
+                if (parsed.Build == 0 && (parsed.Revision == -1 || parsed.Revision == 0))
                 {
-                    return $"{parsedVersion.Major}.{parsedVersion.Minor}";
-                }
+                    return $"{parsed.Major}.{parsed.Minor}";
+                } 
                 return version;
             }
-            catch (FormatException)
-            {
-                Logger.Debug($"Invalid version format: {version}");
-                return version;
-            }
+            return version;
         }
         private bool CheckIfAlreadyDownloaded(ComparisonBomData component, string tagVersion, out string downloadedPath)
         {
@@ -190,8 +189,9 @@ namespace LCT.SW360PackageCreator
 
         private static Result ListTagsOfComponent(ComparisonBomData component)
         {
+            Logger.DebugFormat("ListTagsOfComponent():Start git process for identifying list of tags for this component , Name-{0},version-{1}", component.Name, component.Version);
             string gitCommand = $"ls-remote --tags {component.DownloadUrl}";
-            Logger.Debug($"GetCorrectVersion():{component.Name}@{component.Version} --> {gitCommand}");
+            Logger.DebugFormat("ListTagsOfComponent():{0}@{1} --> {2}", component.Name, component.Version, gitCommand);
 
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
@@ -205,7 +205,8 @@ namespace LCT.SW360PackageCreator
             const int timeOutMs = 200 * 60 * 1000;
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo, timeOutMs);
             Result result = processResult?.Result ?? new Result();
-            Logger.Debug($"GetCorrectVersion:{gitCommand}:{result.ExitCode}, output:{result.StdOut}, Error:{result.StdErr}");
+            Logger.DebugFormat("ListTagsOfComponent():{0}:{1}, output:{2}, Error:{3}", gitCommand, result.ExitCode, result.StdOut, result.StdErr);
+            Logger.DebugFormat("ListTagsOfComponent():Completed git process for identifying list of tags for this component , Name-{0},version-{1}", component.Name, component.Version);
             return result;
         }
 
@@ -215,7 +216,7 @@ namespace LCT.SW360PackageCreator
             List<string> gitCommands = GetGitCloneCommands(component, taggedVersion, compressedFilePath);
             Result result = null;
 
-            Logger.Debug($"CloneSource:Download Path : {downloadPath}  Taggedversion:{taggedVersion}");
+            Logger.DebugFormat("CloneSource:Download Path : {0}  Taggedversion:{1}", downloadPath, taggedVersion);
 
             foreach (string command in gitCommands)
             {
@@ -231,7 +232,7 @@ namespace LCT.SW360PackageCreator
 
                 var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo, timeoutInMs);
                 result = processResult?.Result;
-                Logger.Debug($"CloneSource:Command : {command}, ExitCode:{result?.ExitCode},stdout:{result?.StdOut}, npm pack stdErr:{result?.StdErr}");
+                Logger.DebugFormat("CloneSource:Command : {0}, ExitCode:{1},stdout:{2}, npm pack stdErr:{3}", command, result?.ExitCode, result?.StdOut, result?.StdErr);
             }
 
             return result;
@@ -249,5 +250,6 @@ namespace LCT.SW360PackageCreator
                $"archive --format=tar.gz --output={compressedFilePath} FETCH_HEAD"
            };
         }
+        
     }
 }

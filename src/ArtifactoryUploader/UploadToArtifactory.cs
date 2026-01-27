@@ -28,15 +28,18 @@ namespace LCT.ArtifactoryUploader
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static IJFrogService JFrogService { get; set; }
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
+        private const string Choco = "CHOCO";
+        private const string Nuget = "NUGET";
         public async static Task<List<ComponentsToArtifactory>> GetComponentsToBeUploadedToArtifactory(List<Component> comparisonBomData,
                                                                                                       CommonAppSettings appSettings,
                                                                                                       DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting GetComponentsToBeUploadedToArtifactory() method");
+            Logger.Debug("GetComponentsToBeUploadedToArtifactory():Starting to get component data for upload to artifactory");
             List<ComponentsToArtifactory> componentsToBeUploaded = new List<ComponentsToArtifactory>();
 
             foreach (var item in comparisonBomData)
             {
+                Logger.DebugFormat("GetComponentsToBeUploadedToArtifactory(): Identifying data for this component name-{0}, version-{1}", item.Name, item.Version);
                 var packageType = GetPackageType(item);
 
                 if (packageType != PackageType.Unknown)
@@ -74,6 +77,7 @@ namespace LCT.ArtifactoryUploader
                     components.JfrogPackageName = GetJfrogPackageName(components);
                     components.JfrogRepoPath = GetJfrogRepPath(components);
                     componentsToBeUploaded.Add(components);
+                    Logger.DebugFormat("GetComponentsToBeUploadedToArtifactory(): Component identified as unknown package type, name-{0}, version-{1}", item.Name, item.Version);
                 }
                 else
                 {
@@ -82,20 +86,51 @@ namespace LCT.ArtifactoryUploader
                     await AddUnknownPackagesAsync(item, displayPackagesInfo);
                 }
             }
-            Logger.Debug("Ending GetComponentsToBeUploadedToArtifactory() method");
+            ValidComponentsIdentifiedToBeUpload(componentsToBeUploaded);
+            Logger.Debug("GetComponentsToBeUploadedToArtifactory():Completed to getting component data for upload to artifactory");
             return componentsToBeUploaded;
         }
+        private static void ValidComponentsIdentifiedToBeUpload(List<ComponentsToArtifactory> componentsToBeUploaded)
+        {
+            if (componentsToBeUploaded == null || componentsToBeUploaded.Count == 0)
+            {
+                Logger.Debug("No components to be uploaded to Artifactory.");
+                return;
+            }
 
+            var logBuilder = new System.Text.StringBuilder();
+            logBuilder.AppendLine($"\n================================================================================================================");
+            logBuilder.AppendLine(" Components to be Uploaded to Artifactory");
+            logBuilder.AppendLine("================================================================================================================");
+            logBuilder.AppendLine($"| {"Name",-50} | {"Version",-15} | {"ComponentType",-15} | {"PackageType",-20} | {"SrcRepoName",-20} | {"DestRepoName",-20} |");
+            logBuilder.AppendLine("----------------------------------------------------------------------------------------------------------------");
+
+            foreach (var component in componentsToBeUploaded)
+            {
+                logBuilder.AppendLine($"| {component.Name,-50} | {component.Version,-15} | {component.ComponentType,-15} | {component.PackageType,-20} | {component.SrcRepoName,-20} | {component.DestRepoName,-20} |");
+            }
+
+            logBuilder.AppendLine("================================================================================================================");
+
+            Logger.Debug(logBuilder.ToString());
+        }
         private static string GetComponentType(Component item)
         {
-
+            var projectTypeProp = item.Properties
+                                       ?.Find(p => p.Name == Dataconstant.Cdx_ProjectType)
+                                       ?.Value;
+            if (!string.IsNullOrEmpty(projectTypeProp) &&
+                projectTypeProp.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return Choco;
+            }
             if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
                 return "NPM";
             }
             else if (item.Purl.Contains("nuget", StringComparison.OrdinalIgnoreCase))
             {
-                return "NUGET";
+                return Nuget;
             }
             else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
             {
@@ -130,7 +165,7 @@ namespace LCT.ArtifactoryUploader
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == Nuget)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
             }
@@ -173,6 +208,8 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Npm.ReleaseRepo, appSettings.Npm.DevDepRepo, appSettings.Npm.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "nuget":
                         return GetRepoName(packageType, appSettings.Nuget.ReleaseRepo, appSettings.Nuget.DevDepRepo, appSettings.Nuget.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
+                    case "choco":
+                        return GetRepoName(packageType, appSettings.Choco.ReleaseRepo, appSettings.Choco.DevDepRepo, appSettings.Choco.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "maven":
                         return GetRepoName(packageType, appSettings.Maven.ReleaseRepo, appSettings.Maven.DevDepRepo, appSettings.Maven.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "poetry":
@@ -185,7 +222,6 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Cargo.ReleaseRepo, appSettings.Cargo.DevDepRepo, appSettings.Cargo.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                 }
             }
-
             return string.Empty;
         }
 
@@ -237,7 +273,7 @@ namespace LCT.ArtifactoryUploader
                $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
 
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == Nuget || component.ComponentType == Choco)
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
@@ -286,7 +322,7 @@ namespace LCT.ArtifactoryUploader
               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
 
             }
-            else if (component.ComponentType == "NUGET")
+            else if (component.ComponentType == Nuget || component.ComponentType == Choco)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
@@ -331,7 +367,8 @@ namespace LCT.ArtifactoryUploader
             return component.ComponentType switch
             {
                 "NPM" => component.PypiOrNpmCompName,
-                "NUGET" => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
+                Nuget => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
+                Choco => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 "DEBIAN" => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
                 "CARGO" => $"{component.PackageName}.{component.Version}{ApiConstant.CargoExtension}",
                 "POETRY" => component.PypiOrNpmCompName,
@@ -360,7 +397,7 @@ namespace LCT.ArtifactoryUploader
                 case "NPM":
                     displayPackagesInfo.UnknownPackagesNpm.Add(component);
                     break;
-                case "NUGET":
+                case Nuget:
                     displayPackagesInfo.UnknownPackagesNuget.Add(component);
                     break;
                 case "MAVEN":
@@ -377,6 +414,9 @@ namespace LCT.ArtifactoryUploader
                     break;
                 case "CARGO":
                     displayPackagesInfo.UnknownPackagesCargo.Add(component);
+                    break;
+                case Choco:
+                    displayPackagesInfo.UnknownPackagesChoco.Add(component);
                     break;
             }
         }
@@ -444,7 +484,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
                 }
-            }
+            }          
 
             return null;
         }
@@ -577,22 +617,25 @@ namespace LCT.ArtifactoryUploader
                         .Find(p => p.Name == propertyName)?
                         .Value?
                         .ToUpperInvariant();
-
+            Logger.DebugFormat("GetPackageType(): Determining package type for Component - Name: {0}, Version: {1}", item.Name, item.Version);
             if (GetPropertyValue(Dataconstant.Cdx_ClearingState) == "APPROVED")
             {
+                Logger.Debug($"GetPackageType(): Package type determined as Clearing state is APPROVED");
                 return PackageType.ClearedThirdParty;
             }
             else if (GetPropertyValue(Dataconstant.Cdx_IsInternal) == "TRUE")
             {
+                Logger.Debug($"GetPackageType(): Package type determined as Internal");
                 return PackageType.Internal;
             }
             else if (GetPropertyValue(Dataconstant.Cdx_IsDevelopment) == "TRUE")
             {
+                Logger.Debug($"GetPackageType(): Package type determined as Development");
                 return PackageType.Development;
             }
-
+            Logger.Debug($"GetPackageType(): Package type determined as Unknown");
             return PackageType.Unknown;
-        }
+        }       
 
     }
 }

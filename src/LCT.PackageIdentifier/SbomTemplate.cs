@@ -26,6 +26,7 @@ namespace LCT.PackageIdentifier
             if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Bom templateDetails = CycloneDXBomParser.ExtractSBOMDetailsFromTemplate(cycloneDXBomParser.ParseCycloneDXBom(templateFilePath));
+                LogHandlingHelper.ComponentsList(templateFilePath, templateDetails.Components);
                 CycloneDXBomParser.CheckValidComponentsForProjectType(templateDetails.Components, projectType);
                 AddComponentDetails(componentsForBOM, templateDetails);
             }
@@ -78,11 +79,13 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentException ex)
             {
-                Logger.Error($"PropertyAdditionForTemplate():ArgumentException:Error from {sbomcomp.Name} : {sbomcomp.Version}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("ArgumentException", "PropertyAdditionForTemplate()", ex, $"Component: {sbomcomp.Name} @ {sbomcomp.Version}");
+                Logger.Error(string.Format("ArgumentException occurred while adding properties for component: {0} @ {1}. Details: {2}", sbomcomp.Name, sbomcomp.Version, ex.Message), ex);                
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Error($"PropertyAdditionForTemplate():InvalidOperationException:Error from {sbomcomp.Name} : {sbomcomp.Version}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("InvalidOperationException", "PropertyAdditionForTemplate()", ex, $"Component: {sbomcomp.Name} @ {sbomcomp.Version}");
+                Logger.Error(string.Format("InvalidOperationException occurred while adding properties for component: {0} @ {1}. Details: {2}", sbomcomp.Name, sbomcomp.Version, ex.Message), ex);
             }
         }
 

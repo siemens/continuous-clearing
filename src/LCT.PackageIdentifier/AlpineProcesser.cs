@@ -26,11 +26,12 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
+        private const string ProjectTypeAlpine = "ALPINE";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-
+        private readonly IEnvironmentHelper _environmentHelper = new EnvironmentHelper();
         #region public method
 
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
@@ -40,17 +41,17 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             List<Dependency> dependenciesForBOM = new();
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine,_environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.DebugFormat("ParsePackageFile():Template file detected: {0}", filepath);
                     listOfTemplateBomfilePaths.Add(filepath);
                 }
                 else
                 {
-                    Logger.Debug($"ParsePackageFile():FileName: " + filepath);
                     listofComponents.AddRange(ParseCycloneDX(filepath, dependenciesForBOM, appSettings));
                 }
 
@@ -131,7 +132,7 @@ namespace LCT.PackageIdentifier
                 };
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["ALPINE"]))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[ProjectTypeAlpine]))
                 {
 
                     alpinePackages.Add(package);
@@ -150,7 +151,10 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
-
+        private static string GetReleaseExternalId(string name, string version)
+        {
+            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()[ProjectTypeAlpine]);
+        }
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
             int initialCount = listofComponents.Count;
@@ -158,15 +162,7 @@ namespace LCT.PackageIdentifier
 
             if (listofComponents.Count != initialCount)
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
-        }
-
-        private static string GetReleaseExternalId(string name, string version)
-        {
-            version = WebUtility.UrlEncode(version);
-            version = version.Replace("%3A", ":");
-
-            return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
-        }
+        }       
 
         private static string GetDistro(AlpinePackage alpinePackage)
         {
@@ -191,7 +187,7 @@ namespace LCT.PackageIdentifier
                     Version = prop.Version
                 };
                 component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
-                component.BomRef = string.IsNullOrEmpty(distro) ? $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}" : $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
+                component.BomRef = string.IsNullOrEmpty(distro) ? $"{Dataconstant.PurlCheck()[ProjectTypeAlpine]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}" : $"{Dataconstant.PurlCheck()[ProjectTypeAlpine]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
                 component.Type = Component.Classification.Library;
                 AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);

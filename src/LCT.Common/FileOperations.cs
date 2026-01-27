@@ -25,18 +25,21 @@ namespace LCT.Common
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string CatoolBomFilePath { get; set; }
+        private const string FileOperationsMessage = "File Operations";
+        private const string LogMessage = "Generated FilePath: {0}";
 
         public void ValidateFilePath(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
+                LogHandlingHelper.ExceptionErrorHandling($"Given file path is empty or null", "Method:ValidateFilePath()", new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}"), "Provide valid file path");
                 throw new ArgumentException($"Invalid value for the {nameof(filePath)} - {filePath}");
             }
 
             if (!File.Exists(filePath))
             {
-                throw new FileNotFoundException($"The {nameof(filePath)}  is not found at this path" +
-                    $" - {filePath}");
+                LogHandlingHelper.ExceptionErrorHandling($"File not exist in given path", "Method:ValidateFilePath()", new FileNotFoundException($"Invalid value for the {nameof(filePath)} - {filePath}"), "Provide valid file path");
+                throw new FileNotFoundException($"The {nameof(filePath)}  is not found at this path- {filePath}");
             }
         }
 
@@ -52,35 +55,35 @@ namespace LCT.Common
         {
             try
             {
-                Logger.Debug($"WriteContentToFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," + $"projectName-{projectName}");
+                Logger.DebugFormat("WriteContentToFile(): Starting to write content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}",folderPath, fileNameWithExtension, projectName);
 
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
 
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
-                Logger.Debug($"filePath-{filePath}");
+                Logger.DebugFormat(LogMessage, filePath);
 
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, jsonString);
-
+                Logger.Debug("WriteContentToFile():Content successfully written to file.");
             }
             catch (IOException e)
             {
-                Logger.Debug($"WriteContentToFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (UnauthorizedAccessException e)
             {
-                Logger.Debug($"WriteContentToFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (SecurityException e)
             {
-                Logger.Debug($"WriteContentToFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
-            Logger.Debug($"WriteContentToFile():End");
+            Logger.Debug($"WriteContentToFile():Completed writing content to the file.\n");
             return "success";
 
         }
@@ -88,33 +91,33 @@ namespace LCT.Common
         {
             try
             {
-                Logger.Debug($"WriteContentToBomFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," + $"projectName-{projectName}");
-
+                Logger.DebugFormat("WriteContentToOutputBomFile(): Starting to write BOM content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}",folderPath, fileNameWithExtension, projectName);
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = CatoolBomFilePath = Path.Combine(folderPath, fileName);
-                Logger.Debug($"filePath-{filePath}");
+                Logger.DebugFormat(LogMessage, filePath);
 
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, dataToWrite.ToString());
+                Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
 
             }
             catch (IOException e)
             {
-                Logger.Debug($"WriteContentToBomFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (UnauthorizedAccessException e)
             {
-                Logger.Debug($"WriteContentToBomFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (SecurityException e)
             {
-                Logger.Debug($"WriteContentToBomFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
-            Logger.Debug($"WriteContentToBomFile():End");
+            Logger.Debug($"WriteContentToOutputBomFile():Completed writing content to the file.");
             return "success";
 
         }
@@ -162,17 +165,20 @@ namespace LCT.Common
                 }
                 else
                 {
+                    LogHandlingHelper.BasicErrorHandling($"Combine components in already existing Bomfile", "CombineComponentsFromExistingBOM()", $"Invalid path entered. Please check in {filePath} if the comparison BOM path entered is correct.", "Ensure the file path is correct and the file exists.");
                     Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct");
                     throw new FileNotFoundException();
                 }
             }
             catch (IOException e)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Combine components in already existing Bomfile", "CombineComponentsFromExistingBOM()", e);
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM  path entered is correct", e);
             }
             catch (UnauthorizedAccessException e)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Combine components in already existing Bomfile", "CombineComponentsFromExistingBOM()", e);
                 Environment.ExitCode = -1;
                 Logger.Error($"Error:Invalid path entered,Please check if the comparison BOM path entered is correct", e);
             }
@@ -182,31 +188,31 @@ namespace LCT.Common
         {
             try
             {
-                Logger.Debug($"WriteContentToCycloneDXFile():folderpath-{filePath}");
+                Logger.DebugFormat("WriteContentToCycloneDXFile(): Starting to write content to CycloneDX file. FolderPath: {0}, FileName: {1}",filePath, fileNameWithExtension);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
                 string filename = Path.GetFileName(fileNameWithExtension);
                 filePath = $"{filePath}\\{filename}";
                 File.Copy(fileNameWithExtension, filePath);
                 File.WriteAllText(filePath, jsonString);
-
+                Logger.Debug("WriteContentToCycloneDXFile():Content successfully written to CycloneDX file.");
 
             }
             catch (IOException e)
             {
-                Logger.Debug($"WriteContentToCycloneDXFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (UnauthorizedAccessException e)
             {
-                Logger.Debug($"WriteContentToCycloneDXFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (SecurityException e)
             {
-                Logger.Debug($"WriteContentToCycloneDXFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
-            Logger.Debug($"WriteContentToCycloneDXFile():End");
+            Logger.Debug($"WriteContentToCycloneDXFile():Completed writing content to the file.");
             return "success";
 
         }
@@ -215,27 +221,30 @@ namespace LCT.Common
         {
             string oldFile = Path.Combine(folderPath, fileName);
             string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm_ss}_{2}_{3}", folderPath, DateTime.Now, FileConstant.backUpKey, fileName);
-            Logger.Debug($"BackupTheGivenFile():oldFile{oldFile},newFile{newFile}");
+            Logger.DebugFormat("BackupTheGivenFile(): Starting backup process. OldFile: {0}, NewFile: {1}",oldFile, newFile);
             try
             {
                 if (File.Exists(oldFile))
                 {
                     File.Move(oldFile, newFile);
-                    Logger.Debug($"BackupTheGivenFile():Successfully taken backup of {oldFile}");
+                    Logger.DebugFormat("BackupTheGivenFile(): Successfully created backup of {0} at {1}", oldFile, newFile);
                 }
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Backup BOM File", "BackupTheGivenFile()", ex, $"OldFile: {oldFile}, NewFile: {newFile}");
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
             catch (NotSupportedException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Backup BOM File", "BackupTheGivenFile()", ex, $"OldFile: {oldFile}, NewFile: {newFile}");
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
             catch (UnauthorizedAccessException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Backup BOM File", "BackupTheGivenFile()", ex, $"OldFile: {oldFile}, NewFile: {newFile}");
                 Logger.Error($"Error occurred while generating backup BOM file", ex);
                 Environment.ExitCode = -1;
             }
@@ -245,32 +254,31 @@ namespace LCT.Common
         {
             try
             {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
-                    $"Name-{name}");
+                Logger.DebugFormat("WriteContentToReportNotApprovedFile(): Starting to write content to Report Not Approved file. FolderPath: {0}, FileName: {1}, Name: {2}",folderPath, fileNameWithExtension, name);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 string fileName = $"{name}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
-                Logger.Debug($"filePath-{filePath}");
+                Logger.DebugFormat(LogMessage, filePath);
                 File.WriteAllText(filePath, jsonString);
-
+                Logger.Debug("WriteContentToReportNotApprovedFile():Content successfully written to the file.");
             }
             catch (IOException e)
             {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (UnauthorizedAccessException e)
             {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (SecurityException e)
             {
-                Logger.Debug($"WriteContentToReportNotApprovedFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
-            Logger.Debug($"WriteContentToReportNotApprovedFile():End");
+            Logger.Debug($"WriteContentToReportNotApprovedFile():Completed writing content to the file.");
             return "success";
 
         }
@@ -278,33 +286,32 @@ namespace LCT.Common
         {
             try
             {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():folderpath-{folderPath},fileNameWithExtension-{fileNameWithExtension}," +
-                    $"projectName-{projectName}");
+                Logger.DebugFormat("WriteContentToMultipleVersionsFile(): Starting to write content to Multiple Versions file. FolderPath: {0}, FileName: {1}, ProjectName: {2}",folderPath, fileNameWithExtension, projectName);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = Path.Combine(folderPath, fileName);
-                Logger.Debug($"filePath-{filePath}");
+                Logger.DebugFormat(LogMessage, filePath);
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, jsonString);
-
+                Logger.Debug("WriteContentToMultipleVersionsFile():Content successfully written to the file.");
             }
             catch (IOException e)
             {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (UnauthorizedAccessException e)
             {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
             catch (SecurityException e)
             {
-                Logger.Debug($"WriteContentToMultipleVersionsFile():Error:", e);
+                LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
                 return "failure";
             }
-            Logger.Debug($"WriteContentToMultipleVersionsFile():End");
+            Logger.Debug($"WriteContentToMultipleVersionsFile():Completed writing content to the file.");
             return "success";
 
         }
