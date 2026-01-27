@@ -34,9 +34,12 @@ namespace LCT.PackageIdentifier
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private List<Component> listOfInternalComponents = new List<Component>();
         #region public methods
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
+            Logger.Debug($"ParsePackageFile():Started Parseing input File for Cargo components.");
             List<Component> componentsForBOM;
             Bom bom = new Bom();
             ParsingInputFileForBOM(appSettings, ref bom);
@@ -55,13 +58,14 @@ namespace LCT.PackageIdentifier
             AddSiemensDirectProperty(ref ListUnsupportedComponentsForBom);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
-            Logger.Debug($"ParsePackageFile():End");
+            Logger.Debug($"ParsePackageFile():Completed Parseing input File for Cargo components.\n");
             return bom;
         }
 
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings,
             IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             List<AqlResult> aqlResultList =
                 await bomhelper.GetCargoListOfComponentsFromRepo(appSettings.Cargo.Artifactory.InternalRepos, jFrogService);
             var inputIterationList = componentData.comparisonBOMData;
@@ -70,13 +74,16 @@ namespace LCT.PackageIdentifier
                 component => IsInternalCargoComponent(aqlResultList, component));
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.DebugFormat("IdentificationOfInternalComponents(): identified internal components:{0}.", internalComponents.Count);
+            Logger.Debug("IdentificationOfInternalComponents(): Completed identification of internal components\n");
             return componentData;
         }
 
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetCargoListOfComponentsFromRepo(repoList, jFrogService);
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
@@ -87,6 +94,8 @@ namespace LCT.PackageIdentifier
                 var processedComponent = ProcessCargoComponent(component, aqlResultList, bomhelper, appSettings, projectType);
                 modifiedBOM.Add(processedComponent);
             }
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }
 
@@ -98,6 +107,7 @@ namespace LCT.PackageIdentifier
 
         private static Component ProcessCargoComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
         {
+            Logger.DebugFormat("GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {0}, Version: {1}].", component.Name, component.Version);
             string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out string jfrogPackageNameWhlExten, out string jfrogRepoPath);
 
             var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "crate.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "crate.version" && p.Value == component.Version));
@@ -212,7 +222,7 @@ namespace LCT.PackageIdentifier
 
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
-            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Cargo);
+            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Cargo,environmentHelper);
             var componentsForBOM = new List<Component>();
             var dependencies = new List<Dependency>();
             var templateBomFilePaths = new List<string>();
@@ -254,11 +264,12 @@ namespace LCT.PackageIdentifier
 
         private static void ParseCargoFile(string filepath, List<Component> componentsForBOM, List<Dependency> dependencies)
         {
-            Logger.Debug($"ParsingInputFileForBOM():Found metadata.json: {filepath}");
+            Logger.DebugFormat("ParsingInputFileForBOM():Found metadata.json: {0}", filepath);
             var components = new List<Component>();
             var deps = new List<Dependency>();
             GetPackagesFromCargoMetadataJson(filepath, components, deps);
             AddingIdentifierType(components);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
             componentsForBOM.AddRange(components);
             dependencies.AddRange(deps);
         }
@@ -270,12 +281,13 @@ namespace LCT.PackageIdentifier
             List<Component> componentsForBOM,
             List<Dependency> dependencies)
         {
-            Logger.Debug($"ParsingInputFileForBOM():Found as SPDXFile: {filepath}");
+            Logger.DebugFormat("ParsingInputFileForBOM():Spdx file detected: {0}", filepath);
             BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
             var listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             bom = _spdxBomParser.ParseSPDXBom(filepath);
             SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
             SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bom, filepath);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
             componentsForBOM.AddRange(bom.Components);
             dependencies.AddRange(bom.Dependencies);
             SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
@@ -289,10 +301,11 @@ namespace LCT.PackageIdentifier
             ref Bom bom,
             List<Component> componentsForBOM)
         {
-            Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+            Logger.DebugFormat("ParsingInputFileForBOM():CycloneDX file detected: {0}", filepath);
             bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
             CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
             BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
             if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
@@ -339,7 +352,7 @@ namespace LCT.PackageIdentifier
 
                 if (packageDetails == null)
                 {
-                    Logger.Debug($"GetPackagesFromCargoMetadataJson: Deserialized packageDetails is null for file: {metadataJsonPath}");
+                    Logger.DebugFormat("GetPackagesFromCargoMetadataJson: Deserialized packageDetails is null for file: {0}", metadataJsonPath);
                     return;
                 }
 
@@ -361,12 +374,12 @@ namespace LCT.PackageIdentifier
             catch (FileNotFoundException ex)
             {
                 Logger.Error("Exception in reading cargo metadata json file", ex);
-                Logger.Debug($"GetPackagesFromCargoMetadataJson: File not found: {metadataJsonPath}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("Error occurred while parsing the package lock JSON file.", "GetPackagesFromCargoMetadataJson()", ex, $"File Path: {metadataJsonPath}");
             }
             catch (JsonException ex)
             {
                 Logger.Error("Exception in reading cargo metadata json file", ex);
-                Logger.Debug($"GetPackagesFromCargoMetadataJson: JSON deserialization error in file: {metadataJsonPath}", ex);
+                LogHandlingHelper.ExceptionErrorHandling("JSON deserialization error in file", "GetPackagesFromCargoMetadataJson()", ex, $"File Path: {metadataJsonPath}");                
             }
 
         }
@@ -568,6 +581,7 @@ namespace LCT.PackageIdentifier
         {
             if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "crate.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "crate.version" && p.Value == component.Version)))
             {
+                Logger.DebugFormat("IsInternalCargoComponent(): Component [Name: {0}, Version: {1}] is internal.", component.Name, component.Version);
                 return true;
             }
 

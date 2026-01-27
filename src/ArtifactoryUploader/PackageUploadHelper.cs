@@ -58,7 +58,7 @@ namespace LCT.ArtifactoryUploader
         /// <returns>A Bom object containing the components.</returns>
         public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper)
         {
-            Logger.Debug("Starting GetComponentListFromComparisonBOM() method");
+            Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
             Bom componentsToBoms = null;
             try
             {
@@ -66,6 +66,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     string json = File.ReadAllText(comparisonBomFilePath);
                     componentsToBoms = CycloneDX.Json.Serializer.Deserialize(json);
+                    LogHandlingHelper.ListOfBomFileComponents(comparisonBomFilePath, componentsToBoms.Components ?? new List<Component>());
                 }
                 else
                 {
@@ -75,9 +76,11 @@ namespace LCT.ArtifactoryUploader
             }
             catch (JsonReaderException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("GetComponentListFromComparisonBOM", $"Failed to deserialize the comparison BOM file at path: {comparisonBomFilePath}", ex, "JsonReaderException occurred while deserializing the comparison BOM.");
                 Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
                 environmentHelper.CallEnvironmentExit(-1);
             }
+            Logger.Debug("GetComponentListFromComparisonBOM(): Completed the reading and identifying components from bom file.");
             return componentsToBoms;
         }
 
@@ -358,7 +361,7 @@ namespace LCT.ArtifactoryUploader
         // Properly wrap UploadingThePackages as a method
         public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            Logger.Debug("Starting UploadingThePackages() method");
+            Logger.Debug("UploadingThePackages(): Starting the package upload process.");
             foreach (var item in componentsToUpload)
             {
                 await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item, timeout, displayPackagesInfo);
@@ -371,7 +374,7 @@ namespace LCT.ArtifactoryUploader
                 Logger.Debug("Setting ExitCode to 2");
             }
 
-            Logger.Debug("Ending UploadingThePackages() method");
+            Logger.Debug("UploadingThePackages(): Package upload process completed.");
             Program.UploaderStopWatch?.Stop();
         }
 
@@ -395,6 +398,7 @@ namespace LCT.ArtifactoryUploader
             {
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
+                    Logger.DebugFormat("PackageUploadToArtifactory():{0} and {1}  contains Source repository:{2} and Destination Repository:{3} ,So now started upload package process .", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
                     await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
                 }
                 else
@@ -402,12 +406,14 @@ namespace LCT.ArtifactoryUploader
                     uploaderKpiData.PackagesNotExistingInRemoteCache++;
                     item.DestRepoName = null;
                     await JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+                    Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is not found in any jfrog repository.", item.Name, item.Version);
                 }
             }
             else
             {
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
                 await SucessfullPackagesAsync(item, displayPackagesInfo);
+                Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is identified in source: {2} and destination: {3} repositories",item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
                 item.DestRepoName = null;
             }
         }

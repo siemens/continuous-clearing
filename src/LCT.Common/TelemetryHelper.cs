@@ -68,6 +68,7 @@ namespace LCT.Common
             }
             catch (Exception ex) when (ex is ArgumentNullException or IOException)
             {
+                LogHandlingHelper.ExceptionErrorHandling("Exception", "StartTelemetry()", ex, "");
                 Logger.Error($"An error occurred: {ex.Message}");
                 TrackException(ex);
                 environmentHelper.CallEnvironmentExit(-1);

@@ -90,6 +90,7 @@ namespace LCT.Common
                 }
                 catch (AggregateException ex)
                 {
+                    LogHandlingHelper.ExceptionErrorHandling("AggregateException", "RunAsync()", ex, "");
                     Logger.Error($"Exception in RunAsync method(){ex}");
                 }
 

@@ -41,7 +41,7 @@ namespace LCT.Common
         /// Gets or sets the current directory for the tool.
         /// </summary>
         public static string CatoolCurrentDirectory { get; set; }
-        #endregion
+        public static bool Verbose { get; set; }
 
         #region Constructors
         // No constructors present.
@@ -117,11 +117,17 @@ namespace LCT.Common
 
             return Path.Combine(appFolder, "log4net.color.config");
         }
-        #endregion
-
-        #region Events
-        // No events present.
-        #endregion
+        public static void AppendVerboseValue(CommonAppSettings appSettings)
+        {
+            if (appSettings.Verbose || CommonHelper.IsAzureDevOpsDebugEnabled())
+            {
+                Verbose = true;
+            }
+            else
+            {
+                Verbose = false;
+            }
+        }
     }
 }
 

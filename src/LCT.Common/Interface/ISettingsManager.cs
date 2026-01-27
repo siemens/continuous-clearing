@@ -14,10 +14,10 @@ namespace LCT.Common.Interface
         /// <summary>
         /// Reads the configuration from input arguments and a JSON settings file.
         /// </summary>
-        /// <param name="args">The input arguments.</param>
-        /// <param name="jsonSettingsFileName">The name of the JSON settings file.</param>
-        /// <returns>The deserialized configuration object of type T.</returns>
-        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName);
+        /// <param name="args">args</param>
+        /// <param name="jsonSettingsFileName">jsonSettingsFileName</param>
+        /// <returns>AppSettings</returns>
+        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName, IEnvironmentHelper environmentHelper);
 
         /// <summary>
         /// Checks that all required arguments are present to run the application.

@@ -155,7 +155,8 @@ namespace LCT.Common
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException($"Invalid value for {name} - {value}");
+                Logger.ErrorFormat("The provided value for '{0}' is null, empty, or whitespace. Value: '{1}'", name, value);
+                LogHandlingHelper.ExceptionErrorHandling("CheckNullOrEmpty()", $"Validation failed for parameter: {name}", new ArgumentException($"Invalid value for {name} - {value}"), $"The provided value for '{name}' is null, empty, or whitespace.");
             }
         }
 
@@ -271,51 +272,55 @@ namespace LCT.Common
 
             return Array.Empty<string>();
         }
-
-        /// <summary>
-        /// Initializes the log folder based on application settings and migrates existing logs.
-        /// </summary>
-        /// <param name="appSettings">The application settings.</param>
-        /// <param name="logFileName">The log file name.</param>
-        /// <param name="m_Verbose">Whether verbose logging is enabled.</param>
-        /// <returns>The initialized log folder path.</returns>
-        public static string LogFolderInitialisation(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
+        public static string LogFolderInitialization(CommonAppSettings appSettings, string logFileName, bool m_Verbose)
         {
-            string FolderPath = DefaultLogPath;
+            string FolderPath;
+            string defaultLogFilePath = Log4Net.CatoolLogPath;
+            LoggerManager.Shutdown();
             if (!string.IsNullOrEmpty(appSettings.Directory.LogFolder))
             {
-                string defaultLogFilePath = Log4Net.CatoolLogPath;
-
-                if (File.Exists(defaultLogFilePath))
+                FolderPath = appSettings.Directory.LogFolder;
+                Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
+            }
+            else
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    LoggerManager.Shutdown();
-                    FolderPath = appSettings.Directory.LogFolder;
-                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
-                    string currentLogFilePath = Log4Net.CatoolLogPath;
-                    string currentlogFileName = Path.GetFileName(Log4Net.CatoolLogPath);
-                    LoggerManager.Shutdown();
-                    try
-                    {
-                        File.Copy(defaultLogFilePath, currentLogFilePath, overwrite: true);
-                    }
-                    catch (IOException ioEx)
-                    {
-                        Logger.Debug($"IO Exception during log file copy: {ioEx.Message}");
-                    }
-                    catch (UnauthorizedAccessException uaEx)
-                    {
-                        Logger.Debug($"Unauthorized Access Exception during log file copy: {uaEx.Message}");
-                    }
-                    Thread.Sleep(2000);
-                    Log4Net.Init(currentlogFileName, FolderPath, m_Verbose);
+                    FolderPath = FileConstant.LogFolder;
                 }
                 else
                 {
-                    FolderPath = appSettings.Directory.LogFolder;
-                    Log4Net.Init(logFileName, appSettings.Directory.LogFolder, m_Verbose);
+                    FolderPath = "/var/log";
+                }
+
+                Log4Net.Init(logFileName, FolderPath, m_Verbose);
+            }
+            CopyInitialLogsToCurrentLoggerAndDelete(defaultLogFilePath);
+            return FolderPath;
+        } 
+        private static void CopyInitialLogsToCurrentLoggerAndDelete(string defaultLogFilePath)
+        {
+            try
+            {
+                Logger.Debug("====================<<<<< Start >>>>>====================");
+                if (!string.IsNullOrEmpty(defaultLogFilePath) && File.Exists(defaultLogFilePath))
+                {
+                    foreach (var line in File.ReadLines(defaultLogFilePath).Where(l => !string.IsNullOrWhiteSpace(l)))
+                    {
+                        var messageOnly = TrimLogHeader(line);
+                        Logger.Debug(messageOnly);
+                    }
+                    File.Delete(defaultLogFilePath);
                 }
             }
-            return FolderPath;
+            catch (IOException ioEx)
+            {                
+                Logger.Debug("IO Exception while Copying initial logs.", ioEx);
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                Logger.Debug("Unauthorized Access while Copying initial logs.", uaEx);
+            }
         }
 
         /// <summary>
@@ -324,18 +329,53 @@ namespace LCT.Common
         /// <param name="logFileName">The log file name.</param>
         /// <param name="m_Verbose">Whether verbose logging is enabled.</param>
         public static void DefaultLogFolderInitialisation(string logFileName, bool m_Verbose)
+        private static string TrimLogHeader(string line)
         {
-            string FolderPath;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            int first = line.IndexOf('|');
+            if (first < 0) return line;
+
+            int second = line.IndexOf('|', first + 1);
+            if (second < 0) return line;
+
+            int third = line.IndexOf('|', second + 1);
+            if (third < 0) return line;
+
+            // Return content after the third pipe, trimming leading spaces
+            return line[(third + 1)..].TrimStart();
+        }
+        public static string DefaultLogFolderInitialization(string logFileName, bool m_Verbose)
+        {
+            string localPathforSourceRepo = string.Empty;
+            try
             {
-                FolderPath = FileConstant.LogFolder;
+                localPathforSourceRepo = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
+                if (!System.IO.Directory.Exists(localPathforSourceRepo))
+                {
+                    System.IO.Directory.CreateDirectory(localPathforSourceRepo);
+                }
+
+                Log4Net.Init(logFileName, localPathforSourceRepo, m_Verbose);
+                DefaultLogPath = localPathforSourceRepo;
             }
-            else
+            catch (IOException ex)
             {
-                FolderPath = "/var/log";
+                LogHandlingHelper.ExceptionErrorHandling(
+                    "DefaultLogFolderInitialization",
+                    "MethodName:DefaultLogFolderInitialization()",
+                    ex,
+                    "An I/O error occurred while trying to create or access the temp directory.");
+                Logger.Error("DefaultLogFolderInitialization() ", ex);
             }
-            Log4Net.Init(logFileName, FolderPath, m_Verbose);
-            DefaultLogPath = FolderPath;
+            catch (UnauthorizedAccessException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling(
+                    "DefaultLogFolderInitialization",
+                    "MethodName:DefaultLogFolderInitialization()",
+                    ex,
+                    "Unauthorized access occurred while trying to create or access the temp directory.");
+                Logger.Error("DefaultLogFolderInitialization() ", ex);
+            }
+            return localPathforSourceRepo;
         }
 
         /// <summary>
@@ -622,6 +662,7 @@ namespace LCT.Common
                         RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
                         component.Properties = properties;
                         noOfExcludedComponents++;
+                        Logger.DebugFormat("Component excluded due to PURL match: Name = {0}, Version = {1}, PURL = {2}", component.Name, component.Version, component.Purl);
                     }
                 }
             }
@@ -667,6 +708,7 @@ namespace LCT.Common
                         var properties = component.Properties;
                         RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ExcludeComponent, "true");
                         component.Properties = properties;
+                        Logger.DebugFormat("Component excluded due to Name and Version match: Name = {0}, Version = {1}", component.Name, component.Version);
                     }
                 }
             }

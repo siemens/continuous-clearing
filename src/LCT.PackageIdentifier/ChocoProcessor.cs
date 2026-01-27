@@ -24,7 +24,7 @@ namespace LCT.PackageIdentifier
     {
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-
+        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         /// <summary>
         /// Parses package configuration files from the specified input folder and generates a Bill of Materials (BOM).
         /// </summary>
@@ -39,13 +39,14 @@ namespace LCT.PackageIdentifier
         /// files.</returns>
         public override Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco,environmentHelper);
             List<Component> chocoComponents = new();
             List<NugetPackage> nugetPackages = new();
             Bom bom = new();
-
+            string filePath=string.Empty;
             foreach (string filepath in configFiles)
             {
+                filePath = filepath;
                 Logger.DebugFormat("ParsePackageFile():FileName: {0}", filepath);
                 var chocoList = ParsePackageConfig(filepath, appSettings);
                 nugetPackages.AddRange(chocoList);
@@ -54,7 +55,7 @@ namespace LCT.PackageIdentifier
             //Dependencies are not extracted for choco as of now
             ConvertToCycloneDXModel(chocoComponents, nugetPackages, null);
             bom.Components = chocoComponents;
-
+            LogHandlingHelper.IdentifierInputFileComponents(filePath, bom.Components);
             // No dependencies for now
             bom.Dependencies = new List<Dependency>();
             AddSiemensDirectProperty(ref bom);
@@ -81,7 +82,7 @@ namespace LCT.PackageIdentifier
             {
                 // setting SiemensDirect property to true by default for choco packages
                 const string siemensDirectValue = "true";
-
+                Logger.DebugFormat("AddSiemensDirectProperty(): Component [Name: {0}, Version: {1}] is a direct dependency. Setting SiemensDirect property to {2}.", component.Name, component.Version, siemensDirectValue);
                 component.Properties ??= new List<Property>();
                 var properties = component.Properties;
                 CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
