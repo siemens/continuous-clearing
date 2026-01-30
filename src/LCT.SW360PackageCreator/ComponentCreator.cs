@@ -45,6 +45,15 @@ namespace LCT.SW360PackageCreator
         private List<Components> ListofBomComponents { get; set; } = new List<Components>();
         private List<Components> ListofChocoComponents { get; set; } = new List<Components>();
         public static int TotalComponentsFromPackageIdentifier { get; private set; }
+
+        /// <summary>
+        /// cycloneDxBomParser
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <param name="sw360Service"></param>
+        /// <param name="cycloneDXBomParser"></param>
+        /// <param name="creatorHelper"></param>
+        /// <returns>bom data</returns>
         public async Task<List<ComparisonBomData>> CycloneDxBomParser(CommonAppSettings appSettings,
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper)
         {
@@ -63,6 +72,12 @@ namespace LCT.SW360PackageCreator
             return comparisonBomData;
         }
 
+        /// <summary>
+        /// getListOfBomData
+        /// </summary>
+        /// <param name="components"></param>
+        /// <param name="appSettings"></param>
+        /// <returns>components list</returns>
         private async Task<List<Components>> GetListOfBomData(List<Component> components, CommonAppSettings appSettings)
         {
             List<Components> lstOfBomDataToBeCompared = new List<Components>();
@@ -118,6 +133,12 @@ namespace LCT.SW360PackageCreator
             return lstOfBomDataToBeCompared;
         }
 
+        /// <summary>
+        /// updateToLocalBomFile
+        /// </summary>
+        /// <param name="componentsData"></param>
+        /// <param name="currName"></param>
+        /// <param name="currVersion"></param>
         private static void LogSkippedComponent(Component item, Components componentsData, CommonAppSettings appSettings, bool isInternalComponent)
         {
             if (isInternalComponent)
@@ -173,6 +194,12 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// gets package type
+        /// </summary>
+        /// <param name="package"></param>
+        /// <param name="componentsData"></param>
+        /// <returns>boolean value</returns>
         private static bool GetPackageType(Component package, ref Components componentsData)
         {
             bool isInternalComponent = false;
@@ -203,6 +230,13 @@ namespace LCT.SW360PackageCreator
             return isInternalComponent;
         }
 
+        /// <summary>
+        /// Generates the package name for the specified component based on its group and name properties.
+        /// </summary>
+        /// <param name="item">The component for which to generate the package name. Must not be null. The group and name properties are
+        /// used to construct the result.</param>
+        /// <returns>A string representing the package name. If the component has a non-empty group and its package URL does not
+        /// indicate a Maven package, returns "{group}/{name}"; otherwise, returns the component's name.</returns>
         private static string GetPackageName(Component item)
         {
             if (!string.IsNullOrEmpty(item.Group) && !item.Purl.Contains(Dataconstant.PurlCheck()["MAVEN"]))
@@ -215,6 +249,19 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// Retrieves source URL information for a software component based on its name, version, project type, and BOM
+        /// reference.
+        /// </summary>        
+        /// <param name="name">The name of the software component for which to retrieve the source URL.</param>
+        /// <param name="version">The version of the software component. This value is used to identify the specific release.</param>
+        /// <param name="projectType">The type of project or package manager associated with the component (for example, "NPM", "NUGET",
+        /// "DEBIAN"). The value is case-insensitive.</param>
+        /// <param name="bomRef">The Bill of Materials (BOM) reference identifier for the component. This parameter is required for certain
+        /// project types, such as "ALPINE".</param>
+        /// <returns>A <see cref="Components"/> object containing the source URL and related metadata for the specified
+        /// component. If the project type is not recognized, the returned object may not contain source URL
+        /// information.</returns>
         private static async Task<Components> GetSourceUrl(string name, string version, string projectType, string bomRef)
         {
             Components componentsData = new Components();
@@ -251,6 +298,24 @@ namespace LCT.SW360PackageCreator
             return componentsData;
         }
 
+        /// <summary>
+        /// Creates a new component in SW360, updates the Software Bill of Materials (SBOM) with SW360 information,
+        /// links releases to the specified SW360 project, and writes output files containing BOM data, KPI metrics, and
+        /// source file information.
+        /// </summary>        
+        /// <param name="appSettings">The application settings containing SW360 configuration, output directory paths, and project details. Must
+        /// not be null.</param>
+        /// <param name="sw360CreatorService">The service used to create components and link releases within SW360. Must not be null.</param>
+        /// <param name="sw360Service">The service used to retrieve and update SW360 component and release information. Must not be null.</param>
+        /// <param name="sw360ProjectService">The service used to interact with SW360 projects, including retrieving linked releases. Must not be null.</param>
+        /// <param name="fileOperations">The file operations service used to write BOM, KPI, and source file information to output files. Must not be
+        /// null.</param>
+        /// <param name="creatorHelper">The helper used for component creation, KPI data generation, and console output related to the creation
+        /// process. Must not be null.</param>
+        /// <param name="parsedBomData">The list of BOM data items to be processed and used for component creation in SW360. Must not be null or
+        /// empty.</param>
+        /// <returns>A task that represents the asynchronous operation of creating and linking components in SW360, updating SBOM
+        /// data, and writing output files.</returns>
         public async Task CreateComponentInSw360(CommonAppSettings appSettings,
             ISw360CreatorService sw360CreatorService, ISW360Service sw360Service, ISw360ProjectService sw360ProjectService,
             IFileOperations fileOperations, ICreatorHelper creatorHelper, List<ComparisonBomData> parsedBomData)
@@ -305,6 +370,15 @@ namespace LCT.SW360PackageCreator
             Logger.Debug("CreateComponentInSw360():Create component process completed");
         }
 
+        /// <summary>
+        /// creates Component
+        /// </summary>
+        /// <param name="creatorHelper"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="componentsToBoms"></param>
+        /// <param name="sw360Url"></param>
+        /// <param name="appSettings"></param>
+        /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CreateComponent(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, List<ComparisonBomData> componentsToBoms,
             string sw360Url, CommonAppSettings appSettings)
@@ -337,6 +411,14 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of releases that have been manually linked to a project, excluding those linked by the CA
+        /// Tool.
+        /// </summary>
+        /// <param name="alreadyLinkedReleases">A list of releases currently linked to the project. This list may include both manually linked releases and
+        /// those linked by the CA Tool.</param>
+        /// <returns>A list containing only the releases that were manually linked to the project. Releases linked by the CA Tool
+        /// are excluded from the returned list.</returns>
         private static async Task<List<ReleaseLinked>> GetManuallyLinkedReleasesFromProject(List<ReleaseLinked> alreadyLinkedReleases)
         {
             var manuallyLinkedReleases = new List<ReleaseLinked>(alreadyLinkedReleases);
@@ -345,12 +427,28 @@ namespace LCT.SW360PackageCreator
             return manuallyLinkedReleases;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves the list of releases that are already linked to the specified project.
+        /// </summary>
+        /// <param name="projectId">The unique identifier of the project for which to retrieve linked releases. Cannot be null or empty.</param>
+        /// <param name="sw360ProjectService">An implementation of the project service used to access release linkage information. Cannot be null.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of linked releases for
+        /// the specified project. The list will be empty if no releases are linked.</returns>
         private static async Task<List<ReleaseLinked>> GetAlreadyLinkedReleasesByProjectId(string projectId, ISw360ProjectService sw360ProjectService)
         {
             List<ReleaseLinked> alreadyLinkedReleases = await sw360ProjectService.GetAlreadyLinkedReleasesByProjectId(projectId);
             return alreadyLinkedReleases;
         }
 
+        /// <summary>
+        /// Updates SBOM release entries with comment and relation information from a provided list of already linked
+        /// releases.
+        /// </summary>
+        /// <remarks>Only releases in the SBOM that have a matching release ID in the provided list will
+        /// be updated. This method does not modify releases that are not found in the input list.</remarks>
+        /// <param name="alreadyLinkedReleases">A list of releases that have already been linked, containing comment and relation data to be applied to
+        /// matching SBOM releases. Cannot be null.</param>
+        /// <returns>A task that represents the asynchronous update operation.</returns>
         private async Task UpdateSBOMReleasesWithSw360Info(List<ReleaseLinked> alreadyLinkedReleases)
         {
             foreach (var release in ReleasesFoundInCbom)
@@ -365,6 +463,16 @@ namespace LCT.SW360PackageCreator
             await Task.Yield();
         }
 
+        /// <summary>
+        /// Ensures that the specified component and its release exist in the SW360 system, creating them if they are
+        /// not already available.
+        /// </summary>
+        /// <param name="creatorHelper">A helper used to facilitate the creation of components and releases.</param>
+        /// <param name="sw360CreatorService">The service used to interact with the SW360 system for component and release operations.</param>
+        /// <param name="item">The BOM data representing the component and version to be checked or created.</param>
+        /// <param name="sw360Url">The base URL of the SW360 system to be used for component and release operations.</param>
+        /// <param name="appSettings">The application settings containing configuration values required for the operation.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         private async Task CreateComponentAndRealease(ICreatorHelper creatorHelper,
             ISw360CreatorService sw360CreatorService, ComparisonBomData item, string sw360Url, CommonAppSettings appSettings)
         {
@@ -377,6 +485,14 @@ namespace LCT.SW360PackageCreator
             await ComponentAndReleaseAvailable(item, sw360Url, sw360CreatorService, appSettings, creatorHelper);
         }
 
+        /// <summary>
+        /// creates component and release when not available
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="creatorHelper"></param>
+        /// <param name="appSettings"></param>
+        /// <returns></returns>
         private async Task CreateComponentAndReleaseWhenNotAvailable(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
         {
@@ -409,6 +525,13 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// triggering Fossology upload and update additional data
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="appSettings"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static async Task TriggeringFossologyUploadAndUpdateAdditionalData(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
         {
@@ -441,6 +564,14 @@ namespace LCT.SW360PackageCreator
                 item.FossologyUploadStatus = Dataconstant.NotUploaded;
             }
         }
+        /// <summary>
+        /// creates release when not available
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="creatorHelper"></param>
+        /// <param name="appSettings"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         private async Task CreateReleaseWhenNotAvailable(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, ICreatorHelper creatorHelper, CommonAppSettings appSettings)
         {
@@ -471,6 +602,14 @@ namespace LCT.SW360PackageCreator
                 await sw360CreatorService.UpdatePurlIdForExistingComponent(item, componentId);
             }
         }
+        /// <summary>
+        /// updates fossology status
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="formattedName"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static async Task<bool> UpdateFossologyStatus(ComparisonBomData item, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, string formattedName)
         {
             bool fossologyUpload = false;
@@ -487,6 +626,12 @@ namespace LCT.SW360PackageCreator
             }
             return fossologyUpload;
         }
+
+        /// <summary>
+        /// gets formatted name
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>name</returns>
         public static string GetFormattedName(ComparisonBomData item)
         {
             if (!string.IsNullOrEmpty(item.ParentReleaseName) && !item.ParentReleaseName.Equals(item.Name, StringComparison.OrdinalIgnoreCase))
@@ -498,6 +643,14 @@ namespace LCT.SW360PackageCreator
                 return item.Name;
             }
         }
+
+        /// <summary>
+        /// triggers fossology process
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="appSettings"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static async Task<string> TriggerFossologyProcess(ComparisonBomData item,
             ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings)
         {
@@ -523,6 +676,13 @@ namespace LCT.SW360PackageCreator
             return uploadId;
         }
 
+        /// <summary>
+        /// checks fossology process status
+        /// </summary>
+        /// <param name="link"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="item"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static async Task<string> CheckFossologyProcessStatus(string link, ISw360CreatorService sw360CreatorService, ComparisonBomData item)
         {
             string uploadId = string.Empty;
@@ -561,6 +721,12 @@ namespace LCT.SW360PackageCreator
             return uploadId;
         }
 
+        /// <summary>
+        /// gets component id
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static async Task<string> GetComponentId(ComparisonBomData item, ISw360CreatorService sw360CreatorService)
         {
             Logger.Debug("GetComponentId(): start Identifying componentId for creating release");
@@ -573,6 +739,17 @@ namespace LCT.SW360PackageCreator
             Logger.DebugFormat("GetComponentId(): Identified componentId for creating release is :{0}", componentId);
             return componentId;
         }
+
+        /// <summary>
+        /// updates fossology link and status
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="formattedName"></param>
+        /// <param name="uploadId"></param>
+        /// <param name="logPrefix"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         private static async Task<bool> UpdateFossologyLinkAndStatus(ComparisonBomData item, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, string formattedName, string uploadId, string logPrefix)
         {
             item.FossologyLink = $"{appSettings.SW360.Fossology.URL}{ApiConstant.FossUploadJobUrlSuffix}{uploadId}";
@@ -596,6 +773,16 @@ namespace LCT.SW360PackageCreator
             }
             return uploadStatus;
         }
+
+        /// <summary>
+        /// component and release available
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360Url"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="creatorHelper"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         private async Task ComponentAndReleaseAvailable(ComparisonBomData item,
             string sw360Url, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, ICreatorHelper creatorHelper)
         {
@@ -629,6 +816,16 @@ namespace LCT.SW360PackageCreator
                 await sw360CreatorService.UpdatePurlIdForExistingRelease(item, releaseId, releasesInfo);
             }
         }
+
+        /// <summary>
+        /// if already release exists upload source code and url in SW360
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="releasesInfo"></param>
+        /// <param name="releaseId"></param>
+        /// <param name="creatorHelper"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(ComparisonBomData item, ReleasesInfo releasesInfo, string releaseId, ICreatorHelper creatorHelper, ISw360CreatorService sw360CreatorService)
         {
             if (item.ApprovedStatus == Dataconstant.NewClearing && !AreAttachmentsPresent(releasesInfo))
@@ -653,6 +850,14 @@ namespace LCT.SW360PackageCreator
 
             }
         }
+
+        /// <summary>
+        /// gets upload id when release exists
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="releasesInfo"></param>
+        /// <param name="appSettings"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static Task GetUploadIdWhenReleaseExists(ComparisonBomData item, ReleasesInfo releasesInfo = null, CommonAppSettings appSettings = null)
         {
             if (releasesInfo == null)
@@ -685,6 +890,15 @@ namespace LCT.SW360PackageCreator
 
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// process release already exist
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="sw360CreatorService"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="releaseCreateStatus"></param>
+        /// <returns>task that returns asynchronous operation</returns>
         public static async Task ProcessReleaseAlreadyExist(ComparisonBomData item, ISw360CreatorService sw360CreatorService, CommonAppSettings appSettings, ReleaseCreateStatus releaseCreateStatus)
         {
             if (releaseCreateStatus.ReleaseAlreadyExist)
@@ -707,16 +921,35 @@ namespace LCT.SW360PackageCreator
                 }
             }
         }
+
+        /// <summary>
+        /// is release attachment exist
+        /// </summary>
+        /// <param name="releasesInfo"></param>
+        /// <returns>boolean value</returns>
         public static bool IsReleaseAttachmentExist(ReleasesInfo releasesInfo)
         {
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
             return releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
         }
+
+        /// <summary>
+        /// are attachments present
+        /// </summary>
+        /// <param name="releasesInfo"></param>
+        /// <returns>boolean value</returns>
         public static bool AreAttachmentsPresent(ReleasesInfo releasesInfo)
         {
             var attachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
             return attachments.Any(x => x.AttachmentType.Equals("SOURCE") || x.AttachmentType.Equals("SOURCE_SELF"));
         }
+
+        /// <summary>
+        /// updates the attachment URL in the BOM for the specified release
+        /// </summary>
+        /// <param name="sw360Url"></param>
+        /// <param name="item"></param>
+        /// <param name="releaseId"></param>
         private void UpdateAttachmentURLInBOm(string sw360Url, ComparisonBomData item, string releaseId)
         {
             string attachmentUrl = $"{sw360Url}{ApiConstant.Sw360ReleaseApiSuffix}/{releaseId}/{ApiConstant.Attachments}";
@@ -725,11 +958,21 @@ namespace LCT.SW360PackageCreator
             AddReleaseIdToLink(item, releaseId);
         }
 
+        /// <summary>
+        /// gets created status
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns>status</returns>
         public static string GetCreatedStatus(bool status)
         {
             return status ? Dataconstant.NewlyCreated : Dataconstant.NotCreated;
         }
 
+        /// <summary>
+        /// adds release id to link
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="releaseIdToLink"></param>
         public void AddReleaseIdToLink(ComparisonBomData item, string releaseIdToLink)
         {
             if (!string.IsNullOrWhiteSpace(releaseIdToLink))
@@ -743,6 +986,11 @@ namespace LCT.SW360PackageCreator
             }
         }
 
+        /// <summary>
+        /// removes duplicate components
+        /// </summary>
+        /// <param name="components"></param>
+        /// <returns>list of components</returns>
         public List<Components> RemoveDuplicateComponents(List<Components> components)
         {
             // Removes duplicate

@@ -35,6 +35,13 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+
+        /// <summary>
+        ///Parses PackageFile
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <param name="unSupportedBomList"></param>
+        /// <returns>updated BOM data</returns>
         private List<Component> listOfInternalComponents = new List<Component>();
         private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
@@ -104,10 +111,17 @@ namespace LCT.PackageIdentifier
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
+
         private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
         {
             return CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _cycloneDXBomParser.ParseCycloneDXBom);
         }
+
+
+        /// <summary>
+        /// Adds Siemens DirectProperty
+        /// </summary>
+        /// <param name="bom"></param>
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
             Logger.Debug("AddSiemensDirectProperty(): Starting to identifying Direct dependencies.");
@@ -135,6 +149,12 @@ namespace LCT.PackageIdentifier
 
         #region Private Methods
 
+        /// <summary>
+        /// Extract Details For Poetry Lock file
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="dependencies"></param>
+        /// <returns> list of package</returns>
         public static List<PythonPackage> ExtractDetailsForPoetryLockfile(string filePath, List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages;
@@ -143,6 +163,12 @@ namespace LCT.PackageIdentifier
             return PythonPackages;
         }
 
+        /// <summary>
+        /// Gets Packages From TOML File
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="dependencies"></param>
+        /// <returns>list of package</returns>
         private static List<PythonPackage> GetPackagesFromTOMLFile(string filePath, List<Dependency> dependencies)
         {
             List<PythonPackage> PythonPackages = new();
@@ -176,6 +202,12 @@ namespace LCT.PackageIdentifier
             return PythonPackages;
         }
 
+        /// <summary>
+        /// Gets Ref Details From DependencyText
+        /// </summary>
+        /// <param name="keyValues"></param>
+        /// <param name="dependencies"></param>
+        /// <param name="PythonPackages"></param>
         private static void GetRefDetailsFromDependencyText(List<KeyValuePair<string, TomlNode>> keyValues, List<Dependency> dependencies, List<PythonPackage> PythonPackages)
         {
             foreach (var node in keyValues)
@@ -201,6 +233,12 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Form Ref From Node Details
+        /// </summary>
+        /// <param name="valuePair"></param>
+        /// <param name="PythonPackages"></param>
+        /// <returns>node details</returns>
         private static string FormRefFromNodeDetails(KeyValuePair<string, TomlNode> valuePair, List<PythonPackage> PythonPackages)
         {
             var value = PythonPackages.Find(val => val.Name == valuePair.Key)?.Version;
@@ -215,6 +253,13 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Extract Details From Json
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="dependencies"></param>
+        /// <returns>list of package</returns>
         private List<PythonPackage> ExtractDetailsFromJson(string filePath, CommonAppSettings appSettings, ref List<Dependency> dependencies)
         {
             Bom bom;
@@ -271,6 +316,10 @@ namespace LCT.PackageIdentifier
             return PythonPackages;
         }
 
+        /// <summary>
+        /// Gets Distinct ComponentList
+        /// </summary>
+        /// <param name="listofComponents"></param>
         private static void GetDistinctComponentList(ref List<PythonPackage> listofComponents)
         {
             int initialCount = listofComponents.Count;
@@ -280,6 +329,12 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
         }
 
+        /// <summary>
+        /// Gets Release ExternalId
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns>release id</returns>
         private static string GetReleaseExternalId(string name, string version)
         {
             version = WebUtility.UrlEncode(version);
@@ -288,6 +343,11 @@ namespace LCT.PackageIdentifier
             return $"{Dataconstant.PurlCheck()["POETRY"]}{Dataconstant.ForwardSlash}{name}@{version}";
         }
 
+        /// <summary>
+        /// Form Component Release ExternalID
+        /// </summary>
+        /// <param name="listOfComponents"></param>
+        /// <returns>list of components</returns>
         private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
         {
             List<Component> listComponentForBOM = new List<Component>();
@@ -306,6 +366,12 @@ namespace LCT.PackageIdentifier
             return listComponentForBOM;
         }
 
+        /// <summary>
+        /// Remove Excluded Components
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <param name="cycloneDXBOM"></param>
+        /// <returns>updated BOM file</returns>
         private static Bom RemoveExcludedComponents(CommonAppSettings appSettings,
             Bom cycloneDXBOM)
         {
@@ -313,6 +379,14 @@ namespace LCT.PackageIdentifier
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
+        /// <summary>
+        /// Identification Of InternalComponents
+        /// </summary>
+        /// <param name="componentData"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="jFrogService"></param>
+        /// <param name="bomhelper"></param>
+        /// <returns>component identification</returns>
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
 
@@ -334,6 +408,13 @@ namespace LCT.PackageIdentifier
             return componentData;
         }
 
+        /// <summary>
+        /// Is Internal PythonComponent
+        /// </summary>
+        /// <param name="aqlResultList"></param>
+        /// <param name="component"></param>
+        /// <param name="bomHelper"></param>
+        /// <returns>boolean value</returns>
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
@@ -346,7 +427,13 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
-
+        /// <summary>
+        /// Gets Jfrog Name Of PypiComponent
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <param name="aqlResultList"></param>
+        /// <returns>component name</returns>
         private static string GetJfrogNameOfPypiComponent(string name, string version, List<AqlResult> aqlResultList)
         {
 
@@ -358,7 +445,14 @@ namespace LCT.PackageIdentifier
             return nameVerison;
         }
 
-
+        /// <summary>
+        ///Gets Jfrog Repo Details OfAComponent
+        /// </summary>
+        /// <param name="componentsForBOM"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="jFrogService"></param>
+        /// <param name="bomhelper"></param>
+        /// <returns>list of component</returns>
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             // get the  component list from Jfrog for given repo + internal repo
@@ -376,6 +470,15 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
+        /// <summary>
+        /// Process Python Component
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="aqlResultList"></param>
+        /// <param name="bomhelper"></param>
+        /// <param name="appSettings"></param>
+        /// <param name="projectType"></param>
+        /// <returns>component name</returns>
         private static Component ProcessPythonComponent(Component component, List<AqlResult> aqlResultList, IBomHelper bomhelper, CommonAppSettings appSettings, Property projectType)
         {
             string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out string jfrogPackageNameWhlExten, out string jfrogRepoPath);
@@ -395,6 +498,11 @@ namespace LCT.PackageIdentifier
             return componentVal;
         }
 
+        /// <summary>
+        /// Updates Python Kpi Data Based On Repo
+        /// </summary>
+        /// <param name="repoValue"></param>
+        /// <param name="appSettings"></param>
         private static void UpdatePythonKpiDataBasedOnRepo(string repoValue, CommonAppSettings appSettings)
         {
             if (repoValue == appSettings.Poetry.DevDepRepo)
@@ -425,6 +533,15 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Gets Artifactory Repo Name
+        /// </summary>
+        /// <param name="aqlResultList"></param>
+        /// <param name="component"></param>
+        /// <param name="bomHelper"></param>
+        /// <param name="jfrogPackageName"></param>
+        /// <param name="jfrogRepoPath"></param>
+        /// <returns>repo name</returns>
         private static string GetArtifactoryRepoName(List<AqlResult> aqlResultList,
                                                      Component component,
                                                      IBomHelper bomHelper,
@@ -473,6 +590,11 @@ namespace LCT.PackageIdentifier
             return repoName;
         }
 
+        /// <summary>
+        /// Gets Jfrog Repo Path
+        /// </summary>
+        /// <param name="aqlResult"></param>
+        /// <returns>repo path</returns>
         private static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
@@ -482,6 +604,12 @@ namespace LCT.PackageIdentifier
 
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
+
+        /// <summary>
+        /// Adds Component Properties
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <param name="component"></param>
         private static void AddComponentProperties(PythonPackage prop, Component component)
         {
             var devDependency = new Property
@@ -502,6 +630,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Adds Spdx Properties
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <param name="component"></param>
         private static void AddSpdxProperties(PythonPackage prop, Component component)
         {
             string fileName = Path.GetFileName(prop.SpdxComponentDetails.SpdxFilePath);
@@ -538,6 +671,12 @@ namespace LCT.PackageIdentifier
             Logger.Debug(logBuilder.ToString());
         }
 
+        /// <summary>
+        /// Adds Identifier Type Property
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <param name="component"></param>
+        /// <param name="devDependency"></param>
         private static void AddIdentifierTypeProperty(PythonPackage prop, Component component, Property devDependency)
         {
             component.Properties ??= new List<Property>();
@@ -552,6 +691,13 @@ namespace LCT.PackageIdentifier
                 identifierTypeValue);
             component.Properties = properties;
         }
+
+        /// <summary>
+        /// Sets Spdx ComponentDetails
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="package"></param>
+        /// <param name="componentInfo"></param>
         private static void SetSpdxComponentDetails(string filePath, PythonPackage package, Component componentInfo)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))

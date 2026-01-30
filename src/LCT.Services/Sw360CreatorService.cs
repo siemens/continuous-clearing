@@ -49,6 +49,12 @@ namespace LCT.Services
             m_SW360CommonService = sW360CommonService;
         }
 
+        /// <summary>
+        /// creates componnet base of comparison BOM
+        /// </summary>
+        /// <param name="componentInfo"></param>
+        /// <param name="attachmentUrlList"></param>
+        /// <returns>Component create status</returns>
         public async Task<ComponentCreateStatus> CreateComponentBasesOFswComaprisonBOM(
             ComparisonBomData componentInfo, Dictionary<string, string> attachmentUrlList)
         {
@@ -104,7 +110,12 @@ namespace LCT.Services
             return componentCreateStatus;
         }
 
-
+        /// <summary>
+        /// trigger fossology process
+        /// </summary>
+        /// <param name="releaseId"></param>
+        /// <param name="sw360link"></param>
+        /// <returns>task that represents foss trigger status</returns>
         public async Task<FossTriggerStatus> TriggerFossologyProcess(string releaseId, string sw360link)
         {
             FossTriggerStatus fossTriggerStatus = null;
@@ -123,6 +134,11 @@ namespace LCT.Services
 
         }
 
+        /// <summary>
+        /// checks fossology process status
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns>task that represents fosology process</returns>
         public async Task<CheckFossologyProcess> CheckFossologyProcessStatus(string link)
         {
             CheckFossologyProcess fossTriggerStatus = null;
@@ -147,6 +163,14 @@ namespace LCT.Services
             return fossTriggerStatus;
 
         }
+
+        /// <summary>
+        /// create release component
+        /// </summary>
+        /// <param name="componentInfo"></param>
+        /// <param name="componentId"></param>
+        /// <param name="attachmentUrlList"></param>
+        /// <returns>create status</returns>
         public async Task<ReleaseCreateStatus> CreateReleaseForComponent(ComparisonBomData componentInfo, string componentId,
                                                              Dictionary<string, string> attachmentUrlList)
         {
@@ -202,6 +226,15 @@ namespace LCT.Services
             }
             return createStatus;
         }
+
+        /// <summary>
+        /// gets release id to link to project
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <param name="releaseExternalId"></param>
+        /// <param name="componentId"></param>
+        /// <returns>task that represents asynchronous operation</returns>
         private async Task<string> GetReleaseIdToLinkToProject(string name, string version, string releaseExternalId, string componentId)
         {
             string releaseId = await GetReleaseIdByName(name, version);
@@ -230,6 +263,14 @@ namespace LCT.Services
             return releaseId ?? string.Empty;
         }
 
+        /// <summary>
+        /// attach source and binary
+        /// </summary>
+        /// <param name="attachmentUrlList"></param>
+        /// <param name="createStatus"></param>
+        /// <param name="response"></param>
+        /// <param name="comparisonBomData"></param>
+        /// <returns>value</returns>
         private string AttachSourceAndBinary(Dictionary<string, string> attachmentUrlList, ReleaseCreateStatus createStatus, HttpResponseMessage response, ComparisonBomData comparisonBomData)
         {
             string releaseId = string.Empty;
@@ -246,6 +287,12 @@ namespace LCT.Services
             return releaseId;
         }
 
+        /// <summary>
+        /// gets source download url
+        /// </summary>
+        /// <param name="componentInfo"></param>
+        /// <param name="attachmentUrlList"></param>
+        /// <returns>value</returns>
         private static string GetSourceDownloadUrl(ComparisonBomData componentInfo, Dictionary<string, string> attachmentUrlList)
         {
             if (componentInfo.DownloadUrl == Dataconstant.DownloadUrlNotFound || !(attachmentUrlList.ContainsKey("SOURCE")))
@@ -255,6 +302,12 @@ namespace LCT.Services
             return componentInfo.DownloadUrl ?? string.Empty;
         }
 
+        /// <summary>
+        /// gets package download url
+        /// </summary>
+        /// <param name="componentInfo"></param>
+        /// <param name="attachmentUrlList"></param>
+        /// <returns>value</returns>
         private static string GetPackageDownloadUrl(ComparisonBomData componentInfo, Dictionary<string, string> attachmentUrlList)
         {
             if (!(attachmentUrlList.ContainsKey("BINARY")))
@@ -264,6 +317,14 @@ namespace LCT.Services
             return componentInfo.PackageUrl ?? string.Empty;
         }
 
+
+        /// <summary>
+        /// link releases to project 
+        /// </summary>
+        /// <param name="releasesTobeLinked"></param>
+        /// <param name="manuallyLinkedReleases"></param>
+        /// <param name="sw360ProjectId"></param>
+        /// <returns>boolean value</returns>
         public async Task<bool> LinkReleasesToProject(List<ReleaseLinked> releasesTobeLinked, List<ReleaseLinked> manuallyLinkedReleases, string sw360ProjectId)
         {
             if (manuallyLinkedReleases.Count <= 0 && releasesTobeLinked.Count <= 0)
@@ -333,6 +394,13 @@ namespace LCT.Services
             }
         }
 
+        /// <summary>
+        /// gets release id of a component
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componentVersion"></param>
+        /// <param name="componentid"></param>
+        /// <returns>value</returns>
         public async Task<string> GetReleaseIDofComponent(string componentName, string componentVersion, string componentid)
         {
             string releaseIdOfComponent = null;
@@ -357,6 +425,12 @@ namespace LCT.Services
             return releaseIdOfComponent ?? string.Empty;
         }
 
+        /// <summary>
+        /// gets release id by name
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componentVersion"></param>
+        /// <returns>name</returns>
         public async Task<string> GetReleaseIdByName(string componentName, string componentVersion)
         {
             string releaseid = string.Empty;
@@ -376,6 +450,14 @@ namespace LCT.Services
             return releaseid ?? string.Empty;
         }
 
+        /// <summary>
+        /// gets release id from response
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componentVersion"></param>
+        /// <param name="releaseid"></param>
+        /// <param name="responseBody"></param>
+        /// <returns>release id</returns>
         private static string GetReleaseIdFromResponse(string componentName, string componentVersion, string releaseid, string responseBody)
         {
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
@@ -393,6 +475,11 @@ namespace LCT.Services
             return releaseid;
         }
 
+        /// <summary>
+        /// gets component id
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <returns>component id</returns>
         public async Task<string> GetComponentId(string componentName)
         {
             string ComponentId = "";
@@ -426,7 +513,13 @@ namespace LCT.Services
             return ComponentId;
         }
 
-
+        /// <summary>
+        /// attach sources to releases
+        /// </summary>
+        /// <param name="releaseId"></param>
+        /// <param name="attachmentUrlList"></param>
+        /// <param name="comparisonBomData"></param>
+        /// <returns>value</returns>
         public string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList, ComparisonBomData comparisonBomData)
         {
             Logger.Debug("AttachSourcesToReleasesCreated(): starting attach sources to the releases");
@@ -449,6 +542,12 @@ namespace LCT.Services
             return attachmentApiUrl;
         }
 
+        /// <summary>
+        /// update id for existing component
+        /// </summary>
+        /// <param name="cbomData"></param>
+        /// <param name="componentId"></param>
+        /// <returns>boolean value</returns>
         public async Task<bool> UpdatePurlIdForExistingComponent(ComparisonBomData cbomData, string componentId)
         {
             try
@@ -492,6 +591,14 @@ namespace LCT.Services
             }
         }
 
+        /// <summary>
+        /// external id addition for component
+        /// </summary>
+        /// <param name="cbomData"></param>
+        /// <param name="componentPurlId"></param>
+        /// <param name="externalIds"></param>
+        /// <param name="existingExternalIds"></param>
+        /// <returns>boolean value</returns>
         private static bool ExternalIdAdditionForComponent(ComparisonBomData cbomData, ComponentPurlId componentPurlId, ref Dictionary<string, string> externalIds, Dictionary<string, string> existingExternalIds)
         {
 
@@ -514,6 +621,14 @@ namespace LCT.Services
             return false;
         }
 
+        /// <summary>
+        /// adding to existing component url id list
+        /// </summary>
+        /// <param name="existingExternalIds"></param>
+        /// <param name="cbomData"></param>
+        /// <param name="componentPurlId"></param>
+        /// <param name="externalIds"></param>
+        /// <returns>boolean value</returns>
         private static bool AddingToExistingComponentPurlIdList(Dictionary<string, string> existingExternalIds, ComparisonBomData cbomData, ComponentPurlId componentPurlId, ref Dictionary<string, string> externalIds)
         {
             bool isUpdated = false;
@@ -559,6 +674,13 @@ namespace LCT.Services
             return isUpdated;
         }
 
+        /// <summary>
+        /// updates url for existing release
+        /// </summary>
+        /// <param name="cbomData"></param>
+        /// <param name="releaseId"></param>
+        /// <param name="releasesInfo"></param>
+        /// <returns>boolean value</returns>
         public async Task<bool> UpdatePurlIdForExistingRelease(ComparisonBomData cbomData, string releaseId, ReleasesInfo releasesInfo = null)
         {
             try
@@ -604,6 +726,14 @@ namespace LCT.Services
                 return false;
             }
         }
+
+        /// <summary>
+        /// Updates Source Code Download URL For Existing Release
+        /// </summary>
+        /// <param name="cbomData"></param>
+        /// <param name="attachmentUrlList"></param>
+        /// <param name="releaseId"></param>
+        /// <returns>boolean value</returns>
         public async Task<bool> UpdateSourceCodeDownloadURLForExistingRelease(ComparisonBomData cbomData, Dictionary<string, string> attachmentUrlList, string releaseId)
         {
             try
@@ -642,6 +772,12 @@ namespace LCT.Services
                 return false;
             }
         }
+
+        /// <summary>
+        /// gets decided external id
+        /// </summary>
+        /// <param name="ReleaseExternalID"></param>
+        /// <returns>external id</returns>
         private static string GetDecodedExternalId(string ReleaseExternalID)
         {
             string releaseID;
@@ -657,6 +793,14 @@ namespace LCT.Services
             return releaseID;
         }
 
+        /// <summary>
+        /// External Id Addition For Release
+        /// </summary>
+        /// <param name="cbomData"></param>
+        /// <param name="releasesInfo"></param>
+        /// <param name="externalIds"></param>
+        /// <param name="existingExternalIds"></param>
+        /// <returns>boolean value</returns>
         private static bool ExternalIdAdditionForRelease(ComparisonBomData cbomData, ReleasesInfo releasesInfo, ref Dictionary<string, string> externalIds, Dictionary<string, string> existingExternalIds)
         {
             if (releasesInfo == null || releasesInfo.ExternalIds == null || releasesInfo.ExternalIds?.Count == 0)
@@ -679,6 +823,14 @@ namespace LCT.Services
             return false;
         }
 
+        /// <summary>
+        /// Adding To Existing Release Purl Id List
+        /// </summary>
+        /// <param name="existingExternalIds"></param>
+        /// <param name="cbomData"></param>
+        /// <param name="releasesInfo"></param>
+        /// <param name="externalIds"></param>
+        /// <returns>boolean value</returns>
         private static bool AddingToExistingReleasePurlIdList(Dictionary<string, string> existingExternalIds, ComparisonBomData cbomData, ReleasesInfo releasesInfo, ref Dictionary<string, string> externalIds)
         {
             bool isUpdated = false;
@@ -724,6 +876,11 @@ namespace LCT.Services
             return isUpdated;
         }
 
+        /// <summary>
+        /// gets release info
+        /// </summary>
+        /// <param name="releaseId"></param>
+        /// <returns>release info</returns>
         public async Task<ReleasesInfo> GetReleaseInfo(string releaseId)
         {
             ReleasesInfo responsBody = null;
@@ -746,7 +903,12 @@ namespace LCT.Services
             return responsBody;
         }
 
-
+        /// <summary>
+        /// updates sw360 release content
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="fossUrl"></param>
+        /// <returns>boolean value</returns>
         public async Task<bool> UpdateSW360ReleaseContent(Components component, string fossUrl)
         {
             bool isUpdated = false;
@@ -789,6 +951,13 @@ namespace LCT.Services
             return isUpdated;
         }
 
+        /// <summary>
+        /// gets release by external id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="releaseVersion"></param>
+        /// <param name="releaseExternalId"></param>
+        /// <returns>external id</returns>
         public async Task<string> GetReleaseByExternalId(string name, string releaseVersion, string releaseExternalId)
         {
             Releasestatus releasestatus = await m_SW360CommonService.GetReleaseDataByExternalId(name, releaseVersion, releaseExternalId);
@@ -797,6 +966,12 @@ namespace LCT.Services
             return releaseId;
         }
 
+        /// <summary>
+        /// Gets Component Id Using External Id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="componentExternalId"></param>
+        /// <returns>component id</returns>
         public async Task<string> GetComponentIdUsingExternalId(string name, string componentExternalId)
         {
             ComponentStatus componentstatus = await m_SW360CommonService.GetComponentDataByExternalId(name, componentExternalId);
@@ -805,6 +980,13 @@ namespace LCT.Services
             return ComponentId;
         }
 
+        /// <summary>
+        /// Gets Update Release Content
+        /// </summary>
+        /// <param name="releaseId"></param>
+        /// <param name="fossUrl"></param>
+        /// <param name="uploadId"></param>
+        /// <returns></returns>
         private async Task<UpdateReleaseAdditinoalData> GetUpdateReleaseContent(string releaseId, string fossUrl, string uploadId)
         {
             ReleasesInfo releasesInfo = await GetReleaseInfo(releaseId);
@@ -847,6 +1029,13 @@ namespace LCT.Services
 
             return updateRelease;
         }
+
+        /// <summary>
+        /// Trigger Fossology Process For Validation
+        /// </summary>
+        /// <param name="releaseId"></param>
+        /// <param name="sw360link"></param>
+        /// <returns>trigger status</returns>
         public async Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link)
         {
             FossTriggerStatus fossTriggerStatus = null;

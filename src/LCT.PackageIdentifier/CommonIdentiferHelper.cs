@@ -17,7 +17,22 @@ namespace LCT.PackageIdentifier
 {
     public static class CommonIdentiferHelper
     {
+        #region Fields
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
+        #endregion
+
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Returns the repository name for a prioritized order (release, devdep, dev) from AQL results.
+        /// </summary>
+        /// <param name="aqlResults">List of AQL results to inspect.</param>
+        /// <returns>Repository name matching the preferred order or a sentinel when not found.</returns>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults)
         {
@@ -53,7 +68,14 @@ namespace LCT.PackageIdentifier
                 }
             }
             return null;
-        }        
+        }
+      
+        /// <summary>
+        /// Returns the default project name to use in file naming based on SW360 configuration or a fallback.
+        /// </summary>
+        /// <param name="appSettings">Application settings which may contain SW360 project info.</param>
+        /// <returns>Project name string for use as default.</returns>
+
         public static string GetDefaultProjectName(CommonAppSettings appSettings)
         {
             string projectName;
@@ -68,6 +90,7 @@ namespace LCT.PackageIdentifier
 
             return projectName;
         }
+
         public static Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings, System.Func<string, Bom> parseCycloneDxBom)
         {
             var cdxGenBomData = CommonHelper.GetCdxGenBomData(configFiles, parseCycloneDxBom);
@@ -79,5 +102,10 @@ namespace LCT.PackageIdentifier
             }
             return null;
         }
+
+
+        #region Events
+        #endregion
+
     }
 }

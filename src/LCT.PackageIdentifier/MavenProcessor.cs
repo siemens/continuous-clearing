@@ -23,15 +23,30 @@ namespace LCT.PackageIdentifier
 {
     public class MavenProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
+        #region Fields
         private const string FalseString = "false";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
-        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };       
         private List<Component> listOfInternalComponents = new List<Component>();
         private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        #endregion
 
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Parses Maven-related BOM files from input and constructs a combined CycloneDX BOM for comparison.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing input folder and Maven configuration.</param>
+        /// <param name="unSupportedBomList">Reference BOM to be populated with unsupported components discovered during parsing.</param>
+        /// <returns>Constructed CycloneDX BOM.</returns>
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             Logger.Debug("ParsePackageFile():Starting to parse the package file for Maven components.");
@@ -92,6 +107,11 @@ namespace LCT.PackageIdentifier
             Logger.Debug("ParsePackageFile():Completed parsing the package file.\n");
             return bom;
         }
+
+        /// <summary>
+        /// Removes the ".jar" type suffix from component references and PURLs in the BOM.
+        /// </summary>
+        /// <param name="bom">BOM whose component and dependency references will be normalized.</param>
         private static void RemoveTypeJarSuffix(Bom bom)
         {
             const string suffix = Dataconstant.TypeJarSuffix;
@@ -107,6 +127,12 @@ namespace LCT.PackageIdentifier
                 RemoveTypeJarSuffixFromDependency(dependency);
             }
         }
+
+        /// <summary>
+        /// Recursively removes the ".jar" type suffix from dependency refs.
+        /// </summary>
+        /// <param name="dependency">Dependency node to normalize.</param>
+        
         public static void IdentifiedMavenComponents(string filePath, List<Component> components)
         {
             if (components == null || components.Count == 0)
@@ -151,6 +177,15 @@ namespace LCT.PackageIdentifier
                 }
             }
         }
+
+        /// <summary>
+        /// Processes each BOM file path and accumulates components and dependencies into provided lists.
+        /// </summary>
+        /// <param name="configFiles">List of configuration/BOM file paths to process.</param>
+        /// <param name="componentsForBOM">Primary component list to populate.</param>
+        /// <param name="componentsToBOM">Secondary component list used for dev dependency identification.</param>
+        /// <param name="dependenciesForBOM">Dependency list to populate.</param>
+        /// <param name="appSettings">Application settings used for SPDX validation and project type checks.</param>
         private void ProcessBomFiles(List<string> configFiles, List<Component> componentsForBOM, List<Component> componentsToBOM, List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
         {
             foreach (string filepath in configFiles)
@@ -190,6 +225,13 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Adds components and dependencies from a parsed BOM into the accumulator lists.
+        /// </summary>
+        /// <param name="bomList">Parsed BOM whose contents should be merged.</param>
+        /// <param name="componentsForBOM">Primary component accumulator.</param>
+        /// <param name="componentsToBOM">Secondary component accumulator.</param>
+        /// <param name="dependenciesForBOM">Dependency accumulator.</param>
         private static void AddComponentsToBom(Bom bomList, List<Component> componentsForBOM, List<Component> componentsToBOM, List<Dependency> dependenciesForBOM)
         {
             if (componentsForBOM.Count == 0)
@@ -207,6 +249,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Extracts SBOM template file paths from the provided file list.
+        /// </summary>
+        /// <param name="configFiles">List of file paths to inspect.</param>
+        /// <returns>List of template SBOM file paths.</returns>
         private static List<string> GetTemplateBomFilePaths(List<string> configFiles)
         {
             List<string> listOfTemplateBomfilePaths = new();
@@ -220,12 +267,23 @@ namespace LCT.PackageIdentifier
             }
             return listOfTemplateBomfilePaths;
         }
+        /// <summary>
+        /// Removes a suffix from a string value if present.
+        /// </summary>
+        /// <param name="value">Input string to process.</param>
+        /// <param name="suffix">Suffix to remove.</param>
+        /// <returns>String without the suffix when present.</returns>
         private static string RemoveSuffix(string value, string suffix)
         {
             return !string.IsNullOrEmpty(value) && value.EndsWith(suffix)
                 ? value[..^suffix.Length]
                 : value;
         }
+
+        /// <summary>
+        /// Adds or updates the Siemens-specific direct-dependency property on each component in the BOM.
+        /// </summary>
+        /// <param name="bom">BOM whose components will be annotated.</param>
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
             Logger.Debug("AddSiemensDirectProperty(): Starting to add SiemensDirect property to BOM components.");
@@ -248,6 +306,12 @@ namespace LCT.PackageIdentifier
             bom.Components = bomComponentsList;
         }
 
+        /// <summary>
+        /// Evaluates components across two BOM sets to identify development-only dependencies.
+        /// </summary>
+        /// <param name="componentsForBOM">Components from the primary BOM.</param>
+        /// <param name="componentsToBOM">Components from the secondary BOM.</param>
+        /// <param name="ListOfComponents">Reference list that will be filled with annotated components.</param>
         public static void DevDependencyIdentificationLogic(List<Component> componentsForBOM, List<Component> componentsToBOM, ref List<Component> ListOfComponents)
         {
 
@@ -259,6 +323,13 @@ namespace LCT.PackageIdentifier
 
         }
 
+        /// <summary>
+        /// Internal helper that marks components as development dependencies when they appear only in one BOM.
+        /// </summary>
+        /// <param name="ListOfComponents">Accumulator list to add processed components to.</param>
+        /// <param name="iterateBOM">The BOM list iterated over.</param>
+        /// <param name="checkBOM">The BOM list compared against to determine dev-only components.</param>
+        /// <returns>Updated accumulator list.</returns>
         private static List<Component> DevdependencyIdentification(List<Component> ListOfComponents, List<Component> iterateBOM, List<Component> checkBOM)
         {
             foreach (var item in iterateBOM)
@@ -291,6 +362,12 @@ namespace LCT.PackageIdentifier
             return ListOfComponents;
         }
 
+        /// <summary>
+        /// Sets identifier and development properties for a component and appends it to the provided list.
+        /// </summary>
+        /// <param name="componentsToBOM">Reference to the component list to add to.</param>
+        /// <param name="component">Component to annotate.</param>
+        /// <param name="devValue">String value indicating development dependency ("true"/"false").</param>
         private static void SetPropertiesforBOM(ref List<Component> componentsToBOM, Component component, string devValue)
         {
             Property identifierType = new() { Name = Dataconstant.Cdx_IdentifierType, Value = Dataconstant.Discovered };
@@ -328,6 +405,14 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Asynchronously enriches components with JFrog repository details (repo, file name, path, hashes).
+        /// </summary>
+        /// <param name="componentsForBOM">List of components to enrich.</param>
+        /// <param name="appSettings">Application settings with repo configuration.</param>
+        /// <param name="jFrogService">JFrog service used for queries.</param>
+        /// <param name="bomhelper">BOM helper providing repository query helpers.</param>
+        /// <returns>Asynchronously returns the modified components list.</returns>
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
                                                                    CommonAppSettings appSettings,
                                                                    IJFrogService jFrogService,
@@ -366,6 +451,14 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
+        /// <summary>
+        /// Asynchronously identifies internal Maven components by querying configured internal repositories.
+        /// </summary>
+        /// <param name="componentData">Component identification structure containing comparison BOM data.</param>
+        /// <param name="appSettings">Application settings with Artifactory internal repos.</param>
+        /// <param name="jFrogService">JFrog service used to query AQL results.</param>
+        /// <param name="bomhelper">BOM helper utilities.</param>
+        /// <returns>Asynchronously returns updated component identification data with internal components set.</returns>
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(
            ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
@@ -390,10 +483,10 @@ namespace LCT.PackageIdentifier
             return componentData;
         }
         /// <summary>
-        /// Updates KPI data based on the repository value
+        /// Updates KPI counters depending on which repository a component was found in.
         /// </summary>
-        /// <param name="repoValue">The repository value to check</param>
-        /// <param name="appSettings">Application settings containing repository configurations</param>
+        /// <param name="repoValue">Repository name discovered for the component.</param>
+        /// <param name="appSettings">Application settings used to map repo categories.</param>
         private static void UpdateKpiDataBasedOnRepo(string repoValue, CommonAppSettings appSettings)
         {
             if (repoValue == appSettings.Maven.DevDepRepo)
@@ -425,6 +518,14 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.UnofficialComponents++;
             }
         }
+
+        /// <summary>
+        /// Determines whether a Maven component is internal by inspecting AQL results and fallbacks.
+        /// </summary>
+        /// <param name="aqlResultList">List of AQL results to search.</param>
+        /// <param name="component">Component to check.</param>
+        /// <param name="bomHelper">BOM helper for generating full component names.</param>
+        /// <returns>True if component is found in internal results; otherwise false.</returns>
         private static bool IsInternalMavenComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = $"{component.Name}-{component.Version}";
@@ -446,6 +547,14 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
+        /// <summary>
+        /// Locates JFrog AQL entry for a Maven component and returns associated repo details and path.
+        /// </summary>
+        /// <param name="aqlResultList">AQL results to search.</param>
+        /// <param name="component">Component for which to locate artifact.</param>
+        /// <param name="bomHelper">BOM helper for full-name resolution fallback.</param>
+        /// <param name="jfrogRepoPath">Outputs the repo path when found.</param>
+        /// <returns>Found <see cref="AqlResult"/> or an empty item when none found.</returns>
         private static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
                                                                 Component component,
                                                                 IBomHelper bomHelper,
@@ -468,7 +577,7 @@ namespace LCT.PackageIdentifier
                 if (!fullNameVersion.Equals(jfrogcomponentName, StringComparison.OrdinalIgnoreCase))
                 {
                     aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
-                        fullNameVersion, StringComparison.OrdinalIgnoreCase));
+                    fullNameVersion, StringComparison.OrdinalIgnoreCase));
 
                     repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
                 }
@@ -488,6 +597,11 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
+        /// <summary>
+        /// Builds a JFrog repository path string from an AQL result entry.
+        /// </summary>
+        /// <param name="aqlResult">AQL result entry to format.</param>
+        /// <returns>Formatted repo path string.</returns>
         private static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
@@ -497,5 +611,9 @@ namespace LCT.PackageIdentifier
 
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }
