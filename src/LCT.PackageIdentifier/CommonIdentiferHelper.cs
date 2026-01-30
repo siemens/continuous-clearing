@@ -103,8 +103,7 @@ namespace LCT.PackageIdentifier
             return null;
         }
 
-
-        #region Events
+        
         #endregion
 
     }

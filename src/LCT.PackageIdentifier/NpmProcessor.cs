@@ -927,8 +927,7 @@ namespace LCT.PackageIdentifier
                 }
             }
         }       
-
-        #region Events
+       
         #endregion
     }
  }
