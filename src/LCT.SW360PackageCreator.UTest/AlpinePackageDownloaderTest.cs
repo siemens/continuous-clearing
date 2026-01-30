@@ -27,7 +27,10 @@ namespace LCT.SW360PackageCreator.UTest
                 AlpineSource = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v$pkgver/apk-tools-v$pkgver.tar.gz\\n\\tfix-recursive-solve-1.patch\\n\\tfix-recursive-solve-2.patch\\n\\t_apk\\n\\t"
 
             };
-            var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+            var localPathforDownload = Path.Combine(
+    Directory.GetParent(Directory.GetCurrentDirectory())!.FullName,
+    "ClearingTool",
+    "DownloadedFiles") + Path.DirectorySeparatorChar;
             var alpinePackageDownloader = new AlpinePackageDownloader();
 
             //Act
@@ -49,7 +52,10 @@ namespace LCT.SW360PackageCreator.UTest
                 AlpineSource = ""
 
             };
-            var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+            var localPathforDownload = Path.Combine(
+    Directory.GetParent(Directory.GetCurrentDirectory())!.FullName,
+    "ClearingTool",
+    "DownloadedFiles") + Path.DirectorySeparatorChar;
             var alpinePackageDownloader = new AlpinePackageDownloader();
 
             //Act
