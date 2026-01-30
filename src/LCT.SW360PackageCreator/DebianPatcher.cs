@@ -20,6 +20,14 @@ namespace LCT.SW360PackageCreator
     [ExcludeFromCodeCoverage]
     public class DebianPatcher : IDebianPatcher
     {
+
+        /// <summary>
+        /// Apply Patch
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="localDownloadPath"></param>
+        /// <param name="fileName"></param>
+        /// <returns>result</returns>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public Result ApplyPatch(ComparisonBomData component, string localDownloadPath, string fileName)
         {

@@ -22,8 +22,11 @@ namespace LCT.PackageIdentifier.Model.NugetModel
     [ExcludeFromCodeCoverage]
     public abstract class BuildInfoComponent : IEquatable<BuildInfoComponent>
     {
+        #region Fields
         protected static readonly HashAlgorithm HashAlgorithm = SHA512.Create();
+        #endregion
 
+        #region Properties
         public string Name { get; set; }
 
         public string Version { get; set; }
@@ -46,15 +49,10 @@ namespace LCT.PackageIdentifier.Model.NugetModel
         public string Sha1 { get; set; }
         public string Sha256 { get; set; }
 
-        protected BuildInfoComponent(string id, string version)
-        {
-            Name = id;
-            Version = version;
-            Dependencies = new HashSet<BuildInfoComponent>();
-            Ancestors = new HashSet<BuildInfoComponent>();
-            TypeName = GetType().Name;
-        }
-
+        /// <summary>
+        /// Gets a stable identifier for this component based on name, version, scope and runtime type.
+        /// </summary>
+        /// <returns>Hashed identifier string for the component.</returns>
         public virtual string Id
         {
             get
@@ -63,14 +61,41 @@ namespace LCT.PackageIdentifier.Model.NugetModel
                 return GetHashFromString(input);
             }
         }
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BuildInfoComponent"/> class.
+        /// </summary>
+        /// <param name="id">Component name or identifier.</param>
+        /// <param name="version">Component version.</param>
+        protected BuildInfoComponent(string id, string version)
+        {
+            Name = id;
+            Version = version;
+            Dependencies = new HashSet<BuildInfoComponent>();
+            Ancestors = new HashSet<BuildInfoComponent>();
+            TypeName = GetType().Name;
+        }
+        #endregion
 
+        #region Methods
+        /// <summary>
+        /// Computes a hex encoded hash for the given input string using the configured hash algorithm.
+        /// </summary>
+        /// <param name="input">String to hash.</param>
+        /// <returns>Hex encoded hash string.</returns>
         public static string GetHashFromString(string input)
         {
             byte[] byteHash = HashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
             return Convert.ToHexString(byteHash);
         }
 
+        /// <summary>
+        /// Returns all ancestor paths ending at this component. Each path is a list where the last element is this component.
+        /// </summary>
+        /// <param name="children">Optional list of child components accumulated so far; pass null to start a new path.</param>
+        /// <returns>List of ancestor paths, each path is a list of components.</returns>
         public IList<IList<BuildInfoComponent>> GetAncestors(IList<BuildInfoComponent> children)
         {
             List<IList<BuildInfoComponent>> ancestorsPathList = new();
@@ -106,6 +131,11 @@ namespace LCT.PackageIdentifier.Model.NugetModel
             return ancestorsPathList;
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="BuildInfoComponent"/> is equal to the current one.
+        /// </summary>
+        /// <param name="other">The other component to compare.</param>
+        /// <returns>True if components are equal; otherwise false.</returns>
         public virtual bool Equals(BuildInfoComponent other)
         {
             if (other is null)
@@ -150,14 +180,27 @@ namespace LCT.PackageIdentifier.Model.NugetModel
                            StringComparison.InvariantCultureIgnoreCase);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current component.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current component.</param>
+        /// <returns>True if equal; otherwise false.</returns>
         public override bool Equals(object obj)
         {
             return Equals(obj as BuildInfoComponent);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>Integer hash code for the instance.</returns>
         public override int GetHashCode()
         {
             return 0;
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

@@ -16,12 +16,32 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public static class BomValidator
     {
+        #region Fields
+        #endregion
+
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Asynchronously validates application settings by querying SW360 for the project name and delegating to CommonHelper validation.
+        /// </summary>
+        /// <param name="appSettings">Application settings to validate.</param>
+        /// <param name="bomService">SW360 project service used to retrieve project information.</param>
+        /// <param name="projectReleases">Project releases information used during validation.</param>
+        /// <returns>Asynchronously returns an integer validation code (e.g. -1 on failure).</returns>
         public static async Task<int> ValidateAppSettings(CommonAppSettings appSettings, ISw360ProjectService bomService, ProjectReleases projectReleases)
         {
             string sw360ProjectName = await bomService.GetProjectNameByProjectIDFromSW360(appSettings.SW360.ProjectID, appSettings.SW360.ProjectName, projectReleases);
 
             return CommonHelper.ValidateSw360Project(sw360ProjectName, projectReleases?.ClearingState, projectReleases?.Name, appSettings);
         }
+        #endregion
 
+        #region Events
+        #endregion
     }
 }

@@ -34,16 +34,33 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class BomHelper : IBomHelper
     {
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
 
-        #region public methods
+        #region Properties
+        #endregion
 
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Builds a URL that links to the project summary page in SW360.
+        /// </summary>
+        /// <param name="projectId">SW360 project identifier.</param>
+        /// <param name="sw360Url">Base SW360 URL.</param>
+        /// <returns>Full URL to the project's summary page.</returns>
         public string GetProjectSummaryLink(string projectId, string sw360Url)
         {
             Logger.Debug("starting method GetProjectSummaryLink");
             return $"{sw360Url}{ApiConstant.Sw360ProjectUrlApiSuffix}{projectId}";
         }
 
+        /// <summary>
+        /// Writes BOM KPI data to the console in a formatted table.
+        /// </summary>
+        /// <param name="bomKpiData">KPI data collected during BOM creation.</param>
         public void WriteBomKpiDataToConsole(BomKpiData bomKpiData)
         {
             KpiNames identifierKpiNames = IdentifyKpiNames(bomKpiData);
@@ -80,6 +97,12 @@ namespace LCT.PackageIdentifier
             CommonHelper.ProjectSummaryLink = bomKpiData.ProjectSummaryLink;
             LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink, Dataconstant.Identifier, identifierKpiNames);
         }
+
+        /// <summary>
+        /// Validates related signature/certificate files for an SPDX file and logs naming issues.
+        /// </summary>
+        /// <param name="filepath">Path to the SPDX file.</param>
+        /// <param name="appSettings">Application settings containing input folder info.</param>
         public static void NamingConventionOfSPDXFile(string filepath, CommonAppSettings appSettings)
         {
             string filename = Path.GetFileName(filepath);
@@ -100,6 +123,13 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Checks whether the related certificate/signature files exist in the input folder.
+        /// </summary>
+        /// <param name="inputFolder">Input folder path to search.</param>
+        /// <param name="relatedExtensions">Array of related file names to check.</param>
+        /// <param name="foundFiles">Dictionary to populate with found file paths keyed by name.</param>
+        /// <param name="missingFiles">List to populate with missing file names.</param>
         private static void CheckFileExistence(string inputFolder, string[] relatedExtensions,
             Dictionary<string, string> foundFiles, List<string> missingFiles)
         {
@@ -117,6 +147,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Logs errors for missing certificate/signature files using a helpful message.
+        /// </summary>
+        /// <param name="missingFiles">List of missing related files.</param>
+        /// <param name="filename">Base SPDX filename.</param>
         private static void HandleMissingFiles(List<string> missingFiles, string filename)
         {
             foreach (var missingFile in missingFiles)
@@ -132,6 +167,12 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Validates the found signature and certificate files for the SPDX file and logs warnings on failure.
+        /// </summary>
+        /// <param name="filepath">Path to the SPDX file.</param>
+        /// <param name="filename">SPDX file name.</param>
+        /// <param name="foundFiles">Dictionary of discovered related files.</param>
         private static void ValidateFoundFiles(string filepath, string filename, Dictionary<string, string> foundFiles)
         {
             string sigFilePath = foundFiles.TryGetValue($"{filename}.sig", out string sigFile) ? sigFile : string.Empty;
@@ -144,6 +185,13 @@ namespace LCT.PackageIdentifier
                 Logger.Warn($"Currently processing the SPDX file '{filename}' without signature verification.");
             }
         }
+
+        /// <summary>
+        /// Executes 'npm view' to retrieve the shasum for the specified package version.
+        /// </summary>
+        /// <param name="name">Package name.</param>
+        /// <param name="version">Package version.</param>
+        /// <returns>SHA sum string or empty string if unavailable.</returns>
         public static string GetHashCodeUsingNpmView(string name, string version)
         {
             string hashCode;
@@ -178,6 +226,12 @@ namespace LCT.PackageIdentifier
             return hashCode?.Trim() ?? string.Empty;
         }
 
+        /// <summary>
+        /// Executes Maven dependency:list to generate a dependency output file. (Obsolete)
+        /// </summary>
+        /// <param name="bomFilePath">Path to the POM or BOM file.</param>
+        /// <param name="depFilePath">Output dependency file path.</param>
+        /// <returns>Result containing process stdout/stderr.</returns>
         [Obsolete("not used")]
         [ExcludeFromCodeCoverage]
         public static Result GetDependencyList(string bomFilePath, string depFilePath)
@@ -209,6 +263,11 @@ namespace LCT.PackageIdentifier
 
         }
 
+        /// <summary>
+        /// Builds a display name for a component including group if available.
+        /// </summary>
+        /// <param name="item">CycloneDX component instance.</param>
+        /// <returns>Full name (group/name) or name if no group present.</returns>
         public string GetFullNameOfComponent(Component item)
         {
             if (!string.IsNullOrEmpty(item.Group))
@@ -221,6 +280,12 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Asynchronously retrieves AQL results for components from the specified repositories.
+        /// </summary>
+        /// <param name="repoList">Array of repository names to query.</param>
+        /// <param name="jFrogService">JFrog service to execute queries.</param>
+        /// <returns>Asynchronously returns a list of AQL results aggregated from all repos.</returns>
         public async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             List<AqlResult> aqlResultList = new();
@@ -235,6 +300,13 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
+
+        /// <summary>
+        /// Asynchronously retrieves NPM-style component information from the specified repositories.
+        /// </summary>
+        /// <param name="repoList">Array of repository names.</param>
+        /// <param name="jFrogService">JFrog service to execute queries.</param>
+        /// <returns>Asynchronously returns aggregated AQL results for NPM components.</returns>
         public async Task<List<AqlResult>> GetNpmListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             List<AqlResult> aqlResultList = new();
@@ -249,6 +321,13 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
+
+        /// <summary>
+        /// Asynchronously retrieves Cargo-style component information from the specified repositories.
+        /// </summary>
+        /// <param name="repoList">Array of repository names.</param>
+        /// <param name="jFrogService">JFrog service to execute queries.</param>
+        /// <returns>Asynchronously returns aggregated AQL results for Cargo components.</returns>
         public async Task<List<AqlResult>> GetCargoListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             List<AqlResult> aqlResultList = new();
@@ -263,6 +342,13 @@ namespace LCT.PackageIdentifier
 
             return aqlResultList;
         }
+
+        /// <summary>
+        /// Asynchronously retrieves PyPI-style component information from the specified repositories.
+        /// </summary>
+        /// <param name="repoList">Array of repository names.</param>
+        /// <param name="jFrogService">JFrog service to execute queries.</param>
+        /// <returns>Asynchronously returns aggregated AQL results for PyPI components.</returns>
         public async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
         {
             List<AqlResult> aqlResultList = new();
@@ -278,6 +364,15 @@ namespace LCT.PackageIdentifier
             return aqlResultList;
         }
 
+        /// <summary>
+        /// Parses a CycloneDX or SPDX BOM file and returns a Bom instance. Unsupported components are accumulated.
+        /// </summary>
+        /// <param name="filePath">Path to the BOM file.</param>
+        /// <param name="spdxBomParser">SPDX parser instance.</param>
+        /// <param name="cycloneDXBomParser">CycloneDX parser instance.</param>
+        /// <param name="appSettings">Application settings used for SPDX validation.</param>
+        /// <param name="listUnsupportedComponents">Reference list where unsupported components will be added.</param>
+        /// <returns>Parsed Bom object.</returns>
         public static Bom ParseBomFile(string filePath, ISpdxBomParser spdxBomParser, ICycloneDXBomParser cycloneDXBomParser, CommonAppSettings appSettings, ref Bom listUnsupportedComponents)
         {
             if (filePath.EndsWith(FileConstant.SPDXFileExtension))
@@ -306,6 +401,12 @@ namespace LCT.PackageIdentifier
 
             return $"{purlBase}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
+
+        /// <summary>
+        /// Maps BomKpiData properties to human readable KPI names used for printing.
+        /// </summary>
+        /// <param name="bomKpiData">KPI data instance to map.</param>
+        /// <returns>Structure with KPI display name mappings.</returns>
         private static KpiNames IdentifyKpiNames(BomKpiData bomKpiData)
         {
             KpiNames identifierKpiNames = new KpiNames();
@@ -329,6 +430,13 @@ namespace LCT.PackageIdentifier
             return identifierKpiNames;
         }
 
+        /// <summary>
+        /// Filters and returns components that match the specified purl prefix for a project type.
+        /// </summary>
+        /// <param name="componentsForBOM">List of components to evaluate.</param>
+        /// <param name="purlPrefix">PURL prefix to match (project type specific).</param>
+        /// <param name="projectType">Project type label used in logging.</param>
+        /// <returns>List of components that match the exclusion criteria.</returns>
         public static List<Component> GetExcludedComponentsList(List<Component> componentsForBOM, string purlPrefix, string projectType)
         {
             List<Component> components = new List<Component>();
@@ -349,6 +457,11 @@ namespace LCT.PackageIdentifier
             }
             return components;
         }
+
+        /// <summary>
+        /// Removes duplicate components from the list based on name, version and PURL, updating KPI counts.
+        /// </summary>
+        /// <param name="listofComponents">Reference to the list of components to deduplicate.</param>
         public static void GetDistinctComponentList(ref List<Component> listofComponents)
         {
             int initialCount = listofComponents.Count;
@@ -359,12 +472,22 @@ namespace LCT.PackageIdentifier
 
         }
 
+        /// <summary>
+        /// Removes components excluded by settings from the provided BOM and updates KPI counters.
+        /// </summary>
+        /// <param name="appSettings">Application settings with exclude lists.</param>
+        /// <param name="cycloneDXBOM">BOM to filter.</param>
+        /// <returns>Filtered BOM.</returns>
         public static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
         {
             return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
+        /// <summary>
+        /// Adds standard properties for components that were manually added to the BOM.
+        /// </summary>
+        /// <param name="componentsForBOM">List of manually added components to update.</param>
         public static void GetDetailsforManuallyAddedComp(List<Component> componentsForBOM)
         {
             foreach (var component in componentsForBOM)
@@ -380,6 +503,9 @@ namespace LCT.PackageIdentifier
                 component.Properties = properties;
             }
         }
+        #endregion
+
+        #region Events
         #endregion
     }
 }
