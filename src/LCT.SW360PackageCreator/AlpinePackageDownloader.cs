@@ -58,23 +58,28 @@ namespace LCT.SW360PackageCreator
         /// <param name="localPathforSourceRepo"></param>
         private static void CopyBuildFilesFromSourceRepo(string localPathforDownload, ComparisonBomData component, string sourceData, string localPathforSourceRepo)
         {
-            if (sourceData != null)
+            if (string.IsNullOrWhiteSpace(sourceData)) return;
+
+            // Normalize lines to LF, split, and process
+            var filenameList = sourceData.Replace("\r\n", "\n").Split('\n');
+
+            foreach (var name in filenameList)
             {
-                string[] filenameList = sourceData.Split("\n");
-                foreach (var name in filenameList)
+                var fileName = name.Trim();
+                if (string.IsNullOrEmpty(fileName)) continue;
+
+                var buildFileLocation = Path.Combine(localPathforSourceRepo, "aports", "main", component.Name, fileName);
+
+                // Skip patches here (ApplyPatchFilesToSourceCode handles patches)
+                if (File.Exists(buildFileLocation) && !fileName.EndsWith(".patch", StringComparison.OrdinalIgnoreCase))
                 {
-                    var fileName = name.Trim();
-                    string buildFileLocation = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
-                    if (System.IO.File.Exists(buildFileLocation) && !fileName.EndsWith(".patch"))
-                    {
+                    var buildFilesFolder = Path.Combine(localPathforDownload, "BuildFiles");
+                    Directory.CreateDirectory(buildFilesFolder);
 
-                        string destFile = System.IO.Path.Combine(Directory.CreateDirectory(localPathforDownload + "BuildFiles").ToString(), fileName);
-                        System.IO.File.Copy(buildFileLocation, destFile, true);
-
-                    }
+                    var destFile = Path.Combine(buildFilesFolder, fileName);
+                    File.Copy(buildFileLocation, destFile, true);
                 }
             }
-
         }
 
         /// <summary>
