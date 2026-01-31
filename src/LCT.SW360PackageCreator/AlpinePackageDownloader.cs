@@ -85,7 +85,14 @@ namespace LCT.SW360PackageCreator
         /// <returns>folder path</returns>
         private static string GetCurrentDownloadFolderPath(string localPathforDownload, ComparisonBomData component)
         {
-            return $"{localPathforDownload}{component.Name}--{DateTime.Now.ToString("yyyyMMddHHmmss")}{Dataconstant.ForwardSlash}";
+            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var folder = Path.Combine(localPathforDownload, $"{component.Name}--{timestamp}");
+
+            // Ensure the directory exists
+            Directory.CreateDirectory(folder);
+
+            // Return with a trailing separator if callers expect it
+            return folder + Path.DirectorySeparatorChar;
         }
 
         /// <summary>
@@ -103,26 +110,27 @@ namespace LCT.SW360PackageCreator
             try
             {
                 string componenetFullName = GetCorrectFileExtension(SourceUrl);
-                string downloadedFilePathWithName = $"{localPathforDownload}{componenetFullName}";
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(downloadedFilePathWithName));
+                string downloadedFilePathWithName = Path.Combine(localPathforDownload, componenetFullName);
+                Directory.CreateDirectory(Path.GetDirectoryName(downloadedFilePathWithName)!);
+
                 if (!string.IsNullOrEmpty(SourceUrl) && !component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
                 {
                     Uri uri = new Uri(SourceUrl);
                     downloadPath = await UrlHelper.DownloadFileAsync(uri, downloadedFilePathWithName);
                     ApplyPatchFilesToSourceCode(downloadPath, sourceData, localPathforSourceRepo, component, localPathforDownload);
-
                 }
+
                 CopyBuildFilesFromSourceRepo(localPathforDownload, component, sourceData, localPathforSourceRepo);
                 string gZipFilePath = PackageFolderGzip(localPathforDownload, component, downloadPath);
                 downloadPath = gZipFilePath;
             }
             catch (WebException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, PackageUrl: {SourceUrl}", ex, "A network error occurred while trying to download the tar file.");
+                LogHandlingHelper.ExceptionErrorHandling("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, PackageUrl: {SourceUrl}", ex, "A network error occurred while trying to download the tar file.");                
             }
             catch (UriFormatException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, PackageUrl: {SourceUrl}", ex, "The provided URL is not in a valid format.");
+                LogHandlingHelper.ExceptionErrorHandling("DownloadTarFileAndGetPath", $"MethodName:DownloadTarFileAndGetPath(), Release Name: {component.Name}@{component.Version}, PackageUrl: {SourceUrl}", ex, "The provided URL is not in a valid format.");                
             }
 
             return downloadPath;
@@ -266,10 +274,15 @@ namespace LCT.SW360PackageCreator
             if (Directory.GetDirectories(localPathforDownload).Length != 0)
             {
 
-                var tempFolder = Directory.CreateDirectory($"{Directory.GetParent(Directory.GetCurrentDirectory())}" +
-                    $"\\ClearingTool\\DownloadedFiles\\SourceCodeZipped\\{component.Name}\\--" +
-                    $"{DateTime.Now.ToString("yyyyMMddHHmmss")}\\");
-                tarArchivePath = tempFolder + (component.Name + "_" + component.Version) + ".tar.gz";
+                var tempFolderPath = Path.Combine(
+    Directory.GetParent(Directory.GetCurrentDirectory())!.FullName,
+    "ClearingTool",
+    "DownloadedFiles",
+    "SourceCodeZipped",    
+    $"{component.Name}--{DateTime.Now:yyyyMMddHHmmss}");
+
+                var tempFolder = Directory.CreateDirectory(tempFolderPath).FullName + Path.DirectorySeparatorChar;
+                tarArchivePath = Path.Combine(tempFolder, $"{component.Name}_{component.Version}.tar.gz");
                 var InputDirectory = localPathforDownload;
                 var OutputFilename = tarArchivePath;
                 using Stream zipStream = new FileStream(System.IO.Path.GetFullPath(OutputFilename), FileMode.Create, FileAccess.Write);

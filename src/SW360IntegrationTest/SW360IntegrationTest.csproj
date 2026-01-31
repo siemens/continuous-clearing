@@ -41,6 +41,9 @@
 		<None Update="PackageIdentifierTestFiles\CCTLocalBOMTemplateNugetInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="PackageIdentifierTestFiles\DepMaven\CCTLocalBOMMavenInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="PackageIdentifierTestFiles\DepNpm\CCTLocalBOMNpmInitial.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
@@ -98,7 +101,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Maven\" />
 		<Folder Include="PackageCreatorTestFiles\Alpine\" />
 		<Folder Include="PackageIdentifierTestFiles\Alpine\" />
 		<Folder Include="PackageIdentifierTestFiles\DepNpm\" />
