@@ -89,6 +89,12 @@ namespace LCT.SW360PackageCreator
             }
             return componentsData;
         }
+
+        /// <summary>
+        /// Gets Alpine Distro
+        /// </summary>
+        /// <param name="bomRef"></param>
+        /// <returns>distro</returns>
         public static string GetAlpineDistro(string bomRef)
         {
 
@@ -99,6 +105,13 @@ namespace LCT.SW360PackageCreator
             return distro;
         }
 
+        /// <summary>
+        /// Gets Alpine Source Url
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <param name="localPathforSourceRepo"></param>
+        /// <returns>AlpinePackage</returns>
         private static Task<AlpinePackage> GetAlpineSourceUrl(string name, string version, string localPathforSourceRepo)
         {
             AlpinePackage sourceURLDetails = new AlpinePackage { Name = name, Version = version };
@@ -127,6 +140,13 @@ namespace LCT.SW360PackageCreator
             }
             return Task.FromResult(sourceURLDetails);
         }
+
+        /// <summary>
+        /// Gets Source From APK BUILD
+        /// </summary>
+        /// <param name="localPathforSourceRepo"></param>
+        /// <param name="name"></param>
+        /// <returns>source data</returns>
         public static string GetSourceFromAPKBUILD(string localPathforSourceRepo, string name)
         {
             string sourceData = string.Empty;
@@ -161,6 +181,13 @@ namespace LCT.SW360PackageCreator
 
             return sourceData;
         }
+
+        /// <summary>
+        /// Gets Source Url For Alpine
+        /// </summary>
+        /// <param name="pkgFilePath"></param>
+        /// <param name="sourceData"></param>
+        /// <returns>source url</returns>
         public static string GetSourceUrlForAlpine(string pkgFilePath, string sourceData)
         {
             string sourceUrl = string.Empty;
@@ -224,6 +251,10 @@ namespace LCT.SW360PackageCreator
             return sourceUrl;
         }
 
+        /// <summary>
+        /// Gets Download Path For Alpine Repo
+        /// </summary>
+        /// <returns>local path for repo</returns>
         public static string GetDownloadPathForAlpineRepo()
         {
             string localPathforSourceRepo = string.Empty;
@@ -248,17 +279,38 @@ namespace LCT.SW360PackageCreator
 
             return localPathforSourceRepo;
         }
+
+        /// <summary>
+        /// Get Release External Id For Alpine
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns>external id</returns>
         public static string GetReleaseExternalIdForAlpine(string name, string version)
         {
 
             return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
+        /// <summary>
+        /// Generates the external identifier URL for an Alpine Linux package component using the specified package
+        /// name.
+        /// </summary>       
+        /// <param name="name">The name of the Alpine Linux package for which to generate the external identifier. Cannot be null or empty.</param>
+        /// <returns>A string containing the external identifier URL for the specified Alpine Linux package.</returns>
         private static string GetComponentExternalIdForAlpine(string name)
         {
             return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}?arch=source";
         }
 
+        /// <summary>
+        /// Clones a source Git repository to a specified local directory and checks out the specified Alpine
+        /// distribution if the target path exists.
+        /// </summary>       
+        /// <param name="localPathforSourceRepo">The local file system path where the source repository will be cloned. Must be a valid, existing directory.</param>
+        /// <param name="alpineDistro">The name or identifier of the Alpine distribution branch or tag to check out after cloning.</param>
+        /// <param name="fullPath">The full file system path to the directory where the repository should be checked out. If this directory
+        /// exists, the specified Alpine distribution is checked out.</param>
         private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
         {
             Logger.DebugFormat("CloneSource(): Start cloneing from git - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
@@ -309,6 +361,11 @@ namespace LCT.SW360PackageCreator
             Logger.DebugFormat("CloneSource(): completed cloneing - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
         }
 
+        /// <summary>
+        /// Check out Distro
+        /// </summary>
+        /// <param name="alpineDistro"></param>
+        /// <param name="fullPath"></param>
         private static void CheckoutDistro(string alpineDistro, string fullPath)
         {
             Logger.DebugFormat("CheckoutDistro(): Start checkout github repo - AlpineDistro: {0}, FullPath: {1}", alpineDistro, fullPath);
@@ -333,6 +390,10 @@ namespace LCT.SW360PackageCreator
             Logger.DebugFormat("CheckoutDistro(): Completed checkout github repo - AlpineDistro: {0}, FullPath: {1}", alpineDistro, fullPath);
         }
 
+        /// <summary>
+        /// Get Git Clone Commands
+        /// </summary>
+        /// <returns></returns>
         private static List<string> GetGitCloneCommands()
         {
             return new List<string>()
@@ -545,6 +606,12 @@ namespace LCT.SW360PackageCreator
             return componentSrcURL;
         }
 
+        /// <summary>
+        /// Gets Source URL From Nuspec File
+        /// </summary>
+        /// <param name="nuspecURL"></param>
+        /// <param name="componentName"></param>
+        /// <returns>task that represents asynchronous operation</returns>
         private async Task<string> GetSourceURLFromNuspecFile(string nuspecURL, string componentName)
         {
             string response;
@@ -581,6 +648,11 @@ namespace LCT.SW360PackageCreator
             return GithubUrl;
         }
 
+        /// <summary>
+        /// Search For Project URL Tag In Nuspec File
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        /// <returns>url</returns>
         private static string SearchForProjectURLTagInNuspecFile(XmlDocument xmlDoc)
         {
             string url = string.Empty;
@@ -609,6 +681,12 @@ namespace LCT.SW360PackageCreator
             return url;
         }
 
+        /// <summary>
+        /// Gets Release External Id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns>external id</returns>
         public static string GetReleaseExternalId(string name, string version)
         {
             version = WebUtility.UrlEncode(version);
@@ -617,11 +695,22 @@ namespace LCT.SW360PackageCreator
             return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
+        /// <summary>
+        /// Gets Component External Id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>external id</returns>
         private static string GetComponentExternalId(string name)
         {
             return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}?arch=source";
         }
 
+        /// <summary>
+        /// Gets Source Url
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns>task</returns>
         private async Task<DebianPackage> GetSourceUrl(string name, string version)
         {
             DebianPackage sourceURLDetails = new DebianPackage { Name = name, Version = version };
@@ -642,6 +731,12 @@ namespace LCT.SW360PackageCreator
             return sourceURLDetails;
         }
 
+        /// <summary>
+        /// Gets Archive Response
+        /// </summary>
+        /// <param name="packageDetails"></param>
+        /// <param name="packageType"></param>
+        /// <returns>package</returns>
         private async Task<DebianPackage> GetArchiveResponse(DebianPackage packageDetails, string packageType)
         {
             string URL;
@@ -677,6 +772,12 @@ namespace LCT.SW360PackageCreator
             return packageDetails;
         }
 
+        /// <summary>
+        /// Gets Source Detials From Type
+        /// </summary>
+        /// <param name="packageType"></param>
+        /// <param name="sourceURLDetails"></param>
+        /// <returns>debian package</returns>
         private async Task<DebianPackage> GetSourceDetialsFromType(string packageType, DebianPackage sourceURLDetails)
         {
             if (packageType == "source")
@@ -690,6 +791,11 @@ namespace LCT.SW360PackageCreator
             return sourceURLDetails;
         }
 
+        /// <summary>
+        /// Gets Source URL From Json Text For SourceType
+        /// </summary>
+        /// <param name="sourceURLDetails"></param>
+        /// <returns>devbian package</returns>
         private static DebianPackage GetSourceURLFromJsonTextForSourceType(DebianPackage sourceURLDetails)
         {
             List<string> SourceURL = new List<string>();
@@ -732,6 +838,11 @@ namespace LCT.SW360PackageCreator
             return sourceURLDetails;
         }
 
+        /// <summary>
+        /// Gets Source URL From Json Text For Binary Type
+        /// </summary>
+        /// <param name="sourceURLDetails"></param>
+        /// <returns>debian package</returns>
         private async Task<DebianPackage> GetSourceURLFromJsonTextForBinaryType(DebianPackage sourceURLDetails)
         {
             try
@@ -769,6 +880,12 @@ namespace LCT.SW360PackageCreator
             return sourceURLDetails;
         }
 
+        /// <summary>
+        /// Gets Proper Source URL
+        /// </summary>
+        /// <param name="sourceURLDetails"></param>
+        /// <param name="URLs"></param>
+        /// <returns>debian package</returns>
         private static DebianPackage GetProperSourceURL(DebianPackage sourceURLDetails, List<string> URLs)
         {
             if (URLs.Count > 2)
@@ -824,6 +941,12 @@ namespace LCT.SW360PackageCreator
             return sourceURLDetails;
         }
 
+        /// <summary>
+        /// Retry To Get Source  URl Details Async
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns>debian package</returns>
         private async Task<DebianPackage> RetryToGetSourceURlDetailsAsync(string name, string version)
         {
             Logger.DebugFormat("RetryToGetSourceURlDetailsAsync(): Start - ComponentName: {0}, Version: {1}", name, version);
@@ -860,6 +983,12 @@ namespace LCT.SW360PackageCreator
             return sourceURL;
         }
 
+        /// <summary>
+        /// Gets Response From PyPiOrg
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <returns>result</returns>
         private async Task<string> GetResponseFromPyPiOrg(string componentName, string componenVersion)
         {
             string URL;
@@ -884,6 +1013,11 @@ namespace LCT.SW360PackageCreator
             return result;
         }
 
+        /// <summary>
+        /// Gets Source URL From PyPi Response
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns>source url</returns>
         private static string GetSourceURLFromPyPiResponse(string response)
         {
             string SourceURL = "";
@@ -914,6 +1048,12 @@ namespace LCT.SW360PackageCreator
             return SourceURL;
         }
 
+        /// <summary>
+        /// Download File Async
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="downloadFilePath"></param>
+        /// <returns>download path</returns>
         public static async Task<string> DownloadFileAsync(Uri uri, string downloadFilePath)
         {
             string downloadedPath = string.Empty;
@@ -934,6 +1074,11 @@ namespace LCT.SW360PackageCreator
             return downloadedPath;
         }
 
+        /// <summary>
+        /// Gets Correct File Extension
+        /// </summary>
+        /// <param name="sourceURL"></param>
+        /// <returns></returns>
         public static string GetCorrectFileExtension(string sourceURL)
         {
             int idx = sourceURL.LastIndexOf(Dataconstant.ForwardSlash);

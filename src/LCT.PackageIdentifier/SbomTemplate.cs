@@ -19,8 +19,24 @@ namespace LCT.PackageIdentifier
 {
     public static class SbomTemplate
     {
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
 
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Processes a SBOM template file and applies template component details to the provided BOM components list.
+        /// </summary>
+        /// <param name="templateFilePath">Path to the CycloneDX template file.</param>
+        /// <param name="cycloneDXBomParser">Parser used to read CycloneDX BOM files.</param>
+        /// <param name="componentsForBOM">Component list to which template details will be applied or appended.</param>
+        /// <param name="projectType">Project type used to validate components from the template.</param>
         public static void ProcessTemplateFile(string templateFilePath, ICycloneDXBomParser cycloneDXBomParser, List<Component> componentsForBOM, string projectType)
         {
             if (File.Exists(templateFilePath) && templateFilePath.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -31,6 +47,12 @@ namespace LCT.PackageIdentifier
                 AddComponentDetails(componentsForBOM, templateDetails);
             }
         }
+
+        /// <summary>
+        /// Selects the first template file path from a list and logs when multiple templates are provided.
+        /// </summary>
+        /// <param name="filePaths">List of candidate template file paths.</param>
+        /// <returns>The selected template file path, or an empty string when none provided.</returns>
         public static string GetFilePathForTemplate(List<string> filePaths)
         {
             string firstFilePath = string.Empty;
@@ -44,6 +66,12 @@ namespace LCT.PackageIdentifier
             }
             return firstFilePath;
         }
+
+        /// <summary>
+        /// Adds components from the SBOM template into the target BOM list when missing.
+        /// </summary>
+        /// <param name="bom">Target BOM component list to merge into.</param>
+        /// <param name="sbomdDetails">Template BOM details containing components to apply.</param>
         public static void AddComponentDetails(List<Component> bom, Bom sbomdDetails)
         {
             if (sbomdDetails.Components == null)
@@ -57,6 +85,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Adds a template component to the BOM or updates an existing BOM component with template properties/licenses.
+        /// </summary>
+        /// <param name="bom">Target BOM component list.</param>
+        /// <param name="sbomcomp">Template component to add or apply.</param>
         private static void PropertyAdditionForTemplate(List<Component> bom, Component sbomcomp)
         {
             try
@@ -89,6 +122,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Updates an existing BOM component using values from a template component and increments KPI counters when updated.
+        /// </summary>
+        /// <param name="sbomcomp">Template component.</param>
+        /// <param name="bomComp">Existing BOM component to update.</param>
         private static void TemplateComponentUpdation(Component sbomcomp, Component bomComp)
         {
             bool isLicenseUpdated = UpdateLicenseDetails(bomComp, sbomcomp);
@@ -105,6 +143,12 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Merges license information from the template component into the BOM component when present.
+        /// </summary>
+        /// <param name="bomComp">Existing BOM component to update.</param>
+        /// <param name="sbomcomp">Template component containing license data.</param>
+        /// <returns>True if licenses were added; otherwise false.</returns>
         private static bool UpdateLicenseDetails(Component bomComp, Component sbomcomp)
         {
             //Adding Licenses if mainatined
@@ -124,6 +168,12 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
+        /// <summary>
+        /// Merges properties from the template component into the BOM component and sets identifier type to 'TemplateUpdated'.
+        /// </summary>
+        /// <param name="bomComp">Existing BOM component to update.</param>
+        /// <param name="sbomcomp">Template component containing properties.</param>
+        /// <returns>True if properties were added; otherwise false.</returns>
         private static bool UpdatePropertiesDetails(Component bomComp, Component sbomcomp)
         {
             //Adding properties if mainatined
@@ -148,5 +198,9 @@ namespace LCT.PackageIdentifier
             }
             return false;
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

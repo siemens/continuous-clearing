@@ -33,16 +33,29 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class ConanProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
-        #region fields
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
-        private List<Component> listOfInternalComponents = new List<Component>();
         #endregion
 
-        #region public methods
+        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        private List<Component> listOfInternalComponents = new List<Component>();
+        #region Properties
+        #endregion
+
+        #region Constructors
+        // Primary constructor parameters are declared on the class.
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Parses Conan dep.json input files and produces a CycloneDX BOM for the project.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing input folder and project type.</param>
+        /// <param name="unSupportedBomList">Reference BOM that will be filled with unsupported components found during parsing.</param>
+        /// <returns>Constructed CycloneDX BOM representing discovered components and dependencies.</returns>
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             Logger.Debug("ParsePackageFile():Started Parseing input File for conan components.");
@@ -76,6 +89,14 @@ namespace LCT.PackageIdentifier
             return bom;
         }
 
+        /// <summary>
+        /// Asynchronously identifies internal Conan components by comparing BOM components to JFrog AQL results.
+        /// </summary>
+        /// <param name="componentData">Component identification input containing comparison BOM data.</param>
+        /// <param name="appSettings">Application settings with repository configuration.</param>
+        /// <param name="jFrogService">JFrog service used to query AQL results.</param>
+        /// <param name="bomhelper">BOM helper providing repository query helpers.</param>
+        /// <returns>Asynchronously returns the updated component identification data with internal components separated.</returns>
         public async Task<ComponentIdentification> IdentificationOfInternalComponents(ComponentIdentification componentData, CommonAppSettings appSettings,
             IJFrogService jFrogService, IBomHelper bomhelper)
         {
@@ -95,6 +116,14 @@ namespace LCT.PackageIdentifier
         }
 
 
+        /// <summary>
+        /// Asynchronously enriches the given components with JFrog repository details and returns the modified list.
+        /// </summary>
+        /// <param name="componentsForBOM">List of components to enrich with JFrog details.</param>
+        /// <param name="appSettings">Application settings providing repo lists and configuration.</param>
+        /// <param name="jFrogService">JFrog service used to query AQL results.</param>
+        /// <param name="bomhelper">BOM helper utilities for repository queries.</param>
+        /// <returns>Asynchronously returns a new list of components with repository properties and hashes set.</returns>
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
             Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
@@ -114,9 +143,14 @@ namespace LCT.PackageIdentifier
             return modifiedBOM;
         }
 
-        #endregion
-
-        #region private methods
+        /// <summary>
+        /// Updates a single component's properties (repo, path, project type) and populates hashes if available.
+        /// </summary>
+        /// <param name="component">Component to update.</param>
+        /// <param name="aqlResultList">AQL results used to find repository entries and hashes.</param>
+        /// <param name="appSettings">Application settings for repo configuration.</param>
+        /// <param name="projectType">Property representing the project type to attach to the component.</param>
+        /// <returns>Updated component instance.</returns>
         private static Component UpdateComponentDetails(Component component, List<AqlResult> aqlResultList, CommonAppSettings appSettings, Property projectType)
         {
             string repoName = GetArtifactoryRepoName(aqlResultList, component, out string jfrogRepoPath);
@@ -145,6 +179,11 @@ namespace LCT.PackageIdentifier
             return component;
         }
 
+        /// <summary>
+        /// Updates KPI counters depending on repository type (devdep, third-party, release or not found).
+        /// </summary>
+        /// <param name="appSettings">Application settings containing repository names.</param>
+        /// <param name="repoValue">Repository name that the component was found in.</param>
         private static void UpdateBomKpiData(CommonAppSettings appSettings, string repoValue)
         {
             if (repoValue == appSettings.Conan.DevDepRepo)
@@ -165,6 +204,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Converts AQL hash result into a CycloneDX Hash list.
+        /// </summary>
+        /// <param name="hashes">AQL result containing MD5, SHA1 and SHA256 values.</param>
+        /// <returns>List of CycloneDX Hash objects.</returns>
         private static List<Hash> GetComponentHashes(AqlResult hashes)
         {
             return new List<Hash>
@@ -175,6 +219,11 @@ namespace LCT.PackageIdentifier
     };
         }
 
+        /// <summary>
+        /// Writes a file enumerating components that have multiple versions detected in the project.
+        /// </summary>
+        /// <param name="componentsWithMultipleVersions">List of components that have multiple versions.</param>
+        /// <param name="appSettings">Application settings used to determine output paths.</param>
         public static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
@@ -220,6 +269,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Scans input folder, parses supported files and populates the BOM with components and dependencies.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing input folder and type-specific config.</param>
+        /// <param name="bom">Reference BOM to populate.</param>
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
             Logger.Debug("ParsingInputFileForBOM():Starting parsing of input files for BOM.");
@@ -294,6 +348,12 @@ namespace LCT.PackageIdentifier
             Logger.Debug("ParsingInputFileForBOM():Completed parsing of input files for BOM.");
         }
 
+        /// <summary>
+        /// Parses a Conan dep.json file and returns a list of CycloneDX components derived from it.
+        /// </summary>
+        /// <param name="filepath">Path to the dep.json file.</param>
+        /// <param name="dependencies">Reference list that will be populated with dependency relationships.</param>
+        /// <returns>List of components extracted from the dep.json file.</returns>
         private static List<Component> ParseDepJson(string filepath, ref List<Dependency> dependencies)
         {
             List<Component> StartingComponentForBOM = new List<Component>();
@@ -339,6 +399,12 @@ namespace LCT.PackageIdentifier
             return StartingComponentForBOM;
         }
 
+        /// <summary>
+        /// Extracts components from node packages and updates the dev-dependency counter.
+        /// </summary>
+        /// <param name="StartingComponentForBOM">Reference list to add components to.</param>
+        /// <param name="noOfDevDependent">Reference counter for development dependencies.</param>
+        /// <param name="nodePackages">List of node id / ConanPackage pairs.</param>
         private static void GetPackagesForBom(ref List<Component> StartingComponentForBOM, ref int noOfDevDependent,
             List<KeyValuePair<string, ConanPackage>> nodePackages)
         {
@@ -406,6 +472,12 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Determines whether a Conan package represents a development dependency.
+        /// </summary>
+        /// <param name="package">Conan package to evaluate.</param>
+        /// <param name="noOfDevDependent">Reference counter incremented when a dev dependency is found.</param>
+        /// <returns>True if package is a development dependency; otherwise false.</returns>
         public static bool IsDevDependency(ConanPackage package, ref int noOfDevDependent)
         {
             // For Conan 2.0, dev dependencies are identified by context = "build"
@@ -419,6 +491,12 @@ namespace LCT.PackageIdentifier
             return isDev;
         }
 
+        /// <summary>
+        /// Builds CycloneDX dependency relationships from Conan node package information.
+        /// </summary>
+        /// <param name="componentsForBOM">List of components for which to build dependencies.</param>
+        /// <param name="nodePackages">Node package map from the dep.json graph.</param>
+        /// <param name="dependencies">List to populate with CycloneDX Dependency objects.</param>
         private static void GetDependencyDetails(List<Component> componentsForBOM,
             List<KeyValuePair<string, ConanPackage>> nodePackages, List<Dependency> dependencies)
         {
@@ -453,6 +531,11 @@ namespace LCT.PackageIdentifier
             }
         }        
 
+        /// <summary>
+        /// Adds identification-related properties to components depending on the identification source.
+        /// </summary>
+        /// <param name="components">Components to update.</param>
+        /// <param name="identifiedBy">Identifier source name (e.g., "PackageFile" or manual).</param>
         private static void AddingIdentifierType(List<Component> components, string identifiedBy)
         {
             foreach (var component in components)
@@ -480,8 +563,59 @@ namespace LCT.PackageIdentifier
                 }
             }
         }
+
+        /// <summary>
+        /// Removes duplicate components (same name/version/purl) and updates KPI counters accordingly.
+        /// </summary>
+        /// <param name="listofComponents">Reference list of components to deduplicate.</param>
+        private static void GetDistinctComponentList(ref List<Component> listofComponents)
+        {
+            int initialCount = listofComponents.Count;
+            listofComponents = listofComponents.GroupBy(x => new { x.Name, x.Version, x.Purl }).Select(y => y.First()).ToList();
+
+            if (listofComponents.Count != initialCount)
+                BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
+        }
+
+        /// <summary>
+        /// Removes components excluded via application settings and adjusts KPI counters.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing exclusion lists.</param>
+        /// <param name="cycloneDXBOM">BOM to filter.</param>
+        /// <returns>Filtered BOM.</returns>
+        private static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
+        {
+            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
+                noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
+        }
+
+        /// <summary>
+        /// Ensures manually added components have standard properties set (development flag and identifier type).
+        /// </summary>
+        /// <param name="componentsForBOM">List of manually added components to update.</param>
+        private static void GetDetailsforManuallyAddedComp(List<Component> componentsForBOM)
+        {
+            foreach (var component in componentsForBOM)
+            {
+                component.Properties ??= new List<Property>();
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IsDevelopment,
+                    "false");
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
+                    Dataconstant.Cdx_IdentifierType,
+                    Dataconstant.ManullayAdded);
+                component.Properties = properties;
+            }
+        }
                
 
+        /// <summary>
+        /// Determines whether the specified component exists in the provided AQL results (internal).
+        /// </summary>
+        /// <param name="aqlResultList">AQL results to search.</param>
+        /// <param name="component">Component to locate.</param>
+        /// <returns>True if an internal match is found; otherwise false.</returns>
         private static bool IsInternalConanComponent(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
@@ -495,6 +629,13 @@ namespace LCT.PackageIdentifier
             return false;
         }
 
+        /// <summary>
+        /// Determines the artifactory repository name and repository path for a Conan component based on AQL results.
+        /// </summary>
+        /// <param name="aqlResultList">List of AQL query results.</param>
+        /// <param name="component">Component for which to locate a repository.</param>
+        /// <param name="jfrogRepoPath">Output path within the JFrog repository when found.</param>
+        /// <returns>Repository name or a sentinel if not found.</returns>
         public static string GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component, out string jfrogRepoPath)
         {
             Logger.DebugFormat("GetArtifactoryRepoName(): Starting identify JFrog repository details retrieval for component [Name: {0}, Version: {1}].", component.Name, component.Version);
@@ -512,6 +653,9 @@ namespace LCT.PackageIdentifier
 
             return repoName;
         }
+        #endregion
+
+        #region Events
         #endregion
     }
 }

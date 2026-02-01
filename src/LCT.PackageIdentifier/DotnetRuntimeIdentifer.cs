@@ -24,8 +24,17 @@ namespace LCT.PackageIdentifier
 {
     public class DotnetRuntimeIdentifer : IRuntimeIdentifier
     {
+        #region Fields
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
 
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
         /// <summary>
         /// Registers the default MSBuild instance for use within the application if it has not already been registered.
         /// </summary>
@@ -158,7 +167,6 @@ namespace LCT.PackageIdentifier
             return filteredFiles;
         }
 
-        #region Private Methods
         /// <summary>
         /// Parses a .csproj project file and extracts runtime-related information, including target framework,
         /// self-contained status, runtime identifiers, and framework references.
@@ -211,9 +219,9 @@ namespace LCT.PackageIdentifier
         /// <summary>
         /// Loads a project with default settings for configuration and platform.
         /// </summary>
-        /// <param name="projectFilePath"></param>
-        /// <param name="projectCollection"></param>
-        /// <returns></returns>
+        /// <param name="projectFilePath">Project file path to load.</param>
+        /// <param name="projectCollection">ProjectCollection to associate with the loaded project.</param>
+        /// <returns>Loaded <see cref="Project"/> instance.</returns>
         private static Project LoadProjectWithDefaultSettings(string projectFilePath, ProjectCollection projectCollection)
         {
             var globalProperties = new Dictionary<string, string>
@@ -228,8 +236,8 @@ namespace LCT.PackageIdentifier
         /// <summary>
         /// Populates the <see cref="RuntimeInfo"/> object with project metadata such as path and name.
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="project"></param>
+        /// <param name="info">RuntimeInfo instance to populate.</param>
+        /// <param name="project">Loaded MSBuild project to read metadata from.</param>
         private static void PopulateProjectInfo(RuntimeInfo info, Project project)
         {
             info.ProjectPath = project.FullPath;
@@ -237,10 +245,10 @@ namespace LCT.PackageIdentifier
         }
 
         /// <summary>
-        /// Processes the self-contained status of the project, determining whether it is self-contained
+        /// Processes the self-contained status of the project, determining whether it is self-contained.
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="project"></param>
+        /// <param name="info">RuntimeInfo to update with self-contained values.</param>
+        /// <param name="project">Project to inspect for self-contained and runtime identifier properties.</param>
         private static void ProcessSelfContainedStatus(RuntimeInfo info, Project project)
         {
             string selfContainedEvaluated = project.GetPropertyValue("SelfContained");
@@ -266,11 +274,11 @@ namespace LCT.PackageIdentifier
         /// <summary>
         /// Sets the reason for the self-contained status based on the evaluated value and project properties.
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="isSelfContained"></param>
-        /// <param name="selfContainedExplicitlySet"></param>
-        /// <param name="hasRuntimeIdentifier"></param>
-        /// <param name="selfContainedValueParsed"></param>
+        /// <param name="info">RuntimeInfo to update the reason on.</param>
+        /// <param name="isSelfContained">Whether the project was evaluated as self-contained.</param>
+        /// <param name="selfContainedExplicitlySet">Whether the SelfContained property was explicitly set.</param>
+        /// <param name="hasRuntimeIdentifier">Whether a runtime identifier or identifiers were provided.</param>
+        /// <param name="selfContainedValueParsed">Whether the SelfContained evaluated value could be parsed to boolean.</param>
         private static void SetSelfContainedReason(RuntimeInfo info, bool isSelfContained, bool selfContainedExplicitlySet,
             bool hasRuntimeIdentifier, bool selfContainedValueParsed)
         {
@@ -301,8 +309,8 @@ namespace LCT.PackageIdentifier
         /// <summary>
         /// Processes the runtime identifiers from the project file, extracting both single and multiple runtime identifiers.
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="project"></param>
+        /// <param name="info">RuntimeInfo to populate with runtime identifiers.</param>
+        /// <param name="project">Project to inspect for RuntimeIdentifier and RuntimeIdentifiers properties.</param>
         private static void ProcessRuntimeIdentifiers(RuntimeInfo info, Project project)
         {
             string runtimeIdentifier = project.GetPropertyValue("RuntimeIdentifier");
@@ -318,8 +326,8 @@ namespace LCT.PackageIdentifier
         /// <summary>
         /// Processes the framework references from the project file, extracting relevant information such as target framework and targeting pack version.
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="project"></param>
+        /// <param name="info">RuntimeInfo to add discovered framework references to.</param>
+        /// <param name="project">Project to inspect for KnownFrameworkReference items.</param>
         private static void ProcessFrameworkReferences(RuntimeInfo info, Project project)
         {
             string targetFrameworkValue = project.GetPropertyValue("TargetFramework");
@@ -340,8 +348,8 @@ namespace LCT.PackageIdentifier
         /// <summary>
         /// Handles exceptions related to invalid project files, populating the provided <see cref="RuntimeInfo"/> with error details.
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="ex"></param>
+        /// <param name="info">RuntimeInfo to populate with error information.</param>
+        /// <param name="ex">InvalidProjectFileException thrown by MSBuild during project load.</param>
         private static void HandleProjectFileException(RuntimeInfo info, Microsoft.Build.Exceptions.InvalidProjectFileException ex)
         {
             info.ErrorMessage = $"Error loading project file: {ex.Message}";
@@ -440,6 +448,9 @@ namespace LCT.PackageIdentifier
 
             return excludePatterns.Any(pattern => filePath.Contains(pattern, StringComparison.OrdinalIgnoreCase));
         }
+        #endregion
+
+        #region Events
         #endregion
     }
 }

@@ -55,11 +55,25 @@ namespace LCT.Services
             m_SW360CommonService = sw360CommonService;
             environmentHelper = _environmentHelper;
         }
+
+        /// <summary>
+        /// Retrieves a list of components that have duplicate Package URL (PURL) identifiers.
+        /// </summary>
+        /// <returns>A list of <see cref="Components"/> objects that share the same PURL identifier. The list is empty if no
+        /// duplicates are found.</returns>
         public List<Components> GetDuplicateComponentsByPurlId()
         {
             return InvalidComponentsIdentifiedByPurlId;
         }
 
+        /// <summary>
+        /// Retrieves the list of components from SW360 that are available as releases and match the specified
+        /// components.
+        /// </summary>       
+        /// <param name="listOfComponentsToBom">The list of components to check for available releases in SW360. Each component in the list is compared
+        /// against the releases retrieved from SW360.</param>
+        /// <returns>A list of components representing the available releases in SW360 that correspond to the specified
+        /// components. The list is empty if no matching releases are found.</returns>
         public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom)
         {
             Logger.Debug("GetAvailableReleasesInSw360():Starting to get available releases in sw360");
@@ -100,7 +114,13 @@ namespace LCT.Services
             return availableComponentsList;
         }
 
-
+        /// <summary>
+        /// Retrieves release information for a specified component using the provided release link.
+        /// </summary>
+        /// <param name="releaseLink">The URL or identifier used to locate and retrieve the release data for the component. Cannot be null or
+        /// empty.</param>
+        /// <returns>A <see cref="ReleasesInfo"/> object containing the release details for the specified component. Returns an
+        /// empty <see cref="ReleasesInfo"/> instance if no data is found or an error occurs.</returns>
         public async Task<ReleasesInfo> GetReleaseDataOfComponent(string releaseLink)
         {
             ReleasesInfo releasesInfo = new ReleasesInfo();
@@ -127,7 +147,14 @@ namespace LCT.Services
             return releasesInfo;
         }
 
-
+        /// <summary>
+        /// Retrieves release information from the SW360 API using the specified release link.
+        /// </summary>       
+        /// <param name="releaseLink">The URL or link identifying the release to retrieve. Must not be null or empty. The release ID is extracted
+        /// from the last segment of this link.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the HTTP response message with
+        /// the release information if the request is successful; otherwise, the response may be null if an error
+        /// occurs.</returns>
         public async Task<HttpResponseMessage> GetReleaseInfoByReleaseId(string releaseLink)
         {
             HttpResponseMessage responseBody = null;
@@ -147,6 +174,12 @@ namespace LCT.Services
             return responseBody;
         }
 
+        /// <summary>
+        /// Retrieves the release identifier for a specified component and version.
+        /// </summary>       
+        /// <param name="componentName">The name of the component for which to retrieve the release identifier. Cannot be null or empty.</param>
+        /// <param name="version">The version of the component for which to retrieve the release identifier. Cannot be null or empty.</param>
+        /// <returns>A string containing the release identifier if found; otherwise, an empty string.</returns>
         public async Task<string> GetComponentReleaseID(string componentName, string version)
         {
             string releaseId = ""; string href = "";
@@ -176,6 +209,15 @@ namespace LCT.Services
             return releaseId;
         }
 
+        /// <summary>
+        /// Retrieves the download link and related metadata for an attachment associated with a release, given the
+        /// attachment URL.
+        /// </summary>       
+        /// <param name="releaseAttachmentUrl">The URL of the release attachment for which to obtain the download link. Cannot be null, empty, or
+        /// whitespace.</param>
+        /// <returns>A <see cref="Sw360AttachmentHash"/> object containing the download link and related information. If the
+        /// attachment is not available or the URL is invalid, the returned object will indicate that the source is not
+        /// available.</returns>
         public async Task<Sw360AttachmentHash> GetAttachmentDownloadLink(string releaseAttachmentUrl)
         {
             Sw360AttachmentHash attachmentHash = new Sw360AttachmentHash();
@@ -214,6 +256,13 @@ namespace LCT.Services
             return attachmentHash;
         }
 
+        /// <summary>
+        /// Retrieves the attachment link, hash code, and name for the first attachment of type "SOURCE" from the
+        /// specified collection.
+        /// </summary>
+        /// <param name="sw360attachments">A list of SW360 attachments to search for a source attachment. Cannot be null.</param>
+        /// <returns>A Sw360AttachmentHash containing the link, hash code, and name of the first source attachment found;
+        /// otherwise, an empty Sw360AttachmentHash if no source attachment exists.</returns>
         private static Sw360AttachmentHash GetReleaseSourceAttachmentLink(IList<Sw360Attachments> sw360attachments)
         {
             Sw360AttachmentHash attachmentHash = new Sw360AttachmentHash();
@@ -229,6 +278,15 @@ namespace LCT.Services
             return attachmentHash;
         }
 
+        /// <summary>
+        /// Downloads the source code attachment for a release from the specified SW360 attachment information.
+        /// </summary>        
+        /// <param name="fileName">The name of the component file to use as a base for the downloaded file path.</param>
+        /// <param name="version">The version of the component associated with the source code to download.</param>
+        /// <param name="attachmentHash">The SW360 attachment hash containing metadata and the download URL for the source code attachment. Cannot be
+        /// null.</param>
+        /// <returns>The full file path to the downloaded source code file if the download succeeds; otherwise, returns the
+        /// original component file name if the download fails or the source download URL is not available.</returns>
         [ExcludeFromCodeCoverage]
         public string DownloadReleaseSourceCode(string fileName, string version, Sw360AttachmentHash attachmentHash)
         {
@@ -277,6 +335,13 @@ namespace LCT.Services
             return fileName;
         }
 
+        /// <summary>
+        /// gets upload description frim sw360
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componetVersion"></param>
+        /// <param name="sw360url"></param>
+        /// <returns>description</returns>
         [ExcludeFromCodeCoverage]
         public async Task<string> GetUploadDescriptionfromSW360(string componentName, string componetVersion, string sw360url)
         {
@@ -311,6 +376,12 @@ namespace LCT.Services
             return "";
         }
 
+        /// <summary>
+        /// gets available components list
+        /// </summary>
+        /// <param name="sw360Releases"></param>
+        /// <param name="listOfComponentsToBom"></param>
+        /// <returns>list of components</returns>
         private async Task<List<Components>> GetAvailableComponenentsList(IList<Sw360Releases> sw360Releases, List<Components> listOfComponentsToBom)
         {
 
@@ -340,6 +411,11 @@ namespace LCT.Services
             RemoveInvalidComponentsByPurlId(listOfComponentsToBom);
             return availableComponentList;
         }
+
+        /// <summary>
+        /// remove invalid component by purl id
+        /// </summary>
+        /// <param name="components"></param>
         private static void RemoveInvalidComponentsByPurlId(List<Components> components)
         {
             if (InvalidComponentsIdentifiedByPurlId.Count == 0)
@@ -352,6 +428,14 @@ namespace LCT.Services
                     invalid.ReleaseExternalId?.Equals(component.ReleaseExternalId) == true
                 ));
         }
+
+        /// <summary>
+        /// check availability by name and version
+        /// </summary>
+        /// <param name="sw360Releases"></param>
+        /// <param name="component"></param>
+        /// <param name="sw360ComponentList"></param>
+        /// <returns>boolean value</returns>
         private static bool CheckAvailabilityByNameAndVersion(IList<Sw360Releases> sw360Releases, Components component, IList<Sw360Components> sw360ComponentList)
         {
             Logger.DebugFormat("CheckAvailabilityByNameAndVersion(): Starting check for component '{0}' version '{1}'", component?.Name, component?.Version);
@@ -371,6 +455,12 @@ namespace LCT.Services
             return ValidateAndProcessComponent(sw360Release, sw360Component, component);
         }
 
+        /// <summary>
+        /// fins matching release
+        /// </summary>
+        /// <param name="sw360Releases"></param>
+        /// <param name="component"></param>
+        /// <returns>releases data</returns>
         private static Sw360Releases FindMatchingRelease(IList<Sw360Releases> sw360Releases, Components component)
         {
             // Find regular version match
@@ -390,12 +480,25 @@ namespace LCT.Services
             return sw360Release;
         }
 
+        /// <summary>
+        /// finds matching component
+        /// </summary>
+        /// <param name="sw360ComponentList"></param>
+        /// <param name="component"></param>
+        /// <returns>component</returns>
         private static Sw360Components FindMatchingComponent(IList<Sw360Components> sw360ComponentList, Components component)
         {
             return sw360ComponentList.FirstOrDefault(x =>
                 x.Name?.Trim().ToLowerInvariant() == component?.Name?.Trim().ToLowerInvariant());
         }
 
+        /// <summary>
+        /// validate and process component
+        /// </summary>
+        /// <param name="sw360Release"></param>
+        /// <param name="sw360Component"></param>
+        /// <param name="component"></param>
+        /// <returns>boolean value</returns>
         private static bool ValidateAndProcessComponent(Sw360Releases sw360Release, Sw360Components sw360Component, Components component)
         {
             if (string.IsNullOrEmpty(sw360Component?.ExternalIds?.Package_Url)
@@ -416,6 +519,12 @@ namespace LCT.Services
             return true;
         }
 
+        /// <summary>
+        /// validates project type url
+        /// </summary>
+        /// <param name="sw360Component"></param>
+        /// <param name="component"></param>
+        /// <returns>boolean value</returns>
         private static bool ValidateProjectTypePurl(Sw360Components sw360Component, Components component)
         {
             if (string.IsNullOrEmpty(component?.ProjectType)
@@ -439,6 +548,11 @@ namespace LCT.Services
             return true;
         }
 
+        /// <summary>
+        /// handle mismatched url id
+        /// </summary>
+        /// <param name="sw360Component"></param>
+        /// <param name="component"></param>
         private static void HandleMismatchedPurlId(Sw360Components sw360Component, Components component)
         {
             Logger.DebugFormat("GetAvailableComponenentsList(): Component Name '{0}' PURL ID mismatched with SW360 component PURL ID", component.Name);
@@ -450,6 +564,11 @@ namespace LCT.Services
             InvalidComponentsIdentifiedByPurlId.Add(component);
         }
 
+        /// <summary>
+        /// adds to available list
+        /// </summary>
+        /// <param name="sw360Release"></param>
+        /// <param name="component"></param>
         private static void AddToAvailableList(Sw360Releases sw360Release, Components component)
         {
             availableComponentList.Add(new Components
@@ -462,6 +581,10 @@ namespace LCT.Services
             });
         }
 
+        /// <summary>
+        /// gets available component list from sw360
+        /// </summary>
+        /// <returns></returns>
         private async Task<IList<Sw360Components>> GetAvailableComponenentsListFromSw360()
         {
             IList<Sw360Components> componentsList = new List<Sw360Components>();
@@ -481,6 +604,12 @@ namespace LCT.Services
             return componentsList;
         }
 
+        /// <summary>
+        /// checks availability by name
+        /// </summary>
+        /// <param name="sw360Components"></param>
+        /// <param name="component"></param>
+        /// <returns>boolean value</returns>
         private static bool CheckAvailabilityByName(IList<Sw360Components> sw360Components, Components component)
         {
             //checking for component existance with name 
@@ -505,6 +634,11 @@ namespace LCT.Services
             return isComponentAvailable;
         }
 
+        /// <summary>
+        /// checks component existence by external id
+        /// </summary>
+        /// <param name="componentToBomData"></param>
+        /// <returns>boolean value</returns>
         private async Task<bool> CheckComponentExistenceByExternalId(Components componentToBomData)
         {
             Logger.DebugFormat("CheckComponentExistenceByExternalId(): Starting to identifying component through ExternalId - {0}", componentToBomData.Name);
@@ -543,6 +677,11 @@ namespace LCT.Services
             return componentstatus.isComponentExist;
         }
 
+        /// <summary>
+        /// checks release existence by external id
+        /// </summary>
+        /// <param name="componentToBomData"></param>
+        /// <returns>boolean value</returns>
         private async Task<bool> CheckReleaseExistenceByExternalId(Components componentToBomData)
         {
             Logger.DebugFormat("CheckReleaseExistenceByExternalId():Starting to identifying release through External Id : Release name - {0}, version - {1},ExternalId - {2}", componentToBomData.Name, componentToBomData.Version, componentToBomData.ReleaseExternalId);
