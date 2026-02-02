@@ -1048,12 +1048,15 @@ namespace LCT.SW360PackageCreator
             return SourceURL;
         }
 
-        /// <summary>
-        /// Download File Async
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="downloadFilePath"></param>
-        /// <returns>download path</returns>
+        // PLAN (pseudocode):
+        // - Replace obsolete WebClient usage with HttpClient to be compatible with .NET 8.
+        // - Use HttpClient with HttpCompletionOption.ResponseHeadersRead for streaming download.
+        // - Preserve existing retry mechanism via RetryHttpClientHandler.ExecuteWithRetryAsync.
+        // - Write response stream to target file using FileStream with async copy.
+        // - Keep logging and exception handling similar to existing code.
+
+        // Code changes: Replace DownloadFileAsync implementation.
+
         public static async Task<string> DownloadFileAsync(Uri uri, string downloadFilePath)
         {
             string downloadedPath = string.Empty;
@@ -1061,16 +1064,35 @@ namespace LCT.SW360PackageCreator
             {
                 await RetryHttpClientHandler.ExecuteWithRetryAsync(async () =>
                 {
-                    using WebClient webClient = new();
-                    await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
+                    using var client = new HttpClient();
+                    // Optional: set user agent to avoid some servers blocking
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("ContinuousClearing");
+
+                    using var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                    response.EnsureSuccessStatusCode();
+
+                    await using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    Directory.CreateDirectory(Path.GetDirectoryName(downloadFilePath)!);
+                    await using var fileStream = new FileStream(downloadFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, useAsync: true);
+                    await contentStream.CopyToAsync(fileStream).ConfigureAwait(false);
                 });
+
                 downloadedPath = downloadFilePath;
                 Logger.DebugFormat("DownloadFileFromSnapshotorgAsync:File Name : {0} ,Downloaded Successfully!!", Path.GetFileName(downloadFilePath));
             }
-            catch (WebException webex)
+            catch (HttpRequestException httpEx)
             {
-                LogHandlingHelper.ExceptionErrorHandling("DownloadFileAsync", $"MethodName:DownloadFileAsync(), FilePath: {downloadFilePath}, URI: {uri}", webex, "A network error occurred while trying to download the file.");
+                LogHandlingHelper.ExceptionErrorHandling("DownloadFileAsync", $"MethodName:DownloadFileAsync(), FilePath: {downloadFilePath}, URI: {uri}", httpEx, "An HTTP error occurred while trying to download the file.");
             }
+            catch (IOException ioEx)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("DownloadFileAsync", $"MethodName:DownloadFileAsync(), FilePath: {downloadFilePath}, URI: {uri}", ioEx, "An I/O error occurred while writing the downloaded file.");
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("DownloadFileAsync", $"MethodName:DownloadFileAsync(), FilePath: {downloadFilePath}, URI: {uri}", uaEx, "Unauthorized access while writing the downloaded file.");
+            }
+
             return downloadedPath;
         }
 
