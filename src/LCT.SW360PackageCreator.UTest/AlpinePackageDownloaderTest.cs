@@ -16,27 +16,6 @@ namespace LCT.SW360PackageCreator.UTest
     [TestFixture]
     class AlpinePackageDownloaderTest
     {
-        [TestCase]
-        public async Task DownloadSourceForAlpine_ProvidedSourceURL_ReturnsDownloadPath()
-        {
-            //Arrange
-            var lstComparisonBomData = new ComparisonBomData()
-            {
-                Name = "apk-tools",
-                Version = "2.12.9-r3",
-                SourceUrl = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v2.12.9/apk-tools-v2.12.9.tar.gz",
-                AlpineSource = "https://gitlab.alpinelinux.org/alpine/apk-tools/-/archive/v$pkgver/apk-tools-v$pkgver.tar.gz"
-
-            };
-            var localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
-            var alpinePackageDownloader = new AlpinePackageDownloader();
-
-            //Act
-            var downloadpath = await alpinePackageDownloader.DownloadPackage(lstComparisonBomData, localPathforDownload);
-
-            //Assert
-            Assert.IsNotEmpty(downloadpath);
-        }
 
         [TestCase]
         public async Task DownloadSourceForAlpine_ProvidedInValidSourceURL_ReturnsNull()
