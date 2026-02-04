@@ -6,7 +6,6 @@
 
 // Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api LCT aql
 
-using ArtifactoryUploader;
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
@@ -431,9 +430,9 @@ namespace LCT.ArtifactoryUploader
         {
             const string dryRunSuffix = null;
             string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
-            ArtfactoryUploader.JFrogService = JFrogService;
-            ArtfactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
-            HttpResponseMessage responseMessage = await ArtfactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
+            ArtifactoryUploader.JFrogService = JFrogService;
+            ArtifactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
+            HttpResponseMessage responseMessage = await ArtifactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
 
             if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
             {

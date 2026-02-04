@@ -9,7 +9,6 @@
 using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
-using LCT.ArtifactoryUploader;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Logging;
@@ -28,7 +27,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace ArtifactoryUploader
+namespace LCT.ArtifactoryUploader
 {
     [ExcludeFromCodeCoverage]
     public static class Program

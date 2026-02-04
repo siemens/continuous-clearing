@@ -124,7 +124,7 @@ namespace LCT.ArtifactoryUploader
         /// <param name="displayPackagesInfo">The display information containing all package lists.</param>
         public static void DisplayPackageUploadInformation(DisplayPackagesInfo displayPackagesInfo)
         {
-            string localPathforartifactory = ArtfactoryUploader.GettPathForArtifactoryUpload();
+            string localPathforartifactory = ArtifactoryUploader.GettPathForArtifactoryUpload();
 
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "npm", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "NuGet", localPathforartifactory);

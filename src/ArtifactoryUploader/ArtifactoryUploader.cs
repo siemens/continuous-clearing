@@ -22,7 +22,7 @@ using Directory = System.IO.Directory;
 
 namespace LCT.ArtifactoryUploader
 {
-    public static class ArtfactoryUploader
+    public static class ArtifactoryUploader
     {
         #region Fields
 
