@@ -20,9 +20,20 @@ namespace LCT.Common
     /// </summary>
     public class SettingsManager : ISettingsManager
     {
-        public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+
+        #endregion
+
+        #region Properties
+
+        public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Reads the Configuration from input args and json setting file
@@ -86,6 +97,9 @@ namespace LCT.Common
             return appSettings;
         }
 
+        /// <summary>
+        /// Displays the CLI usage help from the help text file.
+        /// </summary>
         public static void DisplayHelp()
         {
 
@@ -97,6 +111,12 @@ namespace LCT.Common
             sr.Dispose();
         }
 
+        /// <summary>
+        /// Gets the configuration file path from command line arguments.
+        /// </summary>
+        /// <param name="args">The command line arguments.</param>
+        /// <param name="jsonSettingsFileName">The default JSON settings file name.</param>
+        /// <returns>The configuration file path.</returns>
         internal string GetConfigFilePathFromArgs(string[] args, string jsonSettingsFileName)
         {
             IConfigurationBuilder settingsFileConfigBuilder = new ConfigurationBuilder()
@@ -124,6 +144,11 @@ namespace LCT.Common
             return settingsFilePath;
         }
 
+        /// <summary>
+        /// Checks required arguments to run based on the current executable type.
+        /// </summary>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="currentExe">The current executable type (Identifier, Creator, or other).</param>
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
 
@@ -187,6 +212,11 @@ namespace LCT.Common
             Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has completed\n");
         }
 
+        /// <summary>
+        /// Checks for missing required parameters in the application settings.
+        /// </summary>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="reqParameters">The list of required parameter keys.</param>
         private static void CheckForMissingParameter(CommonAppSettings appSettings, List<string> reqParameters)
         {
             StringBuilder missingParameters = new StringBuilder();
@@ -209,6 +239,12 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Gets the nested property value from an object using dot notation.
+        /// </summary>
+        /// <param name="obj">The object to retrieve the property value from.</param>
+        /// <param name="key">The property key in dot notation (e.g., "Property.SubProperty").</param>
+        /// <returns>The property value, or null if not found.</returns>
         private static object GetNestedPropertyValue(object obj, string key)
         {
             string[] parts = key.Split('.');
@@ -228,6 +264,11 @@ namespace LCT.Common
             return currentObject;
         }
 
+        /// <summary>
+        /// Checks if a value is missing, null, empty, or whitespace.
+        /// </summary>
+        /// <param name="value">The value to check.</param>
+        /// <returns>True if the value is missing; otherwise, false.</returns>
         private static bool IsMissingValue(object value)
         {
             if (value is Array array)
@@ -242,6 +283,11 @@ namespace LCT.Common
 
             return string.IsNullOrWhiteSpace(value?.ToString());
         }
+
+        /// <summary>
+        /// Checks if Azure DevOps debug mode is enabled.
+        /// </summary>
+        /// <returns>True if Azure DevOps debug mode is enabled; otherwise, false.</returns>
         public static bool IsAzureDevOpsDebugEnabled()
         {
             string azureDevOpsDebug = Environment.GetEnvironmentVariable("System.Debug") ?? string.Empty;
@@ -252,10 +298,18 @@ namespace LCT.Common
             return false;
         }
 
+        #endregion
     }
 
+    /// <summary>
+    /// Represents settings file configuration.
+    /// </summary>
     public class SettingsFile
     {
+        #region Properties
+
         public string SettingsFilePath { get; set; }
+
+        #endregion
     }
 }

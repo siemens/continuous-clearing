@@ -22,12 +22,30 @@ using Directory = System.IO.Directory;
 
 namespace LCT.ArtifactoryUploader
 {
-    public static class ArtfactoryUploader
+    public static class ArtifactoryUploader
     {
-        //ConfigurationAttribute
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Properties
+
         public static IJFrogService JFrogService { get; set; }
         public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously uploads a package to the repository.
+        /// </summary>
+        /// <param name="component">The component to upload.</param>
+        /// <param name="timeout">The timeout value in seconds.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task containing the HTTP response message.</returns>
 
         public static async Task<HttpResponseMessage> UploadPackageToRepo(ComponentsToArtifactory component, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
@@ -77,6 +95,11 @@ namespace LCT.ArtifactoryUploader
             return responsemessage;
         }
 
+        /// <summary>
+        /// Gets the operation type for the component based on package type.
+        /// </summary>
+        /// <param name="component">The component to determine operation type for.</param>
+        /// <returns>The operation type as a string ("copy" or "move").</returns>
         private static string GetOperationType(ComponentsToArtifactory component)
         {
             if (component.ComponentType == "CHOCO")
@@ -86,6 +109,11 @@ namespace LCT.ArtifactoryUploader
             return (component.PackageType == PackageType.ClearedThirdParty || component.PackageType == PackageType.Development) ? "copy" : "move";
         }
 
+        /// <summary>
+        /// Asynchronously gets the repository operation response based on package type.
+        /// </summary>
+        /// <param name="component">The component to perform the operation on.</param>
+        /// <returns>A task containing the HTTP response message.</returns>
         private static async Task<HttpResponseMessage> GetRepoOperationResponse(ComponentsToArtifactory component)
         {
             return component.PackageType switch
@@ -98,6 +126,11 @@ namespace LCT.ArtifactoryUploader
             };
         }
 
+        /// <summary>
+        /// Creates a not found HTTP response message.
+        /// </summary>
+        /// <param name="reasonPhrase">The reason phrase for the response.</param>
+        /// <returns>An HTTP response message with not found status.</returns>
         private static HttpResponseMessage CreateNotFoundResponse(string reasonPhrase)
         {
             return new HttpResponseMessage(HttpStatusCode.NotFound)
@@ -106,6 +139,12 @@ namespace LCT.ArtifactoryUploader
             };
         }
 
+        /// <summary>
+        /// Handles upload exceptions and returns an error response.
+        /// </summary>
+        /// <param name="ex">The exception that occurred.</param>
+        /// <param name="responsemessage">The response message to update.</param>
+        /// <returns>An HTTP response message with error information.</returns>
         private static HttpResponseMessage HandleUploadException(Exception ex, HttpResponseMessage responsemessage)
         {
             Logger.Error("Error has occurred in UploadPackageToArtifactory--{Exception}", ex);
@@ -113,6 +152,12 @@ namespace LCT.ArtifactoryUploader
             return responsemessage;
         }
 
+        /// <summary>
+        /// Asynchronously gets package information with retry logic for lowercase names.
+        /// </summary>
+        /// <param name="jFrogService">The JFrog service instance.</param>
+        /// <param name="component">The component to get information for.</param>
+        /// <returns>A task containing the AQL result with package information, or null if not found.</returns>
         private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
             async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)
@@ -145,6 +190,11 @@ namespace LCT.ArtifactoryUploader
 
             return packageInfo;
         }
+
+        /// <summary>
+        /// Gets the path for Artifactory upload directory.
+        /// </summary>
+        /// <returns>The local path for Artifactory upload.</returns>
         public static string GettPathForArtifactoryUpload()
         {
             string localPathforartifactory = string.Empty;
@@ -169,5 +219,6 @@ namespace LCT.ArtifactoryUploader
             return localPathforartifactory;
         }
 
+        #endregion
     }
 }

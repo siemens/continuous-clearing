@@ -4,11 +4,10 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using ArtifactoryUploader;
+using LCT.ArtifactoryUploader;
 using LCT.APICommunications;
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
-using LCT.ArtifactoryUploader;
 using LCT.Common;
 using LCT.Common.Model;
 using LCT.Facade;
@@ -22,7 +21,7 @@ using System.IO;
 using System.Threading.Tasks;
 using UnitTestUtilities;
 
-namespace AritfactoryUploader.UTest
+namespace LCT.ArtifactoryUploader.UTest
 {
     [TestFixture]
     public class PackageUploaderTest
@@ -76,7 +75,7 @@ namespace AritfactoryUploader.UTest
             IJFrogService jFrogService = GetJfrogService(commonAppSettings);
             PackageUploadHelper.JFrogService = jFrogService;
             UploadToArtifactory.JFrogService = jFrogService;
-            ArtfactoryUploader.JFrogService = jFrogService;
+            ArtifactoryUploader.JFrogService = jFrogService;
 
             Program.UploaderStopWatch = new Stopwatch();
             Program.UploaderStopWatch.Start();

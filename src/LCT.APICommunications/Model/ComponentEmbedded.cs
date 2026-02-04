@@ -15,7 +15,14 @@ namespace LCT.APICommunications.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ComponentEmbedded
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the list of SW360 components.
+        /// </summary>
         [JsonProperty("sw360:components")]
         public IList<Sw360Components> Sw360components { get; set; }
+
+        #endregion Properties
     }
 }

@@ -13,6 +13,10 @@ namespace LCT.ArtifactoryUploader.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class JfrogKey
     {
+        #region Properties
+
         public string Token { get; set; }
+
+        #endregion
     }
 }

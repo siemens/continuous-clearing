@@ -12,6 +12,13 @@ namespace LCT.Common
 {
     public class FileParser : IFileParser
     {
+        #region Methods
+
+        /// <summary>
+        /// Parses a TOML file and returns the parsed table.
+        /// </summary>
+        /// <param name="filePath">The file path of the TOML file to parse.</param>
+        /// <returns>A TomlTable containing the parsed data, or an empty TomlTable if parsing fails.</returns>
         public TomlTable ParseTomlFile(string filePath)
         {
             TomlTable table;
@@ -27,5 +34,7 @@ namespace LCT.Common
                 return new TomlTable();
             }
         }
+
+        #endregion
     }
 }
