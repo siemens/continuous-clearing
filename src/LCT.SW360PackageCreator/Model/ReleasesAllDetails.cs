@@ -22,14 +22,14 @@ namespace LCT.SW360PackageCreator.Model
         /// </summary>
         [JsonProperty("_embedded")]
         public AllReleasesEmbedded Embedded { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the pagination information.
         /// </summary>
         [JsonProperty("page")]
         public Pagination Page { get; set; }
         #endregion
-        
+
         /// <summary>
         /// Represents embedded data containing releases and attachments.
         /// </summary>
@@ -49,7 +49,7 @@ namespace LCT.SW360PackageCreator.Model
             public List<List<Attachment>> Sw360attachments { get; set; }
             #endregion
         }
-        
+
         /// <summary>
         /// Represents an attachment with filename and type.
         /// </summary>
@@ -61,7 +61,7 @@ namespace LCT.SW360PackageCreator.Model
             /// </summary>
             [JsonProperty("filename")]
             public string Filename { get; set; }
-            
+
             /// <summary>
             /// Gets or sets the type of the attachment.
             /// </summary>
@@ -69,7 +69,7 @@ namespace LCT.SW360PackageCreator.Model
             public string AttachmentType { get; set; }
             #endregion
         }
-        
+
         /// <summary>
         /// Represents links associated with a resource.
         /// </summary>
@@ -83,7 +83,7 @@ namespace LCT.SW360PackageCreator.Model
             public Self Self { get; set; }
             #endregion
         }
-        
+
         /// <summary>
         /// Represents a self-referencing link.
         /// </summary>
@@ -97,7 +97,7 @@ namespace LCT.SW360PackageCreator.Model
             public string Href { get; set; }
             #endregion
         }
-        
+
         /// <summary>
         /// Represents a SW360 release with name, version, clearing state, and embedded data.
         /// </summary>
@@ -109,25 +109,25 @@ namespace LCT.SW360PackageCreator.Model
             /// </summary>
             [JsonProperty("name")]
             public string Name { get; set; }
-            
+
             /// <summary>
             /// Gets or sets the version of the release.
             /// </summary>
             [JsonProperty("version")]
             public string Version { get; set; }
-            
+
             /// <summary>
             /// Gets or sets the clearing state of the release.
             /// </summary>
             [JsonProperty("clearingState")]
             public string ClearingState { get; set; }
-            
+
             /// <summary>
             /// Gets or sets the links associated with the release.
             /// </summary>
             [JsonProperty("_links")]
             public Links Links { get; set; }
-            
+
             /// <summary>
             /// Gets or sets the embedded release data.
             /// </summary>
@@ -135,7 +135,7 @@ namespace LCT.SW360PackageCreator.Model
             public AllReleasesEmbedded AllReleasesEmbedded { get; set; }
             #endregion
         }
-        
+
         /// <summary>
         /// Represents pagination information.
         /// </summary>

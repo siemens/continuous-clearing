@@ -143,7 +143,7 @@ namespace LCT.Common
         /// <param name="target">The target directory information.</param>
         private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
-            Logger.DebugFormat("FolderAction.CopyAll(): Start copying from '{0}' to '{1}'.", source.FullName, target.FullName);            
+            Logger.DebugFormat("FolderAction.CopyAll(): Start copying from '{0}' to '{1}'.", source.FullName, target.FullName);
 
             try
             {
@@ -177,7 +177,7 @@ namespace LCT.Common
             {
                 LogHandlingHelper.ExceptionErrorHandling("Copy Error", $"Failed to copy from '{source.FullName}' to '{target.FullName}'.", ex, "Unauthorized access occurred. Ensure the application has the required permissions to access the directories.");
                 Logger.Error("FolderAction.CopyAll():", ex);
-            }            
+            }
             Logger.DebugFormat("FolderAction.CopyAll(): Finished copying from '{0}' to '{1}'.", source.FullName, target.FullName);
         }
 

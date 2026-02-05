@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
 
-using ArtifactoryUploader;
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader.Model;

@@ -319,7 +319,7 @@ namespace LCT.SW360PackageCreator
             LogHandlingHelper.SW360AvailableComponentsList(componentsAvailableInSw360);
             Logger.Debug($"SetContentsForComparisonBOM():Completed of the sw360 data for available components");
             return comparisonBomData;
-        }       
+        }
 
         /// <summary>
         /// Gets Comparision Bom Items
@@ -785,7 +785,7 @@ namespace LCT.SW360PackageCreator
         /// <param name="comparisionBomDataList"></param>
         /// <param name="appSetting"></param>
         public void WriteSourceNotFoundListToConsole(List<ComparisonBomData> comparisionBomDataList, CommonAppSettings appSetting)
-        {          
+        {
 
             List<ComparisonBomData> sourceNotAvailable = GetDownloadUrlNotFoundList(comparisionBomDataList);
             foreach (var item in comparisionBomDataList)

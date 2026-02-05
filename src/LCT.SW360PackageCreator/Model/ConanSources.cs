@@ -22,7 +22,7 @@ namespace LCT.SW360PackageCreator.Model
         /// </summary>
         [YamlMember(Alias = "sources")]
         public Dictionary<string, Source> SourcesData { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the dictionary of patches.
         /// </summary>
@@ -43,7 +43,7 @@ namespace LCT.SW360PackageCreator.Model
         /// </summary>
         [YamlMember(Alias = "url")]
         public object Url { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the SHA256 hash of the source.
         /// </summary>
@@ -63,22 +63,22 @@ namespace LCT.SW360PackageCreator.Model
         /// Gets or sets the patch file name.
         /// </summary>
         public string PatchFile { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the patch description.
         /// </summary>
         public string PatchDescription { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the patch type.
         /// </summary>
         public string PatchType { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the patch source.
         /// </summary>
         public string PatchSource { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the SHA256 hash of the patch.
         /// </summary>

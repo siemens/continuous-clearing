@@ -208,7 +208,7 @@ namespace LCT.Common
         /// <returns>A Component object if successful; otherwise, null.</returns>
         private static Component CreateComponentFromPackage(Package package)
         {
-            
+
             if (package.ExternalRefs == null)
                 return null;
 
@@ -218,7 +218,7 @@ namespace LCT.Common
 
             var purl = purlRef.ReferenceLocator;
             var bomRef = !string.IsNullOrEmpty(purl) ? purl : package.SPDXID;
-            
+
             var component = new Component
             {
                 Name = package.Name,
@@ -237,7 +237,7 @@ namespace LCT.Common
             {
                 component.Manufacturer.BomRef = bomRef;
             }
-            
+
             return component;
         }
 

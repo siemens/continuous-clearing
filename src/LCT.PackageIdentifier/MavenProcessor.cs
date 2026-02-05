@@ -29,7 +29,7 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
-        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };       
+        private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private List<Component> listOfInternalComponents = new List<Component>();
         private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
         #endregion
@@ -88,7 +88,7 @@ namespace LCT.PackageIdentifier
             bom.Components = componentsForBOM;
             bom.Dependencies = dependenciesForBOM;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
-            BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;            
+            BomCreator.bomKpiData.ComponentsInComparisonBOM = bom.Components.Count;
 
             if (bom.Components != null)
             {
@@ -132,7 +132,7 @@ namespace LCT.PackageIdentifier
         /// Recursively removes the ".jar" type suffix from dependency refs.
         /// </summary>
         /// <param name="dependency">Dependency node to normalize.</param>
-        
+
         public static void IdentifiedMavenComponents(string filePath, List<Component> components)
         {
             if (components == null || components.Count == 0)

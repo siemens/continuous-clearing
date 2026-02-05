@@ -1,4 +1,4 @@
-﻿﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -18,7 +18,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Threading;
 using File = System.IO.File;
 
 namespace LCT.Common
@@ -60,9 +59,9 @@ namespace LCT.Common
         /// Gets or sets the default log path.
         /// </summary>
         public static string DefaultLogPath { get; set; }
-        public static bool DependencyFileNotFound { get; set; }=true;
+        public static bool DependencyFileNotFound { get; set; } = true;
         #endregion Properties
-        
+
         #region Methods
 
         /// <summary>
@@ -110,7 +109,7 @@ namespace LCT.Common
 
             configFiles.Remove(dependencyFilePath);
 
-            
+
             var cdxGenBomData = parseCycloneDxBom?.Invoke(dependencyFilePath);
 
             if (cdxGenBomData?.Components != null)
@@ -156,7 +155,7 @@ namespace LCT.Common
         {
             if (!DependencyFileNotFound)
             {
-                DependencyFileNotFound=true;
+                DependencyFileNotFound = true;
                 Logger.Warn("   Can you please provide the cdxgen-generated SBOM to get more accurate dependencies");
             }
         }
@@ -429,7 +428,7 @@ namespace LCT.Common
                 }
             }
             catch (IOException ioEx)
-            {                
+            {
                 Logger.Debug("IO Exception while Copying initial logs.", ioEx);
             }
             catch (UnauthorizedAccessException uaEx)
@@ -903,16 +902,16 @@ namespace LCT.Common
         /// If cdxgen has no components, this method returns without changes.
         /// </remarks>
 
-        public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies,Bom cdxGenBomData)
+        public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies, Bom cdxGenBomData)
         {
             if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
             {
                 return;
             }
 
-            _duplicateComponents = Math.Max(0,(ListofComponentsFromLockFile?.Count ?? 0) - cdxGenBomData.Components.Count);
+            _duplicateComponents = Math.Max(0, (ListofComponentsFromLockFile?.Count ?? 0) - cdxGenBomData.Components.Count);
             EnrichComponentsFromCdxGen(ref ListofComponentsFromLockFile, cdxGenBomData.Components);
-            
+
             if (cdxGenBomData.Components != null && cdxGenBomData.Components.Count > 0)
             {
                 componentsForBOM.AddRange(cdxGenBomData.Components);
@@ -921,7 +920,7 @@ namespace LCT.Common
             if (cdxGenBomData.Dependencies != null && cdxGenBomData.Dependencies.Count > 0)
             {
                 dependencies.AddRange(cdxGenBomData.Dependencies);
-            }          
+            }
             AddSiemensDirectProperty(ref cdxGenBomData);
         }
         public static void AddSiemensDirectProperty(ref Bom bom)
@@ -960,7 +959,7 @@ namespace LCT.Common
         /// </remarks>
         private static void EnrichComponentsFromCdxGen(ref List<Component> componentsForBOM, List<Component> cdxComponents)
         {
-           
+
             var byPurl = new Dictionary<string, Component>(StringComparer.OrdinalIgnoreCase);
             foreach (var c in componentsForBOM.Where(c => !string.IsNullOrEmpty(c.Purl)))
             {
@@ -1030,9 +1029,9 @@ namespace LCT.Common
             {
                 cdx.Properties ??= new List<Property>();
             }
-        }        
+        }
         #endregion
-        
+
 
     }
 }

@@ -291,7 +291,7 @@ namespace LCT.PackageIdentifier
         /// <param name="bom">Reference to the BOM to populate.</param>
         private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref Bom bom)
         {
-            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Cargo,environmentHelper);
+            var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Cargo, environmentHelper);
             var componentsForBOM = new List<Component>();
             var dependencies = new List<Dependency>();
             var templateBomFilePaths = new List<string>();
@@ -492,7 +492,7 @@ namespace LCT.PackageIdentifier
             catch (JsonException ex)
             {
                 Logger.Error("Exception in reading cargo metadata json file", ex);
-                LogHandlingHelper.ExceptionErrorHandling("JSON deserialization error in file", "GetPackagesFromCargoMetadataJson()", ex, $"File Path: {metadataJsonPath}");                
+                LogHandlingHelper.ExceptionErrorHandling("JSON deserialization error in file", "GetPackagesFromCargoMetadataJson()", ex, $"File Path: {metadataJsonPath}");
             }
 
         }

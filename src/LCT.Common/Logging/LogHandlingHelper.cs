@@ -1,16 +1,16 @@
-﻿using LCT.Common.Constants;
+﻿using CycloneDX.Models;
+using LCT.Common.Constants;
+using LCT.Common.Model;
 using log4net;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using CycloneDX.Models;
-using LCT.Common.Model;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace LCT.Common
 {

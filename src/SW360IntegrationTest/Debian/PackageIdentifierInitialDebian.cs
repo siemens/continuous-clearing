@@ -95,7 +95,7 @@ namespace SW360IntegrationTest.Debian
                 }
                 Assert.AreEqual(expected.BoM.Dependencies.Count, actual.BoM.Dependencies.Count);
             }
-            
+
             Assert.IsTrue(fileExist, "Test to BOM file present");
         }
     }

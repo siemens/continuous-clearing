@@ -569,7 +569,7 @@ namespace LCT.ArtifactoryUploader
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
                 }
-            }          
+            }
 
             return null;
         }
@@ -762,7 +762,7 @@ namespace LCT.ArtifactoryUploader
             }
             Logger.Debug($"GetPackageType(): Package type determined as Unknown");
             return PackageType.Unknown;
-        }       
+        }
 
         #endregion
     }

@@ -47,10 +47,10 @@ namespace LCT.PackageIdentifier
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
             Logger.Debug("ParsePackageFile():Starting to parse package files for BOM.");
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry,environmentHelper);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry, environmentHelper);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
-            List<Component> listComponentForBOM=new List<Component>();
+            List<Component> listComponentForBOM = new List<Component>();
             List<Dependency> dependencies = new List<Dependency>();
             List<string> listOfTemplateBomfilePaths = new List<string>();
             List<Component> ListofComponentsFromLockFile = new List<Component>();
@@ -66,14 +66,14 @@ namespace LCT.PackageIdentifier
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
                     Logger.DebugFormat("ParsePackageFile():Poetry lock file detected: {0}", config);
-                    listofComponents=ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
+                    listofComponents = ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
                     ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents));
 
                 }
                 else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.DependencyFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    listofComponents=ExtractDetailsFromJson(config, appSettings, ref dependencies);
+                    listofComponents = ExtractDetailsFromJson(config, appSettings, ref dependencies);
                     listComponentForBOM.AddRange(FormComponentReleaseExternalID(listofComponents));
                 }
             }
@@ -278,7 +278,7 @@ namespace LCT.PackageIdentifier
                 LogHandlingHelper.IdentifierInputFileComponents(filePath, listUnsupportedComponents.Components);
             }
             else
-            {                
+            {
                 bom = _cycloneDXBomParser.ParseCycloneDXBom(filePath);
                 CycloneDXBomParser.CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
             }

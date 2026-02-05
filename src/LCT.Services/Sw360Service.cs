@@ -673,7 +673,7 @@ namespace LCT.Services
                 componentstatus.isComponentExist = false;
                 Logger.Error($"CheckComponentExistenceByExternalId():", ex);
             }
-            
+
             return componentstatus.isComponentExist;
         }
 

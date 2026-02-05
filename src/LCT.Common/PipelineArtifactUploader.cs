@@ -30,7 +30,7 @@ namespace LCT.Common
         /// Uploads both logs and BOM artifacts to the pipeline.
         /// </summary>
         public static void UploadArtifacts()
-        {            
+        {
             UploadBom();
             UploadLogs();
         }

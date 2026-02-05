@@ -93,7 +93,7 @@ namespace LCT.Common
         public string Token { get; set; }
         public Fossology Fossology { get; set; }
         public bool IgnoreDevDependency { get; set; } = true;
-        public List<string> ExcludeComponents { get; set; }        
+        public List<string> ExcludeComponents { get; set; }
         public string URL
         {
             get
@@ -179,7 +179,7 @@ namespace LCT.Common
                     !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
                     {
                         var folderAction = new FolderAction();
-                        folderAction.ValidateFolderPath(value,environmentHelper);
+                        folderAction.ValidateFolderPath(value, environmentHelper);
                         m_InputFolder = value;
                     }
                 }
@@ -202,7 +202,7 @@ namespace LCT.Common
                 {
                     var folderAction = new FolderAction();
                     m_OutputFolder = value;
-                    folderAction.ValidateFolderPath(value,environmentHelper);
+                    folderAction.ValidateFolderPath(value, environmentHelper);
                 }
                 catch (DirectoryNotFoundException)
                 {

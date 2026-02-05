@@ -6,7 +6,6 @@
 
 
 using LCT.APICommunications.Model;
-using System.Net;
 
 namespace LCT.APICommunications.UTest
 {

@@ -412,7 +412,7 @@ namespace LCT.ArtifactoryUploader
             {
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
                 await SucessfullPackagesAsync(item, displayPackagesInfo);
-                Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is identified in source: {2} and destination: {3} repositories",item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
+                Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is identified in source: {2} and destination: {3} repositories", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
                 item.DestRepoName = null;
             }
         }

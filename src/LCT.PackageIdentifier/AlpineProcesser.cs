@@ -15,7 +15,6 @@ using log4net;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -56,7 +55,7 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom();
             List<Dependency> dependenciesForBOM = new();
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine,_environmentHelper);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Alpine, _environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
@@ -215,7 +214,7 @@ namespace LCT.PackageIdentifier
 
             if (listofComponents.Count != initialCount)
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
-        }       
+        }
 
         private static string GetDistro(AlpinePackage alpinePackage)
         {

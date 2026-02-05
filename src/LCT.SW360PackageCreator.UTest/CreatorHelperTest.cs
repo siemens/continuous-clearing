@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using Castle.Core.Internal;
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.Common;
@@ -26,7 +25,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
-using LCT.SW360PackageCreator;
 
 namespace LCT.SW360PackageCreator.UTest
 {
@@ -820,7 +818,7 @@ namespace LCT.SW360PackageCreator.UTest
             File.Delete(zipFilePath);
             File.Delete(tarGzFilePath);
             Directory.Delete(tempDir);
-        }        
+        }
 
         [Test]
         public async Task SetContentsForComparisonBOM_WithMixedChocoAndOtherComponents_ProcessesNormally()
@@ -838,7 +836,7 @@ namespace LCT.SW360PackageCreator.UTest
                 new Components
                 {
                     Name = "7zip",
-                    Version = "19.0.0", 
+                    Version = "19.0.0",
                     ProjectType = "CHOCO",
                     ComponentExternalId = "pkg:choco/7zip",
                     ReleaseExternalId = "pkg:choco/7zip@19.0.0"
@@ -897,6 +895,6 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Act & Assert - Should not throw any exceptions or show action item tables
             Assert.DoesNotThrow(() => creatorHelper.WriteSourceNotFoundListToConsole(chocoComparisonData, appSettings));
-        }        
+        }
     }
 }

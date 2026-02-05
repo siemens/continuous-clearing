@@ -25,7 +25,7 @@ namespace LCT.PackageIdentifier.Interface
         /// <param name="unSupportedBomList">The BOM list for unsupported components.</param>
         /// <returns>The parsed BOM.</returns>
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList);
-        
+
         /// <summary>
         /// Asynchronously identifies internal components from the component data.
         /// </summary>
@@ -36,7 +36,7 @@ namespace LCT.PackageIdentifier.Interface
         /// <returns>A task representing the asynchronous operation that returns the updated component identification data.</returns>
         public Task<ComponentIdentification> IdentificationOfInternalComponents(
             ComponentIdentification componentData, CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper);
-        
+
         /// <summary>
         /// Asynchronously gets JFrog repository details for the specified components.
         /// </summary>

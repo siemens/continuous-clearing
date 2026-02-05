@@ -885,7 +885,7 @@ namespace AritfactoryUploader.UTest
             Assert.AreEqual("bar", method.Invoke(null, new object[] { noGroup }));
         }
     }
-    
+
 
     [TestFixture]
     public class GetArtifactoryRepoNameTests

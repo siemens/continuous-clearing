@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -51,7 +50,7 @@ namespace LCT.PackageIdentifier
             Bom bom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             List<Component> listComponentForBOM;
 
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Debian,environmentHelper);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Debian, environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
             foreach (string filepath in configFiles)
             {
@@ -80,7 +79,7 @@ namespace LCT.PackageIdentifier
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, bom.Components, appSettings.ProjectType);
             bom = RemoveExcludedComponents(appSettings, bom);
-            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();            
+            bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             CycloneDXBomParser.CheckValidDependenciesForProjectType(bom.Dependencies, appSettings.ProjectType);
             if (bom.Components != null)
             {
@@ -261,19 +260,19 @@ namespace LCT.PackageIdentifier
         {
             List<DebianPackage> debianPackages = new List<DebianPackage>();
             Bom sbom = ExtractDetailsForJson(filePath, ref debianPackages, appSettings);
-            
+
             if (sbom == null)
-            {               
+            {
                 return debianPackages;
             }
             if (sbom.Components != null && sbom.Components.Count > 0)
             {
                 bom.Components.AddRange(sbom.Components);
-            } 
+            }
             if (sbom.Dependencies != null && sbom.Dependencies.Count > 0)
             {
                 bom.Dependencies.AddRange(sbom.Dependencies);
-            }            
+            }
 
             return debianPackages;
         }
@@ -428,7 +427,7 @@ namespace LCT.PackageIdentifier
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
-                    debianPackages.Add(package);                    
+                    debianPackages.Add(package);
                 }
                 else
                 {

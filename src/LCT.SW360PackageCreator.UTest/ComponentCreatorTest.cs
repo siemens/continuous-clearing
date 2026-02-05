@@ -1315,7 +1315,7 @@ namespace LCT.SW360PackageCreator.UTest
 
             // Assert
             _mockSw360CreatorService.Verify(service => service.GetReleaseInfo(It.IsAny<string>()), Times.Never);
-        }        
+        }
 
         [Test]
         public async Task CreateComponentInSw360_WithMixedChocoAndOtherComponents_ProcessesNormally()
@@ -1387,8 +1387,8 @@ namespace LCT.SW360PackageCreator.UTest
                 .ReturnsAsync(mockReleasesInfo);
 
             // Act
-            await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, 
-                mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, 
+            await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object,
+                mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object,
                 mockCreatorHelper.Object, mixedComparisonData);
 
             // Assert - SW360 operations should be called for mixed components
@@ -1416,13 +1416,13 @@ namespace LCT.SW360PackageCreator.UTest
             Bom bom = new Bom();
             bom.Components = new List<Component>()
             {
-                new Component() 
-                { 
-                    Name = "7zip", 
-                    Version = "19.0.0", 
-                    Group = "", 
-                    Purl = "pkg:choco/7zip@19.0.0", 
-                    Properties = properties 
+                new Component()
+                {
+                    Name = "7zip",
+                    Version = "19.0.0",
+                    Group = "",
+                    Purl = "pkg:choco/7zip@19.0.0",
+                    Properties = properties
                 },
             };
 
@@ -1437,8 +1437,8 @@ namespace LCT.SW360PackageCreator.UTest
 
             List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>
             {
-                new ComparisonBomData 
-                { 
+                new ComparisonBomData
+                {
                     Name = "7zip",
                     ComponentStatus = "Not Processed for CHOCO",
                     ReleaseStatus = "Not Processed for CHOCO"

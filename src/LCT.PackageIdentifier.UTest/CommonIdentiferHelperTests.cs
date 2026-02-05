@@ -67,7 +67,7 @@ namespace LCT.PackageIdentifier.UTest
             };
             var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
             Assert.AreEqual("generic-repo", result);
-        }           
+        }
 
         [Test]
         public void GetDefaultProjectName_WhenBasicSBOMIsFalse_ReturnsProjectName()
@@ -140,7 +140,7 @@ namespace LCT.PackageIdentifier.UTest
             var appSettings = new CommonAppSettings { ProjectType = "NPM" };
 
             // Create BOM with both Application and Library components
-            var appComponent = new Component { Name = "app", Version = "1.0", Type = Component.Classification.Application,Purl= "pkg:npm/app@1.0.0" };
+            var appComponent = new Component { Name = "app", Version = "1.0", Type = Component.Classification.Application, Purl = "pkg:npm/app@1.0.0" };
             var libComponent = new Component { Name = "lib", Version = "1.0", Type = Component.Classification.Library, Purl = "pkg:npm/lib@1.0.0" };
 
             Bom Parse(string path) => new Bom { Components = new List<Component> { appComponent, libComponent } };

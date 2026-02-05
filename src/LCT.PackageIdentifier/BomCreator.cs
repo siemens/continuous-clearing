@@ -62,13 +62,13 @@ namespace LCT.PackageIdentifier
         public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser, IRuntimeIdentifier runtimeIdentifier)
         {
             CycloneDXBomParser = cycloneDXBomParser;
-            _frameworkPackages = frameworkPackages; 
+            _frameworkPackages = frameworkPackages;
             _compositionBuilder = compositionBuilder;
             SpdxBomParser = spdxBomParser;
             _runtimeIdentifier = runtimeIdentifier;
         }
         #endregion
-       
+
 
         /// <summary>
         /// Asynchronously generates a CycloneDX BOM from configured inputs and writes outputs (BOM, KPI files).
@@ -340,7 +340,7 @@ namespace LCT.PackageIdentifier
             return true;
 
         }
-        
+
 
         #region Events
         #endregion

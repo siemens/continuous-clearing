@@ -113,7 +113,7 @@ namespace LCT.PackageIdentifier
             catch (ArgumentException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("ArgumentException", "PropertyAdditionForTemplate()", ex, $"Component: {sbomcomp.Name} @ {sbomcomp.Version}");
-                Logger.Error(string.Format("ArgumentException occurred while adding properties for component: {0} @ {1}. Details: {2}", sbomcomp.Name, sbomcomp.Version, ex.Message), ex);                
+                Logger.Error(string.Format("ArgumentException occurred while adding properties for component: {0} @ {1}. Details: {2}", sbomcomp.Name, sbomcomp.Version, ex.Message), ex);
             }
             catch (InvalidOperationException ex)
             {

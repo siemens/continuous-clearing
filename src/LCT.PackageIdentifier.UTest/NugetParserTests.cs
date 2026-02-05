@@ -453,7 +453,7 @@ namespace LCT.PackageIdentifier.UTest
             //Assert
             Assert.That(fileCount, Is.EqualTo(allFoundConfigFiles.Count), "Checks for total input files found");
 
-        }       
+        }
         public void IsDevDependent_GivenListOfDevComponents_ReturnsSuccess()
         {
             //Arrange
@@ -550,7 +550,7 @@ namespace LCT.PackageIdentifier.UTest
             IFileOperations fileOperations = new FileOperations();
             CommonAppSettings appSettings = new CommonAppSettings()
             {
-                ProjectType="Nuget",
+                ProjectType = "Nuget",
                 SW360 = new SW360(),
                 Nuget = new Config
                 {
@@ -651,7 +651,7 @@ namespace LCT.PackageIdentifier.UTest
             string[] reooListArr = { "internalrepo1", "internalrepo2" };
 
             CommonAppSettings appSettings = new CommonAppSettings()
-            { 
+            {
                 ProjectType = "Nuget",
                 SW360 = new SW360(),
                 Nuget = new Config
@@ -1321,7 +1321,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 nugetProcessor.GetType()
                     .GetMethod("HandleConfigFile", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths, ListofComponentsFromLockFile, ListofDependenciesFromLockFile});
+                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths, ListofComponentsFromLockFile, ListofDependenciesFromLockFile });
             });
 
             Assert.AreEqual(0, bom.Dependencies.Count);

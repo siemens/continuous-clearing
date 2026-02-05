@@ -24,7 +24,7 @@ namespace LCT.SW360PackageCreator.Model
         /// Gets or sets the version of the Maven package.
         /// </summary>
         public string Version { get; set; }
-        
+
         /// <summary>
         /// Gets the Maven group identifier.
         /// </summary>

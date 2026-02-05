@@ -68,7 +68,7 @@ namespace LCT.PackageIdentifier.UTest
             });
 
             _environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Exactly(2));
-        }        
+        }
 
         [Test]
         public void ValidateInputs_GivenEmptyRootPath_ShouldExitApplication()

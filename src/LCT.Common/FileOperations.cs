@@ -71,7 +71,7 @@ namespace LCT.Common
         {
             try
             {
-                Logger.DebugFormat("WriteContentToFile(): Starting to write content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}",folderPath, fileNameWithExtension, projectName);
+                Logger.DebugFormat("WriteContentToFile(): Starting to write content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}", folderPath, fileNameWithExtension, projectName);
 
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
 
@@ -117,7 +117,7 @@ namespace LCT.Common
         {
             try
             {
-                Logger.DebugFormat("WriteContentToOutputBomFile(): Starting to write BOM content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}",folderPath, fileNameWithExtension, projectName);
+                Logger.DebugFormat("WriteContentToOutputBomFile(): Starting to write BOM content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}", folderPath, fileNameWithExtension, projectName);
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 
                 string filePath = CatoolBomFilePath = Path.Combine(folderPath, fileName);
@@ -229,7 +229,7 @@ namespace LCT.Common
         {
             try
             {
-                Logger.DebugFormat("WriteContentToCycloneDXFile(): Starting to write content to CycloneDX file. FolderPath: {0}, FileName: {1}",filePath, fileNameWithExtension);
+                Logger.DebugFormat("WriteContentToCycloneDXFile(): Starting to write content to CycloneDX file. FolderPath: {0}, FileName: {1}", filePath, fileNameWithExtension);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
                 string filename = Path.GetFileName(fileNameWithExtension);
                 filePath = $"{filePath}\\{filename}";
@@ -267,7 +267,7 @@ namespace LCT.Common
         {
             string oldFile = Path.Combine(folderPath, fileName);
             string newFile = string.Format("{0}/{1:MM-dd-yyyy_HHmm_ss}_{2}_{3}", folderPath, DateTime.Now, FileConstant.backUpKey, fileName);
-            Logger.DebugFormat("BackupTheGivenFile(): Starting backup process. OldFile: {0}, NewFile: {1}",oldFile, newFile);
+            Logger.DebugFormat("BackupTheGivenFile(): Starting backup process. OldFile: {0}, NewFile: {1}", oldFile, newFile);
             try
             {
                 if (File.Exists(oldFile))
@@ -309,7 +309,7 @@ namespace LCT.Common
         {
             try
             {
-                Logger.DebugFormat("WriteContentToReportNotApprovedFile(): Starting to write content to Report Not Approved file. FolderPath: {0}, FileName: {1}, Name: {2}",folderPath, fileNameWithExtension, name);
+                Logger.DebugFormat("WriteContentToReportNotApprovedFile(): Starting to write content to Report Not Approved file. FolderPath: {0}, FileName: {1}, Name: {2}", folderPath, fileNameWithExtension, name);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 string fileName = $"{name}_{fileNameWithExtension}";
 
@@ -351,7 +351,7 @@ namespace LCT.Common
         {
             try
             {
-                Logger.DebugFormat("WriteContentToMultipleVersionsFile(): Starting to write content to Multiple Versions file. FolderPath: {0}, FileName: {1}, ProjectName: {2}",folderPath, fileNameWithExtension, projectName);
+                Logger.DebugFormat("WriteContentToMultipleVersionsFile(): Starting to write content to Multiple Versions file. FolderPath: {0}, FileName: {1}, ProjectName: {2}", folderPath, fileNameWithExtension, projectName);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 string fileName = $"{projectName}_{fileNameWithExtension}";
 

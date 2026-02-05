@@ -14,10 +14,8 @@ using LCT.Common.Model;
 using LCT.PackageIdentifier.Interface;
 using LCT.PackageIdentifier.Model;
 using LCT.PackageIdentifier.Model.NugetModel;
-using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
-using Microsoft.ComponentDetection.Detectors.Linux.Contracts;
 using Newtonsoft.Json;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
@@ -83,7 +81,7 @@ namespace LCT.PackageIdentifier
                 Logger.Debug("Deployment type identified as Classic");
                 isSelfContainedProject = false;
             }
-            ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom,ref ListofComponentsFromLockFile,ref ListofDependenciesFromLockFile);
+            ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
@@ -622,7 +620,7 @@ namespace LCT.PackageIdentifier
         /// <param name="bom"></param>
         private void ParsingInputFileForBOM(CommonAppSettings appSettings,
                                     ref List<Component> listComponentForBOM,
-                                    ref Bom bom, ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
+                                    ref Bom bom, ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile)
         {
             var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget, environmentHelper);
             Bom cdxGenBomData = GetCdxGenBomData(configFiles, appSettings);
@@ -636,7 +634,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string filepath in configFiles)
             {
-                HandleConfigFile(filepath, appSettings, ref listComponentForBOM, ref bom, listOfTemplateBomfilePaths,ref ListofComponentsFromLockFile,ref ListofDependenciesFromLockFile);
+                HandleConfigFile(filepath, appSettings, ref listComponentForBOM, ref bom, listOfTemplateBomfilePaths, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
 
             // Prepare local dependencies list to pass by ref
@@ -682,7 +680,7 @@ namespace LCT.PackageIdentifier
             {
                 Logger.DebugFormat("Template BOM file detected: {0}", filepath);
                 listOfTemplateBomfilePaths.Add(filepath);
-            }            
+            }
 
             if (IsCycloneDxOrDependencyFile(filepath))
             {
@@ -715,7 +713,7 @@ namespace LCT.PackageIdentifier
             Logger.DebugFormat("HandleConfigFile():CycloneDX file detected: {0}", filepath);
             Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
             LogHandlingHelper.IdentifierInputFileComponents(filepath, bomList.Components);
-            
+
             if (bomList.Components != null)
             {
                 CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
@@ -750,7 +748,7 @@ namespace LCT.PackageIdentifier
             foreach (var component in listUnsupportedComponents.Components)
             {
                 SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
-            }   
+            }
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
@@ -940,7 +938,7 @@ namespace LCT.PackageIdentifier
                 ListofComponentsFromLockFile.Add(components);
                 if (prop.Dependencies != null)
                 {
-                    GetDependencyDetails(components, prop,ref ListofDependenciesFromLockFile);
+                    GetDependencyDetails(components, prop, ref ListofDependenciesFromLockFile);
                 }
             }
         }

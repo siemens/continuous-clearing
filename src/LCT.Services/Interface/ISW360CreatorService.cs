@@ -76,7 +76,7 @@ namespace LCT.Services.Interface
         /// <param name="componentName">The component name.</param>
         /// <returns>A task representing the asynchronous operation that returns the component identifier.</returns>
         Task<string> GetComponentId(string componentName);
-        
+
         /// <summary>
         /// Asynchronously gets the component identifier using external ID.
         /// </summary>
@@ -84,7 +84,7 @@ namespace LCT.Services.Interface
         /// <param name="componentExternalId">The component external identifier.</param>
         /// <returns>A task representing the asynchronous operation that returns the component identifier.</returns>
         Task<string> GetComponentIdUsingExternalId(string name, string componentExternalId);
-        
+
         /// <summary>
         /// Asynchronously gets the release by external ID.
         /// </summary>
@@ -93,7 +93,7 @@ namespace LCT.Services.Interface
         /// <param name="releaseExternalId">The release external identifier.</param>
         /// <returns>A task representing the asynchronous operation that returns the release identifier.</returns>
         Task<string> GetReleaseByExternalId(string name, string releaseVersion, string releaseExternalId);
-        
+
         /// <summary>
         /// Asynchronously gets the release information.
         /// </summary>
@@ -133,7 +133,7 @@ namespace LCT.Services.Interface
         /// <param name="fossUrl">The FOSSology URL.</param>
         /// <returns>A task representing the asynchronous operation that returns true if successful; otherwise, false.</returns>
         Task<bool> UpdateSW360ReleaseContent(Components component, string fossUrl);
-        
+
         /// <summary>
         /// Asynchronously triggers the FOSSology process for validation.
         /// </summary>
@@ -141,7 +141,7 @@ namespace LCT.Services.Interface
         /// <param name="sw360link">The SW360 link.</param>
         /// <returns>A task representing the asynchronous operation that returns the FOSSology trigger status.</returns>
         Task<FossTriggerStatus> TriggerFossologyProcessForValidation(string releaseId, string sw360link);
-        
+
         /// <summary>
         /// Attaches sources to releases created in SW360.
         /// </summary>
@@ -150,7 +150,7 @@ namespace LCT.Services.Interface
         /// <param name="comparisonBomData">The comparison BOM data.</param>
         /// <returns>The result of the attachment operation.</returns>
         public string AttachSourcesToReleasesCreated(string releaseId, Dictionary<string, string> attachmentUrlList, ComparisonBomData comparisonBomData);
-        
+
         /// <summary>
         /// Asynchronously updates the source code download URL for an existing release.
         /// </summary>

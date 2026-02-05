@@ -69,7 +69,7 @@ namespace LCT.PackageIdentifier
             }
             return null;
         }
-      
+
         /// <summary>
         /// Returns the default project name to use in file naming based on SW360 configuration or a fallback.
         /// </summary>
@@ -103,7 +103,7 @@ namespace LCT.PackageIdentifier
             return null;
         }
 
-        
+
         #endregion
 
     }

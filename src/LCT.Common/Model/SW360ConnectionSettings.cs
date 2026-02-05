@@ -42,4 +42,3 @@ namespace LCT.Common.Model
         #endregion
     }
 }
- 

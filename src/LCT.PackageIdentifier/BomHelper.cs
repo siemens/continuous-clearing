@@ -447,7 +447,7 @@ namespace LCT.PackageIdentifier
                     !string.IsNullOrEmpty(componentsInfo.Purl) &&
                     componentsInfo.Purl.Contains(purlPrefix))
                 {
-                    components.Add(componentsInfo);                    
+                    components.Add(componentsInfo);
                 }
                 else
                 {

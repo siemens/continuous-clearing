@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using File = System.IO.File;
 
 namespace LCT.Common.UTest
@@ -56,7 +55,7 @@ namespace LCT.Common.UTest
             LogManager.Shutdown();
             if (System.IO.Directory.Exists(tempDir))
                 System.IO.Directory.Delete(tempDir, true);
-        }        
+        }
         [Test]
         public void LogFolderInitialization_WhenLogFolderIsNull_ReturnsDefaultLogPath()
         {
@@ -494,7 +493,7 @@ namespace LCT.Common.UTest
 
             // Assert
             Assert.IsEmpty(result, "Null input should return an empty array.");
-        }        
+        }
 
         [Test]
         public void RemoveExcludedComponentsFromBom_WithNullAppSettings_ReturnsUnchangedBom()

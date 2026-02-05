@@ -18,7 +18,7 @@ namespace LCT.Common.UTest
         public void Setup()
         {
             // Implement
-        }        
+        }
         [Test]
         public void BackupTheGivenFile_WhenFilePathIsNull_ThrowsArgumentNullExceptionn()
         {

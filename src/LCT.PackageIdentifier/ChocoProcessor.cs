@@ -39,12 +39,12 @@ namespace LCT.PackageIdentifier
         /// files.</returns>
         public override Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco,environmentHelper);            
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco, environmentHelper);
             List<NugetPackage> nugetPackages = new();
-            List<Component> ListofComponentsFromLockFile = new ();
-            List<Dependency> ListofDependenciesFromLockFile = new ();
+            List<Component> ListofComponentsFromLockFile = new();
+            List<Dependency> ListofDependenciesFromLockFile = new();
             Bom bom = new();
-            string filePath=string.Empty;
+            string filePath = string.Empty;
             foreach (string filepath in configFiles)
             {
                 filePath = filepath;

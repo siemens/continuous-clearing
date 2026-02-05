@@ -97,7 +97,7 @@ namespace LCT.SW360PackageCreator
                     {
                         Name = item.Name,
                         Version = item.Version,
-                        ProjectType = componentsData.ProjectType                       
+                        ProjectType = componentsData.ProjectType
                     });
                 }
                 else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
@@ -338,7 +338,7 @@ namespace LCT.SW360PackageCreator
             await sw360CreatorService.LinkReleasesToProject(releasesFoundInCbom, manuallyLinkedReleases, appSettings.SW360.ProjectID);
 
             // update comparison bom data
-            bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);           
+            bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
 
@@ -872,7 +872,7 @@ namespace LCT.SW360PackageCreator
             var uploadId = releasesInfo.ExternalToolProcesses?
                 .SelectMany(process => process.ProcessSteps)
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
-            
+
             if (releasesInfo.AdditionalData != null &&
                 releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
                 fossologyUrl.Contains(appSettings?.SW360?.Fossology?.URL))

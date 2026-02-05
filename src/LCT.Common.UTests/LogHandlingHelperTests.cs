@@ -6,15 +6,15 @@
 using CycloneDX.Models;
 using LCT.Common.Constants;
 using LCT.Common.Model;
+using log4net;
 using Moq;
 using NUnit.Framework;
 using System;
-using log4net;
-using System.Net.Http;
-using System.Net;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace LCT.Common.UTest

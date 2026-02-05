@@ -29,7 +29,7 @@ namespace LCT.Services.Model
         /// Gets or sets the attachment API URL.
         /// </summary>
         public string AttachmentApiUrl { get; set; }
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether the release already exists.
         /// </summary>

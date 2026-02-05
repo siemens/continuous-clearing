@@ -6,8 +6,6 @@
 using CycloneDX.Models;
 using LCT.Common;
 using LCT.Common.Interface;
-using LCT.Common.Model;
-using LCT.PackageIdentifier;
 using LCT.PackageIdentifier.Model;
 using Moq;
 using NUnit.Framework;

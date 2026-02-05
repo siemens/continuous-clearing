@@ -18,7 +18,7 @@ namespace LCT.PackageIdentifier.Interface
         /// Registers the runtime identifier.
         /// </summary>
         void Register();
-        
+
         /// <summary>
         /// Identifies the runtime information based on application settings.
         /// </summary>

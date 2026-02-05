@@ -62,7 +62,7 @@ namespace LCT.Services.Interface
         /// <param name="sw360url">The SW360 URL.</param>
         /// <returns>A task representing the asynchronous operation that returns the upload description.</returns>
         Task<string> GetUploadDescriptionfromSW360(string componentName, string componetVersion, string sw360url);
-        
+
         /// <summary>
         /// Gets the duplicate components by PURL identifier.
         /// </summary>

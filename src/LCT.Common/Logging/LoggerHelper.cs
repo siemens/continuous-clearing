@@ -1825,7 +1825,7 @@ namespace LCT.Common.Logging
                     .Expand();
 
 
-              
+
                 table.AddColumn(new TableColumn(GreenNameMarkup).Width(60).NoWrap());
                 table.AddColumn(new TableColumn(BlueVersionMarkup).Width(30).NoWrap());
 

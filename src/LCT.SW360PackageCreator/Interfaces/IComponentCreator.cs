@@ -28,7 +28,7 @@ namespace LCT.SW360PackageCreator.Interfaces
         /// <returns>A task representing the asynchronous operation that returns a list of comparison BOM data.</returns>
         Task<List<ComparisonBomData>> CycloneDxBomParser(CommonAppSettings appSettings,
             ISW360Service sw360Service, ICycloneDXBomParser cycloneDXBomParser, ICreatorHelper creatorHelper);
-        
+
         /// <summary>
         /// Asynchronously creates components in SW360 from the parsed BOM data.
         /// </summary>

@@ -101,7 +101,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetReleases();
         }
-        
+
         /// <summary>
         /// Asynchronously triggers the FOSSology process for a release.
         /// </summary>
@@ -112,7 +112,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.TriggerFossologyProcess(releaseId, sw360link);
         }
-        
+
         /// <summary>
         /// Asynchronously checks the FOSSology process status.
         /// </summary>
@@ -122,7 +122,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.CheckFossologyProcessStatus(link);
         }
-        
+
         /// <summary>
         /// Asynchronously gets all components from SW360.
         /// </summary>
@@ -286,7 +286,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetComponentByName(componentName);
         }
-        
+
         /// <summary>
         /// Asynchronously gets a component using name from SW360.
         /// </summary>
@@ -330,7 +330,7 @@ namespace LCT.Facade
         {
             return m_sw360ApiCommunication.GetComponentByExternalId(purlId, externalIdKey);
         }
-        
+
         /// <summary>
         /// Asynchronously gets all releases with all data from SW360.
         /// </summary>
@@ -342,5 +342,5 @@ namespace LCT.Facade
             return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries);
         }
         #endregion
-     }
- }
+    }
+}

@@ -280,7 +280,7 @@ namespace LCT.PackageIdentifier
             List<string> configFiles;
             List<Dependency> dependencies = new List<Dependency>();
             List<Component> componentsForBOM = new List<Component>();
-            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan,environmentHelper);
+            configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Conan, environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
 
             foreach (string filepath in configFiles)
@@ -529,7 +529,7 @@ namespace LCT.PackageIdentifier
                     dependencies.Add(dependency);
                 }
             }
-        }        
+        }
 
         /// <summary>
         /// Adds identification-related properties to components depending on the identification source.
@@ -608,7 +608,7 @@ namespace LCT.PackageIdentifier
                 component.Properties = properties;
             }
         }
-               
+
 
         /// <summary>
         /// Determines whether the specified component exists in the provided AQL results (internal).

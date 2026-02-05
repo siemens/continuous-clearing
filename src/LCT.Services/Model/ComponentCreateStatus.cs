@@ -19,7 +19,7 @@ namespace LCT.Services.Model
         /// Gets or sets a value indicating whether the component was created successfully.
         /// </summary>
         public bool IsCreated { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the release creation status.
         /// </summary>

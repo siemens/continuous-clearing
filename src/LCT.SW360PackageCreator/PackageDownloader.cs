@@ -13,7 +13,6 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -204,13 +203,13 @@ namespace LCT.SW360PackageCreator
             if (string.IsNullOrWhiteSpace(version))
             {
                 return version;
-            }  
+            }
             if (Version.TryParse(version, out var parsed))
             {
                 if (parsed.Build == 0 && (parsed.Revision == -1 || parsed.Revision == 0))
                 {
                     return $"{parsed.Major}.{parsed.Minor}";
-                } 
+                }
                 return version;
             }
             return version;
@@ -321,6 +320,6 @@ namespace LCT.SW360PackageCreator
                $"archive --format=tar.gz --output={compressedFilePath} FETCH_HEAD"
            };
         }
-        
+
     }
 }
