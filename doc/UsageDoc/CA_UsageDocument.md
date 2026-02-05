@@ -157,6 +157,8 @@ The Continuous Clearing Tool comprises three executable DLLs, each playing a cru
 - Automatically marks components as direct dependencies using the `siemens:direct` property
 - Validates and removes invalid dependency references to ensure SBOM integrity
 
+See the Acknowledgments section for cdxgen credit and licensing details.
+
 > **1. Package Identifier**
 > - This DLL processes the input file and generates a CycloneDX BOM file with comprehensive dependency mapping. The input can be a package file or a CycloneDX BOM file created using a standard tool. If multiple input files are present, simply provide the path to the directory as an argument.
 > - **cdxgen Integration** (for NPM, NuGet, Maven, Poetry): For enhanced dependency accuracy, provide a cdxgen-generated SBOM file named `cdx_dep.json` in your input directory alongside your package files. The tool will automatically detect and merge dependency information from cdxgen output. This file pattern is configured in the `Include` section of appSettings.json for supported project types.
@@ -204,6 +206,18 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       ```
         mvn clean install -DskipTests=true 
       ```
+    * **Alternative SBOM generation (cdxgen)**
+    * Prerequisites:
+      * Node.js and Git installed
+      * Install cdxgen: `npm i -g @cyclonedx/cdxgen` or use `npx @cyclonedx/cdxgen`
+    * Usage:
+      * From the project root (where `pom.xml` is present), run:
+        ```
+        cdxgen -r . -o cdx_dep.json --spec-version 1.6
+        ```
+        
+    * Place the generated `cdx_dep.json` in the input directory .
+
 
   * **Project Type :** **Python**
 
@@ -249,12 +263,9 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - Package identifier via the input directory parameter. The remaining process is same as other project types.
 
   * **Project Type :** **Choco (Chocolatey)**
-
-    * Choco packages are now supported and handled just like NuGet packages.
-    * Set `ProjectType` to `CHOCO` in your configuration or command line.
-    * Input file repository should contain your Choco `.nupkg` files.
-    * Choco packages will be uploaded to the configured NuGet/Choco repositories in Artifactory.
-    * No extra configuration is needed—just include your Choco packages as you would with other supported types.
+    
+    * Input file repository should contain **choco.config** file.
+    
     * Manual license clearing in SW360 is required for Choco packages.
   
 ## SPDX v2.3 Support
@@ -645,6 +656,13 @@ For reporting any bug or enhancement and for your feedbacks click [here](https:/
 | ----------------- | ------------------------- |
 | BOM               | Bill of Material          |
 | apiAuthToken      | SW360 authorization token |
+
+## Acknowledgments
+
+This project integrates dependency data from cdxgen to enhance SBOM dependency accuracy for supported ecosystems (npm, NuGet, Maven, Poetry).
+
+- Tool: cdxgen
+- URL: https://github.com/cdxgen/cdxgen
 
 # References
 
