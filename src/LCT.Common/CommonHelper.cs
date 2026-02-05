@@ -40,7 +40,12 @@ namespace LCT.Common
         /// </summary>
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
 
-        public static int duplicateComponents = 0;
+        private static int _duplicateComponents = 0;
+
+        /// <summary>
+        /// Gets the calculated count of duplicate components detected during enrichment.
+        /// </summary>
+        public static int DuplicateComponents => _duplicateComponents;
 
         #endregion Fields
 
@@ -905,7 +910,7 @@ namespace LCT.Common
                 return;
             }
 
-            duplicateComponents = Math.Max(0,(ListofComponentsFromLockFile?.Count ?? 0) - (cdxGenBomData?.Components?.Count ?? 0));
+            _duplicateComponents = Math.Max(0,(ListofComponentsFromLockFile?.Count ?? 0) - cdxGenBomData.Components.Count);
             EnrichComponentsFromCdxGen(ref ListofComponentsFromLockFile, cdxGenBomData.Components);
             
             if (cdxGenBomData.Components != null && cdxGenBomData.Components.Count > 0)
