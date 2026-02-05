@@ -200,6 +200,8 @@ namespace LCT.Common.Constants
         /// File extension for crate files.
         /// </summary>
         public const string CrateFileExtension = ".crate";
+        public const string DependencyFileExtension = "cdx_dep.json";
+
         #endregion
 
         #region Properties
@@ -217,6 +219,7 @@ namespace LCT.Common.Constants
         #region Events
         // No events present.
         #endregion
+
 
     }
 }

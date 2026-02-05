@@ -73,6 +73,7 @@ Welcome to the Continuous Clearing Tool, your automated solution for streamlinin
 - **Integration with SW360**: It creates entries in SW360 for any components not already present, linking them to their respective projects.
 - **FOSSology Code Scanning**: Initiates jobs for code scans in FOSSology, ensuring compliance and thorough analysis.
 - **SBOM Generation**: Produces a Software Bill of Materials (SBOM) file detailing the nested descriptions of software artifact components and associated metadata.
+- **Complete Dependency Mapping**: Generates SBOMs with a comprehensive `dependencies` section that lists all direct and transitive package relationships, providing full traceability for compliance, security, and auditing.
 
 ## Benefits
 - **Efficiency in Component Management**: Reduces the manual effort required to create and manage components in SW360.
@@ -149,8 +150,16 @@ The Continuous Clearing Tool comprises three executable DLLs, each playing a cru
 
 **Note** :The SBOM created by this tool follows the CycloneDX version [v1.6](https://cyclonedx.org/docs/1.6/json/) and Siemens SBOM standard [v3](https://sbom.siemens.io/v3/format.html). These formats ensure the SBOM is detailed, secure, and meets industry and Siemens-specific requirements.
 
+**Enhanced Dependency Mapping:** The generated SBOM now includes a complete `dependencies` section that maps all direct and transitive package relationships. This enhancement:
+- Lists every package dependency with their `dependsOn` relationships
+- Provides full traceability of the dependency tree
+- Supports cdxgen-generated SBOM enrichment for more accurate dependency data
+- Automatically marks components as direct dependencies using the `siemens:direct` property
+- Validates and removes invalid dependency references to ensure SBOM integrity
+
 > **1. Package Identifier**
-> - This DLL processes the input file and generates a CycloneDX BOM file. The input can be a package file or a CycloneDX BOM file created using a standard tool. If multiple input files are present, simply provide the path to the directory as an argument.
+> - This DLL processes the input file and generates a CycloneDX BOM file with comprehensive dependency mapping. The input can be a package file or a CycloneDX BOM file created using a standard tool. If multiple input files are present, simply provide the path to the directory as an argument.
+> - **cdxgen Integration** (for NPM, NuGet, Maven, Poetry): For enhanced dependency accuracy, provide a cdxgen-generated SBOM file named `cdx_dep.json` in your input directory alongside your package files. The tool will automatically detect and merge dependency information from cdxgen output. This file pattern is configured in the `Include` section of appSettings.json for supported project types.
 
 **Functionality Without Connections:**
 Users have the flexibility to generate a basic SBOM even if connections to SW360, JFrog, or both are unavailable. The tool maintains essential SBOM generation functionality with limited capabilities in such scenarios.
@@ -649,5 +658,6 @@ For reporting any bug or enhancement and for your feedbacks click [here](https:/
 
 * SW360 API Guide : [https://www.eclipse.org/sw360/docs/development/restapi/dev-rest-api/](https://www.eclipse.org/sw360/docs/development/restapi/dev-rest-api/)
 * FOSSology API Guide: [https://www.fossology.org/get-started/basic-rest-api-calls/](https://www.fossology.org/get-started/basic-rest-api-calls/)
+* cdxgen: https://github.com/cdxgen/cdxgen
 
 Copyright © Siemens AG ▪ 2025

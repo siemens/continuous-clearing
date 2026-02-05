@@ -93,7 +93,7 @@ namespace LCT.Common
         public string Token { get; set; }
         public Fossology Fossology { get; set; }
         public bool IgnoreDevDependency { get; set; } = true;
-        public List<string> ExcludeComponents { get; set; }
+        public List<string> ExcludeComponents { get; set; }        
         public string URL
         {
             get

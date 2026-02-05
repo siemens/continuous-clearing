@@ -10,38 +10,37 @@ using NUnit.Framework;
 using System.IO;
 using TestUtilities;
 
-namespace SW360IntegrationTest.Debian
+namespace SW360IntegrationTest.NPM
 {
-    [TestFixture, Order(17)]
-    class PackageIdentifierInitialDebian
+    [TestFixture, Order(48)]
+    public class PackageIdentifierDepSBOMNpm
     {
         private string CCTLocalBomTestFile { get; set; }
         private string OutFolder { get; set; }
-        TestParamDebian testParameters;
+        private static readonly TestParam testParameters = new TestParam();
 
         [SetUp]
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Debian", "CCTLocalBOMDebianInitial.json"));
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "DepNpm", "CCTLocalBOMNpmInitial.json"));
 
-            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
+            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs"))))
             {
-                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs")));
+                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs")));
             }
-            testParameters = new TestParamDebian();
         }
 
         [Test, Order(1)]
-        public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
+        public void TestBOMCreatorexe()
         {
-            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Debian"));
-            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
+            string packagjsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "DependencyTestFiles", "Npm"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs"));
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
-                TestConstant.PackageFilePath, packagejsonPath,
+                TestConstant.PackageFilePath, packagjsonPath,
                 TestConstant.BomFolderPath, bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
@@ -50,17 +49,15 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
+                TestConstant.JfrogNpmInternalRepo,"Npm-test",
+                TestConstant.ProjectType, "Npm",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.JfrogDebianInternalRepo,"Debian-test",
-                TestConstant.ProjectType,"Debian",
-                TestConstant.Mode,""}),
+                 TestConstant.Mode,""}),
                 "Test to run Package Identifier EXE execution");
         }
 
-
-
-        [Test, Order(3)]
-        public void LocalBOMCreation_AfterSuccessfulExeRun_ReturnsSuccess()
+        [Test, Order(2)]
+        public void TestLocalBOMCreation()
         {
             bool fileExist = false;
 
@@ -69,7 +66,7 @@ namespace SW360IntegrationTest.Debian
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
@@ -79,10 +76,9 @@ namespace SW360IntegrationTest.Debian
 
                 foreach (var item in expected.Components)
                 {
-
                     foreach (var i in actual.Components)
                     {
-                        if ((i.Name == item.Name) && (i.Version == item.Version))
+                        if ((i.Name == item.Name) && (i.Group == item.Group) && (i.Version == item.Version))
                         {
                             Component component = i;
                             Assert.AreEqual(item.Name, component.Name);
@@ -91,11 +87,10 @@ namespace SW360IntegrationTest.Debian
                             Assert.AreEqual(item.BomRef, component.BomRef);
                         }
                     }
-
                 }
                 Assert.AreEqual(expected.BoM.Dependencies.Count, actual.BoM.Dependencies.Count);
             }
-            
+
             Assert.IsTrue(fileExist, "Test to BOM file present");
         }
     }

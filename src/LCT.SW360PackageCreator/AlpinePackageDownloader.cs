@@ -105,13 +105,14 @@ namespace LCT.SW360PackageCreator
                 string componenetFullName = GetCorrectFileExtension(SourceUrl);
                 string downloadedFilePathWithName = $"{localPathforDownload}{componenetFullName}";
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(downloadedFilePathWithName));
+
                 if (!string.IsNullOrEmpty(SourceUrl) && !component.SourceUrl.Equals(Dataconstant.SourceUrlNotFound))
                 {
                     Uri uri = new Uri(SourceUrl);
                     downloadPath = await UrlHelper.DownloadFileAsync(uri, downloadedFilePathWithName);
                     ApplyPatchFilesToSourceCode(downloadPath, sourceData, localPathforSourceRepo, component, localPathforDownload);
-
                 }
+
                 CopyBuildFilesFromSourceRepo(localPathforDownload, component, sourceData, localPathforSourceRepo);
                 string gZipFilePath = PackageFolderGzip(localPathforDownload, component, downloadPath);
                 downloadPath = gZipFilePath;
@@ -267,8 +268,8 @@ namespace LCT.SW360PackageCreator
             {
 
                 var tempFolder = Directory.CreateDirectory($"{Directory.GetParent(Directory.GetCurrentDirectory())}" +
-                    $"\\ClearingTool\\DownloadedFiles\\SourceCodeZipped\\{component.Name}\\--" +
-                    $"{DateTime.Now.ToString("yyyyMMddHHmmss")}\\");
+                                    $"\\ClearingTool\\DownloadedFiles\\SourceCodeZipped\\{component.Name}\\--" +
+                                    $"{DateTime.Now.ToString("yyyyMMddHHmmss")}\\");
                 tarArchivePath = tempFolder + (component.Name + "_" + component.Version) + ".tar.gz";
                 var InputDirectory = localPathforDownload;
                 var OutputFilename = tarArchivePath;

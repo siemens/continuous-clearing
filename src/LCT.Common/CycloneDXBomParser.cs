@@ -130,6 +130,31 @@ namespace LCT.Common
             }
         }
 
+
+        public static void CheckValidDependenciesForProjectType(List<Dependency> dependencies, string projectType)
+        {
+            if (dependencies == null || string.IsNullOrWhiteSpace(projectType))
+            {
+                return;
+            }
+
+            var prefix = Dataconstant.PurlCheck()[projectType.ToUpper()];
+            dependencies.RemoveAll(dep => !IsValidDependencyForProjectType(dep, prefix));
+
+            foreach (var childList in dependencies.Select(d => d.Dependencies).Where(list => list != null))
+            {
+                childList.RemoveAll(child => !IsValidDependencyForProjectType(child, prefix));
+            }
+        }
+
+        private static bool IsValidDependencyForProjectType(Dependency dep, string requiredPrefix)
+        {
+            if (dep == null || string.IsNullOrWhiteSpace(dep.Ref)) return false;
+            // Require dependency Ref to contain the project-type purl prefix (e.g., "pkg:npm")
+            return dep.Ref.Contains(requiredPrefix, StringComparison.Ordinal);
+        }
+
         #endregion
+
     }
 }

@@ -120,9 +120,9 @@ namespace SW360IntegrationTest.Debian
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedcomponentType = "OSS";
-            string expectedname = "adduser";
+            string expectedname = "base-passwd";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "adduser";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "base-passwd";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             string name = responseData.Embedded.Sw360components[0].Name;
@@ -144,12 +144,12 @@ namespace SW360IntegrationTest.Debian
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
-            string expectedname = "adduser";
-            string expectedversion = "3.118.debian";
-            string expecteddownloadurl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz";
-            string expectedexternalid = "pkg:deb/debian/adduser@3.118?arch=source";
+            string expectedname = "base-passwd";
+            string expectedversion = "3.6.7.debian";
+            string expecteddownloadurl = "https://snapshot.debian.org/archive/debian-debug/20250323T211036Z/pool/main/b/base-passwd/base-passwd_3.6.7.tar.xz";
+            string expectedexternalid = "pkg:deb/debian/base-passwd@3.6.7?arch=source";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "adduser";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "base-passwd";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;

@@ -50,9 +50,12 @@ namespace LCT.PackageIdentifier
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry,environmentHelper);
             List<PythonPackage> listofComponents = new List<PythonPackage>();
             Bom bom = new Bom();
-            List<Component> listComponentForBOM;
+            List<Component> listComponentForBOM=new List<Component>();
             List<Dependency> dependencies = new List<Dependency>();
             List<string> listOfTemplateBomfilePaths = new List<string>();
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
+            Bom cdxGenBomData = GetCdxGenBomData(configFiles, appSettings);
             foreach (string config in configFiles)
             {
                 if (config.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -63,20 +66,28 @@ namespace LCT.PackageIdentifier
                 if (config.ToLower().EndsWith("poetry.lock"))
                 {
                     Logger.DebugFormat("ParsePackageFile():Poetry lock file detected: {0}", config);
-                    listofComponents.AddRange(ExtractDetailsForPoetryLockfile(config, dependencies));
+                    listofComponents=ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
+                    ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents));
+
                 }
-                else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
+                else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.DependencyFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    listofComponents.AddRange(ExtractDetailsFromJson(config, appSettings, ref dependencies));
+                    listofComponents=ExtractDetailsFromJson(config, appSettings, ref dependencies);
+                    listComponentForBOM.AddRange(FormComponentReleaseExternalID(listofComponents));
                 }
             }
 
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref ListofComponentsFromLockFile,
+                ref ListofDependenciesFromLockFile,
+                ref listComponentForBOM,
+                ref dependencies,
+                cdxGenBomData);
 
-            int initialCount = listofComponents.Count;
+            int initialCount = listComponentForBOM.Count;
             int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
-            GetDistinctComponentList(ref listofComponents);
-            listComponentForBOM = FormComponentReleaseExternalID(listofComponents);
+            listComponentForBOM = listComponentForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = initialCount - listComponentForBOM.Count;
@@ -100,6 +111,12 @@ namespace LCT.PackageIdentifier
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;
         }
+
+        private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
+        {
+            return CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _cycloneDXBomParser.ParseCycloneDXBom);
+        }
+
 
         /// <summary>
         /// Adds Siemens DirectProperty
@@ -158,7 +175,7 @@ namespace LCT.PackageIdentifier
             List<KeyValuePair<string, TomlNode>> keyValuePair = new();
             FileParser fileParser = new();
             TomlTable tomlTable = fileParser.ParseTomlFile(filePath);
-
+            CommonHelper.WarnIfDependencyFileRequired();
             foreach (TomlNode node in tomlTable["package"])
             {
                 PythonPackage pythonPackage = new()

@@ -82,7 +82,6 @@ namespace LCT.PackageIdentifier
             if (appSettings.SW360?.ExcludeComponents != null)
             {
                 componentsForBOM = CommonHelper.RemoveExcludedComponents(componentsForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = CommonHelper.RemoveInvalidDependenciesAndReferences(componentsForBOM, dependenciesForBOM);
                 BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents;
             }
 
@@ -335,6 +334,14 @@ namespace LCT.PackageIdentifier
         {
             foreach (var item in iterateBOM)
             {
+                var scopeString = item.Scope?.ToString();
+                if (!string.IsNullOrEmpty(scopeString) &&
+                    scopeString.Equals("optional", StringComparison.OrdinalIgnoreCase))
+                {
+                    SetPropertiesforBOM(ref ListOfComponents, item, "true");
+                    BomCreator.bomKpiData.DevDependentComponents++;
+                    continue;
+                }
                 //check to see if the second list is empty(which means customer has only provided one bom file)no dev dependency will be identified here
                 if (checkBOM.Count == 0)
                 {

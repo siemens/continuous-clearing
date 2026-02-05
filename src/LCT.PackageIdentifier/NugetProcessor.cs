@@ -17,6 +17,7 @@ using LCT.PackageIdentifier.Model.NugetModel;
 using LCT.Services;
 using LCT.Services.Interface;
 using log4net;
+using Microsoft.ComponentDetection.Detectors.Linux.Contracts;
 using Newtonsoft.Json;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
@@ -30,6 +31,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Dependency = CycloneDX.Models.Dependency;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
 
@@ -69,6 +71,8 @@ namespace LCT.PackageIdentifier
             List<Component> listComponentForBOM = new List<Component>();
             Bom bom = new Bom();
             bom.Dependencies = new List<Dependency>();
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
             if (DetectDeploymentType(appSettings))
             {
                 isSelfContainedProject = true;
@@ -79,7 +83,7 @@ namespace LCT.PackageIdentifier
                 Logger.Debug("Deployment type identified as Classic");
                 isSelfContainedProject = false;
             }
-            ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom);
+            ParsingInputFileForBOM(appSettings, ref listComponentForBOM, ref bom,ref ListofComponentsFromLockFile,ref ListofDependenciesFromLockFile);
             var componentsWithMultipleVersions = bom.Components.GroupBy(s => s.Name).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
 
             CheckForMultipleVersions(appSettings, componentsWithMultipleVersions);
@@ -618,24 +622,44 @@ namespace LCT.PackageIdentifier
         /// <param name="bom"></param>
         private void ParsingInputFileForBOM(CommonAppSettings appSettings,
                                     ref List<Component> listComponentForBOM,
-                                    ref Bom bom)
+                                    ref Bom bom, ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
         {
             var configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Nuget, environmentHelper);
+            Bom cdxGenBomData = GetCdxGenBomData(configFiles, appSettings);
+
             if (!isSelfContainedProject)
             {
                 GetFrameworkPackagesForAllConfigLockFiles(configFiles);
             }
-
             var listOfTemplateBomfilePaths = new List<string>();
             var totalComponentsIdentified = 0;
 
             foreach (string filepath in configFiles)
             {
-                HandleConfigFile(filepath, appSettings, ref listComponentForBOM, ref bom, listOfTemplateBomfilePaths);
+                HandleConfigFile(filepath, appSettings, ref listComponentForBOM, ref bom, listOfTemplateBomfilePaths,ref ListofComponentsFromLockFile,ref ListofDependenciesFromLockFile);
             }
+
+            // Prepare local dependencies list to pass by ref
+            var mergedDependencies = bom.Dependencies ?? new List<Dependency>();
+
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref ListofComponentsFromLockFile,
+                ref ListofDependenciesFromLockFile,
+                ref listComponentForBOM,
+                ref mergedDependencies,
+                cdxGenBomData);
+
+            // Assign back to bom
+            bom.Dependencies = mergedDependencies;
 
             PostProcessBOM(appSettings, ref listComponentForBOM, ref bom, listOfTemplateBomfilePaths, ref totalComponentsIdentified);
         }
+
+        private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
+        {
+            return CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _cycloneDXBomParser.ParseCycloneDXBom);
+        }
+
 
         /// <summary>
         /// handle config file
@@ -646,73 +670,115 @@ namespace LCT.PackageIdentifier
         /// <param name="bom"></param>
         /// <param name="listOfTemplateBomfilePaths"></param>
         private void HandleConfigFile(
-            string filepath,
-            CommonAppSettings appSettings,
-            ref List<Component> listComponentForBOM,
-            ref Bom bom,
-            List<string> listOfTemplateBomfilePaths)
+    string filepath,
+    CommonAppSettings appSettings,
+    ref List<Component> listComponentForBOM,
+    ref Bom bom,
+    List<string> listOfTemplateBomfilePaths,
+    ref List<Component> ListofComponentsFromLockFile,
+    ref List<Dependency> ListofDependenciesFromLockFile)
         {
-            List<Component> componentsForBOM = new List<Component>();
             if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
             {
                 Logger.DebugFormat("Template BOM file detected: {0}", filepath);
                 listOfTemplateBomfilePaths.Add(filepath);
             }            
 
-            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) &&
-                !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+            if (IsCycloneDxOrDependencyFile(filepath))
             {
                 Logger.DebugFormat("HandleConfigFile():CycloneDX file detected: {0}", filepath);
-                Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
-                LogHandlingHelper.IdentifierInputFileComponents(filepath, bomList.Components);
-                if (bomList.Components != null)
-                {
-                    CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                    componentsForBOM.AddRange(bomList.Components);
-                    CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
-                }
-                if (bomList.Dependencies != null)
-                {
-                    bom.Dependencies.AddRange(bomList.Dependencies);
-                }
+                HandleCycloneDxOrDependencyFile(filepath, appSettings, ref listComponentForBOM, ref bom);
+                return;
             }
-            else if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+
+            if (filepath.EndsWith(FileConstant.SPDXFileExtension))
             {
-                Logger.DebugFormat("HandleConfigFile():Spdx sbom file detected: {0}", filepath);
-                Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-                Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                LogHandlingHelper.IdentifierInputFileComponents(filepath, bomList.Components);
-                SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
-                componentsForBOM.AddRange(bomList.Components);
+                HandleSpdxFile(filepath, appSettings, ref listComponentForBOM, ref bom);
+                return;
+            }
+
+            HandlePackageFile(filepath, appSettings, ref bom, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
+        }
+
+        private static bool IsCycloneDxOrDependencyFile(string filepath)
+        {
+            return (filepath.EndsWith(FileConstant.CycloneDXFileExtension) || filepath.EndsWith(FileConstant.DependencyFileExtension))
+                   && !filepath.EndsWith(FileConstant.SBOMTemplateFileExtension);
+        }
+
+        private void HandleCycloneDxOrDependencyFile(
+            string filepath,
+            CommonAppSettings appSettings,
+            ref List<Component> listComponentForBOM,
+            ref Bom bom)
+        {
+            Logger.DebugFormat("HandleConfigFile():CycloneDX file detected: {0}", filepath);
+            Bom bomList = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, bomList.Components);
+            
+            if (bomList.Components != null)
+            {
+                CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                var componentsForBOM = new List<Component>(bomList.Components);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
+            }
+
+            if (bomList.Dependencies != null)
+            {
                 bom.Dependencies.AddRange(bomList.Dependencies);
-                string fileName = Path.GetFileName(filepath);
-                foreach (var component in listUnsupportedComponents.Components)
-                {
-                    SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
-                }
-                ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
-                ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+            }
+        }
+
+        private void HandleSpdxFile(
+            string filepath,
+            CommonAppSettings appSettings,
+            ref List<Component> listComponentForBOM,
+            ref Bom bom)
+        {
+            BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+            Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
+
+            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
+
+            var componentsForBOM = new List<Component>(bomList.Components);
+            CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
+
+            bom.Dependencies.AddRange(bomList.Dependencies);
+
+            string fileName = Path.GetFileName(filepath);
+            foreach (var component in listUnsupportedComponents.Components)
+            {
+                SpdxSbomHelper.AddSpdxComponentProperties(fileName, component);
+            }   
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+            ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+        }
+
+        private void HandlePackageFile(
+            string filepath,
+            CommonAppSettings appSettings,
+            ref Bom bom,
+            ref List<Component> ListofComponentsFromLockFile,
+            ref List<Dependency> ListofDependenciesFromLockFile)
+        {
+            Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+            var listofComponents = new List<NugetPackage>();
+            var dependencies = new List<Dependency>();
+
+            ParseInputFiles(appSettings, filepath, listofComponents);
+            ConvertToCycloneDXModel(listofComponents, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
+
+            if (bom.Dependencies == null || bom.Dependencies.Count == 0)
+            {
+                bom.Dependencies = dependencies;
             }
             else
             {
-                Logger.DebugFormat("HandleConfigFile():Package file detected: {0}", filepath);
-                var listofComponents = new List<NugetPackage>();
-                var dependencies = new List<Dependency>();
-                ParseInputFiles(appSettings, filepath, listofComponents);
-                IdentifiedNugetPackages(filepath, listofComponents);
-                ConvertToCycloneDXModel(listComponentForBOM, listofComponents, dependencies);
-
-                if (bom.Dependencies == null || bom.Dependencies.Count == 0)
-                {
-                    bom.Dependencies = dependencies;
-                }
-                else
-                {
-                    bom.Dependencies.AddRange(dependencies);
-                }
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = listComponentForBOM.Count;
+                bom.Dependencies.AddRange(dependencies);
             }
+
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = ListofComponentsFromLockFile.Count;
         }
 
         /// <summary>
@@ -846,7 +912,7 @@ namespace LCT.PackageIdentifier
         /// <param name="listComponentForBOM"></param>
         /// <param name="listofComponents"></param>
         /// <param name="dependencies"></param>
-        public static void ConvertToCycloneDXModel(List<Component> listComponentForBOM, List<NugetPackage> listofComponents, List<Dependency> dependencies)
+        public static void ConvertToCycloneDXModel(List<NugetPackage> listofComponents, ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile)
         {
             foreach (var prop in listofComponents)
             {
@@ -871,21 +937,21 @@ namespace LCT.PackageIdentifier
                         Name = Dataconstant.Cdx_IdentifierType,Value=Dataconstant.Discovered
                     }
                 };
-                listComponentForBOM.Add(components);
+                ListofComponentsFromLockFile.Add(components);
                 if (prop.Dependencies != null)
                 {
-                    GetDependencyDetails(components, prop, ref dependencies);
+                    GetDependencyDetails(components, prop,ref ListofDependenciesFromLockFile);
                 }
             }
         }
-
         /// <summary>
         /// gets dependency details
         /// </summary>
         /// <param name="compnent"></param>
         /// <param name="prop"></param>
         /// <param name="dependencies"></param>
-        private static void GetDependencyDetails(Component compnent, NugetPackage prop, ref List<Dependency> dependencies)
+        private static void GetDependencyDetails(Component compnent, NugetPackage prop, ref List<Dependency> ListofDependenciesFromLockFile)
+
         {
             Logger.DebugFormat("GetDependencyDetails(): Starting dependency extraction for component: [Name: {0}, Version: {1}, PURL: {2}]", compnent.Name, compnent.Version, compnent.Purl);
             List<Dependency> subDependencies = new();
@@ -904,9 +970,7 @@ namespace LCT.PackageIdentifier
                 Ref = compnent.Purl,
                 Dependencies = subDependencies
             };
-            Logger.DebugFormat("GetDependencyDetails(): Final Dependency for Component: [Ref: {0}, Sub-Dependencies: [{1}]]", dependency.Ref, string.Join(", ", dependency.Dependencies.Select(d => d.Ref)));
-            dependencies.Add(dependency);
-            Logger.DebugFormat("GetDependencyDetails(): Completed dependency extraction for component: [Name: {0}, Version: {1}, PURL: {2}]\n", compnent.Name, compnent.Version, compnent.Purl);
+            ListofDependenciesFromLockFile.Add(dependency);
         }
 
         /// <summary>
@@ -942,6 +1006,7 @@ namespace LCT.PackageIdentifier
         /// <param name="listofComponents"></param>
         private void ParseInputFiles(CommonAppSettings appSettings, string filepath, List<NugetPackage> listofComponents)
         {
+            CommonHelper.WarnIfDependencyFileRequired();
             if (filepath.EndsWith(FileConstant.NugetAssetFile))
             {
                 listofComponents.AddRange(ParseAssetFile(filepath));
@@ -961,6 +1026,7 @@ namespace LCT.PackageIdentifier
                 LogHandlingHelper.BasicErrorHandling("FileNotFound", "ParseInputFiles()", $"Input file not found or unsupported: {filepath}", $"provide {FileConstant.NugetAssetFile} or packages.config filesin this path :{filepath} ");
                 Logger.Warn($"Input file NOT_FOUND :{filepath}");
             }
+            IdentifiedNugetPackages(filepath, listofComponents);
         }
 
         /// <summary>
@@ -1331,7 +1397,7 @@ namespace LCT.PackageIdentifier
             // Add compositions to the BOM
             _compositionBuilder.AddCompositionsToBom(bom, _listofFrameworkPackagesInInputFiles, runtimeInfo);
         }
-        [GeneratedRegex(@"packages\\(.+?)\\lib")]
+        [GeneratedRegex(@"packages\\\\(.+?)\\\\lib")]
         private static partial Regex PackageDetailsRegex();
         [GeneratedRegex(@"\d+")]
         private static partial Regex PackageDetailsMatchRegex();

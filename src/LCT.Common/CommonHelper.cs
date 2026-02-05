@@ -40,6 +40,13 @@ namespace LCT.Common
         /// </summary>
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
 
+        private static int _duplicateComponents = 0;
+
+        /// <summary>
+        /// Gets the calculated count of duplicate components detected during enrichment.
+        /// </summary>
+        public static int DuplicateComponents => _duplicateComponents;
+
         #endregion Fields
 
         #region Properties
@@ -53,15 +60,16 @@ namespace LCT.Common
         /// Gets or sets the default log path.
         /// </summary>
         public static string DefaultLogPath { get; set; }
-
+        public static bool DependencyFileNotFound { get; set; }=true;
         #endregion Properties
-
+        
         #region Methods
 
         /// <summary>
         /// Determines whether Azure DevOps debug mode is enabled.
         /// </summary>
         /// <returns>True if debug mode is enabled; otherwise, false.</returns>
+
         public static bool IsAzureDevOpsDebugEnabled()
         {
             string azureDevOpsDebug = System.Environment.GetEnvironmentVariable("System.Debug");
@@ -73,6 +81,86 @@ namespace LCT.Common
         }
 
         /// <summary>
+        /// Finds and parses a cdxgen-generated CycloneDX SBOM file if present in the provided config files.
+        /// The detected dependency file path is removed from the list to avoid further processing elsewhere.
+        /// Parsing is performed by the provided delegate to avoid introducing cross-project dependencies.
+        /// </summary>
+        /// <param name="configFiles">List of config file paths (will be mutated if dependency file is found)</param>
+        /// <param name="appSettings">Application settings</param>
+        /// <param name="parseCycloneDxBom">Delegate used to parse the CycloneDX file and return a Bom</param>
+        /// <returns>Parsed Bom or null when not found/invalid</returns>
+        public static Bom GetCdxGenBomData(List<string> configFiles, Func<string, Bom> parseCycloneDxBom)
+        {
+            var dependencyFilePath = configFiles
+                .FirstOrDefault(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrEmpty(dependencyFilePath))
+            {
+                DependencyFileNotFound = false;
+                return null;
+            }
+
+            bool onlyDependencyFiles = configFiles.Count > 0 &&
+                configFiles.All(f => f.EndsWith(FileConstant.DependencyFileExtension, StringComparison.OrdinalIgnoreCase));
+
+            if (onlyDependencyFiles)
+            {
+                DependencyFileNotFound = false;
+                return null;
+            }
+
+            configFiles.Remove(dependencyFilePath);
+
+            
+            var cdxGenBomData = parseCycloneDxBom?.Invoke(dependencyFilePath);
+
+            if (cdxGenBomData?.Components != null)
+            {
+                return cdxGenBomData;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Merge cdxgen output into the in-memory lists or fall back to discovered lock-file content.
+        /// If cdxGenBomData has components, ApplyCdxGenEnrichment is used. Otherwise, discovered
+        /// components and dependencies are appended to the BOM lists.
+        /// </summary>
+        public static void EnrichCdxGenforPackagefilesData(
+            ref List<Component> listOfComponentsFromLockFile,
+            ref List<Dependency> listOfDependenciesFromLockFile,
+            ref List<Component> componentsForBOM,
+            ref List<Dependency> dependencies,
+            Bom cdxGenBomData)
+        {
+            if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
+            {
+                componentsForBOM.AddRange(listOfComponentsFromLockFile);
+                dependencies.AddRange(listOfDependenciesFromLockFile);
+            }
+            else
+            {
+                ApplyCdxGenEnrichment(
+                    ref listOfComponentsFromLockFile,
+                    ref listOfDependenciesFromLockFile,
+                    ref componentsForBOM,
+                    ref dependencies,
+                    cdxGenBomData);
+            }
+        }
+        /// <summary>
+        /// Logs a warning asking for cdxgen-generated SBOM data, controlled by the DependencyFileGiven flag.
+        /// Call this when you want to prompt the user to provide the dependency SBOM.
+        /// </summary>
+        public static void WarnIfDependencyFileRequired()
+        {
+            if (!DependencyFileNotFound)
+            {
+                DependencyFileNotFound=true;
+                Logger.Warn("   Can you please provide the cdxgen-generated SBOM to get more accurate dependencies");
+            }
+        }
+
         /// Removes excluded components from the component list.
         /// </summary>
         /// <param name="ComponentList">The list of components to process.</param>
@@ -518,7 +606,6 @@ namespace LCT.Common
             if (appSettings?.SW360?.ExcludeComponents != null)
             {
                 componentForBOM = RemoveExcludedComponents(componentForBOM, appSettings.SW360?.ExcludeComponents, ref noOfExcludedComponents);
-                dependenciesForBOM = RemoveInvalidDependenciesAndReferences(componentForBOM, dependenciesForBOM);
                 updateKpiCallback?.Invoke(noOfExcludedComponents);
             }
 
@@ -790,7 +877,162 @@ namespace LCT.Common
                 _ => projectType.Trim(),
             };
         }
+        /// <summary>
+        /// Merges cdxgen-generated SBOM data into existing BOM collections and enriches component properties.
+        /// </summary>
+        /// <param name="ListofComponentsFromLockFile">
+        /// Reference to the list of components discovered from lock/package files. Used to merge existing properties into cdxgen components.
+        /// </param>
+        /// <param name="ListofDependenciesFromLockFile">
+        /// Reference to the list of dependencies discovered from lock/package files. Currently not modified in this method.
+        /// </param>
+        /// <param name="componentsForBOM">
+        /// Reference to the BOM component list that will be appended with components from the cdxgen SBOM.
+        /// </param>
+        /// <param name="dependencies">
+        /// Reference to the BOM dependency list that will be appended with dependencies from the cdxgen SBOM.
+        /// </param>
+        /// <param name="cdxGenBomData">
+        /// The parsed CycloneDX <see cref="Bom"/> produced by cdxgen. If it contains components, they are merged and appended to the BOM lists.
+        /// </param>
+        /// <remarks>
+        /// Operation order:
+        /// 1) If cdxgen components exist, enrich them with properties from lock-file components (match by PURL or Name+Version).
+        /// 2) Append cdxgen components and dependencies to the target BOM lists.
+        /// 3) Add the "siemens:direct" property to components based on top-level dependency refs from cdxgen.
+        /// If cdxgen has no components, this method returns without changes.
+        /// </remarks>
 
-        #endregion Methods
+        public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies,Bom cdxGenBomData)
+        {
+            if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
+            {
+                return;
+            }
+
+            _duplicateComponents = Math.Max(0,(ListofComponentsFromLockFile?.Count ?? 0) - cdxGenBomData.Components.Count);
+            EnrichComponentsFromCdxGen(ref ListofComponentsFromLockFile, cdxGenBomData.Components);
+            
+            if (cdxGenBomData.Components != null && cdxGenBomData.Components.Count > 0)
+            {
+                componentsForBOM.AddRange(cdxGenBomData.Components);
+            }
+
+            if (cdxGenBomData.Dependencies != null && cdxGenBomData.Dependencies.Count > 0)
+            {
+                dependencies.AddRange(cdxGenBomData.Dependencies);
+            }          
+            AddSiemensDirectProperty(ref cdxGenBomData);
+        }
+        public static void AddSiemensDirectProperty(ref Bom bom)
+        {
+            List<string> npmDirectDependencies = new List<string>();
+            npmDirectDependencies.AddRange(bom.Dependencies?.Select(x => x.Ref).ToList() ?? new List<string>());
+            var bomComponentsList = bom.Components;
+
+            foreach (var component in bomComponentsList)
+            {
+                string siemensDirectValue = npmDirectDependencies.Exists(x => x.Contains(component.Name) && x.Contains(component.Version))
+                    ? "true"
+                    : "false";
+                component.Properties ??= new List<Property>();
+                var properties = component.Properties;
+                CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_SiemensDirect, siemensDirectValue);
+                component.Properties = properties;
+            }
+            bom.Components = bomComponentsList;
+        }
+        /// <summary>
+        /// Enriches cdxgen components by merging existing properties from already discovered BOM components.
+        /// </summary>
+        /// <param name="componentsForBOM">
+        /// Reference to the list of components already discovered (e.g., from lock/package files).
+        /// Properties from these components will be used to enrich the incoming cdxgen components.
+        /// </param>
+        /// <param name="cdxComponents">
+        /// Components parsed from the cdxgen-generated CycloneDX BOM that need to be enriched.
+        /// </param>
+        /// <remarks>
+        /// Matching strategy:
+        /// - First attempts match by PURL (case-insensitive).
+        /// - Falls back to Name+Version key when PURL is unavailable.
+        /// For matched components, existing properties are cloned into the cdxgen component.
+        /// </remarks>
+        private static void EnrichComponentsFromCdxGen(ref List<Component> componentsForBOM, List<Component> cdxComponents)
+        {
+           
+            var byPurl = new Dictionary<string, Component>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in componentsForBOM.Where(c => !string.IsNullOrEmpty(c.Purl)))
+            {
+                byPurl[c.Purl] = c;
+            }
+
+            var byNameVer = new Dictionary<string, Component>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in componentsForBOM.Where(c => !string.IsNullOrEmpty(c.Name) && !string.IsNullOrEmpty(c.Version)))
+            {
+                var key = $"{c.Name}|{c.Version}";
+                byNameVer[key] = c;
+            }
+
+            foreach (var cdx in cdxComponents)
+            {
+                MergeExistingPropertiesIntoCdx(cdx, byPurl, byNameVer);
+            }
+        }
+
+        /// <summary>
+        /// Merges existing component properties into a cdxgen component by matching against already discovered BOM components.
+        /// </summary>
+        /// <param name="cdx">
+        /// The cdxgen component to enrich with properties cloned from a matching existing component.
+        /// </param>
+        /// <param name="byPurl">
+        /// Lookup dictionary of existing components keyed by PURL (case-insensitive).
+        /// </param>
+        /// <param name="byNameVer">
+        /// Lookup dictionary of existing components keyed by "Name|Version" (case-insensitive) for cases where PURL is unavailable.
+        /// </param>
+        /// <remarks>
+        /// Matching strategy:
+        /// - Prefer matching by PURL when available.
+        /// - Fallback to matching by Name and Version.
+        /// If a match is found and the existing component has properties, those properties are cloned into the target <paramref name="cdx"/>.
+        /// Otherwise, ensures <paramref name="cdx"/> has a non-null properties list.
+        /// </remarks>
+        private static void MergeExistingPropertiesIntoCdx(
+            Component cdx,
+            Dictionary<string, Component> byPurl,
+            Dictionary<string, Component> byNameVer)
+        {
+            Component existing = null;
+
+            if (!string.IsNullOrEmpty(cdx.Purl) && byPurl.TryGetValue(cdx.Purl, out var matchByPurl))
+            {
+                existing = matchByPurl;
+            }
+            else
+            {
+                var key = (!string.IsNullOrEmpty(cdx.Name) && !string.IsNullOrEmpty(cdx.Version))
+                    ? $"{cdx.Name}|{cdx.Version}"
+                    : null;
+
+                if (key != null && byNameVer.TryGetValue(key, out var matchByNameVer))
+                {
+                    existing = matchByNameVer;
+                }
+            }
+
+            if (existing != null && existing.Properties != null && existing.Properties.Count > 0)
+            {
+                cdx.Properties = [.. existing.Properties.Select(p => new Property { Name = p.Name, Value = p.Value })];
+            }
+            else
+            {
+                cdx.Properties ??= new List<Property>();
+            }
+        }        
+        #endregion
+        
+
     }
 }

@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -89,9 +90,21 @@ namespace LCT.PackageIdentifier
 
             return projectName;
         }
+
+        public static Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings, System.Func<string, Bom> parseCycloneDxBom)
+        {
+            var cdxGenBomData = CommonHelper.GetCdxGenBomData(configFiles, parseCycloneDxBom);
+            if (cdxGenBomData?.Components != null)
+            {
+                cdxGenBomData.Components = [.. cdxGenBomData.Components.Where(c => c.Type != Component.Classification.Application)];
+                CycloneDXBomParser.CheckValidComponentsForProjectType(cdxGenBomData.Components, appSettings.ProjectType);
+                return cdxGenBomData;
+            }
+            return null;
+        }
+
+        
         #endregion
 
-        #region Events
-        #endregion
     }
 }

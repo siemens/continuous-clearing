@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using CycloneDX.Models;
 using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -97,6 +98,62 @@ namespace LCT.PackageIdentifier.UTest
 
             // Assert
             Assert.AreEqual(FileConstant.basicSBOMName, result);
+        }
+
+        [Test]
+        public void GetCdxGenBomData_ReturnsNull_WhenNoDependencyFile()
+        {
+            // Arrange
+            var configFiles = new List<string> { "somefile.txt", "another.json" };
+            var appSettings = new CommonAppSettings { ProjectType = "NPM" };
+
+            // Act
+            var bom = CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _ => new Bom { Components = new List<Component> { new Component() } });
+
+            // Assert
+            Assert.IsNull(bom);
+        }
+
+        [Test]
+        public void GetCdxGenBomData_ReturnsNull_WhenOnlyDependencyFiles()
+        {
+            // Arrange: only dependency files present
+            var dep1 = $"file1{FileConstant.DependencyFileExtension}";
+            var dep2 = $"file2{FileConstant.DependencyFileExtension}";
+            var configFiles = new List<string> { dep1, dep2 };
+            var appSettings = new CommonAppSettings { ProjectType = "NPM" };
+
+            // Act
+            var bom = CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _ => new Bom { Components = new List<Component> { new Component() } });
+
+            // Assert
+            Assert.IsNull(bom);
+        }
+
+        [Test]
+        public void GetCdxGenBomData_FiltersOutApplicationComponents_AndReturnsBom()
+        {
+            // Arrange: include one dependency file and another non-dependency file to trigger parsing
+            var dep = $"deps{FileConstant.DependencyFileExtension}";
+            var other = "other.txt";
+            var configFiles = new List<string> { dep, other };
+            var appSettings = new CommonAppSettings { ProjectType = "NPM" };
+
+            // Create BOM with both Application and Library components
+            var appComponent = new Component { Name = "app", Version = "1.0", Type = Component.Classification.Application,Purl= "pkg:npm/app@1.0.0" };
+            var libComponent = new Component { Name = "lib", Version = "1.0", Type = Component.Classification.Library, Purl = "pkg:npm/lib@1.0.0" };
+
+            Bom Parse(string path) => new Bom { Components = new List<Component> { appComponent, libComponent } };
+
+            // Act
+            var bom = CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, Parse);
+
+            // Assert
+            Assert.IsNotNull(bom, "Expected BOM to be returned");
+            Assert.IsNotNull(bom.Components);
+            Assert.That(bom.Components.Count, Is.EqualTo(1));
+            Assert.That(bom.Components[0].Name, Is.EqualTo("lib"));
+            Assert.That(bom.Components[0].Type, Is.EqualTo(Component.Classification.Library));
         }
     }
 }

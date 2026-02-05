@@ -61,13 +61,16 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug("ParsePackageFile():Starting to parse the package file for NPM components.");
             List<Component> componentsForBOM = new List<Component>();
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
             Bom bom = new Bom();
             List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
             int totalUnsupportedComponentsIdentified = 0;
-
-            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
-            totalComponentsIdentified = componentsForBOM.Count;
+            int duplicateComponents = 0;
+            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies,ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
+            duplicateComponents = CommonHelper.DuplicateComponents;
+            totalComponentsIdentified = componentsForBOM.Count + duplicateComponents;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
@@ -80,8 +83,7 @@ namespace LCT.PackageIdentifier
             if (componentsWithMultipleVersions.Count != 0)
             {
                 CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
-            }
-
+            }            
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
@@ -92,14 +94,13 @@ namespace LCT.PackageIdentifier
             Logger.Debug("ParsePackageFile():Completed parsing the package file for NPM components.\n");
             return bom;
         }
-
-
         /// <summary>
         /// Parses a package-lock.json file and returns CycloneDX components derived from it.
         /// </summary>
         /// <param name="filepath">Path to the package-lock.json file.</param>
         /// <param name="appSettings">Application settings used for exclusions and KPIs.</param>
         /// <returns>List of components parsed from the package-lock.json file.</returns>
+
         public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
             List<BundledComponents> bundledComponents = new List<BundledComponents>();
@@ -271,7 +272,7 @@ namespace LCT.PackageIdentifier
                 string packageName = GetPackageName(properties, prop);
 
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
-
+                
                 SetComponentGroupAndName(components, packageName);
 
                 components.Type = Component.Classification.Library;
@@ -403,7 +404,7 @@ namespace LCT.PackageIdentifier
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
                 string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;
-
+                
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
 
                 if (prop.Name.Contains('@'))
@@ -544,27 +545,38 @@ namespace LCT.PackageIdentifier
         /// <param name="componentsForBOM">Reference list to populate with discovered components.</param>
         /// <param name="bom">Reference BOM that may be filled when parsing CycloneDX/SPDX files.</param>
         /// <param name="dependencies">Reference dependency list to populate.</param>
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies,ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
         {
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm,environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
-
+            Bom cdxGenBomData = GetCdxGenBomData(configFiles, appSettings);
             foreach (string filepath in configFiles)
-            {
-                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
-                    Logger.DebugFormat("ParsingInputFileForBOM():Template BOM file detected: {0}", filepath);
-                    listOfTemplateBomfilePaths.Add(filepath);
-                    continue;
+                    if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                    {
+                        Logger.DebugFormat("ParsingInputFileForBOM():Template BOM file detected: {0}", filepath);
+                        listOfTemplateBomfilePaths.Add(filepath);
+                        continue;
+                    }
+
+                    Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                    ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile,ref ListofDependenciesFromLockFile);
                 }
-                
-                ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
-            }
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref ListofComponentsFromLockFile,
+                ref ListofDependenciesFromLockFile,
+                ref componentsForBOM,
+                ref dependencies,
+                cdxGenBomData);                   
 
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
+        }       
+        private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
+        {
+            return CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _cycloneDXBomParser.ParseCycloneDXBom);
         }
-
+       
         /// <summary>
         /// Dispatches processing based on the file type (CycloneDX, SPDX or package file).
         /// </summary>
@@ -573,9 +585,10 @@ namespace LCT.PackageIdentifier
         /// <param name="componentsForBOM">Reference component list.</param>
         /// <param name="bom">Reference BOM to update.</param>
         /// <param name="dependencies">Reference dependency list.</param>
-        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies, ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
+
         {
-            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
+            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) || filepath.EndsWith(FileConstant.DependencyFileExtension))
             {
                 ProcessCycloneDXFile(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
             }
@@ -585,7 +598,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                ProcessPackageFile(filepath, appSettings, ref componentsForBOM, ref dependencies);
+                ProcessPackageFile(filepath, appSettings, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
         }
 
@@ -648,7 +661,6 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
-
         /// <summary>
         /// Processes a package file (package-lock.json) and extracts components and dependencies.
         /// </summary>
@@ -656,13 +668,17 @@ namespace LCT.PackageIdentifier
         /// <param name="appSettings">Application settings.</param>
         /// <param name="componentsForBOM">Reference component list.</param>
         /// <param name="dependencies">Reference dependency list.</param>
-        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
+        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings,ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofdependenciesFromLockFile)
+
         {
             Logger.Debug("ProcessPackageFile():Found as Package File");
+            CommonHelper.WarnIfDependencyFileRequired();
             var components = ParsePackageLockJson(filepath, appSettings);
+            var dependenciesFromPackageFiles = new List<Dependency>();
             AddingIdentifierType(components, "PackageFile", filepath);
-            componentsForBOM.AddRange(components);
-            GetDependencyDetails(components, dependencies);
+            ListofComponentsFromLockFile.AddRange(components);
+            GetDependencyDetails(components, dependenciesFromPackageFiles);
+            ListofdependenciesFromLockFile.AddRange(dependenciesFromPackageFiles);            
             LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
         }
 
@@ -911,10 +927,8 @@ namespace LCT.PackageIdentifier
                     }
                 }
             }
-        }
-        #endregion
-
-        #region Events
+        }       
+       
         #endregion
     }
  }

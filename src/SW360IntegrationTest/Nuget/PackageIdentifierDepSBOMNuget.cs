@@ -4,40 +4,40 @@
 //  SPDX-License-Identifier: MIT
 
 // -------------------------------------------------------------------------------------------------------------------- 
-
 using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
 using TestUtilities;
 
-namespace SW360IntegrationTest.Debian
+namespace SW360IntegrationTest.Nuget
 {
-    [TestFixture, Order(17)]
-    class PackageIdentifierInitialDebian
+    [TestFixture, Order(49)]
+    public class PackageIdentifierDepSBOMNuget
     {
+
         private string CCTLocalBomTestFile { get; set; }
         private string OutFolder { get; set; }
-        TestParamDebian testParameters;
+        TestParamNuget testParameters;
 
         [SetUp]
         public void Setup()
         {
             OutFolder = TestHelper.OutFolder;
 
-            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "Debian", "CCTLocalBOMDebianInitial.json"));
+            CCTLocalBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageIdentifierTestFiles", "DepNuget", "CCTLocalBOMNugetInitial.json"));
 
-            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"))))
+            if (!Directory.Exists(Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs"))))
             {
-                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs")));
+                Directory.CreateDirectory(Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs")));
             }
-            testParameters = new TestParamDebian();
+            testParameters = new TestParamNuget();
         }
 
         [Test, Order(1)]
         public void RunBOMCreatorexe_ProvidedPackageJsonFilePath_ReturnsSuccess()
         {
-            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "Debian"));
-            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
+            string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "DependencyTestFiles", "Nuget"));
+            string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs"));
 
             // Test BOM Creator ran with exit code 0
             Assert.AreEqual(0, TestHelper.RunBOMCreatorExe(new string[]{
@@ -51,15 +51,14 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
-                TestConstant.JfrogDebianInternalRepo,"Debian-test",
-                TestConstant.ProjectType,"Debian",
+                TestConstant.JfrogNugetInternalRepo,"Nuget-test",
+                TestConstant.ProjectType,"Nuget",
                 TestConstant.Mode,""}),
-                "Test to run Package Identifier EXE execution");
+                "Test to run  Package Identifier EXE execution");
         }
 
 
-
-        [Test, Order(3)]
+        [Test, Order(2)]
         public void LocalBOMCreation_AfterSuccessfulExeRun_ReturnsSuccess()
         {
             bool fileExist = false;
@@ -69,7 +68,7 @@ namespace SW360IntegrationTest.Debian
             expected.Read(CCTLocalBomTestFile);
 
             // Actual
-            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
+            string generatedBOM = Path.GetFullPath(Path.Combine(OutFolder, "..", "DependencyBOMs", $"{testParameters.SW360ProjectName}_Bom.cdx.json"));
             if (File.Exists(generatedBOM))
             {
                 fileExist = true;
@@ -95,7 +94,7 @@ namespace SW360IntegrationTest.Debian
                 }
                 Assert.AreEqual(expected.BoM.Dependencies.Count, actual.BoM.Dependencies.Count);
             }
-            
+
             Assert.IsTrue(fileExist, "Test to BOM file present");
         }
     }

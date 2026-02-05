@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:167dc9b4-dd8d-4f55-926a-c0f96cabf035",
+  "serialNumber": "urn:uuid:510f515b-e831-4b7a-88c8-a61387431f57",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-05-26T04:19:21Z",
+    "timestamp": "2026-01-20T10:16:11Z",
     "tools": {
       "components": [
         {
@@ -13,7 +13,7 @@
             "name": "Siemens AG"
           },
           "name": "Clearing Automation Tool",
-          "version": "8.0.0",
+          "version": "8.3.0",
           "externalReferences": [
             {
               "url": "https://github.com/siemens/continuous-clearing",
@@ -25,8 +25,8 @@
     },
     "component": {
       "type": "application",
-      "name": "continuous-clearing",
-      "version": "v9.0.x"
+      "name": "Test",
+      "version": "1.0"
     },
     "properties": [
       {
@@ -48,16 +48,16 @@
           "value": "Discovered"
         },
         {
-          "name": "internal:siemens:clearing:is-internal",
-          "value": "false"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
-          "name": "internal:siemens:clearing:project-type",
-          "value": "Alpine"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
           "name": "internal:siemens:clearing:development",
@@ -74,6 +74,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/bf507fb1d80f4f029b914067f6d48c70"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -89,16 +101,16 @@
           "value": "Discovered"
         },
         {
-          "name": "internal:siemens:clearing:is-internal",
-          "value": "false"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
-          "name": "internal:siemens:clearing:project-type",
-          "value": "Alpine"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
           "name": "internal:siemens:clearing:development",
@@ -115,6 +127,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/f67b338f75c64356866fb8e603fe834e"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -130,16 +154,16 @@
           "value": "Discovered"
         },
         {
-          "name": "internal:siemens:clearing:is-internal",
-          "value": "false"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
-          "name": "internal:siemens:clearing:project-type",
-          "value": "Alpine"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
           "name": "internal:siemens:clearing:development",
@@ -156,6 +180,18 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "NEW_CLEARING"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/2f48bb5e662942779b4a535d9795ff00"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     },
@@ -171,16 +207,16 @@
           "value": "Discovered"
         },
         {
-          "name": "internal:siemens:clearing:is-internal",
-          "value": "false"
+          "name": "internal:siemens:clearing:project-type",
+          "value": "Alpine"
         },
         {
           "name": "internal:siemens:clearing:jfrog-repo-name",
           "value": "Not Found in JFrogRepo"
         },
         {
-          "name": "internal:siemens:clearing:project-type",
-          "value": "Alpine"
+          "name": "internal:siemens:clearing:is-internal",
+          "value": "false"
         },
         {
           "name": "internal:siemens:clearing:development",
@@ -197,11 +233,47 @@
         {
           "name": "internal:siemens:clearing:jfrog-repo-path",
           "value": "Jfrog repo path not found"
+        },
+        {
+          "name": "internal:siemens:clearing:clearing-state",
+          "value": "Not Available"
+        },
+        {
+          "name": "internal:siemens:clearing:sw360:release-url",
+          "value": "http://localhost:8090/resource/api/releases/a55a67e8c11b4b1a9aec0101e2a78d3b"
+        },
+        {
+          "name": "internal:siemens:clearing:fossology:url",
+          "value": ""
         }
       ]
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "ref": "pkg:apk/alpine/apk-tools@2.12.9-r3?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=9dee250113821796",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.3-r0?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=3a729016c3dde81e",
+        "pkg:apk/alpine/zlib@1.2.12-r3?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=5dc27240599b9efa"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/busybox@1.35.0-r17?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=d0f6245e9fe7ecbe",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.3-r0?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=3a729016c3dde81e"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/zlib@1.2.12-r3?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=5dc27240599b9efa",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.3-r0?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=3a729016c3dde81e"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/musl@1.2.3-r0?arch=x86_64\u0026amp;distro=alpine-3.16.2\u0026amp;package-id=3a729016c3dde81e"
+    }
+  ],
+  "compositions": [],
   "definitions": {
     "standards": [
       {

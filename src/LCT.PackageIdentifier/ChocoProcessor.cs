@@ -39,9 +39,10 @@ namespace LCT.PackageIdentifier
         /// files.</returns>
         public override Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco,environmentHelper);
-            List<Component> chocoComponents = new();
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Choco,environmentHelper);            
             List<NugetPackage> nugetPackages = new();
+            List<Component> ListofComponentsFromLockFile = new ();
+            List<Dependency> ListofDependenciesFromLockFile = new ();
             Bom bom = new();
             string filePath=string.Empty;
             foreach (string filepath in configFiles)
@@ -53,8 +54,8 @@ namespace LCT.PackageIdentifier
             }
 
             //Dependencies are not extracted for choco as of now
-            ConvertToCycloneDXModel(chocoComponents, nugetPackages, null);
-            bom.Components = chocoComponents;
+            ConvertToCycloneDXModel(nugetPackages, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
+            bom.Components = ListofComponentsFromLockFile;
             LogHandlingHelper.IdentifierInputFileComponents(filePath, bom.Components);
             // No dependencies for now
             bom.Dependencies = new List<Dependency>();

@@ -88,6 +88,7 @@ namespace LCT.PackageIdentifier
 
             bom = RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
+            CycloneDXBomParser.CheckValidDependenciesForProjectType(bom.Dependencies, appSettings.ProjectType);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
             return bom;

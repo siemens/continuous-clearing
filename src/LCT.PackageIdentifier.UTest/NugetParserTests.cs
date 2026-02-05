@@ -1301,7 +1301,8 @@ namespace LCT.PackageIdentifier.UTest
             var listComponentForBOM = new List<Component>();
             var bom = new Bom { Dependencies = new List<Dependency>() };
             var listOfTemplateBomfilePaths = new List<string>();
-
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
             var mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             var testBom = new Bom
             {
@@ -1320,7 +1321,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 nugetProcessor.GetType()
                     .GetMethod("HandleConfigFile", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths });
+                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths, ListofComponentsFromLockFile, ListofDependenciesFromLockFile});
             });
 
             Assert.AreEqual(0, bom.Dependencies.Count);
@@ -1335,7 +1336,8 @@ namespace LCT.PackageIdentifier.UTest
             var listComponentForBOM = new List<Component>();
             var bom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             var listOfTemplateBomfilePaths = new List<string>();
-
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
             var mockSpdxBomParser = new Mock<ISpdxBomParser>();
             var testBom = new Bom
             {
@@ -1358,7 +1360,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 nugetProcessor.GetType()
                     .GetMethod("HandleConfigFile", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths });
+                    .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths, ListofComponentsFromLockFile, ListofDependenciesFromLockFile });
             });
 
             Assert.AreEqual(0, bom.Dependencies.Count);
