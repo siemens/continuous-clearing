@@ -69,6 +69,7 @@ namespace LCT.PackageIdentifier
             int totalUnsupportedComponentsIdentified = 0;
 
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies,ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
             totalComponentsIdentified = componentsForBOM.Count;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);

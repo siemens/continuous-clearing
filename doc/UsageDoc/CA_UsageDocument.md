@@ -658,5 +658,6 @@ For reporting any bug or enhancement and for your feedbacks click [here](https:/
 
 * SW360 API Guide : [https://www.eclipse.org/sw360/docs/development/restapi/dev-rest-api/](https://www.eclipse.org/sw360/docs/development/restapi/dev-rest-api/)
 * FOSSology API Guide: [https://www.fossology.org/get-started/basic-rest-api-calls/](https://www.fossology.org/get-started/basic-rest-api-calls/)
+* cdxgen: https://github.com/cdxgen/cdxgen
 
 Copyright © Siemens AG ▪ 2025
