@@ -67,10 +67,10 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
             int totalUnsupportedComponentsIdentified = 0;
-
-            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies,ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile = componentsForBOM.Count;
-            totalComponentsIdentified = componentsForBOM.Count;
+            int duplicateComponents = 0;
+            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies,ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile,totalComponentsIdentified);
+            duplicateComponents = CommonHelper.duplicateComponents;
+            totalComponentsIdentified = componentsForBOM.Count + duplicateComponents;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
@@ -545,7 +545,7 @@ namespace LCT.PackageIdentifier
         /// <param name="componentsForBOM">Reference list to populate with discovered components.</param>
         /// <param name="bom">Reference BOM that may be filled when parsing CycloneDX/SPDX files.</param>
         /// <param name="dependencies">Reference dependency list to populate.</param>
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies,ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile)
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies,ref List<Component> ListofComponentsFromLockFile,ref List<Dependency> ListofDependenciesFromLockFile,int totalcomponents)
         {
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm,environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();

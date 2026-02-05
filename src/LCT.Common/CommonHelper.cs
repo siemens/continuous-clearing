@@ -40,6 +40,8 @@ namespace LCT.Common
         /// </summary>
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
 
+        public static int duplicateComponents = 0;
+
         #endregion Fields
 
         #region Properties
@@ -870,6 +872,32 @@ namespace LCT.Common
                 _ => projectType.Trim(),
             };
         }
+        /// <summary>
+        /// Merges cdxgen-generated SBOM data into existing BOM collections and enriches component properties.
+        /// </summary>
+        /// <param name="ListofComponentsFromLockFile">
+        /// Reference to the list of components discovered from lock/package files. Used to merge existing properties into cdxgen components.
+        /// </param>
+        /// <param name="ListofDependenciesFromLockFile">
+        /// Reference to the list of dependencies discovered from lock/package files. Currently not modified in this method.
+        /// </param>
+        /// <param name="componentsForBOM">
+        /// Reference to the BOM component list that will be appended with components from the cdxgen SBOM.
+        /// </param>
+        /// <param name="dependencies">
+        /// Reference to the BOM dependency list that will be appended with dependencies from the cdxgen SBOM.
+        /// </param>
+        /// <param name="cdxGenBomData">
+        /// The parsed CycloneDX <see cref="Bom"/> produced by cdxgen. If it contains components, they are merged and appended to the BOM lists.
+        /// </param>
+        /// <remarks>
+        /// Operation order:
+        /// 1) If cdxgen components exist, enrich them with properties from lock-file components (match by PURL or Name+Version).
+        /// 2) Append cdxgen components and dependencies to the target BOM lists.
+        /// 3) Add the "siemens:direct" property to components based on top-level dependency refs from cdxgen.
+        /// If cdxgen has no components, this method returns without changes.
+        /// </remarks>
+
         public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies,Bom cdxGenBomData)
         {
             if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
@@ -877,6 +905,7 @@ namespace LCT.Common
                 return;
             }
 
+            duplicateComponents = Math.Max(0,(ListofComponentsFromLockFile?.Count ?? 0) - (cdxGenBomData?.Components?.Count ?? 0));
             EnrichComponentsFromCdxGen(ref ListofComponentsFromLockFile, cdxGenBomData.Components);
             
             if (cdxGenBomData.Components != null && cdxGenBomData.Components.Count > 0)
@@ -908,6 +937,22 @@ namespace LCT.Common
             }
             bom.Components = bomComponentsList;
         }
+        /// <summary>
+        /// Enriches cdxgen components by merging existing properties from already discovered BOM components.
+        /// </summary>
+        /// <param name="componentsForBOM">
+        /// Reference to the list of components already discovered (e.g., from lock/package files).
+        /// Properties from these components will be used to enrich the incoming cdxgen components.
+        /// </param>
+        /// <param name="cdxComponents">
+        /// Components parsed from the cdxgen-generated CycloneDX BOM that need to be enriched.
+        /// </param>
+        /// <remarks>
+        /// Matching strategy:
+        /// - First attempts match by PURL (case-insensitive).
+        /// - Falls back to Name+Version key when PURL is unavailable.
+        /// For matched components, existing properties are cloned into the cdxgen component.
+        /// </remarks>
         private static void EnrichComponentsFromCdxGen(ref List<Component> componentsForBOM, List<Component> cdxComponents)
         {
            
@@ -928,7 +973,27 @@ namespace LCT.Common
             {
                 MergeExistingPropertiesIntoCdx(cdx, byPurl, byNameVer);
             }
-        }       
+        }
+
+        /// <summary>
+        /// Merges existing component properties into a cdxgen component by matching against already discovered BOM components.
+        /// </summary>
+        /// <param name="cdx">
+        /// The cdxgen component to enrich with properties cloned from a matching existing component.
+        /// </param>
+        /// <param name="byPurl">
+        /// Lookup dictionary of existing components keyed by PURL (case-insensitive).
+        /// </param>
+        /// <param name="byNameVer">
+        /// Lookup dictionary of existing components keyed by "Name|Version" (case-insensitive) for cases where PURL is unavailable.
+        /// </param>
+        /// <remarks>
+        /// Matching strategy:
+        /// - Prefer matching by PURL when available.
+        /// - Fallback to matching by Name and Version.
+        /// If a match is found and the existing component has properties, those properties are cloned into the target <paramref name="cdx"/>.
+        /// Otherwise, ensures <paramref name="cdx"/> has a non-null properties list.
+        /// </remarks>
         private static void MergeExistingPropertiesIntoCdx(
             Component cdx,
             Dictionary<string, Component> byPurl,
