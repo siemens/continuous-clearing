@@ -24,12 +24,35 @@ namespace LCT.PackageIdentifier.Model.NugetModel
     [ExcludeFromCodeCoverage]
     public class Container
     {
+        #region Properties
+        /// <summary>
+        /// Components contained in this container, keyed by component identifier.
+        /// </summary>
         public IDictionary<string, BuildInfoComponent> Components { get; set; } = new Dictionary<string, BuildInfoComponent>();
 
+        /// <summary>
+        /// Name of the container (for example a file name or logical group name).
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Type of the container (for example nuget).
+        /// </summary>
         public ContainerType Type { get; set; }
 
+        /// <summary>
+        /// Default scope applied to components in this container.
+        /// </summary>
         public ComponentScope Scope { get; set; } = ComponentScope.Required;
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

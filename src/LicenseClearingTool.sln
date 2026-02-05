@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.Facade.UTest", "LCT.Fac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.ArtifactoryUploader", "ArtifactoryUploader\LCT.ArtifactoryUploader.csproj", "{23D10886-3534-40D3-BD16-82664B29C266}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AritfactoryUploader.UTest", "AritfactoryUploader.UTest\AritfactoryUploader.UTest.csproj", "{7EF98B95-6F07-4ED2-990F-5C17FE55A87C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.ArtifactoryUploader.UTest", "AritfactoryUploader.UTest\LCT.ArtifactoryUploader.UTest.csproj", "{7EF98B95-6F07-4ED2-990F-5C17FE55A87C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.PackageIdentifier", "LCT.PackageIdentifier\LCT.PackageIdentifier.csproj", "{5A3FB5A5-A982-4DC9-A30F-6AC8D2B32574}"
 EndProject

@@ -19,7 +19,14 @@ namespace LCT.Common
     /// </summary>
     public static class ProcessAsyncHelper
     {
+        #region Fields
+
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// Run a process asynchronously
         /// <para>To capture STDOUT, set StartInfo.RedirectStandardOutput to TRUE</para>
@@ -83,6 +90,7 @@ namespace LCT.Common
                 }
                 catch (AggregateException ex)
                 {
+                    LogHandlingHelper.ExceptionErrorHandling("AggregateException", "RunAsync()", ex, "");
                     Logger.Error($"Exception in RunAsync method(){ex}");
                 }
 
@@ -93,6 +101,11 @@ namespace LCT.Common
 
             return result;
         }
+
+        /// <summary>
+        /// Reads the output stream from the process asynchronously.
+        /// </summary>
+        /// <param name="process">The process to read output from.</param>
         public static void ReadOutputStreamProcess(Process process)
         {
             if (process.StartInfo.RedirectStandardOutput)
@@ -104,6 +117,13 @@ namespace LCT.Common
                 process.BeginErrorReadLine();
             }
         }
+
+        /// <summary>
+        /// Handles standard output stream from the process.
+        /// </summary>
+        /// <param name="process">The process to handle output from.</param>
+        /// <param name="processTasks">The list of tasks to track completion.</param>
+        /// <returns>A StringBuilder containing the standard output.</returns>
         public static StringBuilder STDOutHandler(Process process, List<Task> processTasks)
         {
             var stdOutBuilder = new StringBuilder();
@@ -128,6 +148,13 @@ namespace LCT.Common
             return stdOutBuilder;
 
         }
+
+        /// <summary>
+        /// Handles standard error stream from the process.
+        /// </summary>
+        /// <param name="process">The process to handle error output from.</param>
+        /// <param name="processTasks">The list of tasks to track completion.</param>
+        /// <returns>A StringBuilder containing the standard error output.</returns>
         public static StringBuilder STDErrorHandler(Process process, List<Task> processTasks)
         {
             var stdErrBuilder = new StringBuilder();
@@ -153,6 +180,7 @@ namespace LCT.Common
 
         }
 
+        #endregion
     }
 
 }

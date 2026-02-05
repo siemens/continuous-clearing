@@ -43,6 +43,14 @@ namespace LCT.SW360PackageCreator
 
         protected Program() { }
 
+        /// <summary>
+        /// Initializes and executes the package creator application workflow. This includes reading configuration
+        /// settings, validating input parameters, performing compliance checks, and uploading artifacts as part of the
+        /// application's main entry point.
+        /// </summary>        
+        /// <param name="args">An array of command-line arguments supplied to the application. These arguments are used to configure
+        /// application settings and control execution behavior.</param>
+        /// <returns>A task that represents the asynchronous operation of the application's main workflow.</returns>
         static async Task Main(string[] args)
         {
             CreatorStopWatch = new Stopwatch();
@@ -55,13 +63,17 @@ namespace LCT.SW360PackageCreator
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.ComponentCreatorLog, m_Verbose);
-            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            string logFileNameWithTimestamp = $"{FileConstant.ComponentCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
+            Logger.Debug($"====================<<<<< Package creator >>>>>====================");
+            CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
+            Log4Net.AppendVerboseValue(appSettings);
 
             ISw360ProjectService sw360ProjectService = Getsw360ProjectServiceObject(appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade);
             ProjectReleases projectReleases = new ProjectReleases();
 
-            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.ComponentCreatorLog, m_Verbose);
+            string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
+            Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder name: {FolderPath}", null);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Creator);
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
@@ -102,7 +114,10 @@ namespace LCT.SW360PackageCreator
             PipelineArtifactUploader.UploadArtifacts();
         }
 
-
+        /// <summary>
+        /// gets the catool version from project file
+        /// </summary>
+        /// <returns>ca tool information</returns>
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
             CatoolInfo catoolInfo = new CatoolInfo();
@@ -112,6 +127,12 @@ namespace LCT.SW360PackageCreator
             return catoolInfo;
         }
 
+        /// <summary>
+        /// gets the sw360 project service object
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <param name="sW360ApicommunicationFacade"></param>
+        /// <returns>project service data</returns>
         private static ISw360ProjectService Getsw360ProjectServiceObject(CommonAppSettings appSettings, out ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             ISw360ProjectService sw360ProjectService;
@@ -130,6 +151,13 @@ namespace LCT.SW360PackageCreator
             return sw360ProjectService;
         }
 
+        /// <summary>
+        /// initiates the package creator process
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <param name="sw360ProjectService"></param>
+        /// <param name="sW360ApicommunicationFacade"></param>
+        /// <returns>a task represents async operation</returns>
         private static async Task InitiatePackageCreatorProcess(CommonAppSettings appSettings, ISw360ProjectService sw360ProjectService, ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             ISW360CommonService sw360CommonService = new SW360CommonService(sW360ApicommunicationFacade);
@@ -157,6 +185,10 @@ namespace LCT.SW360PackageCreator
                  sw360ProjectService, new FileOperations(), creatorHelper, parsedBomData);
         }
 
+        /// <summary>
+        /// compliance check for all found components
+        /// </summary>
+        /// <returns>task that represents asynchronous operation</returns>
         private static async Task ComplianceCheckForAllFoundComponents()
         {
             if (parsedBomData != null && parsedBomData.Count > 0)

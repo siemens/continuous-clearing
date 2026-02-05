@@ -169,6 +169,50 @@ stages:
       appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
 
     ##################################################
+    #                    Cargo                       #
+    ##################################################
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: cargo
+      displayName: "B&R CA Tool CARGO"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 3e4e30ddfa82419091a0208b39f51db2
+      sw360ProjectName: "Test-Cargo"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'cargo'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/cargo
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
+    #                    Choco                       #
+    ##################################################
+  
+  - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml
+    parameters:
+      stageName: choco
+      displayName: "B&R CA Tool CHOCO"
+      sw360Url: $(SW360_URL)
+      sw360Token: $(SW360_TOKEN)
+      sw360ProjectId: 28b0f7b4c77f4dfaa071e0a8772c8cf3
+      sw360ProjectName: "Test-Choco"
+      fossologyUrl: $(FOSSOLOGY_URL)
+      JfrogUrl: $(JFROG_URL)
+      JfrogToken: $(JFROG_TOKEN)
+      JfrogDryRun: true
+      projectDefinitions:
+        - projectType: 'choco'
+          inputFolder: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/dependency-locks/choco
+      outputFolder: $(Build.SourcesDirectory)/continuous-clearing
+      appSettingsPath: $(Build.SourcesDirectory)/ca-tool-config-and-testdata/settings/appsettings.json
+
+    ##################################################
     #                    ALPINE                      #
     ##################################################
   - template: ../templates/build/azure-pipelines-clearing-tool-build-run-stage-template.yml

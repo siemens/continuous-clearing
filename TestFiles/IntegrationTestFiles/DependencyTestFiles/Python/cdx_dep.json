@@ -1,0 +1,4386 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:53a7e29c-6904-44cc-8b2e-ad934ce10412",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-12-18T06:02:25Z",
+    "tools": {
+      "components": [
+        {
+          "group": "@cyclonedx",
+          "name": "cdxgen",
+          "version": "12.0.0",
+          "purl": "pkg:npm/%40cyclonedx/cdxgen@12.0.0",
+          "type": "application",
+          "bom-ref": "pkg:npm/@cyclonedx/cdxgen@12.0.0",
+          "publisher": "OWASP Foundation",
+          "authors": [ { "name": "OWASP Foundation" } ]
+        }
+      ]
+    },
+    "authors": [ { "name": "OWASP Foundation" } ],
+    "lifecycles": [ { "phase": "build" } ],
+    "component": {
+      "group": "",
+      "name": "PyDeps",
+      "version": "latest",
+      "type": "application",
+      "bom-ref": "pkg:pypi/pydeps@latest",
+      "purl": "pkg:pypi/pydeps@latest"
+    },
+    "properties": [
+      {
+        "name": "cdx:bom:componentTypes",
+        "value": "pypi"
+      },
+      {
+        "name": "cdx:bom:componentSrcFiles",
+        "value": "poetry.lock\\npyproject.toml"
+      }
+    ]
+  },
+  "components": [
+    {
+      "group": "",
+      "name": "aiomysql",
+      "version": "0.2.0",
+      "description": "MySQL driver for asyncio.",
+      "purl": "pkg:pypi/aiomysql@0.2.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/aiomysql@0.2.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "annotated-doc",
+      "version": "0.0.4",
+      "description": "Document parameters, class attributes, return types, and variables inline, with Annotated.",
+      "purl": "pkg:pypi/annotated-doc@0.0.4",
+      "type": "library",
+      "bom-ref": "pkg:pypi/annotated-doc@0.0.4",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "annotated-types",
+      "version": "0.7.0",
+      "description": "Reusable constraint types to use with typing.Annotated",
+      "purl": "pkg:pypi/annotated-types@0.7.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/annotated-types@0.7.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "anyio",
+      "version": "3.7.1",
+      "description": "High level compatibility layer for multiple asynchronous event loop implementations",
+      "purl": "pkg:pypi/anyio@3.7.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/anyio@3.7.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "event" ]
+    },
+    {
+      "group": "",
+      "name": "apscheduler",
+      "version": "3.10.4",
+      "description": "In-process task scheduler with Cron-like capabilities",
+      "purl": "pkg:pypi/apscheduler@3.10.4",
+      "type": "library",
+      "bom-ref": "pkg:pypi/apscheduler@3.10.4",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.6"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "astroid",
+      "version": "3.3.11",
+      "description": "An abstract syntax tree for Python with inference support.",
+      "purl": "pkg:pypi/astroid@3.3.11",
+      "type": "library",
+      "bom-ref": "pkg:pypi/astroid@3.3.11",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9.0"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "black",
+      "version": "24.10.0",
+      "description": "The uncompromising code formatter.",
+      "purl": "pkg:pypi/black@24.10.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/black@24.10.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "certifi",
+      "version": "2025.11.12",
+      "description": "Python package for providing Mozilla's CA Bundle.",
+      "purl": "pkg:pypi/certifi@2025.11.12",
+      "type": "library",
+      "bom-ref": "pkg:pypi/certifi@2025.11.12",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "bundle" ]
+    },
+    {
+      "group": "",
+      "name": "cffi",
+      "version": "2.0.0",
+      "description": "Foreign Function Interface for Python calling C code.",
+      "purl": "pkg:pypi/cffi@2.0.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/cffi@2.0.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "native" ]
+    },
+    {
+      "group": "",
+      "name": "cfgv",
+      "version": "3.5.0",
+      "description": "Validate configuration and produce human readable error messages.",
+      "purl": "pkg:pypi/cfgv@3.5.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/cfgv@3.5.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "charset-normalizer",
+      "version": "3.4.4",
+      "description": "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet.",
+      "purl": "pkg:pypi/charset-normalizer@3.4.4",
+      "type": "library",
+      "bom-ref": "pkg:pypi/charset-normalizer@3.4.4",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "click",
+      "version": "8.3.1",
+      "description": "Composable command line interface toolkit",
+      "purl": "pkg:pypi/click@8.3.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/click@8.3.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "colorama",
+      "version": "0.4.6",
+      "description": "Cross-platform colored terminal text.",
+      "purl": "pkg:pypi/colorama@0.4.6",
+      "type": "library",
+      "bom-ref": "pkg:pypi/colorama@0.4.6",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "coverage",
+      "version": "7.12.0",
+      "description": "Code coverage measurement for Python",
+      "purl": "pkg:pypi/coverage@7.12.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/coverage@7.12.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "cryptography",
+      "version": "46.0.1",
+      "description": "cryptography is a package which provides cryptographic recipes and primitives to Python developers.",
+      "purl": "pkg:pypi/cryptography@46.0.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/cryptography@46.0.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "!=3.9.0,!=3.9.1,>=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "dill",
+      "version": "0.4.0",
+      "description": "serialize all of Python",
+      "purl": "pkg:pypi/dill@0.4.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/dill@0.4.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "distlib",
+      "version": "0.4.0",
+      "description": "Distribution utilities",
+      "purl": "pkg:pypi/distlib@0.4.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/distlib@0.4.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "*"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "et-xmlfile",
+      "version": "2.0.0",
+      "description": "An implementation of lxml.xmlfile for the standard library",
+      "purl": "pkg:pypi/et-xmlfile@2.0.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/et-xmlfile@2.0.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "fastapi",
+      "version": "0.121.0",
+      "description": "FastAPI framework, high performance, easy to learn, fast to code, ready for production",
+      "purl": "pkg:pypi/fastapi@0.121.0",
+      "type": "framework",
+      "bom-ref": "pkg:pypi/fastapi@0.121.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "framework" ]
+    },
+    {
+      "group": "",
+      "name": "filelock",
+      "version": "3.20.0",
+      "description": "A platform independent file lock.",
+      "purl": "pkg:pypi/filelock@3.20.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/filelock@3.20.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "fsspec",
+      "version": "2025.10.0",
+      "description": "File-system specification",
+      "purl": "pkg:pypi/fsspec@2025.10.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/fsspec@2025.10.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "h11",
+      "version": "0.16.0",
+      "description": "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1",
+      "purl": "pkg:pypi/h11@0.16.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/h11@0.16.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "hf-xet",
+      "version": "1.2.0",
+      "description": "Fast transfer of large files with the Hugging Face Hub.",
+      "purl": "pkg:pypi/hf-xet@1.2.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/hf-xet@1.2.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "description": "A minimal low-level HTTP client.",
+      "purl": "pkg:pypi/httpcore@1.0.9",
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpcore@1.0.9",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "httpx",
+      "version": "0.28.1",
+      "description": "The next generation HTTP client.",
+      "purl": "pkg:pypi/httpx@0.28.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpx@0.28.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "huggingface-hub",
+      "version": "0.36.0",
+      "description": "Client library to download and publish models, datasets and other repos on the huggingface.co hub",
+      "purl": "pkg:pypi/huggingface-hub@0.36.0",
+      "type": "framework",
+      "bom-ref": "pkg:pypi/huggingface-hub@0.36.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8.0"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "framework" ]
+    },
+    {
+      "group": "",
+      "name": "identify",
+      "version": "2.6.15",
+      "description": "File identification library for Python",
+      "purl": "pkg:pypi/identify@2.6.15",
+      "type": "library",
+      "bom-ref": "pkg:pypi/identify@2.6.15",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "idna",
+      "version": "3.11",
+      "description": "Internationalized Domain Names in Applications (IDNA)",
+      "purl": "pkg:pypi/idna@3.11",
+      "type": "library",
+      "bom-ref": "pkg:pypi/idna@3.11",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "iniconfig",
+      "version": "2.3.0",
+      "description": "brain-dead simple config-ini parsing",
+      "purl": "pkg:pypi/iniconfig@2.3.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/iniconfig@2.3.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "isort",
+      "version": "6.1.0",
+      "description": "A Python utility / library to sort Python imports.",
+      "purl": "pkg:pypi/isort@6.1.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/isort@6.1.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9.0"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "jinja2",
+      "version": "3.1.6",
+      "description": "A very fast and expressive template engine.",
+      "purl": "pkg:pypi/jinja2@3.1.6",
+      "type": "library",
+      "bom-ref": "pkg:pypi/jinja2@3.1.6",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "template" ]
+    },
+    {
+      "group": "",
+      "name": "joblib",
+      "version": "1.5.2",
+      "description": "Lightweight pipelining with Python functions",
+      "purl": "pkg:pypi/joblib@1.5.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/joblib@1.5.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "markupsafe",
+      "version": "3.0.3",
+      "description": "Safely add untrusted strings to HTML/XML markup.",
+      "purl": "pkg:pypi/markupsafe@3.0.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/markupsafe@3.0.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "mccabe",
+      "version": "0.7.0",
+      "description": "McCabe checker, plugin for flake8",
+      "purl": "pkg:pypi/mccabe@0.7.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/mccabe@0.7.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.6"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "mpmath",
+      "version": "1.3.0",
+      "description": "Python library for arbitrary-precision floating-point arithmetic",
+      "purl": "pkg:pypi/mpmath@1.3.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/mpmath@1.3.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "*"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "mypy-extensions",
+      "version": "1.1.0",
+      "description": "Type system extensions for programs checked with the mypy type checker.",
+      "purl": "pkg:pypi/mypy-extensions@1.1.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/mypy-extensions@1.1.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "mysql",
+      "version": "0.0.3",
+      "description": "Virtual package for MySQL-python",
+      "purl": "pkg:pypi/mysql@0.0.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/mysql@0.0.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "*"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "mysql-connector-python",
+      "version": "9.4.0",
+      "description": "A self-contained Python driver for communicating with MySQL servers, using an API that is compliant with the Python Database API Specification v2.0 (PEP 249).",
+      "purl": "pkg:pypi/mysql-connector-python@9.4.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/mysql-connector-python@9.4.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "api", "database", "mysql" ]
+    },
+    {
+      "group": "",
+      "name": "mysqlclient",
+      "version": "2.2.7",
+      "description": "Python interface to MySQL",
+      "purl": "pkg:pypi/mysqlclient@2.2.7",
+      "type": "library",
+      "bom-ref": "pkg:pypi/mysqlclient@2.2.7",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "networkx",
+      "version": "3.6",
+      "description": "Python package for creating and manipulating graphs and networks",
+      "purl": "pkg:pypi/networkx@3.6",
+      "type": "library",
+      "bom-ref": "pkg:pypi/networkx@3.6",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.11"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nodeenv",
+      "version": "1.9.1",
+      "description": "Node.js virtual environment builder",
+      "purl": "pkg:pypi/nodeenv@1.9.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nodeenv@1.9.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "numpy",
+      "version": "2.3.5",
+      "description": "Fundamental package for array computing in Python",
+      "purl": "pkg:pypi/numpy@2.3.5",
+      "type": "framework",
+      "bom-ref": "pkg:pypi/numpy@2.3.5",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.11"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "framework" ]
+    },
+    {
+      "group": "",
+      "name": "nvidia-cublas-cu12",
+      "version": "12.8.4.1",
+      "description": "CUBLAS native runtime libraries",
+      "purl": "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cuda-cupti-cu12",
+      "version": "12.8.90",
+      "description": "CUDA profiling tools runtime libs.",
+      "purl": "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "tools" ]
+    },
+    {
+      "group": "",
+      "name": "nvidia-cuda-nvrtc-cu12",
+      "version": "12.8.93",
+      "description": "NVRTC native runtime libraries",
+      "purl": "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cuda-runtime-cu12",
+      "version": "12.8.90",
+      "description": "CUDA Runtime native Libraries",
+      "purl": "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cudnn-cu12",
+      "version": "9.10.2.21",
+      "description": "cuDNN runtime libraries",
+      "purl": "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cufft-cu12",
+      "version": "11.3.3.83",
+      "description": "CUFFT native runtime libraries",
+      "purl": "pkg:pypi/nvidia-cufft-cu12@11.3.3.83",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cufft-cu12@11.3.3.83",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cufile-cu12",
+      "version": "1.13.1.3",
+      "description": "cuFile GPUDirect libraries",
+      "purl": "pkg:pypi/nvidia-cufile-cu12@1.13.1.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cufile-cu12@1.13.1.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-curand-cu12",
+      "version": "10.3.9.90",
+      "description": "CURAND native runtime libraries",
+      "purl": "pkg:pypi/nvidia-curand-cu12@10.3.9.90",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-curand-cu12@10.3.9.90",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cusolver-cu12",
+      "version": "11.7.3.90",
+      "description": "CUDA solver native runtime libraries",
+      "purl": "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cusparse-cu12",
+      "version": "12.5.8.93",
+      "description": "CUSPARSE native runtime libraries",
+      "purl": "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-cusparselt-cu12",
+      "version": "0.7.1",
+      "description": "NVIDIA cuSPARSELt",
+      "purl": "pkg:pypi/nvidia-cusparselt-cu12@0.7.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-cusparselt-cu12@0.7.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "*"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-nccl-cu12",
+      "version": "2.27.5",
+      "description": "NVIDIA Collective Communication Library (NCCL) Runtime",
+      "purl": "pkg:pypi/nvidia-nccl-cu12@2.27.5",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nccl-cu12@2.27.5",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-nvjitlink-cu12",
+      "version": "12.8.93",
+      "description": "Nvidia JIT LTO Library",
+      "purl": "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-nvshmem-cu12",
+      "version": "3.3.20",
+      "description": "NVSHMEM creates a global address space that provides efficient and scalable communication for NVIDIA GPU clusters.",
+      "purl": "pkg:pypi/nvidia-nvshmem-cu12@3.3.20",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nvshmem-cu12@3.3.20",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "nvidia-nvtx-cu12",
+      "version": "12.8.90",
+      "description": "NVIDIA Tools Extension",
+      "purl": "pkg:pypi/nvidia-nvtx-cu12@12.8.90",
+      "type": "library",
+      "bom-ref": "pkg:pypi/nvidia-nvtx-cu12@12.8.90",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "tools" ]
+    },
+    {
+      "group": "",
+      "name": "openpyxl",
+      "version": "3.1.5",
+      "description": "A Python library to read/write Excel 2010 xlsx/xlsm files",
+      "purl": "pkg:pypi/openpyxl@3.1.5",
+      "type": "library",
+      "bom-ref": "pkg:pypi/openpyxl@3.1.5",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "packaging",
+      "version": "25.0",
+      "description": "Core utilities for Python packages",
+      "purl": "pkg:pypi/packaging@25.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/packaging@25.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pandas",
+      "version": "2.2.3",
+      "description": "Powerful data structures for data analysis, time series, and statistics",
+      "purl": "pkg:pypi/pandas@2.2.3",
+      "type": "framework",
+      "bom-ref": "pkg:pypi/pandas@2.2.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "framework" ]
+    },
+    {
+      "group": "",
+      "name": "pathspec",
+      "version": "0.12.1",
+      "description": "Utility library for gitignore style pattern matching of file paths.",
+      "purl": "pkg:pypi/pathspec@0.12.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pathspec@0.12.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pillow",
+      "version": "12.0.0",
+      "description": "Python Imaging Library (fork)",
+      "purl": "pkg:pypi/pillow@12.0.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pillow@12.0.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "platformdirs",
+      "version": "4.5.0",
+      "description": "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`.",
+      "purl": "pkg:pypi/platformdirs@4.5.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/platformdirs@4.5.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pluggy",
+      "version": "1.6.0",
+      "description": "plugin and hook calling mechanisms for python",
+      "purl": "pkg:pypi/pluggy@1.6.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pluggy@1.6.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pre-commit",
+      "version": "4.5.0",
+      "description": "A framework for managing and maintaining multi-language pre-commit hooks.",
+      "purl": "pkg:pypi/pre-commit@4.5.0",
+      "type": "framework",
+      "bom-ref": "pkg:pypi/pre-commit@4.5.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "framework" ]
+    },
+    {
+      "group": "",
+      "name": "pycparser",
+      "version": "2.23",
+      "description": "C parser in Python",
+      "purl": "pkg:pypi/pycparser@2.23",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pycparser@2.23",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "parse" ]
+    },
+    {
+      "group": "",
+      "name": "pydantic",
+      "version": "2.11.7",
+      "description": "Data validation using Python type hints",
+      "purl": "pkg:pypi/pydantic@2.11.7",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic@2.11.7",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "validation" ]
+    },
+    {
+      "group": "",
+      "name": "pydantic-core",
+      "version": "2.33.2",
+      "description": "Core functionality for Pydantic validation and serialization",
+      "purl": "pkg:pypi/pydantic-core@2.33.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic-core@2.33.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "validation" ]
+    },
+    {
+      "group": "",
+      "name": "pygments",
+      "version": "2.19.2",
+      "description": "Pygments is a syntax highlighting package written in Python.",
+      "purl": "pkg:pypi/pygments@2.19.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pygments@2.19.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pylint",
+      "version": "3.3.9",
+      "description": "python code static checker",
+      "purl": "pkg:pypi/pylint@3.3.9",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pylint@3.3.9",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9.0"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pymysql",
+      "version": "1.1.2",
+      "description": "Pure Python MySQL Driver",
+      "purl": "pkg:pypi/pymysql@1.1.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pymysql@1.1.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "mysql" ]
+    },
+    {
+      "group": "",
+      "name": "pytest",
+      "version": "8.4.2",
+      "description": "pytest: simple powerful testing with Python",
+      "purl": "pkg:pypi/pytest@8.4.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest@8.4.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pytest-asyncio",
+      "version": "0.23.8",
+      "description": "Pytest support for asyncio",
+      "purl": "pkg:pypi/pytest-asyncio@0.23.8",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-asyncio@0.23.8",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pytest-cov",
+      "version": "4.1.0",
+      "description": "Pytest plugin for measuring coverage.",
+      "purl": "pkg:pypi/pytest-cov@4.1.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-cov@4.1.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pytest-dependency",
+      "version": "0.6.0",
+      "description": "Manage dependencies of tests",
+      "purl": "pkg:pypi/pytest-dependency@0.6.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-dependency@0.6.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.4"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pytest-html",
+      "version": "4.1.1",
+      "description": "pytest plugin for generating HTML reports",
+      "purl": "pkg:pypi/pytest-html@4.1.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-html@4.1.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "html" ]
+    },
+    {
+      "group": "",
+      "name": "pytest-metadata",
+      "version": "3.1.1",
+      "description": "pytest plugin for test session metadata",
+      "purl": "pkg:pypi/pytest-metadata@3.1.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-metadata@3.1.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "test" ]
+    },
+    {
+      "group": "",
+      "name": "pytest-mock",
+      "version": "3.15.1",
+      "description": "Thin-wrapper around the mock package for easier use with pytest",
+      "purl": "pkg:pypi/pytest-mock@3.15.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-mock@3.15.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "mock" ]
+    },
+    {
+      "group": "",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "description": "Extensions to the standard Python datetime module",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "python-dotenv",
+      "version": "1.0.0",
+      "description": "Read key-value pairs from a .env file and set them as environment variables",
+      "purl": "pkg:pypi/python-dotenv@1.0.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-dotenv@1.0.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pytz",
+      "version": "2025.2",
+      "description": "World timezone definitions, modern and historical",
+      "purl": "pkg:pypi/pytz@2025.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytz@2025.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "*"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "description": "YAML parser and emitter for Python",
+      "purl": "pkg:pypi/pyyaml@6.0.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyyaml@6.0.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "rapidfuzz",
+      "version": "3.14.3",
+      "description": "rapid fuzzy string matching",
+      "purl": "pkg:pypi/rapidfuzz@3.14.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/rapidfuzz@3.14.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "regex",
+      "version": "2025.11.3",
+      "description": "Alternative regular expression module, to replace re.",
+      "purl": "pkg:pypi/regex@2025.11.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/regex@2025.11.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "requests",
+      "version": "2.31.0",
+      "description": "Python HTTP for Humans.",
+      "purl": "pkg:pypi/requests@2.31.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/requests@2.31.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "responses",
+      "version": "0.25.8",
+      "description": "A utility library for mocking out the `requests` Python library.",
+      "purl": "pkg:pypi/responses@0.25.8",
+      "type": "library",
+      "bom-ref": "pkg:pypi/responses@0.25.8",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "respx",
+      "version": "0.21.1",
+      "description": "A utility for mocking out the Python HTTPX and HTTP Core libraries.",
+      "purl": "pkg:pypi/respx@0.21.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/respx@0.21.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "safetensors",
+      "version": "0.7.0",
+      "purl": "pkg:pypi/safetensors@0.7.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/safetensors@0.7.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "scikit-learn",
+      "version": "1.7.2",
+      "description": "A set of python modules for machine learning and data mining",
+      "purl": "pkg:pypi/scikit-learn@1.7.2",
+      "type": "framework",
+      "bom-ref": "pkg:pypi/scikit-learn@1.7.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "framework" ]
+    },
+    {
+      "group": "",
+      "name": "scipy",
+      "version": "1.16.3",
+      "description": "Fundamental algorithms for scientific computing in Python",
+      "purl": "pkg:pypi/scipy@1.16.3",
+      "type": "framework",
+      "bom-ref": "pkg:pypi/scipy@1.16.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.11"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "framework" ]
+    },
+    {
+      "group": "",
+      "name": "sentence-transformers",
+      "version": "5.1.2",
+      "description": "Embeddings, Retrieval, and Reranking",
+      "purl": "pkg:pypi/sentence-transformers@5.1.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/sentence-transformers@5.1.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "transform" ]
+    },
+    {
+      "group": "",
+      "name": "setuptools",
+      "version": "80.9.0",
+      "description": "Easily download, build, install, upgrade, and uninstall Python packages",
+      "purl": "pkg:pypi/setuptools@80.9.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/setuptools@80.9.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "six",
+      "version": "1.17.0",
+      "description": "Python 2 and 3 compatibility utilities",
+      "purl": "pkg:pypi/six@1.17.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/six@1.17.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "sniffio",
+      "version": "1.3.1",
+      "description": "Sniff out which async library your code is running under",
+      "purl": "pkg:pypi/sniffio@1.3.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/sniffio@1.3.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "native" ]
+    },
+    {
+      "group": "",
+      "name": "starlette",
+      "version": "0.49.3",
+      "description": "The little ASGI library that shines.",
+      "purl": "pkg:pypi/starlette@0.49.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/starlette@0.49.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "sympy",
+      "version": "1.14.0",
+      "description": "Computer algebra system (CAS) in Python",
+      "purl": "pkg:pypi/sympy@1.14.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/sympy@1.14.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "threadpoolctl",
+      "version": "3.6.0",
+      "description": "threadpoolctl",
+      "purl": "pkg:pypi/threadpoolctl@3.6.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/threadpoolctl@3.6.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "tokenizers",
+      "version": "0.22.1",
+      "purl": "pkg:pypi/tokenizers@0.22.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/tokenizers@0.22.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "tomlkit",
+      "version": "0.13.3",
+      "description": "Style preserving TOML library",
+      "purl": "pkg:pypi/tomlkit@0.13.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/tomlkit@0.13.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "torch",
+      "version": "2.9.1",
+      "description": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "purl": "pkg:pypi/torch@2.9.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/torch@2.9.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "tqdm",
+      "version": "4.67.1",
+      "description": "Fast, Extensible Progress Meter",
+      "purl": "pkg:pypi/tqdm@4.67.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/tqdm@4.67.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.7"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "transformers",
+      "version": "4.57.3",
+      "description": "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow",
+      "purl": "pkg:pypi/transformers@4.57.3",
+      "type": "library",
+      "bom-ref": "pkg:pypi/transformers@4.57.3",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9.0"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "transform" ]
+    },
+    {
+      "group": "",
+      "name": "triton",
+      "version": "3.5.1",
+      "description": "A language and compiler for custom Deep Learning operations",
+      "purl": "pkg:pypi/triton@3.5.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/triton@3.5.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": "<3.15,>=3.10"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "typing-extensions",
+      "version": "4.15.0",
+      "description": "Backported and Experimental Type Hints for Python 3.9+",
+      "purl": "pkg:pypi/typing-extensions@4.15.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/typing-extensions@4.15.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "devel" ]
+    },
+    {
+      "group": "",
+      "name": "typing-inspection",
+      "version": "0.4.2",
+      "description": "Runtime typing introspection tools",
+      "purl": "pkg:pypi/typing-inspection@0.4.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/typing-inspection@0.4.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "devel" ]
+    },
+    {
+      "group": "",
+      "name": "tzdata",
+      "version": "2025.2",
+      "description": "Provider of IANA time zone data",
+      "purl": "pkg:pypi/tzdata@2025.2",
+      "type": "library",
+      "bom-ref": "pkg:pypi/tzdata@2025.2",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=2"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "tzlocal",
+      "version": "5.3.1",
+      "description": "tzinfo object for the local timezone",
+      "purl": "pkg:pypi/tzlocal@5.3.1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/tzlocal@5.3.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "urllib3",
+      "version": "2.5.0",
+      "description": "HTTP library with thread-safe connection pooling, file post, and more.",
+      "purl": "pkg:pypi/urllib3@2.5.0",
+      "type": "library",
+      "bom-ref": "pkg:pypi/urllib3@2.5.0",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.9"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "uvicorn",
+      "version": "0.24.0.post1",
+      "description": "The lightning-fast ASGI server.",
+      "purl": "pkg:pypi/uvicorn@0.24.0.post1",
+      "type": "library",
+      "bom-ref": "pkg:pypi/uvicorn@0.24.0.post1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "group": "",
+      "name": "virtualenv",
+      "version": "20.35.4",
+      "description": "Virtual Python Environment builder",
+      "purl": "pkg:pypi/virtualenv@20.35.4",
+      "type": "library",
+      "bom-ref": "pkg:pypi/virtualenv@20.35.4",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "pyproject.toml"
+        },
+        {
+          "name": "cdx:pypi:requiresPython",
+          "value": ">=3.8"
+        }
+      ],
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "methods": [
+              {
+                "technique": "manifest-analysis",
+                "confidence": 1,
+                "value": "poetry.lock"
+              }
+            ],
+            "concludedValue": "poetry.lock"
+          }
+        ]
+      },
+      "tags": [ "devel" ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:pypi/pydeps@latest",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/aiomysql@0.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/annotated-doc@0.0.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/annotated-types@0.7.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/anyio@3.7.1",
+      "dependsOn": [ "pkg:pypi/idna@3.11", "pkg:pypi/sniffio@1.3.1" ]
+    },
+    {
+      "ref": "pkg:pypi/apscheduler@3.10.4",
+      "dependsOn": [ "pkg:pypi/pytz@2025.2", "pkg:pypi/six@1.17.0", "pkg:pypi/tzlocal@5.3.1" ]
+    },
+    {
+      "ref": "pkg:pypi/astroid@3.3.11",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/black@24.10.0",
+      "dependsOn": [ "pkg:pypi/click@8.3.1", "pkg:pypi/mypy-extensions@1.1.0", "pkg:pypi/packaging@25.0", "pkg:pypi/pathspec@0.12.1", "pkg:pypi/platformdirs@4.5.0" ]
+    },
+    {
+      "ref": "pkg:pypi/certifi@2025.11.12",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/cffi@2.0.0",
+      "dependsOn": [ "pkg:pypi/pycparser@2.23" ]
+    },
+    {
+      "ref": "pkg:pypi/cfgv@3.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/charset-normalizer@3.4.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/click@8.3.1",
+      "dependsOn": [ "pkg:pypi/colorama@0.4.6" ]
+    },
+    {
+      "ref": "pkg:pypi/colorama@0.4.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/coverage@7.12.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/cryptography@46.0.1",
+      "dependsOn": [ "pkg:pypi/cffi@2.0.0" ]
+    },
+    {
+      "ref": "pkg:pypi/dill@0.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/distlib@0.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/et-xmlfile@2.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/fastapi@0.121.0",
+      "dependsOn": [ "pkg:pypi/annotated-doc@0.0.4", "pkg:pypi/pydantic@2.11.7", "pkg:pypi/starlette@0.49.3", "pkg:pypi/typing-extensions@4.15.0" ]
+    },
+    {
+      "ref": "pkg:pypi/filelock@3.20.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/fsspec@2025.10.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/h11@0.16.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/hf-xet@1.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/httpcore@1.0.9",
+      "dependsOn": [ "pkg:pypi/certifi@2025.11.12", "pkg:pypi/h11@0.16.0" ]
+    },
+    {
+      "ref": "pkg:pypi/httpx@0.28.1",
+      "dependsOn": [ "pkg:pypi/anyio@3.7.1", "pkg:pypi/certifi@2025.11.12", "pkg:pypi/httpcore@1.0.9", "pkg:pypi/idna@3.11" ]
+    },
+    {
+      "ref": "pkg:pypi/huggingface-hub@0.36.0",
+      "dependsOn": [ "pkg:pypi/filelock@3.20.0", "pkg:pypi/fsspec@2025.10.0", "pkg:pypi/hf-xet@1.2.0", "pkg:pypi/packaging@25.0", "pkg:pypi/pyyaml@6.0.3", "pkg:pypi/requests@2.31.0", "pkg:pypi/tqdm@4.67.1", "pkg:pypi/typing-extensions@4.15.0" ]
+    },
+    {
+      "ref": "pkg:pypi/identify@2.6.15",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/idna@3.11",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/iniconfig@2.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/isort@6.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/jinja2@3.1.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/joblib@1.5.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/markupsafe@3.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mccabe@0.7.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mpmath@1.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mypy-extensions@1.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mysql@0.0.3",
+      "dependsOn": [ "pkg:pypi/mysqlclient@2.2.7" ]
+    },
+    {
+      "ref": "pkg:pypi/mysql-connector-python@9.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mysqlclient@2.2.7",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/networkx@3.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nodeenv@1.9.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/numpy@2.3.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cublas-cu12@12.8.4.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21",
+      "dependsOn": [ "pkg:pypi/nvidia-cublas-cu12@12.8.4.1" ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cufft-cu12@11.3.3.83",
+      "dependsOn": [ "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93" ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cufile-cu12@1.13.1.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-curand-cu12@10.3.9.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90",
+      "dependsOn": [ "pkg:pypi/nvidia-cublas-cu12@12.8.4.1", "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93", "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93" ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93",
+      "dependsOn": [ "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93" ]
+    },
+    {
+      "ref": "pkg:pypi/nvidia-cusparselt-cu12@0.7.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nccl-cu12@2.27.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nvshmem-cu12@3.3.20",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/nvidia-nvtx-cu12@12.8.90",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/openpyxl@3.1.5",
+      "dependsOn": [ "pkg:pypi/et-xmlfile@2.0.0" ]
+    },
+    {
+      "ref": "pkg:pypi/packaging@25.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pandas@2.2.3",
+      "dependsOn": [ "pkg:pypi/numpy@2.3.5", "pkg:pypi/python-dateutil@2.9.0.post0", "pkg:pypi/pytz@2025.2", "pkg:pypi/tzdata@2025.2" ]
+    },
+    {
+      "ref": "pkg:pypi/pathspec@0.12.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pillow@12.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/platformdirs@4.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pluggy@1.6.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pre-commit@4.5.0",
+      "dependsOn": [ "pkg:pypi/cfgv@3.5.0", "pkg:pypi/identify@2.6.15", "pkg:pypi/nodeenv@1.9.1", "pkg:pypi/pyyaml@6.0.3", "pkg:pypi/virtualenv@20.35.4" ]
+    },
+    {
+      "ref": "pkg:pypi/pycparser@2.23",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pydantic@2.11.7",
+      "dependsOn": [ "pkg:pypi/annotated-types@0.7.0", "pkg:pypi/pydantic-core@2.33.2", "pkg:pypi/typing-extensions@4.15.0", "pkg:pypi/typing-inspection@0.4.2" ]
+    },
+    {
+      "ref": "pkg:pypi/pydantic-core@2.33.2",
+      "dependsOn": [ "pkg:pypi/typing-extensions@4.15.0" ]
+    },
+    {
+      "ref": "pkg:pypi/pygments@2.19.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pylint@3.3.9",
+      "dependsOn": [ "pkg:pypi/astroid@3.3.11", "pkg:pypi/colorama@0.4.6", "pkg:pypi/dill@0.4.0", "pkg:pypi/isort@6.1.0", "pkg:pypi/mccabe@0.7.0", "pkg:pypi/platformdirs@4.5.0", "pkg:pypi/tomlkit@0.13.3" ]
+    },
+    {
+      "ref": "pkg:pypi/pymysql@1.1.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pytest@8.4.2",
+      "dependsOn": [ "pkg:pypi/colorama@0.4.6", "pkg:pypi/iniconfig@2.3.0", "pkg:pypi/packaging@25.0", "pkg:pypi/pluggy@1.6.0", "pkg:pypi/pygments@2.19.2" ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-asyncio@0.23.8",
+      "dependsOn": [ "pkg:pypi/pytest@8.4.2" ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-cov@4.1.0",
+      "dependsOn": [ "pkg:pypi/coverage@7.12.0", "pkg:pypi/pytest@8.4.2" ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-dependency@0.6.0",
+      "dependsOn": [ "pkg:pypi/pytest@8.4.2", "pkg:pypi/setuptools@80.9.0" ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-html@4.1.1",
+      "dependsOn": [ "pkg:pypi/jinja2@3.1.6", "pkg:pypi/pytest-metadata@3.1.1", "pkg:pypi/pytest@8.4.2" ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-metadata@3.1.1",
+      "dependsOn": [ "pkg:pypi/pytest@8.4.2" ]
+    },
+    {
+      "ref": "pkg:pypi/pytest-mock@3.15.1",
+      "dependsOn": [ "pkg:pypi/pytest@8.4.2" ]
+    },
+    {
+      "ref": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "dependsOn": [ "pkg:pypi/six@1.17.0" ]
+    },
+    {
+      "ref": "pkg:pypi/python-dotenv@1.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pytz@2025.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pyyaml@6.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/rapidfuzz@3.14.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/regex@2025.11.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/requests@2.31.0",
+      "dependsOn": [ "pkg:pypi/certifi@2025.11.12", "pkg:pypi/charset-normalizer@3.4.4", "pkg:pypi/idna@3.11", "pkg:pypi/urllib3@2.5.0" ]
+    },
+    {
+      "ref": "pkg:pypi/responses@0.25.8",
+      "dependsOn": [ "pkg:pypi/pyyaml@6.0.3", "pkg:pypi/requests@2.31.0", "pkg:pypi/urllib3@2.5.0" ]
+    },
+    {
+      "ref": "pkg:pypi/respx@0.21.1",
+      "dependsOn": [ "pkg:pypi/httpx@0.28.1" ]
+    },
+    {
+      "ref": "pkg:pypi/safetensors@0.7.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/scikit-learn@1.7.2",
+      "dependsOn": [ "pkg:pypi/joblib@1.5.2", "pkg:pypi/numpy@2.3.5", "pkg:pypi/scipy@1.16.3", "pkg:pypi/threadpoolctl@3.6.0" ]
+    },
+    {
+      "ref": "pkg:pypi/scipy@1.16.3",
+      "dependsOn": [ "pkg:pypi/numpy@2.3.5" ]
+    },
+    {
+      "ref": "pkg:pypi/sentence-transformers@5.1.2",
+      "dependsOn": [ "pkg:pypi/huggingface-hub@0.36.0", "pkg:pypi/scikit-learn@1.7.2", "pkg:pypi/scipy@1.16.3", "pkg:pypi/torch@2.9.1", "pkg:pypi/tqdm@4.67.1", "pkg:pypi/transformers@4.57.3" ]
+    },
+    {
+      "ref": "pkg:pypi/setuptools@80.9.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/six@1.17.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/sniffio@1.3.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/starlette@0.49.3",
+      "dependsOn": [ "pkg:pypi/anyio@3.7.1" ]
+    },
+    {
+      "ref": "pkg:pypi/sympy@1.14.0",
+      "dependsOn": [ "pkg:pypi/mpmath@1.3.0" ]
+    },
+    {
+      "ref": "pkg:pypi/threadpoolctl@3.6.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/tokenizers@0.22.1",
+      "dependsOn": [ "pkg:pypi/huggingface-hub@0.36.0" ]
+    },
+    {
+      "ref": "pkg:pypi/tomlkit@0.13.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/torch@2.9.1",
+      "dependsOn": [ "pkg:pypi/filelock@3.20.0", "pkg:pypi/fsspec@2025.10.0", "pkg:pypi/jinja2@3.1.6", "pkg:pypi/networkx@3.6", "pkg:pypi/nvidia-cublas-cu12@12.8.4.1", "pkg:pypi/nvidia-cuda-cupti-cu12@12.8.90", "pkg:pypi/nvidia-cuda-nvrtc-cu12@12.8.93", "pkg:pypi/nvidia-cuda-runtime-cu12@12.8.90", "pkg:pypi/nvidia-cudnn-cu12@9.10.2.21", "pkg:pypi/nvidia-cufft-cu12@11.3.3.83", "pkg:pypi/nvidia-cufile-cu12@1.13.1.3", "pkg:pypi/nvidia-curand-cu12@10.3.9.90", "pkg:pypi/nvidia-cusolver-cu12@11.7.3.90", "pkg:pypi/nvidia-cusparse-cu12@12.5.8.93", "pkg:pypi/nvidia-cusparselt-cu12@0.7.1", "pkg:pypi/nvidia-nccl-cu12@2.27.5", "pkg:pypi/nvidia-nvjitlink-cu12@12.8.93", "pkg:pypi/nvidia-nvshmem-cu12@3.3.20", "pkg:pypi/nvidia-nvtx-cu12@12.8.90", "pkg:pypi/setuptools@80.9.0", "pkg:pypi/sympy@1.14.0", "pkg:pypi/triton@3.5.1", "pkg:pypi/typing-extensions@4.15.0" ]
+    },
+    {
+      "ref": "pkg:pypi/tqdm@4.67.1",
+      "dependsOn": [ "pkg:pypi/colorama@0.4.6" ]
+    },
+    {
+      "ref": "pkg:pypi/transformers@4.57.3",
+      "dependsOn": [ "pkg:pypi/filelock@3.20.0", "pkg:pypi/huggingface-hub@0.36.0", "pkg:pypi/numpy@2.3.5", "pkg:pypi/packaging@25.0", "pkg:pypi/pyyaml@6.0.3", "pkg:pypi/regex@2025.11.3", "pkg:pypi/requests@2.31.0", "pkg:pypi/safetensors@0.7.0", "pkg:pypi/tokenizers@0.22.1", "pkg:pypi/tqdm@4.67.1" ]
+    },
+    {
+      "ref": "pkg:pypi/triton@3.5.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/typing-extensions@4.15.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/typing-inspection@0.4.2",
+      "dependsOn": [ "pkg:pypi/typing-extensions@4.15.0" ]
+    },
+    {
+      "ref": "pkg:pypi/tzdata@2025.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/tzlocal@5.3.1",
+      "dependsOn": [ "pkg:pypi/tzdata@2025.2" ]
+    },
+    {
+      "ref": "pkg:pypi/urllib3@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/uvicorn@0.24.0.post1",
+      "dependsOn": [ "pkg:pypi/click@8.3.1", "pkg:pypi/h11@0.16.0" ]
+    },
+    {
+      "ref": "pkg:pypi/virtualenv@20.35.4",
+      "dependsOn": [ "pkg:pypi/distlib@0.4.0", "pkg:pypi/filelock@3.20.0", "pkg:pypi/platformdirs@4.5.0" ]
+    }
+  ],
+  "annotations": [
+    {
+      "bom-ref": "metadata-annotations",
+      "subjects": [ "pkg:pypi/pydeps@latest" ],
+      "annotator": {
+        "component": {
+          "group": "@cyclonedx",
+          "name": "cdxgen",
+          "version": "12.0.0",
+          "purl": "pkg:npm/%40cyclonedx/cdxgen@12.0.0",
+          "type": "application",
+          "bom-ref": "pkg:npm/@cyclonedx/cdxgen@12.0.0",
+          "publisher": "OWASP Foundation",
+          "authors": [ { "name": "OWASP Foundation" } ]
+        }
+      },
+      "timestamp": "2025-12-18T06:02:25Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Thursday, December 18, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'PyDeps'. There are 110 components."
+    }
+  ]
+}

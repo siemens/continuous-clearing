@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:167dc9b4-dd8d-4f55-926a-c0f96cabf035",
+  "serialNumber": "urn:uuid:0e6a0cdf-4ed0-46be-9c22-9a9983422fa5",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-05-26T04:19:21Z",
+    "timestamp": "2026-01-21T06:39:13Z",
     "tools": {
       "components": [
         {
@@ -13,7 +13,7 @@
             "name": "Siemens AG"
           },
           "name": "Clearing Automation Tool",
-          "version": "8.0.0",
+          "version": "8.3.0",
           "externalReferences": [
             {
               "url": "https://github.com/siemens/continuous-clearing",
@@ -25,8 +25,8 @@
     },
     "component": {
       "type": "application",
-      "name": "continuous-clearing",
-      "version": "v9.0.x"
+      "name": "Test",
+      "version": "1.0"
     },
     "properties": [
       {
@@ -43,7 +43,7 @@
       "group": "joda-time",
       "name": "joda-time",
       "version": "2.9.2",
-      "scope": "optional",
+      "scope": "required",
       "hashes": [
         {
           "alg": "MD5",
@@ -131,7 +131,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "MAVEN"
+          "value": "Maven"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -147,7 +147,7 @@
         },
         {
           "name": "internal:siemens:clearing:sw360:release-url",
-          "value": "http://localhost:8090/resource/api/releases/cfeb5c55ad2742b8ac56507ea969a237"
+          "value": "http://localhost:8090/resource/api/releases/77e78f49e48845b3847a0127c90fbf93"
         },
         {
           "name": "internal:siemens:clearing:fossology:url",
@@ -162,7 +162,7 @@
       "group": "junit",
       "name": "junit",
       "version": "4.12",
-      "scope": "optional",
+      "scope": "required",
       "hashes": [
         {
           "alg": "MD5",
@@ -255,7 +255,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "MAVEN"
+          "value": "Maven"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -271,7 +271,7 @@
         },
         {
           "name": "internal:siemens:clearing:sw360:release-url",
-          "value": "http://localhost:8090/resource/api/releases/d4c4ae4b4a394f0aaab3a975c3345992"
+          "value": "http://localhost:8090/resource/api/releases/69f35274991546a48843cba3528455a7"
         },
         {
           "name": "internal:siemens:clearing:fossology:url",
@@ -356,7 +356,7 @@
         },
         {
           "name": "internal:siemens:clearing:project-type",
-          "value": "MAVEN"
+          "value": "Maven"
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
@@ -368,11 +368,11 @@
         },
         {
           "name": "internal:siemens:clearing:clearing-state",
-          "value": "Not Available"
+          "value": "NEW_CLEARING"
         },
         {
           "name": "internal:siemens:clearing:sw360:release-url",
-          "value": "http://localhost:8090/resource/api/releases/9628c57c366741eda3c4effc4c76c955"
+          "value": "http://localhost:8090/resource/api/releases/9dc6779758084b56a9fec15460458532"
         },
         {
           "name": "internal:siemens:clearing:fossology:url",
@@ -382,13 +382,6 @@
     }
   ],
   "dependencies": [
-    {
-      "ref": "pkg:maven/org.springframework/gs-maven@0.1.0",
-      "dependsOn": [
-        "pkg:maven/joda-time/joda-time@2.9.2",
-        "pkg:maven/junit/junit@4.12"
-      ]
-    },
     {
       "ref": "pkg:maven/joda-time/joda-time@2.9.2",
       "dependsOn": []
@@ -404,6 +397,7 @@
       "dependsOn": []
     }
   ],
+  "compositions": [],
   "definitions": {
     "standards": [
       {

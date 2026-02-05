@@ -33,6 +33,7 @@ namespace LCT.PackageIdentifier
     /// </summary>
     public class NpmProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : CycloneDXBomParser, IParser
     {
+        #region Fields
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
@@ -46,16 +47,30 @@ namespace LCT.PackageIdentifier
         private const string Requires = "requires";
         private const string Name = "name";
 
+        private List<Component> listOfInternalComponents = new List<Component>();
+        private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
+        #endregion
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
         public Bom ParsePackageFile(CommonAppSettings appSettings, ref Bom unSupportedBomList)
         {
+            Logger.Debug("ParsePackageFile():Starting to parse the package file for NPM components.");
             List<Component> componentsForBOM = new List<Component>();
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
             Bom bom = new Bom();
             List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
             int totalUnsupportedComponentsIdentified = 0;
-
-            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies);
-            totalComponentsIdentified = componentsForBOM.Count;
+            int duplicateComponents = 0;
+            ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
+            duplicateComponents = CommonHelper.DuplicateComponents;
+            totalComponentsIdentified = componentsForBOM.Count + duplicateComponents;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
@@ -69,7 +84,6 @@ namespace LCT.PackageIdentifier
             {
                 CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
             }
-
             bom.Components = componentsForBOM;
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
@@ -77,10 +91,15 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
-            Logger.Debug($"ParsePackageFile():End");
+            Logger.Debug("ParsePackageFile():Completed parsing the package file for NPM components.\n");
             return bom;
         }
-
+        /// <summary>
+        /// Parses a package-lock.json file and returns CycloneDX components derived from it.
+        /// </summary>
+        /// <param name="filepath">Path to the package-lock.json file.</param>
+        /// <param name="appSettings">Application settings used for exclusions and KPIs.</param>
+        /// <returns>List of components parsed from the package-lock.json file.</returns>
 
         public static List<Component> ParsePackageLockJson(string filepath, CommonAppSettings appSettings)
         {
@@ -125,23 +144,31 @@ namespace LCT.PackageIdentifier
             }
             catch (JsonReaderException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("JsonReaderException", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
+                Logger.Error(string.Format("Failed to parse JSON file. File Path: {0}. Details: {1}", filepath, ex.Message), ex);
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
             }
             catch (IOException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("IOException", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
+                Logger.Error(string.Format("IO error occurred while processing the file. File Path: {0}. Details: {1}", filepath, ex.Message), ex);
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
             }
             catch (SecurityException ex)
             {
                 Environment.ExitCode = -1;
-                Logger.Error($"ParsePackageFile():", ex);
+                LogHandlingHelper.ExceptionErrorHandling("SecurityException", "ParsePackageLockJson()", ex, $"File Path: {filepath}");
+                Logger.Error(string.Format("Security error occurred while accessing the file. File Path: {0}. Details: {1}", filepath, ex.Message), ex);
             }
 
             return lstComponentForBOM;
         }
 
+        /// <summary>
+        /// Returns a combined list of top-level dependencies and devDependencies from a package-lock.json file.
+        /// </summary>
+        /// <param name="filepath">Path to the package-lock.json file.</param>
+        /// <returns>List of JToken entries representing direct dependencies.</returns>
         private static List<JToken> GetDirectDependenciesList(string filepath)
         {
             string jsonContent = File.ReadAllText(filepath);
@@ -154,6 +181,11 @@ namespace LCT.PackageIdentifier
             return directDependencies;
         }
 
+        /// <summary>
+        /// Writes a file that documents components which appear with multiple versions.
+        /// </summary>
+        /// <param name="componentsWithMultipleVersions">List of components that have multiple versions detected.</param>
+        /// <param name="appSettings">Application settings used to determine output paths.</param>
         private static void CreateFileForMultipleVersions(List<Component> componentsWithMultipleVersions, CommonAppSettings appSettings)
         {
             MultipleVersions multipleVersions = new MultipleVersions();
@@ -198,6 +230,14 @@ namespace LCT.PackageIdentifier
         }
 
 
+        /// <summary>
+        /// Extracts components from the legacy "packages" section of certain package-lock.json versions.
+        /// </summary>
+        /// <param name="filepath">Source file path.</param>
+        /// <param name="bundledComponents">Accumulator for bundled components.</param>
+        /// <param name="lstComponentForBOM">Accumulator for components to include in BOM.</param>
+        /// <param name="noOfDevDependent">Reference counter for dev dependencies.</param>
+        /// <param name="depencyComponentList">Enumerable of JProperty dependency entries.</param>
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
@@ -253,6 +293,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Sets the Group and Name properties on a component from an NPM package identifier.
+        /// </summary>
+        /// <param name="component">Component to update.</param>
+        /// <param name="packageName">Package identifier (may include scope).</param>
         private static void SetComponentGroupAndName(Component component, string packageName)
         {
             if (packageName.Contains('@'))
@@ -265,6 +310,12 @@ namespace LCT.PackageIdentifier
                 component.Name = packageName;
             }
         }
+        /// <summary>
+        /// Resolves the package name from parsed properties or from the node_modules path.
+        /// </summary>
+        /// <param name="properties">JObject of package properties.</param>
+        /// <param name="prop">JProperty representing the package entry.</param>
+        /// <returns>Package name string.</returns>
         private static string GetPackageName(JObject properties, JProperty prop)
         {
             string packageName;
@@ -278,6 +329,12 @@ namespace LCT.PackageIdentifier
             }
             return packageName;
         }
+        /// <summary>
+        /// Determines if a given component entry is a direct dependency.
+        /// </summary>
+        /// <param name="directDependencies">List of direct dependency tokens.</param>
+        /// <param name="prop">JProperty for the component to test.</param>
+        /// <returns>"true" if direct; otherwise "false".</returns>
         public static string GetIsDirect(List<JToken> directDependencies, JProperty prop)
         {
             string subvalue = CommonHelper.GetSubstringOfLastOccurance(prop.Name, $"node_modules/");
@@ -292,6 +349,12 @@ namespace LCT.PackageIdentifier
 
             return "false";
         }
+        /// <summary>
+        /// Adds a component to bundled components list when the "bundled" flag is present.
+        /// </summary>
+        /// <param name="bundledComponents">Accumulator for bundled components.</param>
+        /// <param name="prop">JProperty representing the package entry.</param>
+        /// <param name="components">Component instance to add.</param>
         private static void CheckAndAddToBundleComponents(List<BundledComponents> bundledComponents, JProperty prop, Component components)
         {
             if (prop.Value[Bundled] != null && (!bundledComponents.Any(x => x.Name == components.Name && x.Version.Equals(components.Version, StringComparison.OrdinalIgnoreCase))))
@@ -302,6 +365,16 @@ namespace LCT.PackageIdentifier
         }
 
 
+        /// <summary>
+        /// Recursively extracts components from nested dependency structures in package-lock.json.
+        /// </summary>
+        /// <param name="filepath">Source package-lock.json path.</param>
+        /// <param name="appSettings">Application settings for exclusion checks.</param>
+        /// <param name="bundledComponents">Accumulator for bundled components.</param>
+        /// <param name="lstComponentForBOM">Accumulator for components to add to the BOM.</param>
+        /// <param name="noOfDevDependent">Reference dev-dependency counter.</param>
+        /// <param name="depencyComponentList">Enumerable of dependency JProperty entries.</param>
+        /// <param name="directDependenciesList">List of tokens representing direct dependencies.</param>
         private static void GetComponentsForBom(string filepath, CommonAppSettings appSettings,
             ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM,
             ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList, List<JToken> directDependenciesList)
@@ -365,6 +438,7 @@ namespace LCT.PackageIdentifier
             ComponentIdentification componentData, CommonAppSettings appSettings,
             IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("IdentificationOfInternalComponents(): Starting identification of internal components.");
             // get the  component list from Jfrog for given repo
             List<AqlResult> aqlResultList =
                 await bomhelper.GetNpmListOfComponentsFromRepo(appSettings.Npm.Artifactory.InternalRepos, jFrogService);
@@ -379,13 +453,16 @@ namespace LCT.PackageIdentifier
             // update the comparison bom data
             componentData.comparisonBOMData = processedComponents;
             componentData.internalComponents = internalComponents;
-
+            listOfInternalComponents = internalComponents;
+            Logger.DebugFormat("IdentificationOfInternalComponents(): identified internal components:{0}.", internalComponents.Count);
+            Logger.Debug("IdentificationOfInternalComponents(): Completed identification of internal components.\n");
             return componentData;
         }
 
         public async Task<List<Component>> GetJfrogRepoDetailsOfAComponent(List<Component> componentsForBOM,
             CommonAppSettings appSettings, IJFrogService jFrogService, IBomHelper bomhelper)
         {
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
             // get the  component list from Jfrog for given repo + internal repo
             string[] repoList = CommonHelper.GetRepoList(appSettings);
             List<AqlResult> aqlResultList = await bomhelper.GetNpmListOfComponentsFromRepo(repoList, jFrogService);
@@ -398,6 +475,9 @@ namespace LCT.PackageIdentifier
                 var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
                 modifiedBOM.Add(processedComponent);
             }
+            LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
+
+            Logger.Debug("GetJfrogRepoDetailsOfAComponent():Completed retrieving JFrog repository details for components.\n");
             return modifiedBOM;
         }
 
@@ -458,30 +538,57 @@ namespace LCT.PackageIdentifier
                 noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
         }
 
-        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        /// <summary>
+        /// Scans the input folder for NPM-related files and parses them into components and dependencies.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing input folder and NPM config.</param>
+        /// <param name="componentsForBOM">Reference list to populate with discovered components.</param>
+        /// <param name="bom">Reference BOM that may be filled when parsing CycloneDX/SPDX files.</param>
+        /// <param name="dependencies">Reference dependency list to populate.</param>
+        private void ParsingInputFileForBOM(CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies, ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile)
         {
-            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm);
+            List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Npm, environmentHelper);
             List<string> listOfTemplateBomfilePaths = new List<string>();
-
+            Bom cdxGenBomData = GetCdxGenBomData(configFiles, appSettings);
             foreach (string filepath in configFiles)
             {
                 if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
+                    Logger.DebugFormat("ParsingInputFileForBOM():Template BOM file detected: {0}", filepath);
                     listOfTemplateBomfilePaths.Add(filepath);
                     continue;
                 }
 
                 Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
-                ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
+                ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
+            CommonHelper.EnrichCdxGenforPackagefilesData(
+                ref ListofComponentsFromLockFile,
+                ref ListofDependenciesFromLockFile,
+                ref componentsForBOM,
+                ref dependencies,
+                cdxGenBomData);
 
             string templateFilePath = SbomTemplate.GetFilePathForTemplate(listOfTemplateBomfilePaths);
             SbomTemplate.ProcessTemplateFile(templateFilePath, _cycloneDXBomParser, componentsForBOM, appSettings.ProjectType);
         }
-
-        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
+        private Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings)
         {
-            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension))
+            return CommonIdentiferHelper.GetCdxGenBomData(configFiles, appSettings, _cycloneDXBomParser.ParseCycloneDXBom);
+        }
+
+        /// <summary>
+        /// Dispatches processing based on the file type (CycloneDX, SPDX or package file).
+        /// </summary>
+        /// <param name="filepath">Path of the file to process.</param>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="componentsForBOM">Reference component list.</param>
+        /// <param name="bom">Reference BOM to update.</param>
+        /// <param name="dependencies">Reference dependency list.</param>
+        private void ProcessFileBasedOnType(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies, ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile)
+
+        {
+            if (filepath.EndsWith(FileConstant.CycloneDXFileExtension) || filepath.EndsWith(FileConstant.DependencyFileExtension))
             {
                 ProcessCycloneDXFile(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies);
             }
@@ -491,10 +598,18 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                ProcessPackageFile(filepath, appSettings, ref componentsForBOM, ref dependencies);
+                ProcessPackageFile(filepath, appSettings, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
         }
 
+        /// <summary>
+        /// Parses a CycloneDX file and merges its components and dependencies into the accumulators.
+        /// </summary>
+        /// <param name="filepath">CycloneDX file path.</param>
+        /// <param name="appSettings">Application settings for filtering.</param>
+        /// <param name="componentsForBOM">Reference component list.</param>
+        /// <param name="bom">Reference BOM to update.</param>
+        /// <param name="dependencies">Reference dependency list.</param>
         private void ProcessCycloneDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
             if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
@@ -502,7 +617,7 @@ namespace LCT.PackageIdentifier
                 return;
             }
 
-            Logger.Debug($"ParsingInputFileForBOM():Found as CycloneDXFile");
+            Logger.DebugFormat("ProcessCycloneDXFile():CycloneDX file detected: {0}", filepath);
             bom = ParseCycloneDXBom(filepath);
 
             if (bom.Components != null)
@@ -512,6 +627,7 @@ namespace LCT.PackageIdentifier
                 AddingIdentifierType(bom.Components, "CycloneDXFile", filepath);
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                 componentsForBOM.AddRange(bom.Components);
+                LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
             }
 
             if (bom.Dependencies != null)
@@ -520,11 +636,20 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Parses an SPDX file, validates and merges components and unsupported ones.
+        /// </summary>
+        /// <param name="filepath">SPDX file path.</param>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="componentsForBOM">Reference component list.</param>
+        /// <param name="bom">Reference BOM to update.</param>
+        /// <param name="dependencies">Reference dependency list.</param>
         private void ProcessSPDXFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref Bom bom, ref List<Dependency> dependencies)
         {
             BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             bom = _spdxBomParser.ParseSPDXBom(filepath);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
             bom = RemoveExcludedComponents(appSettings, bom);
             SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bom, appSettings.ProjectType, ref listUnsupportedComponents);
             AddingIdentifierType(bom.Components, "SpdxFile", filepath);
@@ -536,24 +661,42 @@ namespace LCT.PackageIdentifier
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
         }
+        /// <summary>
+        /// Processes a package file (package-lock.json) and extracts components and dependencies.
+        /// </summary>
+        /// <param name="filepath">Path to the package file.</param>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="componentsForBOM">Reference component list.</param>
+        /// <param name="dependencies">Reference dependency list.</param>
+        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofdependenciesFromLockFile)
 
-        private static void ProcessPackageFile(string filepath, CommonAppSettings appSettings, ref List<Component> componentsForBOM, ref List<Dependency> dependencies)
         {
-            Logger.Debug($"ParsingInputFileForBOM():Found as Package File");
+            Logger.Debug("ProcessPackageFile():Found as Package File");
+            CommonHelper.WarnIfDependencyFileRequired();
             var components = ParsePackageLockJson(filepath, appSettings);
+            var dependenciesFromPackageFiles = new List<Dependency>();
             AddingIdentifierType(components, "PackageFile", filepath);
-            componentsForBOM.AddRange(components);
-            GetDependencyDetails(components, dependencies);
+            ListofComponentsFromLockFile.AddRange(components);
+            GetDependencyDetails(components, dependenciesFromPackageFiles);
+            ListofdependenciesFromLockFile.AddRange(dependenciesFromPackageFiles);
+            LogHandlingHelper.IdentifierInputFileComponents(filepath, components);
         }
 
+        /// <summary>
+        /// Builds CycloneDX dependency relationships from internal manufacturer references.
+        /// </summary>
+        /// <param name="componentsForBOM">List of components for which to build dependencies.</param>
+        /// <param name="dependencies">Dependency list to populate.</param>
         public static void GetDependencyDetails(List<Component> componentsForBOM, List<Dependency> dependencies)
         {
+            Logger.Debug("GetdependencyDetails(): Starting dependency extraction process.");
             List<Dependency> dependencyList = new();
 
             foreach (var component in componentsForBOM)
             {
                 if ((component.Manufacturer?.BomRef?.Split(",")) != null)
                 {
+                    Logger.DebugFormat("GetdependencyDetails():Processing component for dependency extraction: [Name: {0}, Version: {1}, PURL: {2}, Author(s): {3}]", component.Name, component.Version, component.Purl, component.Manufacturer?.BomRef);
                     List<Dependency> subDependencies = new();
                     foreach (var item in (component.Manufacturer?.BomRef?.Split(",")).Where(item => item.Contains(':')))
                     {
@@ -585,7 +728,7 @@ namespace LCT.PackageIdentifier
                         Ref = component.Purl,
                         Dependencies = subDependencies
                     };
-
+                    Logger.DebugFormat("GetdependencyDetails():Final Dependency for Component: Ref = {0}, Sub-Dependencies = [{1}]\n", dependency.Ref, string.Join(", ", dependency.Dependencies.Select(d => d.Ref)));
                     dependencyList.Add(dependency);
 
                     component.Manufacturer = null;
@@ -594,8 +737,14 @@ namespace LCT.PackageIdentifier
                 component.Manufacturer = null;
             }
             dependencies.AddRange(dependencyList);
+            Logger.Debug("GetdependencyDetails(): Completed dependency extraction process.");
         }
 
+        /// <summary>
+        /// Normalizes component identifier strings replacing known characters.
+        /// </summary>
+        /// <param name="componentInfo">Raw component info string.</param>
+        /// <returns>Formatted string safe for PURL composition.</returns>
         private static string StringFormat(string componentInfo)
         {
             var replacements = new Dictionary<string, string> { { "@", "%40" }, { "\"", "" }, { "{", "" }, { "\r", "" }, { "}", "" }, { "\n", "" } };
@@ -604,6 +753,12 @@ namespace LCT.PackageIdentifier
             return formattedstring.Trim();
         }
 
+        /// <summary>
+        /// Determines whether a JToken represents a dev dependency and increments counter when true.
+        /// </summary>
+        /// <param name="devValue">JToken value to test.</param>
+        /// <param name="noOfDevDependent">Reference counter incremented for dev dependencies.</param>
+        /// <returns>True if devValue indicates a dev dependency; otherwise false.</returns>
         private static bool IsDevDependency(JToken devValue, ref int noOfDevDependent)
         {
             if (devValue != null)
@@ -614,6 +769,11 @@ namespace LCT.PackageIdentifier
             return devValue != null;
         }
 
+        /// <summary>
+        /// Collects bundled:true components from a dependency map into the bundledComponents list.
+        /// </summary>
+        /// <param name="subdependencies">JToken representing sub-dependencies.</param>
+        /// <param name="bundledComponents">Accumulator list for bundled components.</param>
         private static void GetBundledComponents(JToken subdependencies, ref List<BundledComponents> bundledComponents)
         {
             //changes for components with property "bundled:true" shouldn't be on BOMs 
@@ -637,6 +797,12 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Removes components that are identified as bundled from the list of components.
+        /// </summary>
+        /// <param name="bundledComponents">List of bundled component identifiers.</param>
+        /// <param name="lstComponentForBOM">Component list to filter.</param>
+        /// <returns>Filtered list with bundled components removed.</returns>
         private static List<Component> RemoveBundledComponentFromList(List<BundledComponents> bundledComponents, List<Component> lstComponentForBOM)
         {
             List<Component> components = [.. lstComponentForBOM];
@@ -649,27 +815,44 @@ namespace LCT.PackageIdentifier
             return components;
         }
 
+        /// <summary>
+        /// Determines whether a component is internal by checking npm.name and npm.version properties in AQL results.
+        /// </summary>
+        /// <param name="aqlResultList">AQL result entries to search.</param>
+        /// <param name="component">Component to check.</param>
+        /// <param name="bomHelper">BOM helper for full-name resolution.</param>
+        /// <returns>True if the component exists in the provided AQL results; otherwise false.</returns>
         private static bool IsInternalNpmComponent(
             List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
             if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version)))
             {
+                Logger.DebugFormat("IsInternalNpmComponent(): Component [Name: {0}, Version: {1}] is internal,Found in JFrog repository with full name: {2}.", component.Name, component.Version, jfrogcomponentName);
                 return true;
             }
 
             return false;
         }
 
+        /// <summary>
+        /// Locates a JFrog AQL result for an NPM component and returns repo details and path.
+        /// </summary>
+        /// <param name="aqlResultList">AQL results to search.</param>
+        /// <param name="component">Component to locate.</param>
+        /// <param name="bomHelper">BOM helper for full-name calculation.</param>
+        /// <param name="jfrogRepoPath">Outputs the repo path when found.</param>
+        /// <returns>Located AqlResult or a default empty result when none found.</returns>
         public static AqlResult GetJfrogArtifactoryRepoDetials(List<AqlResult> aqlResultList,
                                                                 Component component,
                                                                 IBomHelper bomHelper,
                                                                 out string jfrogRepoPath)
         {
+            Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Starting identify JFrog repository details retrieval for component [Name: {0}, Version: {1}].", component.Name, component.Version);
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;
             string jfrogpackageName = bomHelper.GetFullNameOfComponent(component);
-
+            Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {0}.", jfrogpackageName);
             var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
             string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
@@ -680,7 +863,7 @@ namespace LCT.PackageIdentifier
                 aqlResult = aqlResults.FirstOrDefault(x => x.Repo.Equals(repoName));
                 jfrogRepoPath = GetJfrogRepoPath(aqlResult);
             }
-
+            Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): JFrog repository path: {0}.", jfrogRepoPath);
             if (aqlResult != null)
             {
                 aqlResult.Repo ??= NotFoundInRepo;
@@ -688,6 +871,11 @@ namespace LCT.PackageIdentifier
             return aqlResult;
         }
 
+        /// <summary>
+        /// Formats a JFrog repo path from an AQL result entry.
+        /// </summary>
+        /// <param name="aqlResult">AQL result entry.</param>
+        /// <returns>Formatted repo path.</returns>
         public static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
@@ -699,6 +887,12 @@ namespace LCT.PackageIdentifier
         }
 
 
+        /// <summary>
+        /// Adds identification properties to components depending on the source (package, SPDX, CycloneDX).
+        /// </summary>
+        /// <param name="components">List of components to annotate.</param>
+        /// <param name="identifiedBy">Source identifier string (e.g., "PackageFile", "SpdxFile").</param>
+        /// <param name="filePath">Source file path used for SPDX filename property when applicable.</param>
         private static void AddingIdentifierType(List<Component> components, string identifiedBy, string filePath)
         {
             foreach (var component in components)
@@ -735,5 +929,6 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        #endregion
     }
 }

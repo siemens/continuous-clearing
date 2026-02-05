@@ -77,10 +77,10 @@ namespace SW360IntegrationTest.Alpine
                 ComponentJsonParsor actual = new ComponentJsonParsor();
                 actual.Read(generatedBOM);
 
-                foreach (var item in expected.Components)
+                foreach (var item in expected.BoM.Components)
                 {
 
-                    foreach (var i in actual.Components)
+                    foreach (var i in actual.BoM.Components)
                     {
                         if ((i.Name == item.Name) && (i.Version == item.Version))
                         {
@@ -93,6 +93,7 @@ namespace SW360IntegrationTest.Alpine
                     }
 
                 }
+                Assert.AreEqual(expected.BoM.Dependencies.Count, actual.BoM.Dependencies.Count);
             }
 
             Assert.IsTrue(fileExist, "Test to BOM file present");

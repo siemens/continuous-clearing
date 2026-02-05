@@ -240,7 +240,6 @@ namespace LCT.PackageIdentifier.UTest
             var aqlResultList = new List<AqlResult>();
             var component = new Component { Name = "Test", Version = "1.0" };
             var bomHelper = new Mock<IBomHelper>();
-            string jfrogPackageName, jfrogRepoPath;
             var method = typeof(CargoProcessor).GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             var repoName = (string)method.Invoke(null, new object[] { aqlResultList, component, bomHelper.Object, null, null });

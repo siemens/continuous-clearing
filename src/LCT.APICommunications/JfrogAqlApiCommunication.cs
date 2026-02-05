@@ -6,6 +6,7 @@
 
 using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
+using LCT.Common;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -19,16 +20,33 @@ namespace LCT.APICommunications
     /// </summary>
     public class JfrogAqlApiCommunication : IJfrogAqlApiCommunication
     {
-        protected string DomainName { get; set; }
-        private static int TimeoutInSec { get; set; }
-        protected ArtifactoryCredentials ArtifactoryCredentials { get; set; }
+        #region Properties
 
         /// <summary>
-        /// The JfrogAqlApiCommunication constructor
+        /// Gets or sets the domain name of the JFrog Artifactory server.
         /// </summary>
-        /// <param name="repoDomainName">repoDomainName</param>
-        /// <param name="artifactoryCredentials">artifactoryCredentials</param>
-        /// <param name="timeout">timeout</param>
+        protected string DomainName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timeout value in seconds for HTTP requests.
+        /// </summary>
+        private static int TimeoutInSec { get; set; }
+
+        /// <summary>
+        /// Gets or sets the credentials for accessing the Artifactory repository.
+        /// </summary>
+        protected ArtifactoryCredentials ArtifactoryCredentials { get; set; }
+
+        #endregion Properties
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JfrogAqlApiCommunication"/> class.
+        /// </summary>
+        /// <param name="repoDomainName">The domain name of the repository.</param>
+        /// <param name="artifactoryCredentials">The credentials for accessing the Artifactory repository.</param>
+        /// <param name="timeout">The timeout value in seconds for HTTP requests.</param>
         public JfrogAqlApiCommunication(string repoDomainName, ArtifactoryCredentials artifactoryCredentials, int timeout)
         {
             DomainName = repoDomainName;
@@ -36,13 +54,28 @@ namespace LCT.APICommunications
             TimeoutInSec = timeout;
         }
 
+        #endregion Constructors
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously checks the connection to the Artifactory server.
+        /// </summary>
+        /// <returns>An HttpResponseMessage indicating the connection status.</returns>
         public async Task<HttpResponseMessage> CheckConnection()
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             string url = $"{DomainName}/api/security/apiKey";
+            await LogHandlingHelper.HttpRequestHandling("JFrog Connection validation", $"Methodname:CheckConnection()", httpClient, url);
             return await httpClient.GetAsync(url);
         }
 
+        /// <summary>
+        /// Asynchronously retrieves component data from a specified repository using AQL.
+        /// </summary>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <param name="includeFields">The fields to include in the AQL query result.</param>
+        /// <returns>An HttpResponseMessage containing the component data.</returns>
         private async Task<HttpResponseMessage> GetComponentDataByRepo(string repoName, string includeFields)
         {
             string aqlQueryToBody = BuildSimpleAqlQuery(repoName, includeFields);
@@ -51,9 +84,16 @@ namespace LCT.APICommunications
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
             HttpContent httpContent = new StringContent(aqlQueryToBody);
+            await LogHandlingHelper.HttpRequestHandling("Get component data from jfrog repository", $"MethodName:GetComponentDataByRepo()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 
+        /// <summary>
+        /// Builds a simple AQL query string for a repository with specified include fields.
+        /// </summary>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <param name="includeFields">The fields to include in the query result.</param>
+        /// <returns>A formatted AQL query string.</returns>
         private static string BuildSimpleAqlQuery(string repoName, string includeFields)
         {
             // Helper to build simple AQL queries for repo and include fields
@@ -61,31 +101,50 @@ namespace LCT.APICommunications
         }
 
         /// <summary>
-        /// Gets the Internal Component Data By Repo name
+        /// Asynchronously retrieves internal component data from a specified repository.
         /// </summary>
-        /// <param name="repoName"></param>
-        /// <returns></returns>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <returns>An HttpResponseMessage containing the internal component data.</returns>
         public async Task<HttpResponseMessage> GetInternalComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
+
+        /// <summary>
+        /// Asynchronously retrieves NPM component data from a specified repository.
+        /// </summary>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <returns>An HttpResponseMessage containing the NPM component data.</returns>
         public async Task<HttpResponseMessage> GetNpmComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@npm.name\",\"@npm.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
+
+        /// <summary>
+        /// Asynchronously retrieves PyPI component data from a specified repository.
+        /// </summary>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <returns>An HttpResponseMessage containing the PyPI component data.</returns>
         public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@pypi.normalized.name\",\"@pypi.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
+
+        /// <summary>
+        /// Asynchronously retrieves Cargo component data from a specified repository.
+        /// </summary>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <returns>An HttpResponseMessage containing the Cargo component data.</returns>
         public async Task<HttpResponseMessage> GetCargoComponentDataByRepo(string repoName)
         {
             return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@crate.name\",\"@crate.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
 
         /// <summary>
-        /// Gets the package information in the repo, via the name or path
+        /// Asynchronously retrieves package information from the repository via name or path.
         /// </summary>
-
+        /// <param name="component">The component containing package name and path information.</param>
+        /// <returns>An HttpResponseMessage containing the package information.</returns>
         public async Task<HttpResponseMessage> GetPackageInfo(ComponentsToArtifactory component = null)
         {
             ValidateParameters(component.JfrogPackageName, component.Path);
@@ -98,6 +157,11 @@ namespace LCT.APICommunications
             return await ExecuteSearchAqlAsync(uri, httpContent);
         }
 
+        /// <summary>
+        /// Creates and configures an HttpClient instance with authentication settings.
+        /// </summary>
+        /// <param name="credentials">The Artifactory credentials for authentication.</param>
+        /// <returns>A configured HttpClient instance.</returns>
         private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             var handler = new RetryHttpClientHandler()
@@ -109,6 +173,12 @@ namespace LCT.APICommunications
             return httpClient;
         }
 
+        /// <summary>
+        /// Validates that at least one of the required parameters is provided.
+        /// </summary>
+        /// <param name="packageName">The package name to validate.</param>
+        /// <param name="path">The path to validate.</param>
+        /// <exception cref="ArgumentException">Thrown when both packageName and path are null or empty.</exception>
         private static void ValidateParameters(string packageName, string path)
         {
             if (string.IsNullOrEmpty(packageName) && string.IsNullOrEmpty(path))
@@ -117,6 +187,11 @@ namespace LCT.APICommunications
             }
         }
 
+        /// <summary>
+        /// Builds an AQL query string based on the component type and properties.
+        /// </summary>
+        /// <param name="component">The component containing query parameters.</param>
+        /// <returns>A formatted AQL query string appropriate for the component type.</returns>
         public static string BuildAqlQuery(ComponentsToArtifactory component)
         {
             // Use a single helper for repeated AQL query construction
@@ -128,7 +203,7 @@ namespace LCT.APICommunications
             {
                 return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@pypi.normalized.name", component.Name), ("@pypi.version", component.Version) });
             }
-            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase))
+            else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase) || component.ComponentType.Equals("Choco", StringComparison.InvariantCultureIgnoreCase))
             {
                 // NuGet: $and for repo, $or for id (case), and version
                 return $"items.find({{\"$and\": [{{ \"repo\":{{ \"$eq\": \"{component.SrcRepoName}\" }} }},{{ \"$or\":[{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name}\" }} }},{{ \"@nuget.id\":{{ \"$eq\": \"{component.Name.ToLowerInvariant()}\" }} }}]}},{{ \"@nuget.version\":{{\"$eq\": \"{component.Version}\" }} }}]}}).include(\"repo\", \"path\", \"name\").limit(1)";
@@ -158,7 +233,12 @@ namespace LCT.APICommunications
             }
         }
 
-        // Helper for NPM/Python AQL query
+        /// <summary>
+        /// Builds an AQL query string with specified repository and field-value pairs.
+        /// </summary>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <param name="fields">An array of field-value tuples to include in the query.</param>
+        /// <returns>A formatted AQL query string.</returns>
         private static string BuildAqlQueryWithFields(string repoName, (string field, string value)[] fields)
         {
             var queryList = new List<string> { $"\"repo\":{{\"$eq\":\"{repoName}\"}}" };
@@ -170,15 +250,21 @@ namespace LCT.APICommunications
             return $"items.find({{{string.Join(", ", queryList)}}}).include(\"repo\", \"path\", \"name\")";
         }
 
+        /// <summary>
+        /// Asynchronously executes an AQL search query against the Artifactory server.
+        /// </summary>
+        /// <param name="uri">The URI endpoint for the AQL search.</param>
+        /// <param name="httpContent">The HTTP content containing the AQL query.</param>
+        /// <returns>An HttpResponseMessage containing the search results.</returns>
         private async Task<HttpResponseMessage> ExecuteSearchAqlAsync(string uri, HttpContent httpContent)
         {
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
             httpClient.Timeout = timeOutInSec;
-
+            await LogHandlingHelper.HttpRequestHandling("Get package information from jfrog repository", $"MethodName:ExecuteSearchAqlAsync()", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 
-
+        #endregion Methods
     }
 }

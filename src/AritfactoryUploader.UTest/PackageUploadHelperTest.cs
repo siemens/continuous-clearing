@@ -50,6 +50,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("POETRY", ".whl")]
         [TestCase("CONAN", "package.tgz")]
         [TestCase("CARGO", ".crate")]
+        [TestCase("CHOCO", ".nupkg")]
         public void GetPkgeNameExtensionBasedOnComponentType_GivenType_ReturnsPkgNameExtension(string type, string extension)
         {
             // Arrange
@@ -214,6 +215,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
         [TestCase("CARGO")]
+        [TestCase("CHOCO")]
         public async Task JfrogNotFoundPackagesAsync_CoversAllScenarios(string compType)
         {
             // Arrange
@@ -227,6 +229,7 @@ namespace AritfactoryUploader.UTest
             displayPackagesInfo.JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundPackagesChoco = new List<ComponentsToArtifactory>();
 
             // Act
             await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
@@ -267,6 +270,11 @@ namespace AritfactoryUploader.UTest
                 Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
                 Assert.That(displayPackagesInfo.JfrogNotFoundPackagesCargo[0], Is.Not.Null);
             }
+            else if (item.ComponentType == "CHOCO")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesChoco.Count);
+                Assert.That(displayPackagesInfo.JfrogNotFoundPackagesChoco[0], Is.Not.Null);
+            }
         }
 
         [Test]
@@ -277,6 +285,7 @@ namespace AritfactoryUploader.UTest
         [TestCase("CONAN")]
         [TestCase("DEBIAN")]
         [TestCase("CARGO")]
+        [TestCase("CHOCO")]
         public async Task JfrogFoundPackagesAsync_CoversAllScenarios(string compType)
         {
             // Arrange
@@ -290,6 +299,7 @@ namespace AritfactoryUploader.UTest
             displayPackagesInfo.JfrogFoundPackagesConan = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogFoundPackagesChoco = new List<ComponentsToArtifactory>();
             var operationType = "operationType";
             var responseMessage = new HttpResponseMessage();
             var dryRunSuffix = "dryRunSuffix";
@@ -332,6 +342,11 @@ namespace AritfactoryUploader.UTest
             {
                 Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesCargo.Count);
                 Assert.That(displayPackagesInfo.JfrogFoundPackagesCargo[0], Is.Not.Null);
+            }
+            else if (item.ComponentType == "CHOCO")
+            {
+                Assert.AreEqual(1, displayPackagesInfo.JfrogFoundPackagesChoco.Count);
+                Assert.That(displayPackagesInfo.JfrogFoundPackagesChoco[0], Is.Not.Null);
             }
         }
 
