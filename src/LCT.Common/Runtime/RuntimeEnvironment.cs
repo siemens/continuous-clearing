@@ -7,10 +7,16 @@
 namespace LCT.Common.Runtime
 {
     /// <summary>
-    /// The RuntimeEnvironment class
+    /// Provides utilities for detecting the runtime environment (Azure, GitLab, etc.).
     /// </summary>
     public static class RuntimeEnvironment
     {
+        #region Methods
+
+        /// <summary>
+        /// Gets the current runtime environment type based on environment variables.
+        /// </summary>
+        /// <returns>The detected environment type (AzureRelease, AzurePipeline, GitLab, or Unknown).</returns>
         public static EnvironmentType GetEnvironment()
         {
             // Azure Release Pipeline contains both "Release_ReleaseId" and
@@ -36,6 +42,11 @@ namespace LCT.Common.Runtime
             return EnvironmentType.Unknown;
         }
 
+        /// <summary>
+        /// Checks if an environment variable is defined and has a non-null, non-whitespace value.
+        /// </summary>
+        /// <param name="name">The name of the environment variable to check.</param>
+        /// <returns>True if the environment variable is defined and has a value; otherwise, false.</returns>
         public static bool IsEnvironmentVariableDefined(string name)
         {
             string value = System.Environment.GetEnvironmentVariable(name);
@@ -45,5 +56,7 @@ namespace LCT.Common.Runtime
             }
             return true;
         }
+
+        #endregion
     }
 }

@@ -15,7 +15,14 @@ namespace LCT.APICommunications.Model
     [DataContract]
     public class ReleaseAdditionalData
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the FOSSology URL.
+        /// </summary>
         [DataMember(Name = "fossology url")]
         public string Fossology_url { get; set; }
+
+        #endregion Properties
     }
 }

@@ -19,11 +19,21 @@ namespace LCT.Common
 {
     public class TelemetryHelper
     {
+        #region Fields
+
         private readonly ILog Logger;
         private readonly LCT.Telemetry.Telemetry telemetry_;
         private readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private readonly CommonAppSettings appSettings_;
 
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the TelemetryHelper class.
+        /// </summary>
+        /// <param name="appSettings">The common application settings.</param>
         public TelemetryHelper(CommonAppSettings appSettings)
         {
             Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -35,6 +45,17 @@ namespace LCT.Common
             });
         }
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Starts telemetry tracking with the specified version and KPI data.
+        /// </summary>
+        /// <typeparam name="T">The type of KPI data.</typeparam>
+        /// <param name="catoolVersion">The CA tool version.</param>
+        /// <param name="kpiData">The KPI data to track.</param>
+        /// <param name="telemetryFor">The telemetry event name.</param>
         public void StartTelemetry<T>(string catoolVersion, T kpiData, string telemetryFor)
         {
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
@@ -58,6 +79,13 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Initializes telemetry and tracks a custom event with application details.
+        /// </summary>
+        /// <param name="toolName">The name of the tool.</param>
+        /// <param name="toolVersion">The version of the tool.</param>
+        /// <param name="eventName">The name of the event to track.</param>
+        /// <param name="appSettings">The common application settings.</param>
         private void InitializeAndTrackEvent(string toolName, string toolVersion, string eventName,
                                                     CommonAppSettings appSettings)
         {
@@ -73,6 +101,13 @@ namespace LCT.Common
                 { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
             });
         }
+
+        /// <summary>
+        /// Tracks KPI data as a custom telemetry event.
+        /// </summary>
+        /// <typeparam name="T">The type of KPI data.</typeparam>
+        /// <param name="eventName">The name of the event to track.</param>
+        /// <param name="kpiData">The KPI data to track.</param>
         private void TrackKpiDataTelemetry<T>(string eventName, T kpiData)
         {
             var properties = typeof(T).GetProperties();
@@ -87,6 +122,10 @@ namespace LCT.Common
             telemetry_.TrackCustomEvent(eventName, telemetryData);
         }
 
+        /// <summary>
+        /// Tracks an exception with telemetry data.
+        /// </summary>
+        /// <param name="ex">The exception to track.</param>
         private void TrackException(Exception ex)
         {
             var exceptionData = new Dictionary<string, string>
@@ -97,5 +136,7 @@ namespace LCT.Common
 
             telemetry_.TrackException(ex, exceptionData);
         }
+
+        #endregion
     }
 }

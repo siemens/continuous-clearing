@@ -25,8 +25,19 @@ namespace LCT.ArtifactoryUploader
 {
     public static class PackageUploadInformation
     {
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const string ReportFileName = "Artifactory";
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the components to be packaged with initialized display information.
+        /// </summary>
+        /// <returns>A DisplayPackagesInfo object with initialized package lists.</returns>
         public static DisplayPackagesInfo GetComponentsToBePackages()
         {
             DisplayPackagesInfo displayPackagesInfo = new DisplayPackagesInfo();
@@ -67,6 +78,12 @@ namespace LCT.ArtifactoryUploader
             return displayPackagesInfo;
 
         }
+
+        /// <summary>
+        /// Gets the uploaded package details from the display packages information.
+        /// </summary>
+        /// <param name="displayPackagesInfo">The display information containing all package lists.</param>
+        /// <returns>A list of successfully uploaded components.</returns>
         public static List<ComponentsToArtifactory> GetUploadePackageDetails(DisplayPackagesInfo displayPackagesInfo)
         {
             List<ComponentsToArtifactory> uploadedPackages = new List<ComponentsToArtifactory>();
@@ -100,9 +117,14 @@ namespace LCT.ArtifactoryUploader
                 }
             }
         }
+
+        /// <summary>
+        /// Displays package upload information for all package types.
+        /// </summary>
+        /// <param name="displayPackagesInfo">The display information containing all package lists.</param>
         public static void DisplayPackageUploadInformation(DisplayPackagesInfo displayPackagesInfo)
         {
-            string localPathforartifactory = ArtfactoryUploader.GettPathForArtifactoryUpload();
+            string localPathforartifactory = ArtifactoryUploader.GettPathForArtifactoryUpload();
 
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "npm", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "NuGet", localPathforartifactory);
@@ -114,6 +136,16 @@ namespace LCT.ArtifactoryUploader
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesChoco, displayPackagesInfo.JfrogNotFoundPackagesChoco, displayPackagesInfo.SuccessfullPackagesChoco, displayPackagesInfo.JfrogFoundPackagesChoco, "Choco", localPathforartifactory);
 
         }
+
+        /// <summary>
+        /// Displays sorted components for each package type based on their status.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown packages.</param>
+        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
+        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
+        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
+        /// <param name="name">The name of the package type.</param>
+        /// <param name="filePath">The file path for storing package information.</param>
         private static void DisplaySortedForeachComponents(
     List<ComponentsToArtifactory> unknownPackages,
     List<ComponentsToArtifactory> JfrogNotFoundPackages,
@@ -137,11 +169,25 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Checks if any of the package lists contain packages.
+        /// </summary>
+        /// <param name="packageLists">Variable number of package lists to check.</param>
+        /// <returns>True if any list contains packages, otherwise false.</returns>
         private static bool HasAnyPackages(params List<ComponentsToArtifactory>[] packageLists)
         {
             return packageLists.Any(list => list?.Count > 0);
         }
 
+        /// <summary>
+        /// Displays package information using Spectre Console formatting.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown packages.</param>
+        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
+        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
+        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
+        /// <param name="name">The name of the package type.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
         private static void DisplayWithSpectreConsole(
             List<ComponentsToArtifactory> unknownPackages,
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
@@ -159,6 +205,16 @@ namespace LCT.ArtifactoryUploader
             }, $"Display {name} Package Information", "Info");
         }
 
+        /// <summary>
+        /// Appends package content to a StringBuilder for display.
+        /// </summary>
+        /// <param name="content">The StringBuilder to append content to.</param>
+        /// <param name="unknownPackages">List of unknown packages.</param>
+        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
+        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
+        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
+        /// <param name="name">The name of the package type.</param>
+        /// <param name="filePath">The file path for storing package information.</param>
         private static void AppendPackageContent(
             StringBuilder content,
             List<ComponentsToArtifactory> unknownPackages,
@@ -172,6 +228,13 @@ namespace LCT.ArtifactoryUploader
             AppendSuccessfulPackages(content, SucessfullPackages);
         }
 
+        /// <summary>
+        /// Appends unknown packages information to the content.
+        /// </summary>
+        /// <param name="content">The StringBuilder to append content to.</param>
+        /// <param name="packages">List of unknown packages.</param>
+        /// <param name="name">The name of the package type.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
         private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages, string name, string filepath)
         {
             var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
@@ -182,6 +245,11 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Appends JFrog found packages information to the content.
+        /// </summary>
+        /// <param name="content">The StringBuilder to append content to.</param>
+        /// <param name="packages">List of packages found in JFrog.</param>
         private static void AppendJfrogFoundPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
         {
             if (packages?.Count > 0)
@@ -195,6 +263,11 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Formats a JFrog found package for display.
+        /// </summary>
+        /// <param name="package">The package to format.</param>
+        /// <returns>A formatted string representation of the package.</returns>
         private static string FormatJfrogFoundPackage(ComponentsToArtifactory package)
         {
             if (package.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
@@ -215,6 +288,11 @@ namespace LCT.ArtifactoryUploader
                    $"from [yellow]{package.SrcRepoName}[/] [white]⟶ [/] [yellow]{package.DestRepoName}[/]";
         }
 
+        /// <summary>
+        /// Appends JFrog not found packages information to the content.
+        /// </summary>
+        /// <param name="content">The StringBuilder to append content to.</param>
+        /// <param name="packages">List of packages not found in JFrog.</param>
         private static void AppendJfrogNotFoundPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
         {
             if (packages?.Count > 0)
@@ -228,6 +306,11 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Appends successful packages information to the content.
+        /// </summary>
+        /// <param name="content">The StringBuilder to append content to.</param>
+        /// <param name="packages">List of successfully processed packages.</param>
         private static void AppendSuccessfulPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
         {
             if (packages?.Count > 0)
@@ -240,6 +323,15 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Displays package information using standard logger.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown packages.</param>
+        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
+        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
+        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
+        /// <param name="name">The name of the package type.</param>
+        /// <param name="filePath">The file path for storing package information.</param>
         private static void DisplayWithLogger(
             List<ComponentsToArtifactory> unknownPackages,
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
@@ -254,6 +346,11 @@ namespace LCT.ArtifactoryUploader
             DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
             DisplayErrorForSucessfullPackages(SucessfullPackages);
         }
+
+        /// <summary>
+        /// Displays error information for packages found in JFrog.
+        /// </summary>
+        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
         public static void DisplayErrorForJfrogFoundPackages(List<ComponentsToArtifactory> JfrogFoundPackages)
         {
 
@@ -283,6 +380,10 @@ namespace LCT.ArtifactoryUploader
             }
         }
 
+        /// <summary>
+        /// Displays error information for packages not found in JFrog.
+        /// </summary>
+        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
         public static void DisplayErrorForJfrogPackages(List<ComponentsToArtifactory> JfrogNotFoundPackages)
         {
 
@@ -298,6 +399,11 @@ namespace LCT.ArtifactoryUploader
 
             }
         }
+
+        /// <summary>
+        /// Displays information for successfully processed packages.
+        /// </summary>
+        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
         private static void DisplayErrorForSucessfullPackages(List<ComponentsToArtifactory> SucessfullPackages)
         {
 
@@ -312,11 +418,23 @@ namespace LCT.ArtifactoryUploader
 
             }
         }
+
+        /// <summary>
+        /// Displays a warning message when there are no packages to upload.
+        /// </summary>
+        /// <param name="filename">The filename where package details can be found.</param>
         private static void WarningMessageForNoPackages(string filename)
         {
             if (!LoggerFactory.UseSpectreConsole)
                 Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
         }
+
+        /// <summary>
+        /// Displays error information for unknown packages.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown packages.</param>
+        /// <param name="name">The name of the package type.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
         private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages, string name, string filepath)
         {
             ProjectResponse projectResponse = new ProjectResponse();
@@ -343,6 +461,15 @@ namespace LCT.ArtifactoryUploader
                 }
             }
         }
+
+        /// <summary>
+        /// Gets not approved npm packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown npm packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         private static void GetNotApprovedNpmPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -375,6 +502,15 @@ namespace LCT.ArtifactoryUploader
             }
             WarningMessageForNoPackages(filename);
         }
+
+        /// <summary>
+        /// Gets not approved NuGet packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown NuGet packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         private static void GetNotApprovedNugetPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -407,6 +543,14 @@ namespace LCT.ArtifactoryUploader
             WarningMessageForNoPackages(filename);
         }
 
+        /// <summary>
+        /// Gets not approved Cargo packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown Cargo packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         private static void GetNotApprovedCargoPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -439,6 +583,14 @@ namespace LCT.ArtifactoryUploader
             WarningMessageForNoPackages(filename);
         }
 
+        /// <summary>
+        /// Gets not approved Conan packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown Conan packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         private static void GetNotApprovedConanPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -474,6 +626,15 @@ namespace LCT.ArtifactoryUploader
             WarningMessageForNoPackages(filename);
 
         }
+
+        /// <summary>
+        /// Gets not approved Python packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown Python packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         private static void GetNotApprovedPythonPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -508,6 +669,15 @@ namespace LCT.ArtifactoryUploader
             }
             WarningMessageForNoPackages(filename);
         }
+
+        /// <summary>
+        /// Gets not approved Debian packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown Debian packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         public static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -542,6 +712,15 @@ namespace LCT.ArtifactoryUploader
             }
             WarningMessageForNoPackages(filename);
         }
+
+        /// <summary>
+        /// Gets not approved Maven packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown Maven packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         private static void GetNotApprovedMavenPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -576,6 +755,15 @@ namespace LCT.ArtifactoryUploader
             }
             WarningMessageForNoPackages(filename);
         }
+
+        /// <summary>
+        /// Gets not approved Chocolatey packages and writes them to the report file.
+        /// </summary>
+        /// <param name="unknownPackages">List of unknown Chocolatey packages.</param>
+        /// <param name="projectResponse">The project response object.</param>
+        /// <param name="fileOperations">The file operations interface.</param>
+        /// <param name="filepath">The file path for storing package information.</param>
+        /// <param name="filename">The filename for the report.</param>
         public static void GetNotApprovedChocoPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
         {
             if (File.Exists(filename))
@@ -609,5 +797,6 @@ namespace LCT.ArtifactoryUploader
             WarningMessageForNoPackages(filename);
         }
 
+        #endregion
     }
 }

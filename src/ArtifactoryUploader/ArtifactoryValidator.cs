@@ -13,13 +13,31 @@ namespace LCT.ArtifactoryUploader
 {
     public class ArtifactoryValidator
     {
+        #region Fields
+
         private readonly IJfrogAqlApiCommunication _JfrogAqlApiCommunication;
 
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the ArtifactoryValidator class.
+        /// </summary>
+        /// <param name="jfrogAqlApiCommunication">The JFrog AQL API communication instance.</param>
         public ArtifactoryValidator(IJfrogAqlApiCommunication jfrogAqlApiCommunication)
         {
             _JfrogAqlApiCommunication = jfrogAqlApiCommunication;
         }
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously validates Artifactory credentials by checking the connection.
+        /// </summary>
+        /// <returns>A task containing 0 if validation succeeds, -1 if validation fails.</returns>
         public async Task<int> ValidateArtifactoryCredentials()
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
@@ -37,5 +55,7 @@ namespace LCT.ArtifactoryUploader
                 return -1;
             }
         }
+
+        #endregion
     }
 }

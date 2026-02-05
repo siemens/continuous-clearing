@@ -20,14 +20,23 @@ namespace LCT.Common
     /// </summary>
     public class FolderAction : IFolderAction
     {
+        #region Fields
+
+        /// <summary>
+        /// The logger instance for logging messages and errors.
+        /// </summary>
         static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Copies source directory content to target directory content
         /// </summary>
-        /// <param name="sourceDirectory"></param>
-        /// <param name="targetDirectory"></param>
-        /// <returns>bool</returns>
+        /// <param name="sourceDirectory">The source directory path.</param>
+        /// <param name="targetDirectory">The target directory path.</param>
+        /// <returns>True if the copy operation succeeded; otherwise, false.</returns>
         public bool CopyToTargetDirectory(string sourceDirectory, string targetDirectory)
         {
             Logger.Debug("CopyToTargetDirectory(): Start copying directory.");
@@ -60,9 +69,10 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Validates the folder path given
+        /// Validates the folder path to ensure it is not null and exists.
         /// </summary>
-        /// <param name="folderPath"></param>
+        /// <param name="folderPath">The folder path to validate.</param>
+        /// <param name="environmentHelper">The environment helper for exiting the application on validation failure.</param>
         public void ValidateFolderPath(string folderPath, IEnvironmentHelper environmentHelper)
         {
             if (string.IsNullOrWhiteSpace(folderPath))
@@ -82,8 +92,8 @@ namespace LCT.Common
         /// <summary>
         /// Zip Files To Target Directory
         /// </summary>
-        /// <param name="targetDirectory"></param>
-        /// <returns>bool</returns>
+        /// <param name="targetDirectory">The target directory to create a zip file from.</param>
+        /// <returns>True if the zip operation succeeded; otherwise, false.</returns>
         public bool ZipFileToTargetDirectory(string targetDirectory)
         {
             Logger.Debug("FolderAction.ZipFileToTargetDirectory(): Start zipping directory.");
@@ -126,6 +136,11 @@ namespace LCT.Common
             return isZiped;
         }
 
+        /// <summary>
+        /// Recursively copies all files and subdirectories from source to target directory.
+        /// </summary>
+        /// <param name="source">The source directory information.</param>
+        /// <param name="target">The target directory information.</param>
         private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
             Logger.DebugFormat("FolderAction.CopyAll(): Start copying from '{0}' to '{1}'.", source.FullName, target.FullName);            
@@ -165,5 +180,7 @@ namespace LCT.Common
             }            
             Logger.DebugFormat("FolderAction.CopyAll(): Finished copying from '{0}' to '{1}'.", source.FullName, target.FullName);
         }
+
+        #endregion
     }
 }

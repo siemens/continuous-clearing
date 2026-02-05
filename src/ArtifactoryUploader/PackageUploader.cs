@@ -26,10 +26,21 @@ namespace LCT.ArtifactoryUploader
     /// </summary>
     public static class PackageUploader
     {
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly UploaderKpiData uploaderKpiData = new UploaderKpiData();
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously uploads packages to Artifactory based on the application settings.
+        /// </summary>
+        /// <param name="appSettings">The common application settings.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings)
         {
             Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has started");
@@ -85,5 +96,6 @@ namespace LCT.ArtifactoryUploader
 
         }
 
+        #endregion
     }
 }

@@ -14,7 +14,14 @@ namespace LCT.APICommunications.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ComponentsRelease
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the embedded release data.
+        /// </summary>
         [JsonProperty("_embedded")]
         public ReleaseEmbedded Embedded { get; set; }
+
+        #endregion Properties
     }
 }

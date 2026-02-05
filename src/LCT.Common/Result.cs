@@ -14,6 +14,8 @@ namespace LCT.Common
     [ExcludeFromCodeCoverage]
     public class Result
     {
+        #region Properties
+
         /// <summary>
         /// Exit code
         /// <para>If NULL, process exited due to timeout</para>
@@ -29,5 +31,7 @@ namespace LCT.Common
         /// Standard output stream
         /// </summary>
         public string StdOut { get; set; } = "";
+
+        #endregion
     }
 }

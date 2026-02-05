@@ -19,8 +19,26 @@ namespace LCT.ArtifactoryUploader
 {
     public static class JfrogRepoUpdater
     {
-        public static IJFrogService JFrogService { get; set; }
+        #region Fields
+
         private readonly static List<AqlResult> aqlResultList = new();
+
+        #endregion
+
+        #region Properties
+
+        public static IJFrogService JFrogService { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously updates JFrog repository path for successfully uploaded items.
+        /// </summary>
+        /// <param name="m_ComponentsInBOM">The BOM containing components.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task containing the updated BOM.</returns>
         public static async Task<Bom> UpdateJfrogRepoPathForSucessfullyUploadedItems(Bom m_ComponentsInBOM,
                                                                             DisplayPackagesInfo displayPackagesInfo)
         {
@@ -37,6 +55,14 @@ namespace LCT.ArtifactoryUploader
             return m_ComponentsInBOM;
 
         }
+
+        /// <summary>
+        /// Updates the JFrog repository path property for BOM components.
+        /// </summary>
+        /// <param name="m_ComponentsInBOM">The BOM containing components.</param>
+        /// <param name="uploadedPackages">The list of uploaded packages.</param>
+        /// <param name="jfrogPackagesListAql">The list of JFrog packages from AQL query.</param>
+        /// <returns>A list of updated components.</returns>
         private static List<Component> UpdateJfroRepoPathProperty(Bom m_ComponentsInBOM,
                                                                  List<ComponentsToArtifactory> uploadedPackages,
                                                                  List<AqlResult> jfrogPackagesListAql)
@@ -83,6 +109,12 @@ namespace LCT.ArtifactoryUploader
 
             return bomComponents;
         }
+
+        /// <summary>
+        /// Gets the JFrog repository path from AQL result.
+        /// </summary>
+        /// <param name="aqlResult">The AQL result containing repository information.</param>
+        /// <returns>The formatted JFrog repository path.</returns>
         private static string GetJfrogRepoPath(AqlResult aqlResult)
         {
             if (string.IsNullOrEmpty(aqlResult.Path) || aqlResult.Path.Equals("."))
@@ -91,6 +123,14 @@ namespace LCT.ArtifactoryUploader
             }
             return $"{aqlResult.Repo}/{aqlResult.Path}/{aqlResult.Name}";
         }
+
+        /// <summary>
+        /// Gets the JFrog information of the uploaded package from AQL results.
+        /// </summary>
+        /// <param name="jfrogPackagesListAql">The list of JFrog packages from AQL query.</param>
+        /// <param name="package">The package to find information for.</param>
+        /// <param name="packageNameEXtension">The package name extension.</param>
+        /// <returns>The AQL result for the uploaded package, or null if not found.</returns>
         private static AqlResult GetJfrogInfoOfThePackageUploaded(List<AqlResult> jfrogPackagesListAql, ComponentsToArtifactory package, string packageNameEXtension)
         {
             string pkgType = package.ComponentType ?? string.Empty;
@@ -105,6 +145,11 @@ namespace LCT.ArtifactoryUploader
                                                  && x.Name.Contains(packageNameEXtension));
         }
 
+        /// <summary>
+        /// Asynchronously gets JFrog repository information for all package types.
+        /// </summary>
+        /// <param name="destRepoNames">The list of destination repository names.</param>
+        /// <returns>A task containing a list of AQL results for all packages.</returns>
         public static async Task<List<AqlResult>> GetJfrogRepoInfoForAllTypePackages(List<string> destRepoNames)
         {
             if (destRepoNames != null && destRepoNames.Count > 0)
@@ -119,5 +164,6 @@ namespace LCT.ArtifactoryUploader
             return aqlResultList;
         }
 
+        #endregion
     }
 }

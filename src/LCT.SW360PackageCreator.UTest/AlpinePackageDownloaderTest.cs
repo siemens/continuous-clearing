@@ -16,7 +16,6 @@ namespace LCT.SW360PackageCreator.UTest
     [TestFixture]
     class AlpinePackageDownloaderTest
     {
-
         [TestCase]
         public async Task DownloadSourceForAlpine_ProvidedInValidSourceURL_ReturnsNull()
         {
