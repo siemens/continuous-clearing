@@ -962,8 +962,7 @@ namespace LCT.Common
             }
         }        
         #endregion
-
-        #endregion Methods
+        
 
     }
 }
