@@ -563,52 +563,9 @@ namespace LCT.PackageIdentifier
                 }
             }
         }
-
-        /// <summary>
-        /// Removes duplicate components (same name/version/purl) and updates KPI counters accordingly.
-        /// </summary>
-        /// <param name="listofComponents">Reference list of components to deduplicate.</param>
-        private static void GetDistinctComponentList(ref List<Component> listofComponents)
-        {
-            int initialCount = listofComponents.Count;
-            listofComponents = listofComponents.GroupBy(x => new { x.Name, x.Version, x.Purl }).Select(y => y.First()).ToList();
-
-            if (listofComponents.Count != initialCount)
-                BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
-        }
-
-        /// <summary>
-        /// Removes components excluded via application settings and adjusts KPI counters.
-        /// </summary>
-        /// <param name="appSettings">Application settings containing exclusion lists.</param>
-        /// <param name="cycloneDXBOM">BOM to filter.</param>
-        /// <returns>Filtered BOM.</returns>
-        private static Bom RemoveExcludedComponents(CommonAppSettings appSettings, Bom cycloneDXBOM)
-        {
-            return CommonHelper.RemoveExcludedComponentsFromBom(appSettings, cycloneDXBOM,
-                noOfExcludedComponents => BomCreator.bomKpiData.ComponentsExcludedSW360 += noOfExcludedComponents);
-        }
-
-        /// <summary>
-        /// Ensures manually added components have standard properties set (development flag and identifier type).
-        /// </summary>
-        /// <param name="componentsForBOM">List of manually added components to update.</param>
-        private static void GetDetailsforManuallyAddedComp(List<Component> componentsForBOM)
-        {
-            foreach (var component in componentsForBOM)
-            {
-                component.Properties ??= new List<Property>();
-                var properties = component.Properties;
-                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
-                    Dataconstant.Cdx_IsDevelopment,
-                    "false");
-                CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
-                    Dataconstant.Cdx_IdentifierType,
-                    Dataconstant.ManullayAdded);
-                component.Properties = properties;
-            }
-        }
-
+              
+            
+       
 
         /// <summary>
         /// Determines whether the specified component exists in the provided AQL results (internal).
