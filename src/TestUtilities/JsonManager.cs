@@ -16,6 +16,7 @@ namespace TestUtilities
     public class ComponentJsonParsor
     {
         public List<Component> Components { get; } = new List<Component>();
+        public Bom BoM { get; } = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         public void Read(string path)
         {
             var json = File.ReadAllText(path);
@@ -26,6 +27,11 @@ namespace TestUtilities
                 foreach (var item in components.Components)
                 {
                     Components.Add(item);
+                    BoM.Components.Add(item);
+                }
+                foreach (var item in components.Dependencies)
+                {
+                    BoM.Dependencies.Add(item);
                 }
 
             }

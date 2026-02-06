@@ -16,6 +16,8 @@ namespace LCT.ArtifactoryUploader.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DisplayPackagesInfo
     {
+        #region Properties
+
         public List<ComponentsToArtifactory> UnknownPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesConan { get; set; }
@@ -23,6 +25,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> UnknownPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> UnknownPackagesChoco { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesConan { get; set; }
@@ -30,6 +33,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesChoco { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesConan { get; set; }
@@ -37,6 +41,7 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> JfrogFoundPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> JfrogFoundPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> JfrogFoundPackagesChoco { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesNpm { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesConan { get; set; }
@@ -44,10 +49,18 @@ namespace LCT.ArtifactoryUploader.Model
         public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> SuccessfullPackagesChoco { get; set; }
 
+        #endregion
     }
+
+    /// <summary>
+    /// The Model class for ProjectResponse
+    /// </summary>
     public class ProjectResponse
     {
+        #region Properties
+
         [JsonProperty("npm")]
         public List<JsonComponents> Npm { get; set; }
         [JsonProperty("nuget")]
@@ -62,13 +75,24 @@ namespace LCT.ArtifactoryUploader.Model
         public List<JsonComponents> Maven { get; set; }
         [JsonProperty("cargo")]
         public List<JsonComponents> Cargo { get; set; }
+        [JsonProperty("choco")]
+        public List<JsonComponents> Choco { get; set; }
+
+        #endregion
     }
 
+    /// <summary>
+    /// The Model class for JsonComponents
+    /// </summary>
     public class JsonComponents
     {
+        #region Properties
+
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("version")]
         public string Version { get; set; }
+
+        #endregion
     }
 }

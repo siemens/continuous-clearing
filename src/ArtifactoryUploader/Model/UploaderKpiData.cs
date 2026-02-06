@@ -15,6 +15,8 @@ namespace LCT.ArtifactoryUploader.Model
     [ExcludeFromCodeCoverage]
     public class UploaderKpiData
     {
+        #region Properties
+
         [DisplayName(@"Components in BoM")]
         public int ComponentInComparisonBOM { get; set; }
 
@@ -51,5 +53,6 @@ namespace LCT.ArtifactoryUploader.Model
         [DisplayName(@"Packages Not Moved to Repo")]
         public int InternalPackagesNotUploadedToJfrog { get; set; }
 
+        #endregion
     }
 }

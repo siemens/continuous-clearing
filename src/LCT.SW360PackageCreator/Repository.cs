@@ -37,12 +37,14 @@ namespace LCT.SW360PackageCreator
         /// <returns>string</returns>
         string IRepository.IdentifyRepoURLForGit(string url, string componentName)
         {
-            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():Start");
+            Logger.DebugFormat("Repository.IdentifyRepoURLForGit(): Start identifying Repo url for git - ComponentName: {0}, URL: {1}", componentName, url);
             string downloadUrl = string.Empty;
             string repoName = GetRepoName(url);
+            Logger.DebugFormat("Repository.IdentifyRepoURLForGit(): Repository Name for this component: {0}, Repository Name: {1}", componentName, repoName);
 
             if (string.IsNullOrEmpty(repoName))
             {
+                Logger.DebugFormat("Repository.IdentifyRepoURLForGit(): Repository name could not be identified for ComponentName: {0}, URL: {1}", componentName, url);
                 return downloadUrl;
             }
 
@@ -56,30 +58,44 @@ namespace LCT.SW360PackageCreator
             catch (ArgumentOutOfRangeException ex)
             {
                 Environment.ExitCode = -1;
+                LogHandlingHelper.ExceptionErrorHandling("IdentifyRepoURLForGit", $"MethodName:IdentifyRepoURLForGit(), ComponentName: {componentName}, URL: {url}", ex, "An error occurred while identifying the repository URL. The URL format might be invalid.");
                 Logger.Error($"Repository.IdentifyRepoURLForGitHub():{componentName}-{url}", ex);
             }
 
-            Logger.Debug($"Repository.IdentifyRepoURLForGitHub():End");
+            Logger.DebugFormat("Repository.IdentifyRepoURLForGit(): Completed identifying Repo url for git - ComponentName: {0}, final updated Download URL: {1}", componentName, downloadUrl);
             return downloadUrl;
         }
 
+        /// <summary>
+        /// form git clone url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="componentName"></param>
+        /// <param name="version"></param>
+        /// <returns>url</returns>
         public string FormGitCloneUrl(string url, string componentName, string version)
         {
-            Logger.Debug($"FormGitCloneUrl():Start");
+            Logger.DebugFormat("FormGitCloneUrl(): Start - ComponentName: {0}, Version: {1}, URL: {2}", componentName, version, url);
             string downloadUrl = Dataconstant.DownloadUrlNotFound;
 
             if (string.IsNullOrEmpty(url) || url == Dataconstant.SourceUrlNotFound)
             {
+                Logger.DebugFormat("FormGitCloneUrl(): URL is either null or marked as not found for ComponentName: {0}, Version: {1}", componentName, version);
                 return downloadUrl;
             }
 
             string cloneUrl = url.TrimEnd('/');
             downloadUrl = $"{cloneUrl}.git";
 
-            Logger.Debug($"FormGitCloneUrl():End");
+            Logger.DebugFormat("FormGitCloneUrl(): End - ComponentName: {0}, Version: {1}, Resolved Clone URL: {2}", componentName, version, downloadUrl);
             return downloadUrl;
         }
 
+        /// <summary>
+        /// get repo name from url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns>repo name</returns>
         private string GetRepoName(string url)
         {
             string repoUrl = string.Empty;

@@ -12,6 +12,7 @@ namespace LCT.Common.Interface
         /// Prints a warning message to the output.
         /// </summary>
         /// <param name="content">The warning message to be displayed. Cannot be null or empty.</param>
+        /// <returns>void.</returns>
         void PrintWarning(string content);
     }
 }

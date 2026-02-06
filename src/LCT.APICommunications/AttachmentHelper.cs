@@ -24,16 +24,63 @@ namespace LCT.APICommunications
     /// </summary>
     public class AttachmentHelper
     {
+        #region Fields
+
+        /// <summary>
+        /// The logger instance for logging messages and errors.
+        /// </summary>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /// <summary>
+        /// The full path to the attachment JSON file.
+        /// </summary>
         private readonly string fullPathOfAttachmentJSON = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles/Attachment.json";
+
+        /// <summary>
+        /// The SW360 authentication token.
+        /// </summary>
         private readonly string sw360AuthToken;
+
+        /// <summary>
+        /// The SW360 authentication token type.
+        /// </summary>
         private readonly string sw360AuthTokenType;
+
+        /// <summary>
+        /// The SW360 release API endpoint URL.
+        /// </summary>
         private readonly string sw360ReleaseApi;
+
+        /// <summary>
+        /// Lock object for thread-safe access to the attachments JSON file.
+        /// </summary>
         private readonly object attachmentsJSONFileLock = new object();
 
+        /// <summary>
+        /// The MIME type for compressed files.
+        /// </summary>
         private const string fileMimeType = "application /x-compressed";
+
+        /// <summary>
+        /// The form key used for file uploads.
+        /// </summary>
         private const string fileFormKey = "file";
 
+        /// <summary>
+        /// Error message for attachment failures.
+        /// </summary>
+        private const string AttachmentErrorMessage = "Not able to attachment";
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AttachmentHelper"/> class.
+        /// </summary>
+        /// <param name="sw360TokenType">The SW360 authentication token type.</param>
+        /// <param name="sw360Token">The SW360 authentication token.</param>
+        /// <param name="releaseApi">The SW360 release API endpoint URL.</param>
         public AttachmentHelper(string sw360TokenType, string sw360Token, string releaseApi)
         {
             sw360AuthToken = sw360Token;
@@ -41,13 +88,16 @@ namespace LCT.APICommunications
             sw360ReleaseApi = releaseApi;
         }
 
+        #endregion Constructors
+
+        #region Methods
+
         /// <summary>
-        /// Attaches the component Source to Sw360
+        /// Attaches the component source to SW360 by uploading the attachment file.
         /// </summary>
-        /// <param name="releaseId">releaseId</param>
-        /// <param name="attachmentType">attachmentType</param>
-        /// <param name="attachmentFile">attachmentFile</param>
-        /// <returns>attached api url</returns>
+        /// <param name="attachReport">The attachment report containing release and file information.</param>
+        /// <param name="comparisonBomData">The comparison BOM data for the component.</param>
+        /// <returns>The release attachment API URL.</returns>
         public string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData)
         {
             Uri url = new Uri($"{sw360ReleaseApi}/{attachReport.ReleaseId}/{ApiConstant.Attachments}");
@@ -86,19 +136,23 @@ namespace LCT.APICommunications
                     byte[] endBytes = System.Text.Encoding.UTF8.GetBytes($"--{boundary}--");
                     requestStream.Write(endBytes, 0, endBytes.Length);
                     requestStream.Close();
+                    LogHandlingHelper.LogHttpWebRequest("Attach Component Source", $"Uploading component source for ReleaseId: {attachReport.ReleaseId}", request);
                     using WebResponse response = request.GetResponse();
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
                     HandleAcceptedStatus(httpResponse, comparisonBomData);
                     using StreamReader reader = new StreamReader(response.GetResponseStream());
                     reader.ReadToEnd();
+                    LogHandlingHelper.LogHttpWebResponse("Attach Component Source", $"Response for attaching component source for ReleaseId: {attachReport.ReleaseId}", httpResponse);
                 }
             }
             catch (UriFormatException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, $"Invalid URI format: {url.AbsoluteUri}");
                 Logger.Error($"   └── AttachComponentSourceToSW360:", ex);
             }
             catch (SecurityException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "A security exception occurred. Ensure the application has the required permissions.");
                 Logger.Error($"   └── AttachComponentSourceToSW360:", ex);
             }
             catch (WebException webex)
@@ -110,7 +164,7 @@ namespace LCT.APICommunications
                     {
                         StreamReader reader = new StreamReader(respStream);
                         string text = reader.ReadToEnd();
-                        Logger.Debug($"Web exception: {text}", webex);
+                        LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", webex, $"Web exception occurred. Details: {text}");
                         Logger.Warn($"   └── Web exception: {text}", webex);
                     }
                 }
@@ -118,15 +172,18 @@ namespace LCT.APICommunications
             catch (IOException ex)
             {
                 Logger.Error($"   └── AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
-                Logger.Debug($"AttachComponentSourceToSW360:", ex);
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "An I/O error occurred while processing the attachment.");
             }
             return releaseAttachementApi;
         }
 
 
         /// <summary>
-        /// WriteAttachmentsJSONFile
+        /// Writes the attachments JSON file to the specified folder path.
         /// </summary>
+        /// <param name="fileName">The name of the attachment file.</param>
+        /// <param name="folderPath">The folder path where the JSON file will be written.</param>
+        /// <param name="attachReport">The attachment report containing attachment details.</param>
         public static void WriteAttachmentsJSONFile(string fileName, string folderPath, AttachReport attachReport)
         {
             AttachmentJson attachment = new AttachmentJson
@@ -154,10 +211,20 @@ namespace LCT.APICommunications
             file.Close();
         }
 
+        /// <summary>
+        /// Creates a unique form data boundary string for multipart requests.
+        /// </summary>
+        /// <returns>A unique boundary string based on the current timestamp.</returns>
         private static string CreateFormDataBoundary()
         {
             return "---------------------------" + DateTime.Now.Ticks.ToString("x");
         }
+
+        /// <summary>
+        /// Handles the HTTP accepted status response and logs appropriate messages.
+        /// </summary>
+        /// <param name="httpResponse">The HTTP web response to check.</param>
+        /// <param name="component">The comparison BOM data containing component information.</param>
         private static void HandleAcceptedStatus(HttpWebResponse httpResponse, ComparisonBomData component)
         {
             if (httpResponse.StatusCode == HttpStatusCode.Accepted)
@@ -169,7 +236,7 @@ namespace LCT.APICommunications
                 Logger.Debug($"HTTP Status Code: {httpResponse.StatusCode}");
             }
         }
+
+        #endregion Methods
     }
 }
-
-

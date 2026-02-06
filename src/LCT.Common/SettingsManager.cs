@@ -20,27 +20,38 @@ namespace LCT.Common
     /// </summary>
     public class SettingsManager : ISettingsManager
     {
-        public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        #region Fields
+
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+
+        #endregion
+
+        #region Properties
+
+        public string BasePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Reads the Configuration from input args and json setting file
         /// </summary>
         /// <param name="args">args</param>
         /// <returns>AppSettings</returns>
-        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName)
+        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName, IEnvironmentHelper environmentHelper)
         {
-            Logger.Debug($"ReadConfiguration():Start");
+            Logger.Debug("ReadConfiguration():Start reading configuration.");
 
             if (args != null)
             {
                 string[] maskedArgs = CommonHelper.MaskSensitiveArguments(args);
-                Logger.Debug($"ReadConfiguration():args: {string.Join(" ", maskedArgs)}");
+                Logger.DebugFormat("ReadConfiguration():Commandline arguments: {0}", string.Join(" ", maskedArgs));
             }
             if (args?.Length == 0)
             {
-                Logger.Debug($"Argument Count : {args.Length}");
+                Logger.Debug($"ReadConfiguration():No arguments provided through command line.");
                 DisplayHelp();
                 environmentHelper.CallEnvironmentExit(0);
             }
@@ -59,15 +70,17 @@ namespace LCT.Common
             {
                 settingsConfig = settingsConfigBuilder.Build();
             }
-            catch (InvalidDataException)
+            catch (InvalidDataException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}", ex, "InvalidDataException occurred while loading configuration.");
                 Logger.Error($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
-                throw new InvalidDataException($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
+                return default;
             }
-            catch (FormatException)
+            catch (FormatException ex)
             {
+                LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}", ex, "FormatException occurred while loading configuration.");
                 Logger.Error($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
-                throw new InvalidDataException($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+                return default;
             }
 
 
@@ -75,16 +88,18 @@ namespace LCT.Common
 
             if (appSettings == null)
             {
-                Logger.Debug($"ReadConfiguration(): {nameof(appSettings)} is null");
-
-                throw new InvalidDataException(nameof(appSettings));
+                LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Failed to load application settings. The configuration object is null.", new InvalidDataException(nameof(appSettings)), $"The application settings could not be loaded. Ensure the configuration file is valid and contains the required settings.");
+                return default;
             }
 
-            Logger.Debug($"ReadConfiguration():End");
+            Logger.Debug($"ReadConfiguration():Successfully completed configuration reading.");
 
             return appSettings;
         }
 
+        /// <summary>
+        /// Displays the CLI usage help from the help text file.
+        /// </summary>
         public static void DisplayHelp()
         {
 
@@ -96,6 +111,12 @@ namespace LCT.Common
             sr.Dispose();
         }
 
+        /// <summary>
+        /// Gets the configuration file path from command line arguments.
+        /// </summary>
+        /// <param name="args">The command line arguments.</param>
+        /// <param name="jsonSettingsFileName">The default JSON settings file name.</param>
+        /// <returns>The configuration file path.</returns>
         internal string GetConfigFilePathFromArgs(string[] args, string jsonSettingsFileName)
         {
             IConfigurationBuilder settingsFileConfigBuilder = new ConfigurationBuilder()
@@ -123,11 +144,17 @@ namespace LCT.Common
             return settingsFilePath;
         }
 
+        /// <summary>
+        /// Checks required arguments to run based on the current executable type.
+        /// </summary>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="currentExe">The current executable type (Identifier, Creator, or other).</param>
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
 
             if (currentExe == "Identifier")
             {
+                Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has started");
                 //Required parameters to run Package Identifier
                 List<string> identifierReqParameters = new List<string>()
                 {
@@ -182,12 +209,18 @@ namespace LCT.Common
             };
                 CheckForMissingParameter(appSettings, uploaderReqParameters);
             }
+            Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has completed\n");
         }
 
+        /// <summary>
+        /// Checks for missing required parameters in the application settings.
+        /// </summary>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="reqParameters">The list of required parameter keys.</param>
         private static void CheckForMissingParameter(CommonAppSettings appSettings, List<string> reqParameters)
         {
             StringBuilder missingParameters = new StringBuilder();
-
+            Logger.DebugFormat("CheckForMissingParameter(): Required Parameters: {0}", string.Join(", ", reqParameters));
             foreach (string key in reqParameters)
             {
                 object currentObject = GetNestedPropertyValue(appSettings, key);
@@ -200,11 +233,18 @@ namespace LCT.Common
 
             if (missingParameters.Length > 0)
             {
+                Logger.DebugFormat("HandleMissingParameters(): Missing Parameters: {0}", missingParameters.ToString().Trim());
                 ExceptionHandling.ArgumentException(missingParameters.ToString());
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }
 
+        /// <summary>
+        /// Gets the nested property value from an object using dot notation.
+        /// </summary>
+        /// <param name="obj">The object to retrieve the property value from.</param>
+        /// <param name="key">The property key in dot notation (e.g., "Property.SubProperty").</param>
+        /// <returns>The property value, or null if not found.</returns>
         private static object GetNestedPropertyValue(object obj, string key)
         {
             string[] parts = key.Split('.');
@@ -224,6 +264,11 @@ namespace LCT.Common
             return currentObject;
         }
 
+        /// <summary>
+        /// Checks if a value is missing, null, empty, or whitespace.
+        /// </summary>
+        /// <param name="value">The value to check.</param>
+        /// <returns>True if the value is missing; otherwise, false.</returns>
         private static bool IsMissingValue(object value)
         {
             if (value is Array array)
@@ -238,6 +283,11 @@ namespace LCT.Common
 
             return string.IsNullOrWhiteSpace(value?.ToString());
         }
+
+        /// <summary>
+        /// Checks if Azure DevOps debug mode is enabled.
+        /// </summary>
+        /// <returns>True if Azure DevOps debug mode is enabled; otherwise, false.</returns>
         public static bool IsAzureDevOpsDebugEnabled()
         {
             string azureDevOpsDebug = Environment.GetEnvironmentVariable("System.Debug") ?? string.Empty;
@@ -248,10 +298,18 @@ namespace LCT.Common
             return false;
         }
 
+        #endregion
     }
 
+    /// <summary>
+    /// Represents settings file configuration.
+    /// </summary>
     public class SettingsFile
     {
+        #region Properties
+
         public string SettingsFilePath { get; set; }
+
+        #endregion
     }
 }

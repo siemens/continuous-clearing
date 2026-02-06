@@ -19,18 +19,31 @@ namespace LCT.Common.ComplianceValidator
 {
     public class ComplianceCheck : IChecker
     {
+        #region Fields
+        /// <summary>
+        /// Logger instance for compliance check logging.
+        /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        /// <summary>
+        /// Stores warning messages generated during compliance checks.
+        /// </summary>
         private List<string> Warnings = new();
+        #endregion
 
+        #region Properties
+        // No properties present.
+        #endregion
+
+        #region Constructors
+        // No constructors present.
+        #endregion
+
+        #region Methods
         /// <summary>
         /// Asynchronously loads compliance settings from a JSON file.
         /// </summary>
-        /// <remarks>This method reads the specified JSON file and deserializes its content into a <see
-        /// cref="ComplianceSettingsModel"/> object. Ensure the file exists and contains valid JSON data that matches
-        /// the structure of <see cref="ComplianceSettingsModel"/>.</remarks>
         /// <param name="jsonFilePath">The full path to the JSON file containing the compliance settings. Must not be null or empty.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a <see
-        /// cref="ComplianceSettingsModel"/> object populated with the settings from the specified JSON file.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a ComplianceSettingsModel object populated with the settings from the specified JSON file.</returns>
         public async Task<ComplianceSettingsModel> LoadSettingsAsync(string jsonFilePath)
         {
             using var stream = System.IO.File.OpenRead(jsonFilePath);
@@ -41,16 +54,9 @@ namespace LCT.Common.ComplianceValidator
         /// <summary>
         /// Evaluates compliance settings and data to determine if any compliance warnings or recommendations exist.
         /// </summary>
-        /// <remarks>This method processes the provided compliance settings and data to identify any
-        /// compliance exceptions. If compliance warnings are found, they are logged and displayed, along with any
-        /// associated recommendations. The method returns <see langword="false"/> if warnings are present or if the
-        /// input data is invalid.</remarks>
-        /// <param name="settings">The compliance settings model containing exception components and compliance instructions. Cannot be <see
-        /// langword="null"/>.</param>
-        /// <param name="data">The data to be checked for compliance. Must be a <see cref="List{T}"/> of <see cref="ComparisonBomData"/>
-        /// objects. If the data is not of the expected type or is <see langword="null"/>, the method returns <see
-        /// langword="false"/>.</param>
-        /// <returns><see langword="true"/> if no compliance warnings are detected; otherwise, <see langword="false"/>.</returns>
+        /// <param name="settings">The compliance settings model containing exception components and compliance instructions. Cannot be null.</param>
+        /// <param name="data">The data to be checked for compliance. Must be a List of ComparisonBomData objects. If the data is not of the expected type or is null, the method returns false.</param>
+        /// <returns>True if no compliance warnings are detected; otherwise, false.</returns>
         public bool Check(ComplianceSettingsModel settings, object data)
         {
             Warnings = [];
@@ -78,6 +84,11 @@ namespace LCT.Common.ComplianceValidator
             return hasWarning;
         }
 
+        /// <summary>
+        /// Builds a dictionary mapping PURL strings to their corresponding compliance exception components.
+        /// </summary>
+        /// <param name="components">The collection of compliance exception components.</param>
+        /// <returns>A dictionary mapping PURL strings to compliance exception components.</returns>
         private static Dictionary<string, ComplianceExceptionComponent> BuildPurlToComponentMap(IEnumerable<ComplianceExceptionComponent> components)
         {
             var map = new Dictionary<string, ComplianceExceptionComponent>();
@@ -92,6 +103,12 @@ namespace LCT.Common.ComplianceValidator
             return map;
         }
 
+        /// <summary>
+        /// Groups BOM data by warning and recommendation messages.
+        /// </summary>
+        /// <param name="bomDataList">The list of BOM data to group.</param>
+        /// <param name="purlToComponent">The dictionary mapping PURLs to compliance exception components.</param>
+        /// <returns>A dictionary with keys as (warning, recommendation) and values as lists of affected PURLs.</returns>
         private static Dictionary<(string warning, string recommendation), List<string>> GroupBomDataByWarningAndRecommendation(
             List<ComparisonBomData> bomDataList,
             Dictionary<string, ComplianceExceptionComponent> purlToComponent)
@@ -116,6 +133,13 @@ namespace LCT.Common.ComplianceValidator
             return groupMap;
         }
 
+        /// <summary>
+        /// Handles a group of warnings and recommendations, logging them and returning whether a warning was present.
+        /// </summary>
+        /// <param name="warning">The warning message.</param>
+        /// <param name="recommendation">The recommendation message.</param>
+        /// <param name="purls">The list of affected PURLs.</param>
+        /// <returns>True if a warning was present; otherwise, false.</returns>
         private bool HandleGroup(string warning, string recommendation, List<string> purls)
         {
             bool hasWarning = false;
@@ -142,9 +166,8 @@ namespace LCT.Common.ComplianceValidator
         /// <summary>
         /// Logs the provided recommendation content as an informational message.
         /// </summary>
-        /// <remarks>If the <paramref name="content"/> is null, empty, or contains only whitespace, the
-        /// method does nothing.</remarks>
         /// <param name="content">The recommendation content to log. Must not be null, empty, or consist only of whitespace.</param>
+        /// <returns>void.</returns>
         public void PrintRecommendation(string content)
         {
             if (string.IsNullOrWhiteSpace(content))
@@ -156,9 +179,8 @@ namespace LCT.Common.ComplianceValidator
         /// <summary>
         /// Logs a warning message with the specified content.
         /// </summary>
-        /// <remarks>If the <paramref name="content"/> is null, empty, or contains only whitespace, the
-        /// method does nothing.</remarks>
         /// <param name="content">The warning message to log. Must not be null, empty, or consist only of whitespace.</param>
+        /// <returns>void.</returns>
         public void PrintWarning(string content)
         {
             if (string.IsNullOrWhiteSpace(content))
@@ -175,5 +197,10 @@ namespace LCT.Common.ComplianceValidator
         {
             return Warnings;
         }
+        #endregion
+
+        #region Events
+        // No events present.
+        #endregion
     }
 }

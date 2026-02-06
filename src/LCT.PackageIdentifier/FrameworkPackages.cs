@@ -21,10 +21,25 @@ namespace LCT.PackageIdentifier
 {
     public class FrameworkPackages : IFrameworkPackages
     {
-        readonly Dictionary<string, Dictionary<string, NuGetVersion>> _foundFrameworkPackages = [];
+        #region Fields
+        readonly Dictionary<string, Dictionary<string, NuGetVersion>> _foundFrameworkPackages = new Dictionary<string, Dictionary<string, NuGetVersion>>();
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
 
-        #region public methods
+        #region Properties
+        #endregion
+
+        #region Constructors
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Discovers framework packages for the provided list of NuGet lock file paths.
+        /// </summary>
+        /// <param name="lockFilePaths">List of paths to project.assets.json (lock) files to analyze.</param>
+        /// <returns>
+        /// A dictionary keyed by framework identifier containing package name -> <see cref="NuGetVersion"/> mappings.
+        /// </returns>
         public Dictionary<string, Dictionary<string, NuGetVersion>> GetFrameworkPackages(List<string> lockFilePaths)
         {
             try
@@ -81,6 +96,12 @@ namespace LCT.PackageIdentifier
             return _foundFrameworkPackages;
         }
 
+        /// <summary>
+        /// Returns framework references declared in the lock file target and corresponding package spec.
+        /// </summary>
+        /// <param name="lockFile">Lock file containing PackageSpec and targets.</param>
+        /// <param name="target">Target within the lock file to inspect.</param>
+        /// <returns>An array of framework reference names, or empty array when none found.</returns>
         public string[] GetFrameworkReferences(LockFile lockFile, LockFileTarget target)
         {
             var frameworkInformation = lockFile.PackageSpec.TargetFrameworks.FirstOrDefault(x => x.FrameworkName.Equals(target.TargetFramework));
@@ -100,6 +121,10 @@ namespace LCT.PackageIdentifier
         #endregion
 
         #region private methods
+        /// <summary>
+        /// Loads the Microsoft.ComponentDetection.Detectors assembly and returns the FrameworkPackages type when available.
+        /// </summary>
+        /// <returns>Type of the FrameworkPackages detector or null when the assembly/type cannot be loaded.</returns>
         private static Type LoadAssembly()
         {
             try
@@ -118,6 +143,11 @@ namespace LCT.PackageIdentifier
             return null;
         }
 
+        /// <summary>
+        /// Locates the static public GetFrameworkPackages method on the detector type via reflection.
+        /// </summary>
+        /// <param name="frameworkPackagesType">Type to inspect for the method.</param>
+        /// <returns><see cref="MethodInfo"/> for GetFrameworkPackages or null when not found.</returns>
         private static MethodInfo GetFrameworkPackagesMethod(Type frameworkPackagesType)
         {
             var methods = frameworkPackagesType.GetMethods(BindingFlags.Static | BindingFlags.Public);
@@ -128,6 +158,13 @@ namespace LCT.PackageIdentifier
             return null;
         }
 
+        /// <summary>
+        /// Invokes the detected GetFrameworkPackages method and processes returned framework package objects.
+        /// </summary>
+        /// <param name="getFrameworkPackagesMethod">MethodInfo representing the method to invoke.</param>
+        /// <param name="targetFramework">Target framework to pass as the first argument.</param>
+        /// <param name="frameworkReferences">Framework references to pass as the second argument.</param>
+        /// <param name="lockFileTarget">LockFileTarget instance to pass as the third argument (may be null).</param>
         private void InvokeGetFrameworkPackagesMethod(MethodInfo getFrameworkPackagesMethod, NuGetFramework targetFramework, string[] frameworkReferences, LockFileTarget lockFileTarget)
         {
             object[] parameters = { targetFramework, frameworkReferences, lockFileTarget };
@@ -142,6 +179,11 @@ namespace LCT.PackageIdentifier
             }
         }
 
+        /// <summary>
+        /// Extracts framework name and package dictionary from a frameworkPackage object returned by the detector and stores it.
+        /// </summary>
+        /// <param name="targetFramework">Target framework associated with the frameworkPackage.</param>
+        /// <param name="frameworkPackage">Framework package object returned by the detector.</param>
         private void ProcessFrameworkPackage(NuGetFramework targetFramework, object frameworkPackage)
         {
             var frameworkNameProperty = frameworkPackage.GetType().GetProperty("FrameworkName");

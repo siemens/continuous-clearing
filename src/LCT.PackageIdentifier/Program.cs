@@ -38,23 +38,47 @@ namespace LCT.PackageIdentifier
     [ExcludeFromCodeCoverage]
     public class Program
     {
+        #region Fields
         private bool m_Verbose = false;
 
-        public static Stopwatch BomStopWatch { get; set; }
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         private readonly ISettingsManager _settingsManager;
         private readonly IBomCreator _bomCreator;
+        #endregion
 
+        #region Properties
+        public static Stopwatch BomStopWatch { get; set; }
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Program"/> class with provided dependencies.
+        /// </summary>
+        /// <param name="frameworkPackages">Framework packages provider.</param>
+        /// <param name="settingsManager">Settings manager instance.</param>
+        /// <param name="cycloneDXBomParser">CycloneDX BOM parser.</param>
+        /// <param name="bomCreator">BOM creator instance.</param>
         public Program(IFrameworkPackages frameworkPackages, ISettingsManager settingsManager, ICycloneDXBomParser cycloneDXBomParser, IBomCreator bomCreator)
         {
             _settingsManager = settingsManager;
             _bomCreator = bomCreator;
         }
-        protected Program() { }
 
+        /// <summary>
+        /// Protected parameterless constructor for testing or DI.
+        /// </summary>
+        protected Program() { }
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Asynchronously entry point of the application.
+        /// </summary>
+        /// <param name="args">Command line arguments.</param>
+        /// <returns>Asynchronously completes when the application finishes.</returns>
         static async Task Main(string[] args)
         {
             var serviceCollection = new ServiceCollection();
@@ -66,6 +90,10 @@ namespace LCT.PackageIdentifier
             await program.Run(args);
         }
 
+        /// <summary>
+        /// Configures dependency injection services for the application.
+        /// </summary>
+        /// <param name="services">Service collection to populate.</param>
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IFrameworkPackages, FrameworkPackages>();
@@ -73,11 +101,17 @@ namespace LCT.PackageIdentifier
             services.AddTransient<ICycloneDXBomParser, CycloneDXBomParser>();
             services.AddTransient<IBomCreator, BomCreator>();
             services.AddTransient<ISpdxBomParser, SpdxBomParser>();
+            services.AddTransient<IEnvironmentHelper, EnvironmentHelper>();
             services.AddTransient<Program>();
             services.AddScoped<ICompositionBuilder, CompositionBuilder>();
             services.AddScoped<IRuntimeIdentifier, DotnetRuntimeIdentifer>();
         }
 
+        /// <summary>
+        /// Asynchronously runs the main program logic using the provided arguments.
+        /// </summary>
+        /// <param name="args">Command line arguments.</param>
+        /// <returns>Asynchronously completes when run finishes.</returns>
         public async Task Run(string[] args)
         {
             BomStopWatch = new Stopwatch();
@@ -88,11 +122,14 @@ namespace LCT.PackageIdentifier
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            CommonHelper.DefaultLogFolderInitialisation(FileConstant.BomCreatorLog, m_Verbose);
-            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName);
+            string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
+            Logger.Debug($"====================<<<<< Package Identifier >>>>>====================");
+            CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
+            Log4Net.AppendVerboseValue(appSettings);
             appSettings.ProjectType = CommonHelper.CanonicalizeProjectType(appSettings.ProjectType);
             ProjectReleases projectReleases = new ProjectReleases();
-            string _ = CommonHelper.LogFolderInitialisation(appSettings, FileConstant.BomCreatorLog, m_Verbose);
+            string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             _settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Identifier);
             LoggerHelper.SpectreConsoleInitialMessage("Package Identifier");
@@ -138,6 +175,10 @@ namespace LCT.PackageIdentifier
             PipelineArtifactUploader.UploadArtifacts();
         }
 
+        /// <summary>
+        /// Retrieves the CA tool version and running location from the executing assembly.
+        /// </summary>
+        /// <returns>Information about the CA tool version and running location.</returns>
         private static CatoolInfo GetCatoolVersionFromProjectfile()
         {
             CatoolInfo catoolInfo = new CatoolInfo();
@@ -147,6 +188,11 @@ namespace LCT.PackageIdentifier
             return catoolInfo;
         }
 
+        /// <summary>
+        /// Creates an IJFrogService instance configured from the given application settings.
+        /// </summary>
+        /// <param name="appSettings">Application settings that contain JFrog configuration.</param>
+        /// <returns>Configured IJFrogService or null when settings are not provided.</returns>
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
             if (appSettings == null)
@@ -165,6 +211,12 @@ namespace LCT.PackageIdentifier
             return jFrogService;
         }
 
+        /// <summary>
+        /// Asynchronously validates SW360 settings from application settings and exits the environment on failure.
+        /// </summary>
+        /// <param name="appSettings">Application settings to validate.</param>
+        /// <param name="projectReleases">Project releases holder used during validation.</param>
+        /// <returns>Asynchronously completes after validation (may exit process on failure).</returns>
         private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
@@ -182,5 +234,9 @@ namespace LCT.PackageIdentifier
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }
+        #endregion
+
+        #region Events
+        #endregion
     }
 }

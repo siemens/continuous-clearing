@@ -20,6 +20,7 @@ namespace LCT.Telemetry
     /// </summary>
     public static class TelemetryProviderFactory
     {
+        #region Methods
         /// <summary>
         /// Creates the telemetry provider based on the specified telemetry type and configuration.
         /// </summary>
@@ -34,5 +35,6 @@ namespace LCT.Telemetry
                 _ => throw new NotSupportedException($"Telemetry type '{telemetryType}' is not supported.")
             };
         }
+        #endregion
     }
 }
