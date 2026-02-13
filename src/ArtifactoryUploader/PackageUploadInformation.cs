@@ -825,13 +825,13 @@ namespace LCT.ArtifactoryUploader
                 if (notInRepo > 0 && notUploadedError > 0)
                 {
                     reasonMessage =
-                        $"This step failed due to {notInRepo} packages not existing in repository and {notUploadedError} package{(notUploadedError == 1 ? "" : "s")} not actioned due to error. " +
+                        $"This step failed due to {notInRepo} packages not found in repository and {notUploadedError} packages not actioned due to error. " +
                         "For more details, review the above tables.";
                 }
                 else if (notInRepo > 0)
                 {
                     reasonMessage =
-                        $"This step failed due to {notInRepo} packages not existing in repository. " +
+                        $"This step failed due to {notInRepo} packages not found in repository. " +
                         "For more details, review the above tables.";
                 }
                 else

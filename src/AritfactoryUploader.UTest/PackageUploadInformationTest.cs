@@ -67,7 +67,7 @@ namespace AritfactoryUploader.UTest
             Assert.NotNull(warnEvent, "Warning log was not captured.");
             Assert.NotNull(debugEvent, "Debug log was not captured.");
 
-            StringAssert.Contains("This step failed due to 3 packages not existing in repository and 2 packages not actioned due to error.", warnEvent.RenderedMessage);
+            StringAssert.Contains("This step failed due to 3 packages not found in repository and 2 packages not actioned due to error.", warnEvent.RenderedMessage);
             StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
         }
 
@@ -95,7 +95,7 @@ namespace AritfactoryUploader.UTest
             Assert.NotNull(warnEvent);
             Assert.NotNull(debugEvent);
 
-            StringAssert.Contains("This step failed due to 5 packages not existing in repository.", warnEvent.RenderedMessage);
+            StringAssert.Contains("This step failed due to 5 packages not found in repository.", warnEvent.RenderedMessage);
             StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
         }
 
