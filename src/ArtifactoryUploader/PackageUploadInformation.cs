@@ -340,7 +340,7 @@ namespace LCT.ArtifactoryUploader
             string name,
             string filePath)
         {
-            Logger.Info($"\n{name}:\n");
+            Logger.Info("\n{PackageType}:\n", name);
             DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
             DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
             DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
@@ -426,7 +426,7 @@ namespace LCT.ArtifactoryUploader
         private static void WarningMessageForNoPackages(string filename)
         {
             if (!LoggerFactory.UseSpectreConsole)
-                Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+                Logger.Warn("Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n", filename);
         }
 
         /// <summary>

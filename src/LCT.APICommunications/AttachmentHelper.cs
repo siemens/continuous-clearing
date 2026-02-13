@@ -171,7 +171,7 @@ namespace LCT.APICommunications
             }
             catch (IOException ex)
             {
-                Logger.Error($"   └── AttachComponentSourceToSW360:Failed attach source for release = {attachReport.ReleaseId}");
+                Logger.ErrorFormat("   └── AttachComponentSourceToSW360:Failed attach source for release = {0}", attachReport.ReleaseId);
                 LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "An I/O error occurred while processing the attachment.");
             }
             return releaseAttachementApi;

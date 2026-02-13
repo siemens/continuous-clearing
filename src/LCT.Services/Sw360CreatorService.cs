@@ -153,12 +153,12 @@ namespace LCT.Services
             catch (JsonReaderException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus(), Link: {link}", ex, "An error occurred while parsing the JSON response.");
-                Logger.Error($"TriggerFossologyProcess {ex.Message}");
+                Logger.Error("TriggerFossologyProcess", ex);
             }
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus(), Link: {link}", ex, "An HTTP request error occurred while checking the Fossology process status.");
-                Logger.Error($"TriggerFossologyProcess {ex.Message}");
+                Logger.Error("TriggerFossologyProcess", ex);
             }
             return fossTriggerStatus;
 
@@ -346,8 +346,7 @@ namespace LCT.Services
                     }
                     else
                     {
-                        Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
-                            " , with :" + value.Name + ":" + value.ReleaseId);
+                        Logger.DebugFormat("Duplicate entries found in finalReleasesToBeLinked: {0}:{1} , with :{2}:{3}", release.Name, release.ReleaseId, value.Name, value.ReleaseId);
                     }
                 }
 
@@ -419,7 +418,7 @@ namespace LCT.Services
 
             if (string.IsNullOrEmpty(releaseIdOfComponent))
             {
-                Logger.Warn($"GetReleaseIDofComponent():Release id is null for Component - {componentName}-{componentVersion}");
+                Logger.WarnFormat("GetReleaseIDofComponent():Release id is null for Component - {0}-{1}", componentName, componentVersion);
             }
 
             return releaseIdOfComponent ?? string.Empty;
@@ -578,14 +577,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingComponent", $"MethodName:UpdatePurlIdForExistingComponent(), ComponentId: {componentId}", ex, "An HTTP request error occurred while updating the PURL ID for the component.");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.Error("UpdateExternalIdForRelease()", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingComponent", $"MethodName:UpdatePurlIdForExistingComponent(), ComponentId: {componentId}", ex, "An aggregate exception occurred while updating the PURL ID for the component.");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.Error("UpdateExternalIdForRelease()", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -714,14 +713,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.Error("UpdateExternalIdForRelease()", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.Error("UpdateExternalIdForRelease()", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
