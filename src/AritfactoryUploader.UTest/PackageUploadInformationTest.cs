@@ -31,8 +31,7 @@ namespace AritfactoryUploader.UTest
 
         [SetUp]
         public void SetUp()
-        {
-            // Configure log4net to use a MemoryAppender (same approach as PipelineArtifactUploaderTest)
+        {           
             _memoryAppender = new MemoryAppender();
             BasicConfigurator.Configure(_memoryAppender);
             _memoryAppender.Clear();
