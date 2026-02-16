@@ -131,9 +131,9 @@ namespace SW360IntegrationTest.Conan
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedname = "libcurl";
-            string expectedversion = "8.15.0";
-            string expecteddownloadurl = "https://curl.se/download/curl-8.15.0.tar.xz";
-            string expectedexternalid = "pkg:conan/libcurl@8.15.0";
+            string expectedversion = "8.18.0";
+            string expecteddownloadurl = "https://curl.se/download/curl-8.18.0.tar.xz";
+            string expectedexternalid = "pkg:conan/libcurl@8.18.0";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "libcurl";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
