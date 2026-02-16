@@ -115,7 +115,7 @@ namespace SW360IntegrationTest.Conan
                 new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
 
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "zlib";
+            string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "libcurl";
             string responseBody = await httpClient.GetStringAsync(url); //GET request
             var responseData = JsonConvert.DeserializeObject<ComponentsModel>(responseBody);
             //Assert
@@ -130,12 +130,12 @@ namespace SW360IntegrationTest.Conan
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
-            string expectedname = "zlib";
-            string expectedversion = "1.3.1";
-            string expecteddownloadurl = "https://zlib.net/fossils/zlib-1.3.1.tar.gz";
-            string expectedexternalid = "pkg:conan/zlib@1.3.1";
+            string expectedname = "libcurl";
+            string expectedversion = "8.18.0";
+            string expecteddownloadurl = "https://curl.se/download/curl-8.18.0.tar.xz";
+            string expectedexternalid = "pkg:conan/libcurl@8.18.0";
             //url formation for retrieving component details
-            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "zlib";
+            string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "libcurl";
             string responseBody = await httpClient.GetStringAsync(url);//GET method         
             var responseData = JsonConvert.DeserializeObject<ReleaseIdOfComponent>(responseBody);
             string urlofreleaseid = responseData.Embedded.Sw360Releases[0].Links.Self.Href;
