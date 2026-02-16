@@ -825,20 +825,20 @@ namespace LCT.ArtifactoryUploader
                 if (notInRepo > 0 && notUploadedError > 0)
                 {
                     reasonMessage =
-                        $"This step failed due to {notInRepo} packages not found in repository and {notUploadedError} packages not actioned due to error. " +
-                        "For more details, review the above tables.";
+                        $"Artifactory uploader exited with warning, due to {notInRepo} package{(notInRepo == 1 ? "" : "s")} not found in repository and {notUploadedError} package{(notUploadedError == 1 ? "" : "s")} not actioned due to error. " +
+                        "For more detailed packages information, check the above tables.";
                 }
                 else if (notInRepo > 0)
                 {
                     reasonMessage =
-                        $"This step failed due to {notInRepo} packages not found in repository. " +
-                        "For more details, review the above tables.";
+                        $"Artifactory uploader exited with warning, due to {notInRepo} package{(notInRepo == 1 ? "" : "s")} not found in repository. " +
+                        "For more detailed packages information, check the above tables.";
                 }
                 else
                 {
                     reasonMessage =
-                        $"This step failed due to {notUploadedError} packages not actioned due to error. " +
-                        "For more details, review the above tables.";
+                        $"Artifactory uploader exited with warning, due to {notUploadedError} package{(notUploadedError == 1 ? "" : "s")} not actioned due to error. " +
+                        "For more detailed packages information, check the above tables.";
                 }
 
                 Logger.Warn(reasonMessage);
