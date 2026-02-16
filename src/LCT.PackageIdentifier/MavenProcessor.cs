@@ -188,12 +188,10 @@ namespace LCT.PackageIdentifier
         /// <param name="appSettings">Application settings used for SPDX validation and project type checks.</param>
         private void ProcessBomFiles(List<string> configFiles, List<Component> componentsForBOM, List<Component> componentsToBOM, List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
         {
-            foreach (string filepath in configFiles)
+            foreach (string filepath in configFiles.Where(f => !f.EndsWith(FileConstant.SBOMTemplateFileExtension)))
             {
-                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    Bom bomList;
-                    if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                Bom bomList;
+                if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                     {
                         BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
                         Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
@@ -221,7 +219,6 @@ namespace LCT.PackageIdentifier
 
                     AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
                     IdentifiedMavenComponents(filepath, bomList.Components);
-                }
             }
         }
 

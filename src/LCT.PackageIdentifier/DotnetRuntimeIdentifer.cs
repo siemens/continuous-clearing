@@ -51,8 +51,8 @@ namespace LCT.PackageIdentifier
             // Log the Registered MSBuild version and path
             var instance = MSBuildLocator.QueryVisualStudioInstances().FirstOrDefault();
             LoggerHelper.MSBuildVersionDisplay("MSBuild Registered Version:", $"{instance?.Version}");
-            Logger.Debug($"MSBuild Registered Version: {instance?.Version}");
-            Logger.Debug($"MSBuild Registered Path: {instance?.MSBuildPath}");
+            Logger.DebugFormat("MSBuild Registered Version: {Version}.", instance?.Version);
+            Logger.DebugFormat("MSBuild Registered Path: {MSBuildPath}.", instance?.MSBuildPath);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var assetsFile in assetsFiles)
             {
-                Logger.Debug($"Processing assets file: {assetsFile}");
+                Logger.DebugFormat("Processing assets file: {AssetsFile}.", assetsFile);
                 var runtimeInfo = TryGetRuntimeInfoFromAssetFile(assetsFile);
 
                 if (runtimeInfo != null)
@@ -185,7 +185,7 @@ namespace LCT.PackageIdentifier
 
             if (string.IsNullOrWhiteSpace(projectFilePath) || !File.Exists(projectFilePath))
             {
-                info.ErrorMessage = $"Invalid file path or file does not exist: {projectFilePath}";
+                info.ErrorMessage = "Invalid file path or file does not exist: " + projectFilePath;
                 WriteDetailLog(info);
                 return info;
             }
@@ -207,8 +207,9 @@ namespace LCT.PackageIdentifier
             catch (ArgumentNullException ex)
             {
                 info.ErrorMessage = "Argument null exception";
-                info.ErrorDetails = $"An argument was null when it should not have been. Error: {ex.Message}";
+                info.ErrorDetails = "An argument was null when it should not have been. Error: " + ex.Message;
                 WriteDetailLog(info);
+                Logger.Error("Argument null exception occurred.", ex);
                 return info;
             }
 
@@ -352,8 +353,9 @@ namespace LCT.PackageIdentifier
         /// <param name="ex">InvalidProjectFileException thrown by MSBuild during project load.</param>
         private static void HandleProjectFileException(RuntimeInfo info, Microsoft.Build.Exceptions.InvalidProjectFileException ex)
         {
-            info.ErrorMessage = $"Error loading project file: {ex.Message}";
-            info.ErrorDetails = $"Details: {ex.ErrorCode} at {ex.LineNumber}, {ex.ColumnNumber}";
+            info.ErrorMessage = "Error loading project file: " + ex.Message;
+            info.ErrorDetails = string.Format("Details: {0} at {1}, {2}", ex.ErrorCode, ex.LineNumber, ex.ColumnNumber);
+            Logger.Error("Error loading project file.", ex);
         }
 
         /// <summary>
@@ -376,43 +378,26 @@ namespace LCT.PackageIdentifier
 
             if (!string.IsNullOrEmpty(info.ErrorMessage))
             {
-                Logger.Error($"Error: {info.ErrorMessage}");
+                Logger.ErrorFormat("Error: {ErrorMessage}.", info.ErrorMessage);
                 if (!string.IsNullOrEmpty(info.ErrorDetails))
-                    Logger.Error($"Details: {info.ErrorDetails}");
-                Logger.Debug("--------------------------------------------");
+                    Logger.ErrorFormat("Details: {ErrorDetails}.", info.ErrorDetails);
                 return;
             }
 
-            Logger.Debug($"Project Name      : {info.ProjectName}");
-            Logger.Debug($"Project Path      : {info.ProjectPath}");
-            Logger.Debug($"SelfContained     : {info.IsSelfContained.ToString()}");
-            Logger.Debug($"Explicitly Set    : {info.SelfContainedExplicitlySet}");
-            Logger.Debug($"Evaluated Value   : {info.SelfContainedEvaluated}");
-            Logger.Debug($"Reason            : {info.SelfContainedReason}");
+            // Consolidate runtime information logging to reduce Debug calls from 10 to 4
+            var runtimeIdsList = info.RuntimeIdentifiers != null && info.RuntimeIdentifiers.Count > 0
+                ? string.Join(", ", info.RuntimeIdentifiers)
+                : "(None)";
 
-            Logger.Debug("Runtime Identifiers:");
-            if (info.RuntimeIdentifiers != null && info.RuntimeIdentifiers.Count > 0)
-            {
-                foreach (var rid in info.RuntimeIdentifiers)
-                    Logger.Debug($"  - {rid}");
-            }
-            else
-            {
-                Logger.Debug("  (None)");
-            }
+            var frameworkRefsList = info.FrameworkReferences != null && info.FrameworkReferences.Count > 0
+                ? string.Join(", ", info.FrameworkReferences.Select(fr => string.Format("{0} (TargetingPackVersion: {1})", fr.Name, fr.TargetingPackVersion)))
+                : "(None)";
 
-            Logger.Debug("Framework References:");
-            if (info.FrameworkReferences != null && info.FrameworkReferences.Count > 0)
-            {
-                foreach (var fr in info.FrameworkReferences)
-                    Logger.Debug($"  - {fr.Name} (TargetingPackVersion: {fr.TargetingPackVersion})");
-            }
-            else
-            {
-                Logger.Debug("  (None)");
-            }
-
-            Logger.Debug("--------------------------------------------");
+            Logger.DebugFormat("Project Name: {ProjectName}, Project Path: {ProjectPath}.", info.ProjectName, info.ProjectPath);
+            Logger.DebugFormat("SelfContained: {IsSelfContained}, Explicitly Set: {SelfContainedExplicitlySet}, Evaluated Value: {SelfContainedEvaluated}.", 
+                info.IsSelfContained.ToString(), info.SelfContainedExplicitlySet, info.SelfContainedEvaluated);
+            Logger.DebugFormat("Reason: {SelfContainedReason}.", info.SelfContainedReason);
+            Logger.DebugFormat("Runtime Identifiers: {RuntimeIdentifiers}, Framework References: {FrameworkReferences}.", runtimeIdsList, frameworkRefsList);
         }
 
         /// <summary>

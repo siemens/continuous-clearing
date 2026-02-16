@@ -28,9 +28,6 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public class AlpinePackageDownloader : IPackageDownloader
     {
-
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Downloads the source package for the specified component and returns the local file path to the downloaded
         /// archive.

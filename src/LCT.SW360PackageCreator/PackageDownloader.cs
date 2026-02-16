@@ -136,35 +136,29 @@ namespace LCT.SW360PackageCreator
             string[] taglist = GetTagListFromResult(result);
             string baseVersion = GetBaseVersion(component.Version);
 
-            foreach (string item in taglist)
+            foreach (string item in taglist.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
-                if (!string.IsNullOrWhiteSpace(item))
-                {
-                    string tag = item[(item.IndexOf("tags/") + 5)..];
-                    Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
+                string tag = item[(item.IndexOf("tags/") + 5)..];
+                Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
 
-                    if (tag.Contains(component.Version, StringComparison.OrdinalIgnoreCase) &&
-                tag.Contains(component.Name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return tag;
-                    }
+                if (tag.Contains(component.Version, StringComparison.OrdinalIgnoreCase) &&
+            tag.Contains(component.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return tag;
                 }
             }
-            foreach (string item in taglist)
+            foreach (string item in taglist.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
-                if (!string.IsNullOrWhiteSpace(item))
-                {
-                    string tag = item[(item.IndexOf("tags/") + 5)..];
-                    Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
+                string tag = item[(item.IndexOf("tags/") + 5)..];
+                Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
 
-                    if (tag.Contains(component.Version))
-                    {
-                        return tag;
-                    }
-                    else if (tag.Contains(baseVersion))
-                    {
-                        return tag;
-                    }
+                if (tag.Contains(component.Version))
+                {
+                    return tag;
+                }
+                else if (tag.Contains(baseVersion))
+                {
+                    return tag;
                 }
             }
             Logger.DebugFormat("GetCorrectVersion():Completed identifying correct version for this component ,given version:{0}, correct Version:{1}", component.Version, correctVersion);
