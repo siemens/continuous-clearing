@@ -53,7 +53,7 @@
         },
         {
           "name": "internal:siemens:clearing:siemens:filename",
-          "value": "libcurl/8.15.0"
+          "value": "libcurl/8.18.0"
         },
         {
           "name": "internal:siemens:clearing:identifier-type",

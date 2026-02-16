@@ -154,6 +154,8 @@ namespace SW360IntegrationTest.Conan
             bool AttachmentFound = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
 
             //Assert
+            Assert.IsTrue(AttachmentFound, "Expected a SOURCE attachment to be present in the release.");
+            Assert.AreEqual(expectedname, name, "Test Project Name");
             Assert.AreEqual(expectedversion, version, "Test Project  Version");
             Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of Entity Framework");
             Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
