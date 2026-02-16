@@ -84,7 +84,15 @@ namespace LCT.APICommunications
 
             if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
             {
-                string errorMsg = outcome.Exception != null ? outcome.Exception.Message : (outcome.Result != null ? outcome.Result.StatusCode.ToString() : "");
+                string errorMsg = "";
+                if (outcome.Exception != null)
+                {
+                    errorMsg = outcome.Exception.Message;
+                }
+                else if (outcome.Result != null)
+                {
+                    errorMsg = outcome.Result.StatusCode.ToString();
+                }
                 Logger.WarnFormat("Retry attempt initiated: {0} Error: {1}", operationInfo, errorMsg);
             }
 

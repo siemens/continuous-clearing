@@ -374,7 +374,10 @@ namespace LCT.PackageIdentifier
                 return;
             }
 
-            Logger.Debug("----- .NET Runtime Information Summary -----");
+            // Consolidate the summary and project name/path into a single Debug call
+            Logger.DebugFormat(
+                "----- .NET Runtime Information Summary -----\nProject Name: {0}, Project Path: {1}.",
+                info.ProjectName, info.ProjectPath);
 
             if (!string.IsNullOrEmpty(info.ErrorMessage))
             {
@@ -384,7 +387,6 @@ namespace LCT.PackageIdentifier
                 return;
             }
 
-            // Consolidate runtime information logging to reduce Debug calls from 10 to 4
             var runtimeIdsList = info.RuntimeIdentifiers != null && info.RuntimeIdentifiers.Count > 0
                 ? string.Join(", ", info.RuntimeIdentifiers)
                 : "(None)";
@@ -393,7 +395,6 @@ namespace LCT.PackageIdentifier
                 ? string.Join(", ", info.FrameworkReferences.Select(fr => string.Format("{0} (TargetingPackVersion: {1})", fr.Name, fr.TargetingPackVersion)))
                 : "(None)";
 
-            Logger.DebugFormat("Project Name: {ProjectName}, Project Path: {ProjectPath}.", info.ProjectName, info.ProjectPath);
             Logger.DebugFormat("SelfContained: {IsSelfContained}, Explicitly Set: {SelfContainedExplicitlySet}, Evaluated Value: {SelfContainedEvaluated}.", 
                 info.IsSelfContained.ToString(), info.SelfContainedExplicitlySet, info.SelfContainedEvaluated);
             Logger.DebugFormat("Reason: {SelfContainedReason}.", info.SelfContainedReason);

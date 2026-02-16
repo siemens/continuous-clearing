@@ -38,6 +38,8 @@ namespace LCT.Services
         readonly ISW360CommonService m_SW360CommonService;
         private static EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
+        private const string UpdateExternalIdForReleaseMethod = "UpdateExternalIdForRelease()";
+
         public Sw360CreatorService(ISW360ApicommunicationFacade sw360ApiCommunicationFacade)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
@@ -711,14 +713,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.Error("UpdateExternalIdForRelease()", ex);
+                Logger.Error(UpdateExternalIdForReleaseMethod, ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.Error("UpdateExternalIdForRelease()", ex);
+                Logger.Error(UpdateExternalIdForReleaseMethod, ex);
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -759,13 +761,13 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdateSourceCodeDownloadURLForExistingRelease", $"MethodName:UpdateSourceCodeDownloadURLForExistingRelease()", ex, "An HTTP request error occurred while updating the SW360 release content.");
-                Logger.Error("UpdateExternalIdForRelease():", ex);
+                Logger.Error(UpdateExternalIdForReleaseMethod + ":", ex);
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdateSourceCodeDownloadURLForExistingRelease", $"MethodName:UpdateSourceCodeDownloadURLForExistingRelease()", ex, "An aggregate exception occurred while updating the SW360 release content.");
-                Logger.Error("UpdateExternalIdForRelease():", ex);
+                Logger.Error(UpdateExternalIdForReleaseMethod + ":", ex);
                 return false;
             }
         }
