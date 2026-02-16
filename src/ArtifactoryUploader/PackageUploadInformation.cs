@@ -797,6 +797,55 @@ namespace LCT.ArtifactoryUploader
             WarningMessageForNoPackages(filename);
         }
 
+        /// <summary>
+        /// Logs a detailed failure message based on uploader KPIs and terminates the process with a non-zero exit code.
+        /// </summary>
+        /// <param name="uploaderKpiData">
+        /// The KPI data containing counts of packages not existing in the repository and packages not actioned due to error.
+        /// </param>
+        /// <param name="environmentHelper">
+        /// The environment helper used to exit the process with the appropriate exit code.
+        /// </param>
+        /// <remarks>
+        /// This method constructs a contextual warning message indicating the cause of failure:
+        /// - Packages not existing in repository (remote cache)
+        /// - Packages not actioned due to error
+        /// If one or both counts are greater than zero, it logs the message and calls <see cref="EnvironmentHelper.CallEnvironmentExit(int)"/> with exit code 2.
+        /// </remarks>
+        public static void SetExitCode(UploaderKpiData uploaderKpiData,EnvironmentHelper environmentHelper)
+        {           
+            if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
+            {
+                // Build a detailed failure message
+                var notInRepo = uploaderKpiData.PackagesNotExistingInRemoteCache;
+                var notUploadedError = uploaderKpiData.PackagesNotUploadedDueToError;
+
+                string reasonMessage;
+
+                if (notInRepo > 0 && notUploadedError > 0)
+                {
+                    reasonMessage =
+                        $"This step failed due to {notInRepo} packages not found in repository and {notUploadedError} packages not actioned due to error. " +
+                        "For more details, review the above tables.";
+                }
+                else if (notInRepo > 0)
+                {
+                    reasonMessage =
+                        $"This step failed due to {notInRepo} packages not found in repository. " +
+                        "For more details, review the above tables.";
+                }
+                else
+                {
+                    reasonMessage =
+                        $"This step failed due to {notUploadedError} packages not actioned due to error. " +
+                        "For more details, review the above tables.";
+                }
+
+                Logger.Warn(reasonMessage);
+                environmentHelper.CallEnvironmentExit(2);
+                Logger.Debug("Setting ExitCode to 2");
+            }            
+        }
         #endregion
     }
 }

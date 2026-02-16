@@ -8,8 +8,13 @@ using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.ArtifactoryUploader;
 using LCT.ArtifactoryUploader.Model;
+using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -22,6 +27,106 @@ namespace AritfactoryUploader.UTest
 {
     public class PackageUploadInformationTest
     {
+        private MemoryAppender _memoryAppender;
+
+        [SetUp]
+        public void SetUp()
+        {           
+            _memoryAppender = new MemoryAppender();
+            BasicConfigurator.Configure(_memoryAppender);
+            _memoryAppender.Clear();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _memoryAppender?.Close();
+        }
+
+        [Test]
+        public void SetExitCode_BothCountersNonZero_LogsCombinedWarning_ExitsWith2()
+        {
+            // Arrange
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 3,
+                PackagesNotUploadedDueToError = 2
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper);
+
+            // Assert logs
+            LoggingEvent[] events = _memoryAppender.GetEvents();
+            Assert.That(events.Length, Is.GreaterThanOrEqualTo(2), "Expected at least a warn and a debug log event.");
+
+            var warnEvent = FindEventByLevel(events, Level.Warn);
+            var debugEvent = FindEventByLevel(events, Level.Debug);
+
+            Assert.NotNull(warnEvent, "Warning log was not captured.");
+            Assert.NotNull(debugEvent, "Debug log was not captured.");
+
+            StringAssert.Contains("This step failed due to 3 packages not found in repository and 2 packages not actioned due to error.", warnEvent.RenderedMessage);
+            StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
+        }
+
+        [Test]
+        public void SetExitCode_OnlyNotInRepoNonZero_LogsRepoWarning_ExitsWith2()
+        {
+            // Arrange
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 5,
+                PackagesNotUploadedDueToError = 0
+            };
+
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper);
+
+            // Assert
+            
+            var events = _memoryAppender.GetEvents();
+            var warnEvent = FindEventByLevel(events, Level.Warn);
+            var debugEvent = FindEventByLevel(events, Level.Debug);
+
+            Assert.NotNull(warnEvent);
+            Assert.NotNull(debugEvent);
+
+            StringAssert.Contains("This step failed due to 5 packages not found in repository.", warnEvent.RenderedMessage);
+            StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
+        }
+
+        [Test]
+        public void SetExitCode_OnlyErrorNonZero_LogsErrorWarning_ExitsWith2()
+        {
+            // Arrange
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 0,
+                PackagesNotUploadedDueToError = 7
+            };
+
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper);
+
+            // Assert
+            
+            var events = _memoryAppender.GetEvents();
+            var warnEvent = FindEventByLevel(events, Level.Warn);
+            var debugEvent = FindEventByLevel(events, Level.Debug);
+
+            Assert.NotNull(warnEvent);
+            Assert.NotNull(debugEvent);
+
+            StringAssert.Contains("This step failed due to 7 packages not actioned due to error.", warnEvent.RenderedMessage);
+            StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
+        }
+                
         [Test]
         public void GetUploadPackageDetails_CoversAllScenarios()
         {
@@ -500,6 +605,16 @@ namespace AritfactoryUploader.UTest
 
             // Cleanup
             File.Delete(filename);
+        }
+
+        private static LoggingEvent FindEventByLevel(LoggingEvent[] events, Level level)
+        {
+            foreach (var e in events)
+            {
+                if (e.Level == level)
+                    return e;
+            }
+            return null;
         }
     }
 }
