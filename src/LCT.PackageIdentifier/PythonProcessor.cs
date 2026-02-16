@@ -315,19 +315,7 @@ namespace LCT.PackageIdentifier
             IdentifiedPythonPackages(filePath, PythonPackages);
             return PythonPackages;
         }
-
-        /// <summary>
-        /// Gets Distinct ComponentList
-        /// </summary>
-        /// <param name="listofComponents"></param>
-        private static void GetDistinctComponentList(ref List<PythonPackage> listofComponents)
-        {
-            int initialCount = listofComponents.Count;
-            listofComponents = listofComponents.GroupBy(x => new { x.Name, x.Version, x.PurlID }).Select(y => y.First()).ToList();
-
-            if (listofComponents.Count != initialCount)
-                BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
-        }
+              
 
         /// <summary>
         /// Gets Release ExternalId

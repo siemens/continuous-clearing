@@ -38,7 +38,7 @@
   "components": [
     {
       "type": "null",
-      "bom-ref": "pkg:npm/%40angular/common@9.1.12",
+      "bom-ref": "pkg:npm/@angular/common@9.1.12",
       "group": "@angular",
       "name": "common",
       "version": "9.1.12",

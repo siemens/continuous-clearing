@@ -89,7 +89,7 @@
     },
     {
       "type": "null",
-      "bom-ref": "pkg:npm/%40angular-devkit/architect@0.901.10",
+      "bom-ref": "pkg:npm/@angular-devkit/architect@0.901.10",
       "group": "@angular-devkit",
       "name": "architect",
       "version": "0.901.10",
@@ -141,7 +141,7 @@
     },
     {
       "type": "null",
-      "bom-ref": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
+      "bom-ref": "pkg:npm/@angular-devkit/build-angular@0.901.10",
       "group": "@angular-devkit",
       "name": "build-angular",
       "version": "0.901.10",
@@ -295,7 +295,7 @@
     },
     {
       "type": "null",
-      "bom-ref": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
+      "bom-ref": "pkg:npm/@angular-devkit/build-optimizer@0.901.10",
       "group": "@angular-devkit",
       "name": "build-optimizer",
       "version": "0.901.10",
@@ -354,25 +354,25 @@
       ]
     },
     {
-      "ref": "pkg:npm/%40angular-devkit/architect@0.901.10",
+      "ref": "pkg:npm/@angular-devkit/architect@0.901.10",
       "dependsOn": [
-        "pkg:npm/%40angular-devkit/core@9.1.10",
+        "pkg:npm/@angular-devkit/core@9.1.10",
         "pkg:npm/rxjs@6.5.4"
       ]
     },
     {
-      "ref": "pkg:npm/%40angular-devkit/build-angular@0.901.10",
+      "ref": "pkg:npm/@angular-devkit/build-angular@0.901.10",
       "dependsOn": [
-        "pkg:npm/%40angular-devkit/architect@0.901.10",
-        "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
-        "pkg:npm/%40angular-devkit/build-webpack@0.901.10",
-        "pkg:npm/%40angular-devkit/core@9.1.10",
-        "pkg:npm/%40babel/core@7.9.0",
-        "pkg:npm/%40babel/generator@7.9.3",
-        "pkg:npm/%40babel/preset-env@7.9.0",
-        "pkg:npm/%40babel/template@7.8.6",
-        "pkg:npm/%40jsdevtools/coverage-istanbul-loader@3.0.3",
-        "pkg:npm/%40ngtools/webpack@9.1.10",
+        "pkg:npm/@angular-devkit/architect@0.901.10",
+        "pkg:npm/@angular-devkit/build-optimizer@0.901.10",
+        "pkg:npm/@angular-devkit/build-webpack@0.901.10",
+        "pkg:npm/@angular-devkit/core@9.1.10",
+        "pkg:npm/@babel/core@7.9.0",
+        "pkg:npm/@babel/generator@7.9.3",
+        "pkg:npm/@babel/preset-env@7.9.0",
+        "pkg:npm/@babel/template@7.8.6",
+        "pkg:npm/@jsdevtools/coverage-istanbul-loader@3.0.3",
+        "pkg:npm/@ngtools/webpack@9.1.10",
         "pkg:npm/ajv@6.12.0",
         "pkg:npm/autoprefixer@9.7.4",
         "pkg:npm/babel-loader@8.0.6",
@@ -427,7 +427,7 @@
       ]
     },
     {
-      "ref": "pkg:npm/%40angular-devkit/build-optimizer@0.901.10",
+      "ref": "pkg:npm/@angular-devkit/build-optimizer@0.901.10",
       "dependsOn": [
         "pkg:npm/loader-utils@2.0.0",
         "pkg:npm/source-map@0.7.3",

@@ -38,13 +38,7 @@ namespace LCT.Common
         /// Array of invalid characters for project names.
         /// </summary>
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
-
-        private static int _duplicateComponents = 0;
-
-        /// <summary>
-        /// Gets the calculated count of duplicate components detected during enrichment.
-        /// </summary>
-        public static int DuplicateComponents => _duplicateComponents;
+               
 
         #endregion Fields
 
@@ -156,8 +150,8 @@ namespace LCT.Common
             if (!DependencyFileNotFound)
             {
                 DependencyFileNotFound = true;
-                Logger.Warn("   Can you please provide the cdxgen-generated SBOM to get more accurate dependencies");
-            }
+                Logger.Warn("    Cdxgen SBOM not provided for accurate dependencies");
+            }            
         }
 
         /// Removes excluded components from the component list.
@@ -902,26 +896,59 @@ namespace LCT.Common
         /// If cdxgen has no components, this method returns without changes.
         /// </remarks>
 
-        public static void ApplyCdxGenEnrichment(ref List<Component> ListofComponentsFromLockFile, ref List<Dependency> ListofDependenciesFromLockFile, ref List<Component> componentsForBOM, ref List<Dependency> dependencies, Bom cdxGenBomData)
+      
+        public static void ApplyCdxGenEnrichment(
+     ref List<Component> ListofComponentsFromLockFile,
+     ref List<Dependency> ListofDependenciesFromLockFile,
+     ref List<Component> componentsForBOM,
+     ref List<Dependency> dependencies,
+     Bom cdxGenBomData)
         {
             if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
             {
                 return;
             }
 
-            _duplicateComponents = Math.Max(0, (ListofComponentsFromLockFile?.Count ?? 0) - cdxGenBomData.Components.Count);
-            EnrichComponentsFromCdxGen(ref ListofComponentsFromLockFile, cdxGenBomData.Components);
+            // Step 1: Identify valid BomRefs from components discovered in lock/package files
+            var validBomRefs = new HashSet<string>(
+                (ListofComponentsFromLockFile ?? new List<Component>())
+                    .Where(c => !string.IsNullOrEmpty(c.BomRef))
+                    .Select(c => c.BomRef),
+                StringComparer.OrdinalIgnoreCase);
 
-            if (cdxGenBomData.Components != null && cdxGenBomData.Components.Count > 0)
+            // Keep existing append behavior for components to BOM
+            if (ListofComponentsFromLockFile != null && ListofComponentsFromLockFile.Count > 0)
             {
-                componentsForBOM.AddRange(cdxGenBomData.Components);
+                componentsForBOM.AddRange(ListofComponentsFromLockFile);
             }
 
+            // Step 2: Merge cdxgen dependencies into discovered dependencies and prune invalid refs (top-level and nested)
             if (cdxGenBomData.Dependencies != null && cdxGenBomData.Dependencies.Count > 0)
             {
+                
+                // Prune invalid dependencies by validBomRefs
+                void Prune(List<Dependency> deps)
+                {
+                    if (deps == null) return;
+
+                    // Remove any dependency whose Ref is null/empty or not in validBomRefs
+                    deps.RemoveAll(d => string.IsNullOrEmpty(d.Ref) || !validBomRefs.Contains(d.Ref));
+
+                    // Recurse into children
+                    foreach (var d in deps)
+                    {
+                        if (d.Dependencies != null && d.Dependencies.Count > 0)
+                        {
+                            Prune(d.Dependencies);
+                        }
+                    }
+                }
+
+                Prune(cdxGenBomData.Dependencies);
+
+                // Also reflect the pruned dependencies in the BOM dependencies collection
                 dependencies.AddRange(cdxGenBomData.Dependencies);
             }
-            AddSiemensDirectProperty(ref cdxGenBomData);
         }
         public static void AddSiemensDirectProperty(ref Bom bom)
         {
