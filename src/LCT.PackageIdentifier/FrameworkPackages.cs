@@ -86,11 +86,11 @@ namespace LCT.PackageIdentifier
             }
             catch (ArgumentException ex)
             {
-                Logger.Debug($"GetFrameworkPackages: Argument error: {ex.Message}");
+                Logger.DebugFormat("GetFrameworkPackages: Argument error: {0}", ex.Message);
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Debug($"GetFrameworkPackages : Invalid operation: {ex.Message}");
+                Logger.DebugFormat("GetFrameworkPackages: Invalid operation: {0}", ex.Message);
             }
 
             return _foundFrameworkPackages;
@@ -134,11 +134,11 @@ namespace LCT.PackageIdentifier
             }
             catch (FileNotFoundException ex)
             {
-                Logger.Debug($"LoadAssembly: FileNotFoundException  {ex.Message}");
+                Logger.DebugFormat("LoadAssembly: FileNotFoundException: {0}", ex.Message);
             }
             catch (FileLoadException ex)
             {
-                Logger.Debug($"LoadAssembly: FileLoadException {ex.Message}");
+                Logger.DebugFormat("LoadAssembly: FileLoadException: {0}", ex.Message);
             }
             return null;
         }
