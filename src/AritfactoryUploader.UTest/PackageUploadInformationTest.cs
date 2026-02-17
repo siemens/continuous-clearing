@@ -67,7 +67,8 @@ namespace AritfactoryUploader.UTest
             Assert.NotNull(warnEvent, "Warning log was not captured.");
             Assert.NotNull(debugEvent, "Debug log was not captured.");
 
-            StringAssert.Contains("This step failed due to 3 packages not found in repository and 2 packages not actioned due to error.", warnEvent.RenderedMessage);
+            StringAssert.Contains("Artifactory uploader exited with warning, due to 3 packages not found in repository and 2 packages not actioned due to error.", warnEvent.RenderedMessage);
+            StringAssert.Contains("For more detailed packages information, check the above tables.", warnEvent.RenderedMessage);
             StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
         }
 
@@ -87,7 +88,6 @@ namespace AritfactoryUploader.UTest
             PackageUploadInformation.SetExitCode(kpi, environmentHelper);
 
             // Assert
-            
             var events = _memoryAppender.GetEvents();
             var warnEvent = FindEventByLevel(events, Level.Warn);
             var debugEvent = FindEventByLevel(events, Level.Debug);
@@ -95,7 +95,8 @@ namespace AritfactoryUploader.UTest
             Assert.NotNull(warnEvent);
             Assert.NotNull(debugEvent);
 
-            StringAssert.Contains("This step failed due to 5 packages not found in repository.", warnEvent.RenderedMessage);
+            StringAssert.Contains("Artifactory uploader exited with warning, due to 5 packages not found in repository.", warnEvent.RenderedMessage);
+            StringAssert.Contains("For more detailed packages information, check the above tables.", warnEvent.RenderedMessage);
             StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
         }
 
@@ -115,7 +116,6 @@ namespace AritfactoryUploader.UTest
             PackageUploadInformation.SetExitCode(kpi, environmentHelper);
 
             // Assert
-            
             var events = _memoryAppender.GetEvents();
             var warnEvent = FindEventByLevel(events, Level.Warn);
             var debugEvent = FindEventByLevel(events, Level.Debug);
@@ -123,10 +123,11 @@ namespace AritfactoryUploader.UTest
             Assert.NotNull(warnEvent);
             Assert.NotNull(debugEvent);
 
-            StringAssert.Contains("This step failed due to 7 packages not actioned due to error.", warnEvent.RenderedMessage);
+            StringAssert.Contains("Artifactory uploader exited with warning, due to 7 packages not actioned due to error.", warnEvent.RenderedMessage);
+            StringAssert.Contains("For more detailed packages information, check the above tables.", warnEvent.RenderedMessage);
             StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
         }
-                
+
         [Test]
         public void GetUploadPackageDetails_CoversAllScenarios()
         {
