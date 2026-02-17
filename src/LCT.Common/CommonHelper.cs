@@ -870,84 +870,56 @@ namespace LCT.Common
                 _ => projectType.Trim(),
             };
         }
-        /// <summary>
-        /// Merges cdxgen-generated SBOM data into existing BOM collections and enriches component properties.
-        /// </summary>
-        /// <param name="ListofComponentsFromLockFile">
-        /// Reference to the list of components discovered from lock/package files. Used to merge existing properties into cdxgen components.
-        /// </param>
-        /// <param name="ListofDependenciesFromLockFile">
-        /// Reference to the list of dependencies discovered from lock/package files. Currently not modified in this method.
-        /// </param>
-        /// <param name="componentsForBOM">
-        /// Reference to the BOM component list that will be appended with components from the cdxgen SBOM.
-        /// </param>
-        /// <param name="dependencies">
-        /// Reference to the BOM dependency list that will be appended with dependencies from the cdxgen SBOM.
-        /// </param>
-        /// <param name="cdxGenBomData">
-        /// The parsed CycloneDX <see cref="Bom"/> produced by cdxgen. If it contains components, they are merged and appended to the BOM lists.
-        /// </param>
-        /// <remarks>
-        /// Operation order:
-        /// 1) If cdxgen components exist, enrich them with properties from lock-file components (match by PURL or Name+Version).
-        /// 2) Append cdxgen components and dependencies to the target BOM lists.
-        /// 3) Add the "siemens:direct" property to components based on top-level dependency refs from cdxgen.
-        /// If cdxgen has no components, this method returns without changes.
-        /// </remarks>
+        // Pseudocode:
+        // - Inside ApplyCdxGenEnrichment's local Prune function:
+        //   - Keep removal of invalid refs.
+        //   - Replace foreach over deps to recurse with a single LINQ chain:
+        //     * Select each d.Dependencies
+        //     * Filter non-null and non-empty child collections
+        //     * Call Prune on each child collection
 
-      
         public static void ApplyCdxGenEnrichment(
-     ref List<Component> ListofComponentsFromLockFile,
-     ref List<Dependency> ListofDependenciesFromLockFile,
-     ref List<Component> componentsForBOM,
-     ref List<Dependency> dependencies,
-     Bom cdxGenBomData)
+    ref List<Component> ListofComponentsFromLockFile,
+    ref List<Dependency> ListofDependenciesFromLockFile,
+    ref List<Component> componentsForBOM,
+    ref List<Dependency> dependencies,
+    Bom cdxGenBomData)
         {
             if (cdxGenBomData?.Components == null || cdxGenBomData.Components.Count == 0)
             {
                 return;
             }
 
-            // Step 1: Identify valid BomRefs from components discovered in lock/package files
             var validBomRefs = new HashSet<string>(
                 (ListofComponentsFromLockFile ?? new List<Component>())
                     .Where(c => !string.IsNullOrEmpty(c.BomRef))
                     .Select(c => c.BomRef),
                 StringComparer.OrdinalIgnoreCase);
 
-            // Keep existing append behavior for components to BOM
-            if (ListofComponentsFromLockFile != null && ListofComponentsFromLockFile.Count > 0)
+            if (ListofComponentsFromLockFile?.Count > 0)
             {
                 componentsForBOM.AddRange(ListofComponentsFromLockFile);
             }
 
-            // Step 2: Merge cdxgen dependencies into discovered dependencies and prune invalid refs (top-level and nested)
-            if (cdxGenBomData.Dependencies != null && cdxGenBomData.Dependencies.Count > 0)
+            var cdxDeps = cdxGenBomData.Dependencies;
+            if (cdxDeps is null || cdxDeps.Count == 0)
             {
-                
-                // Prune invalid dependencies by validBomRefs
-                void Prune(List<Dependency> deps)
+                return;
+            }
+
+            CheckDependencies(cdxDeps, validBomRefs);
+            dependencies.AddRange(cdxDeps);
+
+            static void CheckDependencies(List<Dependency> deps, HashSet<string> validBomRefs)
+            {
+                if (deps == null) return;
+
+                deps.RemoveAll(d => string.IsNullOrEmpty(d.Ref) || !validBomRefs.Contains(d.Ref));
+
+                foreach (var child in deps.Select(d => d.Dependencies).Where(child => child is { Count: > 0 }))
                 {
-                    if (deps == null) return;
-
-                    // Remove any dependency whose Ref is null/empty or not in validBomRefs
-                    deps.RemoveAll(d => string.IsNullOrEmpty(d.Ref) || !validBomRefs.Contains(d.Ref));
-
-                    // Recurse into children
-                    foreach (var d in deps)
-                    {
-                        if (d.Dependencies != null && d.Dependencies.Count > 0)
-                        {
-                            Prune(d.Dependencies);
-                        }
-                    }
+                    CheckDependencies(child, validBomRefs);
                 }
-
-                Prune(cdxGenBomData.Dependencies);
-
-                // Also reflect the pruned dependencies in the BOM dependencies collection
-                dependencies.AddRange(cdxGenBomData.Dependencies);
             }
         }
         public static void AddSiemensDirectProperty(ref Bom bom)
