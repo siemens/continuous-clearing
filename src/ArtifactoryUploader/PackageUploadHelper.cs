@@ -69,7 +69,7 @@ namespace LCT.ArtifactoryUploader
                 }
                 else
                 {
-                    Logger.ErrorFormat("File not found: {0}. Please provide a valid file path.", comparisonBomFilePath);
+                    Logger.ErrorFormat("File not found: {ComparisonBomFilePath}. Please provide a valid file path.", comparisonBomFilePath);
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }

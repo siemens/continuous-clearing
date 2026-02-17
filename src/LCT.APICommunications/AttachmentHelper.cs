@@ -233,7 +233,7 @@ namespace LCT.APICommunications
             }
             else
             {
-                Logger.Debug($"HTTP Status Code: {httpResponse.StatusCode}");
+                Logger.DebugFormat("HTTP Status Code: {0}", httpResponse.StatusCode);
             }
         }
 

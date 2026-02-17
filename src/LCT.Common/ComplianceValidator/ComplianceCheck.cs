@@ -114,9 +114,9 @@ namespace LCT.Common.ComplianceValidator
             Dictionary<string, ComplianceExceptionComponent> purlToComponent)
         {
             var groupMap = new Dictionary<(string warning, string recommendation), List<string>>();
-            foreach (var bom in bomDataList)
+            foreach (var componentExternalId in bomDataList.Select(bom => bom.ComponentExternalId))
             {
-                if (bom.ComponentExternalId != null && purlToComponent.TryGetValue(bom.ComponentExternalId, out var comp))
+                if (componentExternalId != null && purlToComponent.TryGetValue(componentExternalId, out var comp))
                 {
                     var warning = comp.ComplianceInstructions?.WarningMessage?.Trim() ?? string.Empty;
                     var recommendation = comp.ComplianceInstructions?.Recommendation?.Trim() ?? string.Empty;
@@ -127,7 +127,7 @@ namespace LCT.Common.ComplianceValidator
                         purlList = new List<string>();
                         groupMap[key] = purlList;
                     }
-                    purlList.Add(bom.ComponentExternalId);
+                    purlList.Add(componentExternalId);
                 }
             }
             return groupMap;

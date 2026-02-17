@@ -56,7 +56,7 @@ namespace LCT.Common
                 environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
-            Logger.Debug($"Settings File: {settingsFilePath}");
+            Logger.Debug("Settings File: {0}", settingsFilePath);
             //add ut for reading - add json and then cmd args
             IConfigurationBuilder settingsConfigBuilder = new ConfigurationBuilder()
                                                                     .SetBasePath(BasePath)

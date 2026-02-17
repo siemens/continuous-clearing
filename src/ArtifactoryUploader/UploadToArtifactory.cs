@@ -31,6 +31,9 @@ namespace LCT.ArtifactoryUploader
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
         private const string Choco = "CHOCO";
         private const string Nuget = "NUGET";
+        private const string Conan = "CONAN";
+        private const string Debian = "DEBIAN";
+        private const string Cargo = "cargo";
 
         #endregion
 
@@ -161,13 +164,13 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
-                return "CONAN";
+                return Conan;
             }
             else if (item.Purl.Contains("pkg:deb/debian", StringComparison.OrdinalIgnoreCase))
             {
-                return "DEBIAN";
+                return Debian;
             }
-            else if (item.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
+            else if (item.Purl.Contains(Cargo, StringComparison.OrdinalIgnoreCase))
             {
                 return "CARGO";
             }
@@ -202,11 +205,11 @@ namespace LCT.ArtifactoryUploader
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
-            else if (component.ComponentType == "CONAN")
+            else if (component.ComponentType == Conan)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}";
             }
-            else if (component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == Debian)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
@@ -250,7 +253,7 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "debian":
                         return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
-                    case "cargo":
+                    case Cargo:
                         return GetRepoName(packageType, appSettings.Cargo.ReleaseRepo, appSettings.Cargo.DevDepRepo, appSettings.Cargo.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                 }
             }
@@ -387,14 +390,14 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
-            else if (component.ComponentType == "CONAN")
+            else if (component.ComponentType == Conan)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
                $"?to=/{component.DestRepoName}/{component.Path}";
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if (component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == Debian)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
@@ -600,7 +603,7 @@ namespace LCT.ArtifactoryUploader
                             repoCache[repo] = componentRepoData;
                             aqlResultList.AddRange(componentRepoData);
                         }
-                        else if (packageType == "cargo")
+                        else if (packageType == Cargo)
                         {
                             var componentRepoData = await jFrogService.GetCargoComponentDataByRepo(repo) ?? new List<AqlResult>();
                             repoCache[repo] = componentRepoData;

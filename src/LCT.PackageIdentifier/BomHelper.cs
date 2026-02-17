@@ -158,11 +158,11 @@ namespace LCT.PackageIdentifier
             {
                 if (missingFile.EndsWith(".sig", StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that signature files are named in the format '{filename}.sig'.");
+                    Logger.ErrorFormat("Naming Convention Error: The certificate file(s) for the SPDX document '{0}' are missing. Please ensure that signature files are named in the format '{0}.sig'.", filename);
                 }
                 else if (missingFile.EndsWith(".pem", StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Error($"Naming Convention Error: The certificate file(s) for the SPDX document '{filename}' are missing. Please ensure that .pem files are named in the format '{filename}.pem'.");
+                    Logger.ErrorFormat("Naming Convention Error: The certificate file(s) for the SPDX document '{0}' are missing. Please ensure that .pem files are named in the format '{0}.pem'.", filename);
                 }
             }
         }
@@ -181,8 +181,8 @@ namespace LCT.PackageIdentifier
             bool isValidFile = PemSignatureVerifier.ValidatePem(filepath, sigFilePath, pemFilePath);
             if (!isValidFile)
             {
-                Logger.Warn($"The signature of the SPDX file '{filename}' is not valid. Please check the signature and certificate files.");
-                Logger.Warn($"Currently processing the SPDX file '{filename}' without signature verification.");
+                Logger.WarnFormat("The signature of the SPDX file '{0}' is not valid. Please check the signature and certificate files.", filename);
+                Logger.WarnFormat("Currently processing the SPDX file '{0}' without signature verification.", filename);
             }
         }
 
@@ -452,7 +452,7 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"GetExcludedComponentsList():InvalidComponent For {projectType} : Component Details : {componentsInfo.Name} @ {componentsInfo.Version} @ {componentsInfo.Purl}");
+                    Logger.DebugFormat("GetExcludedComponentsList():InvalidComponent For {0} : Component Details : {1} @ {2} @ {3}", projectType, componentsInfo.Name, componentsInfo.Version, componentsInfo.Purl);
                 }
             }
             return components;
