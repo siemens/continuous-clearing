@@ -1627,7 +1627,7 @@ namespace LCT.Common.Logging
             }
             else
             {
-                Logger.Info("    Input file FOUND :{0}", configFile);
+                Logger.InfoFormat("    Input file FOUND :{0}", configFile);
             }
         }
 
@@ -1691,7 +1691,7 @@ namespace LCT.Common.Logging
             }
             else
             {
-                Logger.Warn("\t{0}", message);
+                Logger.WarnFormat("\t{0}", message);
             }
         }
         /// <summary>
@@ -1705,10 +1705,10 @@ namespace LCT.Common.Logging
                 WriteInfoWithMarkup($"   [white]└──[/][red]{message}[/]");
                 Logger.Debug($"   └── {message}");
             }
-            else
-            {
-                Logger.Error("\t{0}", message);
-            }
+                else
+                {
+                    Logger.ErrorFormat("\t{0}", message);
+                }
         }
         /// <summary>
         /// Writes component status message.
@@ -1755,10 +1755,10 @@ namespace LCT.Common.Logging
             {
                 WriteInfoWithMarkup($"[white]{message} [/][green]{version}[/]");
             }
-            else
-            {
-                Logger.Info("{0}{1}", message, version);
-            }
+                else
+                {
+                    Logger.InfoFormat("{0}{1}", message, version);
+                }
         }
         /// <summary>
         /// Logs duplicate components by PURL ID using log4net.
