@@ -87,11 +87,7 @@ namespace LCT.ArtifactoryUploader
             Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has completed");
 
             // set the error code
-            if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
-            {
-                environmentHelper.CallEnvironmentExit(2);
-                Logger.Debug("Setting ExitCode to 2");
-            }
+            PackageUploadInformation.SetExitCode(uploaderKpiData, environmentHelper);                    
 
         }
 

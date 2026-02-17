@@ -40,7 +40,7 @@
       "type": "library",
       "bom-ref": "pkg:conan/libcurl@8.18.0",
       "name": "libcurl",
-      "version": "8.15.0",
+      "version": "8.18.0",
       "purl": "pkg:conan/libcurl@8.18.0",
       "properties": [
         {
