@@ -870,13 +870,34 @@ namespace LCT.Common
                 _ => projectType.Trim(),
             };
         }
-        // Pseudocode:
-        // - Inside ApplyCdxGenEnrichment's local Prune function:
-        //   - Keep removal of invalid refs.
-        //   - Replace foreach over deps to recurse with a single LINQ chain:
-        //     * Select each d.Dependencies
-        //     * Filter non-null and non-empty child collections
-        //     * Call Prune on each child collection
+        /// <summary>
+        /// Enriches the BOM with components from lock files and validates cdxgen dependencies against known component BomRefs.
+        /// </summary>
+        /// <param name="ListofComponentsFromLockFile">
+        /// Components discovered from lock/package files. Their BomRefs are used to validate cdxgen dependencies, and they are appended to the BOM component list.
+        /// </param>
+        /// <param name="ListofDependenciesFromLockFile">
+        /// Dependencies discovered from lock/package files. Not modified in this method.
+        /// </param>
+        /// <param name="componentsForBOM">
+        /// Target BOM component list. Components from the lock files are appended to this list.
+        /// </param>
+        /// <param name="dependencies">
+        /// Target BOM dependency list. The pruned cdxgen dependencies are appended to this list.
+        /// </param>
+        /// <param name="cdxGenBomData">
+        /// Parsed CycloneDX BOM produced by cdxgen. Its dependencies are validated and pruned against known BomRefs.
+        /// </param>
+        /// <remarks>
+        /// Operation:
+        /// - Builds a set of valid BomRefs from ListofComponentsFromLockFile.
+        /// - Appends lock-file components to componentsForBOM (if any).
+        /// - Prunes cdxGenBomData.Dependencies:
+        ///   * Removes any dependency (top-level or nested) whose Ref is null/empty or not present in valid BomRefs.
+        ///   * Recurses into child dependencies using a LINQ-based selection to minimize branching.
+        /// - Appends the pruned dependencies to the BOM dependencies list.
+        /// Returns immediately when cdxgen components are missing or when there are no cdxgen dependencies.
+        /// </remarks>
 
         public static void ApplyCdxGenEnrichment(
     ref List<Component> ListofComponentsFromLockFile,
