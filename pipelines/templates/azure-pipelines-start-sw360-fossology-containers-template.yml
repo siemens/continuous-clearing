@@ -47,19 +47,6 @@ steps:
     displayName: "Start sw360 Container"
 
   - script: |
-      echo "Starting a new fossology container..."
-      CONTAINER_ID=$(docker run -dit --name fossology -p ${{ parameters.fossologyPort }}:80 ${{ parameters.fossologyDockerImage }})
-
-      if [ -z "$CONTAINER_ID" ]; then
-          echo "Failed to start fossology container!"
-          exit 1
-      fi
-
-      echo "fossology Container ID: $CONTAINER_ID"
-      echo "Container started successfully."
-    displayName: "Start fossology Container"
-
-  - script: |
       echo "Waiting for 5 minutes to allow sw360 to start..."
       sleep 300
     displayName: "Initial Wait (5 minutes)"
