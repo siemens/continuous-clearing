@@ -25,7 +25,6 @@ namespace LCT.Services
     /// </summary>
     public class JFrogService : IJFrogService
     {
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly IJfrogAqlApiCommunicationFacade m_JFrogApiCommunicationFacade;
 
         public JFrogService(IJfrogAqlApiCommunicationFacade jFrogApiCommunicationFacade)

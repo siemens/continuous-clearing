@@ -33,6 +33,7 @@ namespace LCT.Services
     /// </summary>
     public class Sw360CreatorService : ISw360CreatorService
     {
+        private const string ApplicationJson = "application/json";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         readonly ISW360CommonService m_SW360CommonService;
@@ -94,14 +95,13 @@ namespace LCT.Services
                     componentCreateStatus.ReleaseStatus.IsCreated = false;
                     Environment.ExitCode = -1;
                     Logger.DebugFormat("CreateComponentBasesOFswComaprisonBOM():Component Name -{0}- response status code-{1} and reason parse-{2}", componentInfo.Name, response.StatusCode, response.ReasonPhrase);
-                    Logger.Error($"   └── CreateComponent():Component Name -{componentInfo.Name}- " +
-                        $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    Logger.ErrorFormat("   └── CreateComponent():Component Name -{0}- response status code-{1} and reason pharase-{2}", componentInfo.Name, response.StatusCode, response.ReasonPhrase);
                 }
             }
             catch (HttpRequestException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("CreateComponent", $"MethodName:CreateComponentBasesOFswComaprisonBOM()", e, "");
-                Logger.Error($"   └── CreateComponent():", e);
+                Logger.Error("   └── CreateComponent():", e);
                 Environment.ExitCode = -1;
                 componentCreateStatus.IsCreated = false;
                 componentCreateStatus.ReleaseStatus.IsCreated = false;
@@ -153,12 +153,12 @@ namespace LCT.Services
             catch (JsonReaderException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus(), Link: {link}", ex, "An error occurred while parsing the JSON response.");
-                Logger.Error($"TriggerFossologyProcess {ex.Message}");
+                Logger.ErrorFormat("TriggerFossologyProcess {0}", ex.Message);
             }
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("CheckFossologyProcessStatus", $"MethodName:CheckFossologyProcessStatus(), Link: {link}", ex, "An HTTP request error occurred while checking the Fossology process status.");
-                Logger.Error($"TriggerFossologyProcess {ex.Message}");
+                Logger.ErrorFormat("TriggerFossologyProcess {0}", ex.Message);
             }
             return fossTriggerStatus;
 
@@ -210,8 +210,7 @@ namespace LCT.Services
 
                     Environment.ExitCode = -1;
                     Logger.DebugFormat("CreateReleaseForComponent():Component Name -{0}{1}- response status code-{2} and reason pharase-{3}", componentInfo.Name, componentInfo.Version, response.StatusCode, response.ReasonPhrase);
-                    Logger.Error($"   └── CreateReleaseForComponent():Component Name -{componentInfo.Name}{componentInfo.Version}- " +
-                        $"response status code-{response.StatusCode} and reason pharase-{response.ReasonPhrase}");
+                    Logger.ErrorFormat("   └── CreateReleaseForComponent():Component Name -{0}{1}- response status code-{2} and reason pharase-{3}", componentInfo.Name, componentInfo.Version, response.StatusCode, response.ReasonPhrase);
                 }
 
                 Logger.DebugFormat("Component Name -{0},Version :{1} ,for this identified Release Id is:{2}", componentInfo.Name, componentInfo.Version, releaseId);
@@ -220,7 +219,7 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("CreateReleaseForComponent()", $"MethodName:CreateReleaseForComponent(), ComponentName: {componentInfo.Name}, Version: {componentInfo.Version}", e, "An HTTP request error occurred while creating the release.");
-                Logger.Error($"CreateReleaseForComponent():", e);
+                Logger.Error("CreateReleaseForComponent():", e);
                 Environment.ExitCode = -1;
                 createStatus.IsCreated = false;
             }
@@ -258,7 +257,7 @@ namespace LCT.Services
             }
             if (string.IsNullOrEmpty(releaseId))
             {
-                Logger.Warn($"   └── Release id not found for the Component - {name}-{version}");
+                Logger.WarnFormat("   └── Release id not found for the Component - {0}-{1}", name, version);
             }
             return releaseId ?? string.Empty;
         }
@@ -365,7 +364,7 @@ namespace LCT.Services
                                                 Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
                                             });
 
-                StringContent content = new StringContent(JsonConvert.SerializeObject(linkedReleasesDict), Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(JsonConvert.SerializeObject(linkedReleasesDict), Encoding.UTF8, ApplicationJson);
 
                 var response = await m_SW360ApiCommunicationFacade.LinkReleasesToProject(content, sw360ProjectId);
                 await LogHandlingHelper.HttpResponseHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", response);
@@ -373,7 +372,7 @@ namespace LCT.Services
                 {
                     await LogHandlingHelper.HttpResponseErrorHandling("Error occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", response, "");
                     Environment.ExitCode = -1;
-                    Logger.Error($"LinkReleasesToProject() : Linking releases to project Id {sw360ProjectId} is failed.");
+                    Logger.ErrorFormat("LinkReleasesToProject() : Linking releases to project Id {0} is failed.", sw360ProjectId);
                     return false;
                 }
                 return true;
@@ -381,14 +380,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("HttpRequestException occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An HTTP request error occurred while linking releases to the project.");
-                Logger.Error($"LinkReleasesToProject():", ex);
+                Logger.Error("LinkReleasesToProject():", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("AggregateException occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An aggregate exception occurred while linking releases to the project.");
-                Logger.Error($"LinkReleasesToProject():", ex);
+                Logger.Error("LinkReleasesToProject():", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -419,7 +418,7 @@ namespace LCT.Services
 
             if (string.IsNullOrEmpty(releaseIdOfComponent))
             {
-                Logger.Warn($"GetReleaseIDofComponent():Release id is null for Component - {componentName}-{componentVersion}");
+                Logger.WarnFormat("GetReleaseIDofComponent():Release id is null for Component - {0}-{1}", componentName, componentVersion);
             }
 
             return releaseIdOfComponent ?? string.Empty;
@@ -501,13 +500,13 @@ namespace LCT.Services
             catch (HttpRequestException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("GetComponentId()", $"MethodName:GetComponentId()", e, "");
-                Logger.Error($"GetComponentId():", e);
+                Logger.Error("GetComponentId():", e);
                 Environment.ExitCode = -1;
             }
             catch (AggregateException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("GetComponentId()", $"MethodName:GetComponentId()", e, "");
-                Logger.Error($"GetComponentId():", e);
+                Logger.Error("GetComponentId():", e);
                 Environment.ExitCode = -1;
             }
             return ComponentId;
@@ -569,7 +568,7 @@ namespace LCT.Services
                     ExternalIds = externalIds
                 };
 
-                StringContent content = new StringContent(JsonConvert.SerializeObject(componentPurlUpdated), Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(JsonConvert.SerializeObject(componentPurlUpdated), Encoding.UTF8, ApplicationJson);
 
                 var updateResponse = await m_SW360ApiCommunicationFacade.UpdateComponent(componentId, content);
                 await LogHandlingHelper.HttpResponseHandling("UpdateComponent", $"MethodName:UpdatePurlIdForExistingComponent(), ComponentId: {componentId}", updateResponse);
@@ -578,14 +577,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingComponent", $"MethodName:UpdatePurlIdForExistingComponent(), ComponentId: {componentId}", ex, "An HTTP request error occurred while updating the PURL ID for the component.");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingComponent", $"MethodName:UpdatePurlIdForExistingComponent(), ComponentId: {componentId}", ex, "An aggregate exception occurred while updating the PURL ID for the component.");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -698,7 +697,7 @@ namespace LCT.Services
                     ExternalIds = externalIds
                 };
 
-                StringContent content = new StringContent(JsonConvert.SerializeObject(updateRelease), Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(JsonConvert.SerializeObject(updateRelease), Encoding.UTF8, ApplicationJson);
 
                 var updateResponse = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
                 await LogHandlingHelper.HttpResponseHandling("UpdateRelease", $"MethodName:UpdatePurlIdForExistingRelease()", updateResponse);
@@ -714,14 +713,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -743,7 +742,7 @@ namespace LCT.Services
                     SourceDownloadurl = GetSourceDownloadUrl(cbomData, attachmentUrlList)
                 };
 
-                StringContent content = new StringContent(JsonConvert.SerializeObject(release), Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(JsonConvert.SerializeObject(release), Encoding.UTF8, ApplicationJson);
 
                 HttpResponseMessage updateResponse = await m_SW360ApiCommunicationFacade.UpdateRelease(releaseId, content);
                 await LogHandlingHelper.HttpResponseHandling("UpdateRelease", $"MethodName:UpdateSourceCodeDownloadURLForExistingRelease(), ReleaseId: {releaseId}", updateResponse);
@@ -762,13 +761,13 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdateSourceCodeDownloadURLForExistingRelease", $"MethodName:UpdateSourceCodeDownloadURLForExistingRelease()", ex, "An HTTP request error occurred while updating the SW360 release content.");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdateSourceCodeDownloadURLForExistingRelease", $"MethodName:UpdateSourceCodeDownloadURLForExistingRelease()", ex, "An aggregate exception occurred while updating the SW360 release content.");
-                Logger.Error($"UpdateExternalIdForRelease(): {ex}");
+                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
                 return false;
             }
         }
@@ -940,12 +939,12 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UdpateSW360ReleaseContent", $"MethodName:UdpateSW360ReleaseContent()", ex, "An HTTP request error occurred while updating the SW360 release content.");
-                Logger.Error($"UpdateSW360ReleaseContent():", ex);
+                Logger.Error("UpdateSW360ReleaseContent():", ex);
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UdpateSW360ReleaseContent", $"MethodName:UdpateSW360ReleaseContent()", ex, "An aggregate exception occurred while updating the SW360 release content.");
-                Logger.Error($"UpdateSW360ReleaseContent():", ex);
+                Logger.Error("UpdateSW360ReleaseContent():", ex);
             }
 
             return isUpdated;
@@ -1048,7 +1047,7 @@ namespace LCT.Services
             {
                 if (ex.Message == "500:Connection to Fossology server Failed.")
                 {
-                    Logger.Error($"Fossology process failed.Please check fossology configuration or Token in sw360");
+                    Logger.Error("Fossology process failed.Please check fossology configuration or Token in sw360");
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }
