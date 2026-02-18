@@ -530,14 +530,14 @@ namespace LCT.Common
             }
             else if (ContainsInvalidCharacters(Name, out string invalidChars))
             {
-                Logger.Error($"Invalid characters ({invalidChars}) found in SW360 project name '{Name}'. Create or rename project name without using these characters: '/', '\\', '.'");
-                Logger.Debug($"ValidateAppSettings(): Project name validation failed for '{sw360ProjectName}' due to invalid characters: {invalidChars}");
+                Logger.ErrorFormat("Invalid characters ({0}) found in SW360 project name '{1}'. Create or rename project name without using these characters: '/', '\\', '.'", invalidChars, Name);
+                Logger.DebugFormat("ValidateAppSettings(): Project name validation failed for '{0}' due to invalid characters: {1}", sw360ProjectName, invalidChars);
                 return -1;
             }
             else if (clearingState == "CLOSED")
             {
-                Logger.Error($"Provided Sw360 project is not in active state. Please make sure you added the correct project details that are in an active state.");
-                Logger.Debug($"ValidateSw360Project(): Sw360 project {Name} is in {clearingState} state.");
+                Logger.Error("Provided Sw360 project is not in active state. Please make sure you added the correct project details that are in an active state.");
+                Logger.DebugFormat("ValidateSw360Project(): Sw360 project {0} is in {1} state.", Name, clearingState);
                 return -1;
             }
             else

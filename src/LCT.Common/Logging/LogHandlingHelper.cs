@@ -625,7 +625,7 @@ namespace LCT.Common
             if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
-                Logger.Debug($"No components were found in the list");
+                Logger.Debug("No components were found in the list");
                 return;
             }
             // Build the table
@@ -651,7 +651,7 @@ namespace LCT.Common
             if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
-                Logger.Debug($"No components were found in the list");
+                Logger.Debug("No components were found in the list");
                 return;
             }
 

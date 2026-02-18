@@ -28,7 +28,7 @@ namespace LCT.Common.UTest
                 new object[] { "TestLogger" }
             );
             typeof(SpectreLogAdapter)
-                .GetField("_fileLogger", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .GetField("_log", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                 .SetValue(_adapter, _mockFileLogger.Object);
         }
 
