@@ -46,6 +46,7 @@ steps:
       echo "Container started successfully."
     displayName: "Start sw360 Container"
 
+ 
   - script: |
       echo "Waiting for 5 minutes to allow sw360 to start..."
       sleep 300
