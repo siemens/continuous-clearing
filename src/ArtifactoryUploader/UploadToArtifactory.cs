@@ -31,6 +31,10 @@ namespace LCT.ArtifactoryUploader
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
         private const string Choco = "CHOCO";
         private const string Nuget = "NUGET";
+        private const string Maven = "MAVEN";
+        private const string Poetry = "POETRY";
+        private const string Conan = "CONAN";
+        private const string Cargo = "CARGO";
 
         #endregion
 
@@ -153,15 +157,15 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("maven", StringComparison.OrdinalIgnoreCase))
             {
-                return "MAVEN";
+                return Maven;
             }
             else if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
-                return "POETRY";
+                return Poetry;
             }
             else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
-                return "CONAN";
+                return Conan;
             }
             else if (item.Purl.Contains("pkg:deb/debian", StringComparison.OrdinalIgnoreCase))
             {
@@ -169,7 +173,7 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
             {
-                return "CARGO";
+                return Cargo;
             }
             else
             {
@@ -194,15 +198,15 @@ namespace LCT.ArtifactoryUploader
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
             }
-            else if (component.ComponentType == "MAVEN")
+            else if (component.ComponentType == Maven)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Name}/{component.Version}";
             }
-            else if (component.ComponentType == "POETRY")
+            else if (component.ComponentType == Poetry)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
-            else if (component.ComponentType == "CONAN")
+            else if (component.ComponentType == Conan)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}";
             }
@@ -210,7 +214,7 @@ namespace LCT.ArtifactoryUploader
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
-            else if (component.ComponentType == "CARGO")
+            else if (component.ComponentType == Cargo)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.CargoExtension}";
             }
@@ -278,7 +282,7 @@ namespace LCT.ArtifactoryUploader
                         return $"{component.Name}/-";
                     }
 
-                case "CONAN" when aqlResult != null:
+                case Conan when aqlResult != null:
                     string path = aqlResult.Path;
                     string package = $"{component.Name}/{component.Version}";
 
@@ -292,7 +296,7 @@ namespace LCT.ArtifactoryUploader
                         return path;
                     }
 
-                case "MAVEN":
+                case Maven:
                     string groupWithSlash = !string.IsNullOrEmpty(item.Group) ? item.Group.Replace('.', '/') : string.Empty;
                     string mavenPath = !string.IsNullOrEmpty(groupWithSlash) ? $"{groupWithSlash}/{item.Name}" : item.Name;
                     return $"{mavenPath}/{component.Version}";
@@ -323,17 +327,17 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
             }
-            else if (component.ComponentType == "MAVEN")
+            else if (component.ComponentType == Maven)
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
                $"?to=/{component.DestRepoName}/{component.Path}";
             }
-            else if (component.ComponentType == "POETRY")
+            else if (component.ComponentType == Poetry)
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
-            else if (component.ComponentType == "CONAN")
+            else if (component.ComponentType == Conan)
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}" +
                $"?to=/{component.DestRepoName}/{component.Path}";
@@ -345,7 +349,7 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                            $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
-            else if (component.ComponentType == "CARGO")
+            else if (component.ComponentType == Cargo)
             {
                 //Copy to Destination Repo, not keeping the folder structure intact
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
@@ -377,17 +381,17 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.PackageName}.{component.Version}" +
                $"{ApiConstant.NugetExtension}?to=/{component.DestRepoName}/{component.Name}.{component.Version}{ApiConstant.NugetExtension}";
             }
-            else if (component.ComponentType == "MAVEN")
+            else if (component.ComponentType == Maven)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
                $"?to=/{component.DestRepoName}/{component.Path}";
             }
-            else if (component.ComponentType == "POETRY")
+            else if (component.ComponentType == Poetry)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.PypiOrNpmCompName}";
             }
-            else if (component.ComponentType == "CONAN")
+            else if (component.ComponentType == Conan)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}" +
                $"?to=/{component.DestRepoName}/{component.Path}";
@@ -399,7 +403,7 @@ namespace LCT.ArtifactoryUploader
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
-            else if (component.ComponentType == "CARGO")
+            else if (component.ComponentType == Cargo)
             {
                 //Move to Destination Repo, not keeping the folder structure intact
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
@@ -425,8 +429,8 @@ namespace LCT.ArtifactoryUploader
                 Nuget => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 Choco => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 "DEBIAN" => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
-                "CARGO" => $"{component.PackageName}.{component.Version}{ApiConstant.CargoExtension}",
-                "POETRY" => component.PypiOrNpmCompName,
+                Cargo => $"{component.PackageName}.{component.Version}{ApiConstant.CargoExtension}",
+                Poetry => component.PypiOrNpmCompName,
                 _ => string.Empty,
             };
         }
@@ -466,19 +470,19 @@ namespace LCT.ArtifactoryUploader
                 case Nuget:
                     displayPackagesInfo.UnknownPackagesNuget.Add(component);
                     break;
-                case "MAVEN":
+                case Maven:
                     displayPackagesInfo.UnknownPackagesMaven.Add(component);
                     break;
-                case "POETRY":
+                case Poetry:
                     displayPackagesInfo.UnknownPackagesPython.Add(component);
                     break;
-                case "CONAN":
+                case Conan:
                     displayPackagesInfo.UnknownPackagesConan.Add(component);
                     break;
                 case "DEBIAN":
                     displayPackagesInfo.UnknownPackagesDebian.Add(component);
                     break;
-                case "CARGO":
+                case Cargo:
                     displayPackagesInfo.UnknownPackagesCargo.Add(component);
                     break;
                 case Choco:
