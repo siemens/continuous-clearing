@@ -674,7 +674,7 @@ namespace LCT.Common.Logging
 
             foreach (var projectType in projectTypes)
             {
-                Logger.Info(projectType + ":\n\t");
+                Logger.InfoFormat("{0}:\n\t", projectType);
 
                 if (projectConfigMap.TryGetValue(projectType, out var config))
                 {
@@ -1256,9 +1256,10 @@ namespace LCT.Common.Logging
             const string TimeTakenBy = "Time Taken By";
             string separator = $"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}";
             
-            Logger.Info("\nSummary :\n" + 
+            string summaryHeader = "\nSummary :\n" + 
                 (!string.IsNullOrWhiteSpace(ProjectSummaryLink) ? ProjectSummaryLink + "\n" : "") + 
-                separator);
+                separator;
+            Logger.Info(summaryHeader);
             Logger.InfoFormat("{0,5}{1,-70} {2,5} {3,5} {4,5}\n{6}", "|", Feature, "|", Count, "|", "", separator);
 
             foreach (var item in printData)
@@ -1284,7 +1285,7 @@ namespace LCT.Common.Logging
 
             if ((key == "Packages Not Uploaded Due To Error" || key == "Packages Not Existing in Remote Cache") && value > 0)
             {
-                Logger.Error(row + "\n" + separator);
+                Logger.ErrorFormat("{0}\n{1}", row, separator);
             }
             else
             {
@@ -1686,11 +1687,11 @@ namespace LCT.Common.Logging
             if (LoggerFactory.UseSpectreConsole)
             {
                 WriteInfoWithMarkup($"   [white]└──[/][yellow]{message}[/]");
-                Logger.Debug("   └── " + message);
+                Logger.DebugFormat("   └── {0}", message);
             }
             else
             {
-                Logger.Warn("\t" + message);
+                Logger.WarnFormat("\t{0}", message);
             }
         }
         /// <summary>
@@ -1702,11 +1703,11 @@ namespace LCT.Common.Logging
             if (LoggerFactory.UseSpectreConsole)
             {
                 WriteInfoWithMarkup($"   [white]└──[/][red]{message}[/]");
-                Logger.Debug("   └── " + message);
+                Logger.DebugFormat("   └── {0}", message);
             }
             else
             {
-                Logger.Error("\t" + message);
+                Logger.ErrorFormat("\t{0}", message);
             }
         }
         /// <summary>
@@ -1756,7 +1757,7 @@ namespace LCT.Common.Logging
             }
             else
             {
-                Logger.Info(message + version);
+                Logger.InfoFormat("{0}{1}", message, version);
             }
         }
         /// <summary>

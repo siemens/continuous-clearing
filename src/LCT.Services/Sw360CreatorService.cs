@@ -1047,7 +1047,7 @@ namespace LCT.Services
             {
                 if (ex.Message == "500:Connection to Fossology server Failed.")
                 {
-                    Logger.Error("Fossology process failed.Please check fossology configuration or Token in sw360");
+                    Logger.Error("Fossology process failed.Please check fossology configuration or Token in sw360", ex);
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }
