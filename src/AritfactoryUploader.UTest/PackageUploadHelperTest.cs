@@ -573,6 +573,162 @@ namespace AritfactoryUploader.UTest
             Assert.AreEqual("tokio", displayPackagesInfo.JfrogFoundPackagesCargo[1].Name);
         }
 
+        [Test]
+        public async Task JfrogNotFoundPackagesAsync_WithNullComponentType_DoesNotAddComponent()
+        {
+            // Arrange
+            var item = new ComponentsToArtifactory
+            {
+                ComponentType = null,
+                Name = "test-package",
+                Version = "1.0.0"
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesChoco = new List<ComponentsToArtifactory>()
+            };
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+
+            // Assert - No components should be added to any list
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesMaven.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesPython.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesConan.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesDebian.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesChoco.Count);
+        }
+
+        [Test]
+        public async Task JfrogNotFoundPackagesAsync_WithEmptyComponentType_DoesNotAddComponent()
+        {
+            // Arrange
+            var item = new ComponentsToArtifactory
+            {
+                ComponentType = "",
+                Name = "test-package",
+                Version = "1.0.0"
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesChoco = new List<ComponentsToArtifactory>()
+            };
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+
+            // Assert - No components should be added to any list
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesMaven.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesPython.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesConan.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesDebian.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesChoco.Count);
+        }
+
+        [Test]
+        public async Task JfrogNotFoundPackagesAsync_WithWhitespaceComponentType_DoesNotAddComponent()
+        {
+            // Arrange
+            var item = new ComponentsToArtifactory
+            {
+                ComponentType = "   ",
+                Name = "test-package",
+                Version = "1.0.0"
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesChoco = new List<ComponentsToArtifactory>()
+            };
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+
+            // Assert - No components should be added to any list
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesMaven.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesPython.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesConan.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesDebian.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesCargo.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesChoco.Count);
+        }
+
+        [Test]
+        public void WriteCreatorKpiDataToConsole_ValidUploaderKpiData_LogsDataSuccessfully()
+        {
+            // Arrange
+            var uploaderKpiData = new UploaderKpiData
+            {
+                ComponentInComparisonBOM = 100,
+                ComponentNotApproved = 10,
+                PackagesToBeUploaded = 90,
+                PackagesUploadedToJfrog = 85,
+                PackagesNotUploadedToJfrog = 5,
+                DevPackagesUploaded = 15,
+                DevPackagesNotUploadedToJfrog = 2,
+                InternalPackagesUploaded = 20,
+                InternalPackagesNotUploadedToJfrog = 3,
+                PackagesNotExistingInRemoteCache = 4,
+                PackagesNotUploadedDueToError = 1,
+                TimeTakenByArtifactoryUploader = 45.5
+            };
+
+            // Act & Assert - Should not throw any exceptions
+            Assert.DoesNotThrow(() => PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData));
+        }
+
+        [Test]
+        public void WriteCreatorKpiDataToConsole_WithZeroValues_LogsDataSuccessfully()
+        {
+            // Arrange
+            var uploaderKpiData = new UploaderKpiData
+            {
+                ComponentInComparisonBOM = 0,
+                ComponentNotApproved = 0,
+                PackagesToBeUploaded = 0,
+                PackagesUploadedToJfrog = 0,
+                PackagesNotUploadedToJfrog = 0,
+                DevPackagesUploaded = 0,
+                DevPackagesNotUploadedToJfrog = 0,
+                InternalPackagesUploaded = 0,
+                InternalPackagesNotUploadedToJfrog = 0,
+                PackagesNotExistingInRemoteCache = 0,
+                PackagesNotUploadedDueToError = 0,
+                TimeTakenByArtifactoryUploader = 0.0
+            };
+
+            // Act & Assert - Should not throw any exceptions
+            Assert.DoesNotThrow(() => PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData));
+        }
+
 
     }
 }
