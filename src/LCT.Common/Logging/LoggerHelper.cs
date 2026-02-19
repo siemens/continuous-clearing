@@ -32,6 +32,7 @@ namespace LCT.Common.Logging
         private const string AlertConstant = "Alert";
         private const string BlueVersionMarkup = "[blue]Version[/]";
         private const string GreenNameMarkup = "[green]Name[/]";
+        private const string YellowColor = "yellow";
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
 
@@ -1140,7 +1141,7 @@ namespace LCT.Common.Logging
         /// <param name="title">The optional panel title.</param>
         /// <param name="borderStyle">The border style.</param>
         /// <param name="headerStyle">The header style.</param>
-        public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = "yellow")
+        public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = YellowColor)
         {
             SafeSpectreAction(() =>
             {
@@ -1479,7 +1480,7 @@ namespace LCT.Common.Logging
                 return value == 0 ? "red" : GreenColor;
 
             if (warningGroup.Any(Is))
-                return value == 0 ? GreenColor : "yellow";
+                return value == 0 ? GreenColor : YellowColor;
 
             if (infoGroup.Any(Is))
                 return value == 0 ? GreenColor : "red";
@@ -1590,7 +1591,7 @@ namespace LCT.Common.Logging
                 var content = new StringBuilder()
                     .Append($"[yellow]{message}[/]");
 
-                WriteStyledPanel(content.ToString(), "", "yellow", "yellow");
+                WriteStyledPanel(content.ToString(), "", YellowColor, YellowColor);
                 WriteLine();
             }
             else

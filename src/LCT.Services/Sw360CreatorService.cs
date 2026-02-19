@@ -34,6 +34,7 @@ namespace LCT.Services
     public class Sw360CreatorService : ISw360CreatorService
     {
         private const string ApplicationJson = "application/json";
+        private const string UpdateExternalIdErrorFormat = "UpdateExternalIdForRelease(): {0}";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         readonly ISW360CommonService m_SW360CommonService;
@@ -577,14 +578,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingComponent", $"MethodName:UpdatePurlIdForExistingComponent(), ComponentId: {componentId}", ex, "An HTTP request error occurred while updating the PURL ID for the component.");
-                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
+                Logger.ErrorFormat(UpdateExternalIdErrorFormat, ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingComponent", $"MethodName:UpdatePurlIdForExistingComponent(), ComponentId: {componentId}", ex, "An aggregate exception occurred while updating the PURL ID for the component.");
-                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
+                Logger.ErrorFormat(UpdateExternalIdErrorFormat, ex);
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -713,14 +714,14 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
+                Logger.ErrorFormat(UpdateExternalIdErrorFormat, ex);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdatePurlIdForExistingRelease", $"MethodName:UpdatePurlIdForExistingRelease()", ex, "");
-                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
+                Logger.ErrorFormat(UpdateExternalIdErrorFormat, ex);
                 Environment.ExitCode = -1;
                 return false;
             }
@@ -761,13 +762,13 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdateSourceCodeDownloadURLForExistingRelease", $"MethodName:UpdateSourceCodeDownloadURLForExistingRelease()", ex, "An HTTP request error occurred while updating the SW360 release content.");
-                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
+                Logger.ErrorFormat(UpdateExternalIdErrorFormat, ex);
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("UpdateSourceCodeDownloadURLForExistingRelease", $"MethodName:UpdateSourceCodeDownloadURLForExistingRelease()", ex, "An aggregate exception occurred while updating the SW360 release content.");
-                Logger.ErrorFormat("UpdateExternalIdForRelease(): {0}", ex);
+                Logger.ErrorFormat(UpdateExternalIdErrorFormat, ex);
                 return false;
             }
         }
