@@ -33,32 +33,9 @@ namespace LCT.Common.UTest
         [TearDown]
         public void TearDown()
         {
-            try
+            if (System.IO.Directory.Exists(_testDataDirectory))
             {
-                if (System.IO.Directory.Exists(_testDataDirectory))
-                {
-                    // Reset file attributes before deletion to avoid access issues
-                    foreach (var file in System.IO.Directory.GetFiles(_testDataDirectory, "*", SearchOption.AllDirectories))
-                    {
-                        try
-                        {
-                            var fileInfo = new FileInfo(file);
-                            if (fileInfo.Exists)
-                            {
-                                fileInfo.Attributes = FileAttributes.Normal;
-                            }
-                        }
-                        catch
-                        {
-                            // Ignore individual file errors
-                        }
-                    }
-                    System.IO.Directory.Delete(_testDataDirectory, true);
-                }
-            }
-            catch
-            {
-                // Ignore cleanup errors to prevent test host crash
+                System.IO.Directory.Delete(_testDataDirectory, true);
             }
         }
 
