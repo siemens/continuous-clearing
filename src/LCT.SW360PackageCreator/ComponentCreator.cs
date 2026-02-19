@@ -35,6 +35,8 @@ namespace LCT.SW360PackageCreator
     public class ComponentCreator : IComponentCreator
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private const string DebianProjectType = "DEBIAN";
+        private const string SourceAttachmentType = "SOURCE";
 
         private static readonly CreatorKpiData s_kpiData = new();
         public static CreatorKpiData KpiData => s_kpiData;
@@ -120,7 +122,7 @@ namespace LCT.SW360PackageCreator
                         componentsData.AlpineSourceData = component.AlpineSourceData;
                     }
 
-                    if (componentsData.ProjectType.Equals("DEBIAN", StringComparison.InvariantCultureIgnoreCase))
+                    if (componentsData.ProjectType.Equals(DebianProjectType, StringComparison.InvariantCultureIgnoreCase))
                     {
                         componentsData = component;
                     }
@@ -159,7 +161,7 @@ namespace LCT.SW360PackageCreator
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
             Component currBom;
-            if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase) &&
+            if (componentsData.ProjectType.Equals(DebianProjectType, StringComparison.InvariantCultureIgnoreCase) &&
                 (currName != componentsData.Name || currVersion != componentsData.Version))
             {
                 Logger.Debug($"Source name found for binary package {currName}-{currVersion} --" +
@@ -178,7 +180,7 @@ namespace LCT.SW360PackageCreator
 
                 componentsData.Version = $"{componentsData.Version}.debian";
             }
-            else if (componentsData.ProjectType.Equals("debian", StringComparison.InvariantCultureIgnoreCase))
+            else if (componentsData.ProjectType.Equals(DebianProjectType, StringComparison.InvariantCultureIgnoreCase))
             {
                 //Append .debian to all Debian type component releases
                 currBom = bom.Components?.Find(val => val.Name == currName && val.Version == currVersion);
@@ -273,7 +275,7 @@ namespace LCT.SW360PackageCreator
                 case "NUGET":
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForNugetPackage(name, version);
                     break;
-                case "DEBIAN":
+                case DebianProjectType:
                     Components debComponentData = await UrlHelper.Instance.GetSourceUrlForDebianPackage(name, version);
                     componentsData = debComponentData;
                     componentsData.ProjectType = projectType;
@@ -501,7 +503,7 @@ namespace LCT.SW360PackageCreator
                 LoggerHelper.WriteComponentStatusMessage("Creating the Component & Release ", item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
-                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
+                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey(SourceAttachmentType))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);
@@ -514,7 +516,7 @@ namespace LCT.SW360PackageCreator
                 item.IsComponentCreated = GetCreatedStatus(createdStatus.IsCreated);
                 item.IsReleaseCreated = GetCreatedStatus(createdStatus.ReleaseStatus.IsCreated);
                 item.ReleaseAttachmentLink = createdStatus.ReleaseStatus.AttachmentApiUrl;
-                item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
+                item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                 if (!string.IsNullOrEmpty(createdStatus.ReleaseStatus.ReleaseIdToLink))
                     AddReleaseIdToLink(item, createdStatus.ReleaseStatus.ReleaseIdToLink);
 
@@ -580,7 +582,7 @@ namespace LCT.SW360PackageCreator
                 LoggerHelper.WriteComponentStatusMessage("Creating Release ", item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
-                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey("SOURCE"))
+                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey(SourceAttachmentType))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);
@@ -592,7 +594,7 @@ namespace LCT.SW360PackageCreator
 
                 item.IsReleaseCreated = GetCreatedStatus(releaseCreateStatus.IsCreated);
                 item.ReleaseAttachmentLink = releaseCreateStatus.AttachmentApiUrl;
-                item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
+                item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                 if (!string.IsNullOrEmpty(releaseCreateStatus.ReleaseIdToLink))
                     AddReleaseIdToLink(item, releaseCreateStatus.ReleaseIdToLink);
 
@@ -840,7 +842,7 @@ namespace LCT.SW360PackageCreator
                     }
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
-                    item.DownloadUrl = !attachmentUrlList.ContainsKey("SOURCE") ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
 
                 }
                 else
@@ -930,7 +932,7 @@ namespace LCT.SW360PackageCreator
         public static bool IsReleaseAttachmentExist(ReleasesInfo releasesInfo)
         {
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
-            return releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
+            return releaseAttachments.Any(x => x.AttachmentType.Equals(SourceAttachmentType));
         }
 
         /// <summary>
@@ -941,7 +943,7 @@ namespace LCT.SW360PackageCreator
         public static bool AreAttachmentsPresent(ReleasesInfo releasesInfo)
         {
             var attachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
-            return attachments.Any(x => x.AttachmentType.Equals("SOURCE") || x.AttachmentType.Equals("SOURCE_SELF"));
+            return attachments.Any(x => x.AttachmentType.Equals(SourceAttachmentType) || x.AttachmentType.Equals("SOURCE_SELF"));
         }
 
         /// <summary>

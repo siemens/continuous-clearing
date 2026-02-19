@@ -43,6 +43,7 @@ namespace LCT.SW360PackageCreator
         List<Components> componentsAvailableInSw360 = new List<Components>();
         List<Components> DuplicateComponentsByPurlId = new List<Components>();
         private const string SOURCE = "SOURCE";
+        private const string AlpinePackageType = "ALPINE";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace LCT.SW360PackageCreator
             {
                 if (comparionBomData.ApprovedStatus == Dataconstant.Approved)
                 {
-                    Logger.Debug($"Component {comparionBomData.Name} with version {comparionBomData.Version} is skipped from the 'list of components without a source download URL' because it is in the approved state.");
+                    Logger.DebugFormat("Component {0} with version {1} is skipped from the 'list of components without a source download URL' because it is in the approved state.", comparionBomData.Name, comparionBomData.Version);
                     continue;
                 }
                 if ((comparionBomData.DownloadUrl == Dataconstant.DownloadUrlNotFound || string.IsNullOrEmpty(comparionBomData.DownloadUrl)) && !comparionBomData.SourceAttachmentStatus)
@@ -150,7 +151,7 @@ namespace LCT.SW360PackageCreator
             {
                 downloadPath = await DownloadCargoSource(component, localPathforDownload);
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
                 {
@@ -309,15 +310,15 @@ namespace LCT.SW360PackageCreator
         /// <returns>BOM data</returns>
         public async Task<List<ComparisonBomData>> SetContentsForComparisonBOM(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
-            Logger.Debug($"SetContentsForComparisonBOM():Starting to identify available components data in SW360");
-            Logger.Logger.Log(null, Level.Notice, $"Collecting BoM Data...", null);
+            Logger.DebugFormat("SetContentsForComparisonBOM():Starting to identify available components data in SW360");
+            Logger.Logger.Log(null, Level.Notice, "Collecting BoM Data...", null);
             componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(lstComponentForBOM);
             DuplicateComponentsByPurlId = sw360Service.GetDuplicateComponentsByPurlId();
             //Checking components count before getting status of individual comp details
             List<ComparisonBomData> comparisonBomData = await GetComparisionBomItems(lstComponentForBOM, sw360Service);
 
             LogHandlingHelper.SW360AvailableComponentsList(componentsAvailableInSw360);
-            Logger.Debug($"SetContentsForComparisonBOM():Completed of the sw360 data for available components");
+            Logger.DebugFormat("SetContentsForComparisonBOM():Completed of the sw360 data for available components");
             return comparisonBomData;
         }
 
@@ -366,7 +367,7 @@ namespace LCT.SW360PackageCreator
                     mapper.DownloadUrl = GetComponentDownloadUrl(mapper, item, repo, releasesInfo);
                 }
                 SetMapperStatus(mapper, releasesInfo);
-                Logger.Debug($"Sw360 availability status for Name {mapper.Name}: {mapper.ComponentExternalId}={mapper.ComponentStatus} - Version {mapper.Version}: {mapper.ReleaseExternalId}={mapper.ReleaseStatus}");
+                Logger.DebugFormat("Sw360 availability status for Name {0}: {1}={2} - Version {3}: {4}={5}", mapper.Name, mapper.ComponentExternalId, mapper.ComponentStatus, mapper.Version, mapper.ReleaseExternalId, mapper.ReleaseStatus);
                 comparisonBomData.Add(mapper);
             }
             return comparisonBomData;
@@ -398,7 +399,7 @@ namespace LCT.SW360PackageCreator
         {
             return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) ||
                    item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) ||
-                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]) ||
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]) ||
                    item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]);
         }
 
@@ -545,7 +546,7 @@ namespace LCT.SW360PackageCreator
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
-                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"]))
+                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
@@ -561,7 +562,7 @@ namespace LCT.SW360PackageCreator
             catch (UnauthorizedAccessException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("GetDownloadPathForComponetType", $"MethodName:GetDownloadPathForComponetType(), ComponentName:{component.Name}, ReleaseExternalId:{component.ReleaseExternalId}", ex, "Unauthorized access occurred while determining the download path for the component.");
-                Logger.Error($"GetDownloadPathForComponetType() ", ex);
+                Logger.Error("GetDownloadPathForComponetType() ", ex);
             }
 
             return localPathforDownload;
@@ -962,19 +963,19 @@ namespace LCT.SW360PackageCreator
 
             if (isSourceUrlMissing && isDownloadUrlMissing)
             {
-                Logger.Warn($"   └── Source URL AND Release source Download URL are not found (source file not attached) for {component.Name}-{component.Version}");
-                Logger.Debug($"LogSourceAndDownloadUrlWarnings(): Both SourceUrl and DownloadUrl not found for {component.Name}-{component.Version}");
+                Logger.WarnFormat("   └── Source URL AND Release source Download URL are not found (source file not attached) for {0}-{1}", component.Name, component.Version);
+                Logger.DebugFormat("LogSourceAndDownloadUrlWarnings(): Both SourceUrl and DownloadUrl not found for {0}-{1}", component.Name, component.Version);
             }
             else
             {
                 if (isSourceUrlMissing)
                 {
-                    Logger.Warn($"   └── Source URL is not found for {component.Name}-{component.Version}");
-                    Logger.Debug($"LogSourceAndDownloadUrlWarnings():SourceUrl not found for {component.Name}-{component.Version}");
+                    Logger.WarnFormat("   └── Source URL is not found for {0}-{1}", component.Name, component.Version);
+                    Logger.DebugFormat("LogSourceAndDownloadUrlWarnings():SourceUrl not found for {0}-{1}", component.Name, component.Version);
                 }
                 else if (isDownloadUrlMissing)
                 {
-                    Logger.Warn($"   └── Source file is not attached,Release source Download Url is not Found for {component.Name}-{component.Version}");
+                    Logger.WarnFormat("   └── Source file is not attached,Release source Download Url is not Found for {0}-{1}", component.Name, component.Version);
                 }
             }
 
