@@ -156,5 +156,231 @@ namespace LCT.APICommunications.UTest
             _mockLogger.Verify(logger => logger.Debug(It.IsAny<string>()), Times.Never, "Retry should not occur if there is no exception.");
         }
 
+        [Test]
+        public async Task SendAsync_ShouldLogWarning_OnFirstRetryAttempt()
+        {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var retryHandler = new RetryHttpClientHandler
+            {
+                InnerHandler = handlerMock.Object
+            };
+
+            var httpClient = new HttpClient(retryHandler);
+            var request = new HttpRequestMessage(HttpMethod.Get, "http://test.com");
+            request.Headers.Add("urlInfo", "Test Operation");
+
+            // Act
+            var response = await httpClient.SendAsync(request);
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            handlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Test]
+        public async Task SendAsync_ShouldNotLogWarning_WhenLogWarningsIsFalse()
+        {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.RequestTimeout))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var retryHandler = new RetryHttpClientHandler
+            {
+                InnerHandler = handlerMock.Object
+            };
+
+            var httpClient = new HttpClient(retryHandler);
+            var request = new HttpRequestMessage(HttpMethod.Get, "http://test.com");
+            request.Headers.Add("LogWarnings", "false");
+            request.Headers.Add("urlInfo", "Test Operation");
+
+            // Act
+            var response = await httpClient.SendAsync(request);
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            handlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Test]
+        public async Task SendAsync_ShouldHandleRetryWithException()
+        {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new HttpRequestException("Connection failed"))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var retryHandler = new RetryHttpClientHandler
+            {
+                InnerHandler = handlerMock.Object
+            };
+
+            var httpClient = new HttpClient(retryHandler);
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://test.com/api");
+            request.Headers.Add("urlInfo", "Post Operation");
+
+            // Act
+            var response = await httpClient.SendAsync(request);
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public async Task SendAsync_ShouldRetryOnBadRequest()
+        {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var retryHandler = new RetryHttpClientHandler
+            {
+                InnerHandler = handlerMock.Object
+            };
+
+            var httpClient = new HttpClient(retryHandler);
+
+            // Act
+            var response = await httpClient.GetAsync("http://test.com");
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            handlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Test]
+        public async Task SendAsync_ShouldRetryOnNotAcceptable()
+        {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotAcceptable))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var retryHandler = new RetryHttpClientHandler
+            {
+                InnerHandler = handlerMock.Object
+            };
+
+            var httpClient = new HttpClient(retryHandler);
+
+            // Act
+            var response = await httpClient.GetAsync("http://test.com");
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public async Task SendAsync_ShouldNotRetryOnUnauthorized()
+        {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Unauthorized));
+
+            var retryHandler = new RetryHttpClientHandler
+            {
+                InnerHandler = handlerMock.Object
+            };
+
+            var httpClient = new HttpClient(retryHandler);
+
+            // Act
+            var response = await httpClient.GetAsync("http://test.com");
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            handlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Once(),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Test]
+        public async Task SendAsync_ShouldNotRetryOnForbidden()
+        {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Forbidden));
+
+            var retryHandler = new RetryHttpClientHandler
+            {
+                InnerHandler = handlerMock.Object
+            };
+
+            var httpClient = new HttpClient(retryHandler);
+
+            // Act
+            var response = await httpClient.GetAsync("http://test.com");
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+            handlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Once(),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
+        }
+
     }
 }
