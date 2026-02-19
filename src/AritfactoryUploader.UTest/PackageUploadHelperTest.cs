@@ -729,6 +729,393 @@ namespace AritfactoryUploader.UTest
             Assert.DoesNotThrow(() => PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData));
         }
 
+        #region SourceRepoFoundToUploadArtifactory Tests - Using IncrementCountersBasedOnPackageType
+
+        [Test]
+        public void IncrementCountersBasedOnPackageType_WhenClearedThirdPartySuccess_IncrementsPackagesUploadedToJfrog()
+        {
+            // Arrange
+            var uploaderKpiData = new UploaderKpiData();
+            var packageType = PackageType.ClearedThirdParty;
+            bool isSuccess = true;
+
+            // Use reflection to call private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("IncrementCountersBasedOnPackageType",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            methodInfo.Invoke(null, new object[] { uploaderKpiData, packageType, isSuccess });
+
+            // Assert
+            Assert.AreEqual(1, uploaderKpiData.PackagesUploadedToJfrog);
+            Assert.AreEqual(0, uploaderKpiData.PackagesNotUploadedToJfrog);
+            Assert.AreEqual(0, uploaderKpiData.PackagesNotUploadedDueToError);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WhenPackageNotFound_SetsWarningCodeAndIncrementsFailureCounters()
+        {
+            // Arrange
+            var packageType = PackageType.ClearedThirdParty;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "missing-package",
+                Version = "2.0.0",
+                ComponentType = "NUGET",
+                PackageType = PackageType.ClearedThirdParty,
+                DryRun = false,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dest-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesNuget = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert
+            Assert.AreEqual(0, uploaderKpiData.PackagesUploadedToJfrog);
+            Assert.AreEqual(1, uploaderKpiData.PackagesNotUploadedToJfrog);
+            Assert.AreEqual(1, uploaderKpiData.PackagesNotUploadedDueToError);
+            Assert.IsNull(item.DestRepoName);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WhenErrorInUpload_IncrementsFailureCountersAndLogsError()
+        {
+            // Arrange
+            var packageType = PackageType.Internal;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "error-package",
+                Version = "3.0.0",
+                ComponentType = "MAVEN",
+                PackageType = PackageType.Internal,
+                DryRun = false,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dest-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesMaven = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert
+            Assert.AreEqual(0, uploaderKpiData.InternalPackagesUploaded);
+            Assert.AreEqual(1, uploaderKpiData.InternalPackagesNotUploadedToJfrog);
+            Assert.AreEqual(1, uploaderKpiData.PackagesNotUploadedDueToError);
+            Assert.IsNull(item.DestRepoName);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WhenDevelopmentPackageSuccessful_IncrementsDevCounters()
+        {
+            // Arrange
+            var packageType = PackageType.Development;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "dev-package",
+                Version = "1.0.0-dev",
+                ComponentType = "POETRY",
+                PackageType = PackageType.Development,
+                DryRun = false,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dev-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesPython = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert
+            Assert.AreEqual(1, uploaderKpiData.DevPackagesUploaded);
+            Assert.AreEqual(0, uploaderKpiData.DevPackagesNotUploadedToJfrog);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WhenDevelopmentPackageFails_IncrementsDevFailureCounters()
+        {
+            // Arrange
+            var packageType = PackageType.Development;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "dev-package-fail",
+                Version = "2.0.0-dev",
+                ComponentType = "CONAN",
+                PackageType = PackageType.Development,
+                DryRun = false,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dev-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesConan = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesConan = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert
+            Assert.AreEqual(0, uploaderKpiData.DevPackagesUploaded);
+            Assert.AreEqual(1, uploaderKpiData.DevPackagesNotUploadedToJfrog);
+            Assert.AreEqual(1, uploaderKpiData.PackagesNotUploadedDueToError);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WhenDryRunMode_DoesNotIncrementSuccessCounters()
+        {
+            // Arrange
+            var packageType = PackageType.ClearedThirdParty;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "dryrun-package",
+                Version = "1.0.0",
+                ComponentType = "DEBIAN",
+                PackageType = PackageType.ClearedThirdParty,
+                DryRun = true,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dest-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesDebian = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesDebian = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert - No counters should be incremented in dry run mode with success
+            Assert.AreEqual(0, uploaderKpiData.PackagesUploadedToJfrog);
+            Assert.AreEqual(0, uploaderKpiData.PackagesNotUploadedToJfrog);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WithCopyOperation_SetsCorrectOperationType()
+        {
+            // Arrange
+            var packageType = PackageType.ClearedThirdParty;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "copy-package",
+                Version = "1.0.0",
+                ComponentType = "CARGO",
+                PackageType = PackageType.ClearedThirdParty, // Should result in copy operation
+                DryRun = false,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dest-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesCargo = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesCargo = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert
+            Assert.AreEqual(1, uploaderKpiData.PackagesUploadedToJfrog);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WithMoveOperation_InternalPackage()
+        {
+            // Arrange
+            var packageType = PackageType.Internal;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "internal-package",
+                Version = "1.0.0",
+                ComponentType = "CHOCO",
+                PackageType = PackageType.Internal, // Should result in move operation
+                DryRun = false,
+                SrcRepoName = "src-repo",
+                DestRepoName = "internal-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesChoco = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesChoco = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert
+            Assert.AreEqual(1, uploaderKpiData.InternalPackagesUploaded);
+            Assert.AreEqual(0, uploaderKpiData.InternalPackagesNotUploadedToJfrog);
+        }
+
+        [Test]
+        public async Task SourceRepoFoundToUploadArtifactory_WhenResponseIsNotOkOrKnownError_DoesNothing()
+        {
+            // Arrange
+            var packageType = PackageType.ClearedThirdParty;
+            var uploaderKpiData = new UploaderKpiData();
+            var item = new ComponentsToArtifactory
+            {
+                Name = "unknown-error-package",
+                Version = "1.0.0",
+                ComponentType = "NPM",
+                PackageType = PackageType.ClearedThirdParty,
+                DryRun = false,
+                SrcRepoName = "src-repo",
+                DestRepoName = "dest-repo",
+                JfrogApi = "https://test-api.com",
+                Token = "test-token"
+            };
+            int timeout = 5000;
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogFoundPackagesNpm = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>()
+            };
+
+            // Mock services
+            var mockJFrogService = new Mock<IJFrogService>();
+            var mockJFrogApiComm = new Mock<IJFrogApiCommunication>();
+            PackageUploadHelper.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogService = mockJFrogService.Object;
+            ArtifactoryUploader.ArtifactoryUploader.JFrogApiCommInstance = mockJFrogApiComm.Object;
+
+            // Use reflection to get private method
+            var methodInfo = typeof(PackageUploadHelper).GetMethod("SourceRepoFoundToUploadArtifactory",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var task = (Task)methodInfo.Invoke(null, new object[] { packageType, uploaderKpiData, item, timeout, displayPackagesInfo });
+            await task;
+
+            // Assert - Counters should remain at 0 for unknown errors (else branch does nothing)
+            Assert.AreEqual(0, uploaderKpiData.PackagesUploadedToJfrog);
+        }
+
+        #endregion
 
     }
 }
