@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -76,14 +76,14 @@ namespace LCT.PackageIdentifier
             //IF System.FormatException is thrown, it indicates that the PEM content is not a valid certificate.
             catch (FormatException ex)
             {
-                Logger.Debug($"Error loading PEM content: {ex.Message}");
+                Logger.DebugFormat("Error loading PEM content: {0}", ex.Message);
                 Logger.Debug("Attempting to load as public key...");
                 return ValidateSignedFileFromPublicKey(documentPath, signaturePath, pemFilePath);
             }
             //IF System.Security.Cryptography.CryptographicException is thrown, it indicates that the PEM content is not a valid certificate.
             catch (CryptographicException ex)
             {
-                Logger.Debug($"Error loading as certificate: {ex.Message}");
+                Logger.DebugFormat("Error loading as certificate: {0}", ex.Message);
                 Logger.Debug("Attempting to load as public key...");
                 return ValidateSignedFileFromPublicKey(documentPath, signaturePath, pemFilePath);
             }
@@ -188,27 +188,27 @@ namespace LCT.PackageIdentifier
             }
             catch (IOException ex)
             {
-                Logger.Error($"Error reading file during signature validation: {ex.Message}", ex);
+                Logger.Error("Error reading file during signature validation:", ex);
                 return false;
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger.Error($"Access denied while reading file during signature validation: {ex.Message}", ex);
+                Logger.Error("Access denied while reading file during signature validation:", ex);
                 return false;
             }
             catch (CryptographicException ex)
             {
-                Logger.Error($"Cryptographic error during signature validation: {ex.Message}", ex);
+                Logger.Error("Cryptographic error during signature validation:", ex);
                 return false;
             }
             catch (FormatException ex)
             {
-                Logger.Error($"Invalid format during signature validation: {ex.Message}", ex);
+                Logger.Error("Invalid format during signature validation:", ex);
                 return false;
             }
             catch (ArgumentException ex)
             {
-                Logger.Error($"Invalid argument during signature validation: {ex.Message}", ex);
+                Logger.Error("Invalid argument during signature validation:", ex);
                 return false;
             }
         }
@@ -264,7 +264,7 @@ namespace LCT.PackageIdentifier
             }
             catch (Exception ex) when (ex is CryptographicException || ex is FormatException)
             {
-                Logger.Debug($"ECDSA verification failed: {ex.Message}");
+                Logger.DebugFormat("ECDSA verification failed: {0}", ex.Message);
                 // If ECDSA verification fails, we can try RSA or DSA
                 return false;
             }
@@ -285,7 +285,7 @@ namespace LCT.PackageIdentifier
             }
             catch (Exception ex) when (ex is CryptographicException || ex is FormatException)
             {
-                Logger.Debug($"RSA verification failed: {ex.Message}");
+                Logger.DebugFormat("RSA verification failed: {0}", ex.Message);
                 // If RSA verification fails, we can try DSA
                 return false;
             }
@@ -307,7 +307,7 @@ namespace LCT.PackageIdentifier
             }
             catch (Exception ex) when (ex is CryptographicException || ex is FormatException)
             {
-                Logger.Debug($"DSA verification failed: {ex.Message}", ex);
+                Logger.DebugFormat("DSA verification failed: {0}", ex.Message);
                 return false;
             }
             return false;
@@ -319,13 +319,9 @@ namespace LCT.PackageIdentifier
         /// <param name="certificate">The X509Certificate2 object.</param>
         private static void LogCertificateInfo(X509Certificate2 certificate)
         {
-            Logger.Debug("Certificate loaded successfully.");
-            Logger.Debug($"Subject: {certificate.Subject}");
-            Logger.Debug($"Issuer: {certificate.Issuer}");
-            Logger.Debug($"Valid From: {certificate.NotBefore}");
-            Logger.Debug($"Valid To: {certificate.NotAfter}");
-            Logger.Debug($"Thumbprint: {certificate.Thumbprint}");
-            Logger.Debug($"Algorithm: {certificate.SignatureAlgorithm.FriendlyName}");
+            Logger.DebugFormat("Certificate loaded successfully. Subject: {0}, Issuer: {1}", certificate.Subject, certificate.Issuer);
+            Logger.DebugFormat("Valid From: {0}, Valid To: {1}", certificate.NotBefore, certificate.NotAfter);
+            Logger.DebugFormat("Thumbprint: {0}, Algorithm: {1}", certificate.Thumbprint, certificate.SignatureAlgorithm.FriendlyName);
         }
 
         /// <summary>
@@ -345,7 +341,7 @@ namespace LCT.PackageIdentifier
             }
             catch (CryptographicException ex)
             {
-                Logger.Debug($"Certificate signature verification failed: {ex.Message}");
+                Logger.Debug("Certificate signature verification failed:", ex);
                 Environment.ExitCode = -1;
             }
         }
