@@ -7,7 +7,6 @@
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
-using LCT.ArtifactoryUploader;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;

@@ -107,7 +107,7 @@ namespace LCT.Common.UTest
         {
             // Arrange & Act - Constructor with null should use default CommonAppSettings
             // which will have valid default connection string or handle gracefully
-            
+
             // Assert - Should throw InvalidOperationException due to missing instrumentation key
             Assert.Throws<InvalidOperationException>(() => new TelemetryHelper(null));
         }
@@ -160,7 +160,7 @@ namespace LCT.Common.UTest
                 ProjectType = "Test"
             };
             var telemetryHelperForException = new TelemetryHelper(appSettingsForException);
-            
+
             // Using null version to potentially trigger ArgumentNullException
             string catoolVersion = null;
             var kpiData = new { TestMetric = 100 };
@@ -209,7 +209,7 @@ namespace LCT.Common.UTest
                 ProjectType = "ExceptionTest"
             };
             var helperForTracking = new TelemetryHelper(appSettingsWithException);
-            
+
             string catoolVersion = "2.0.0";
             var kpiData = new { ErrorMetric = 999 };
             string telemetryFor = "TrackExceptionTest";
@@ -217,7 +217,7 @@ namespace LCT.Common.UTest
             // Act - This will internally call TrackException if an exception occurs
             // TrackException creates a Dictionary with "Error Time" (DateTime.UtcNow) and "Stack Trace" (ex.StackTrace)
             Assert.DoesNotThrow(() => helperForTracking.StartTelemetry(catoolVersion, kpiData, telemetryFor));
-            
+
             // Assert - Verification that the method completes without throwing
             // The TrackException method would have been called with exceptionData containing:
             // { "Error Time", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }

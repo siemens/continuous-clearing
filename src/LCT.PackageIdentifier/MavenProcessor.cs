@@ -327,7 +327,7 @@ namespace LCT.PackageIdentifier
         private static List<Component> DevdependencyIdentification(List<Component> ListOfComponents, List<Component> iterateBOM, List<Component> checkBOM)
         {
             foreach (var item in iterateBOM)
-            {               
+            {
                 //check to see if the second list is empty(which means customer has only provided one bom file)no dev dependency will be identified here
                 if (checkBOM.Count == 0)
                 {

@@ -2,7 +2,6 @@
 using LCT.Common.Model;
 using Moq;
 using System.Net;
-using System.Security;
 using File = System.IO.File;
 
 namespace LCT.APICommunications.UTest
@@ -99,7 +98,7 @@ namespace LCT.APICommunications.UTest
             // Act & Assert - Should handle UriFormatException gracefully and not throw
             string result = string.Empty;
             Assert.DoesNotThrow(() => result = _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
-            
+
             // Verify that the method returns the expected API URL structure even when exception occurs
             Assert.That(result, Does.Contain("attachments"));
         }
@@ -125,7 +124,7 @@ namespace LCT.APICommunications.UTest
             // Act & Assert - Should handle SecurityException gracefully and log with exception parameter
             string result = string.Empty;
             Assert.DoesNotThrow(() => result = _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
-            
+
             // Verify that the result contains the release ID
             Assert.That(result, Does.Contain("security-test-123"));
         }
@@ -151,7 +150,7 @@ namespace LCT.APICommunications.UTest
             // Act & Assert - Should handle WebException gracefully with proper logging
             string result = string.Empty;
             Assert.DoesNotThrow(() => result = _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
-            
+
             // Verify method completes and returns URL
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Does.Contain("webex-test-123"));
@@ -179,7 +178,7 @@ namespace LCT.APICommunications.UTest
             // Act & Assert - Should catch IOException, log with exception parameter using ErrorFormat
             string result = string.Empty;
             Assert.DoesNotThrow(() => result = _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
-            
+
             // Verify the release ID is in the returned URL
             Assert.That(result, Does.Contain("io-test-456"));
             Assert.That(result, Does.Contain("/attachments"));
@@ -206,7 +205,7 @@ namespace LCT.APICommunications.UTest
             // Act & Assert - Should handle WebException with response stream gracefully
             string result = string.Empty;
             Assert.DoesNotThrow(() => result = _attachmentHelper.AttachComponentSourceToSW360(attachReport, comparisonBomData));
-            
+
             // Verify result contains expected URL structure
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Does.Contain("webex-stream-789"));

@@ -9,7 +9,6 @@
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
-using LCT.ArtifactoryUploader;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common.Constants;
 using LCT.Common.Interface;

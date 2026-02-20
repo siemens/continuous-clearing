@@ -563,9 +563,9 @@ namespace LCT.PackageIdentifier
                 }
             }
         }
-              
-            
-       
+
+
+
 
         /// <summary>
         /// Determines whether the specified component exists in the provided AQL results (internal).
