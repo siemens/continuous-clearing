@@ -35,6 +35,7 @@ namespace LCT.ArtifactoryUploader
         private const string Poetry = "POETRY";
         private const string Conan = "CONAN";
         private const string Cargo = "CARGO";
+        private const string Debian = "DEBIAN";
 
         #endregion
 
@@ -169,7 +170,7 @@ namespace LCT.ArtifactoryUploader
             }
             else if (item.Purl.Contains("pkg:deb/debian", StringComparison.OrdinalIgnoreCase))
             {
-                return "DEBIAN";
+                return Debian;
             }
             else if (item.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
             {
@@ -210,7 +211,7 @@ namespace LCT.ArtifactoryUploader
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}";
             }
-            else if (component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == Debian)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
             }
@@ -301,7 +302,7 @@ namespace LCT.ArtifactoryUploader
                     string mavenPath = !string.IsNullOrEmpty(groupWithSlash) ? $"{groupWithSlash}/{item.Name}" : item.Name;
                     return $"{mavenPath}/{component.Version}";
 
-                case "DEBIAN":
+                case Debian:
                     return $"pool/main/{component.Name[0]}/{component.Name}";
                 default:
                     return string.Empty;
@@ -344,7 +345,7 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if (component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == Debian)
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                            $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
@@ -398,7 +399,7 @@ namespace LCT.ArtifactoryUploader
                 // Add a wild card to the path end for jFrog AQL query search
                 component.Path = $"{component.Path}/*";
             }
-            else if (component.ComponentType == "DEBIAN")
+            else if (component.ComponentType == Debian)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*" +
                           $"?to=/{component.DestRepoName}/{component.Path}/{component.Name}_{component.Version.Replace(ApiConstant.DebianExtension, "")}*";
@@ -428,7 +429,7 @@ namespace LCT.ArtifactoryUploader
                 "NPM" => component.PypiOrNpmCompName,
                 Nuget => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 Choco => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
-                "DEBIAN" => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
+                Debian => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
                 Cargo => $"{component.PackageName}.{component.Version}{ApiConstant.CargoExtension}",
                 Poetry => component.PypiOrNpmCompName,
                 _ => string.Empty,
@@ -479,7 +480,7 @@ namespace LCT.ArtifactoryUploader
                 case Conan:
                     displayPackagesInfo.UnknownPackagesConan.Add(component);
                     break;
-                case "DEBIAN":
+                case Debian:
                     displayPackagesInfo.UnknownPackagesDebian.Add(component);
                     break;
                 case Cargo:
