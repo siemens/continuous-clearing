@@ -80,11 +80,11 @@ namespace LCT.APICommunications
             var operationInfo = context.ContainsKey("OperationInfo") ? context["OperationInfo"] : requestUri;
 
 
-            Logger.Debug($"Retry attempt {attempt} for {httpMethod} method this URL {requestUri} : {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+            Logger.DebugFormat("Retry attempt {0} for {1} method this URL {2} : {3}", attempt, httpMethod, requestUri, (outcome.Exception != null ? outcome.Exception.Message : outcome.Result.StatusCode.ToString()));
 
             if (!_initialRetryLogged && context["LogWarnings"] as bool? != false)
             {
-                Logger.Warn($"Retry attempt initiated: {operationInfo} Error: {(outcome.Exception != null ? outcome.Exception.Message : $"{outcome.Result.StatusCode}")}");
+                Logger.WarnFormat("Retry attempt initiated: {0} Error: {1}", operationInfo, (outcome.Exception != null ? outcome.Exception.Message : outcome.Result.StatusCode.ToString()));
             }
 
             context["RetryAttempt"] = attempt;
@@ -115,7 +115,7 @@ namespace LCT.APICommunications
             if (_initialRetryLogged)
             {
                 var attempt = context.ContainsKey("RetryAttempt") ? context["RetryAttempt"] : 0;
-                Logger.Debug($"Retry attempt successful after {attempt} attempts for {request.Method} {request.RequestUri}.");
+                Logger.DebugFormat("Retry attempt successful after {0} attempts for {1} {2}.", attempt, request.Method, request.RequestUri);
                 _initialRetryLogged = false;
             }
 
@@ -135,7 +135,7 @@ namespace LCT.APICommunications
                     GetRetryInterval,
                     onRetry: (exception, timespan, attempt, context) =>
                     {
-                        Logger.Debug($"Retry attempt {attempt} due to: {exception?.Message ?? "No exception"}");
+                        Logger.DebugFormat("Retry attempt {0} due to: {1}", attempt, (exception?.Message ?? "No exception"));
                     });
 
             await retryPolicy.ExecuteAsync(action);

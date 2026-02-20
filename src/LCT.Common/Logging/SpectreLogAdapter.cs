@@ -20,7 +20,7 @@ namespace LCT.Common
         #region Fields
 
         private readonly SpectreLogger _logger;
-        private readonly ILog _fileLogger;
+        private readonly ILog _log;
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace LCT.Common
         {
             string resolvedLoggerName = loggerName ?? "Unknown";
             _logger = new SpectreLogger(resolvedLoggerName);
-            _fileLogger = LogManager.GetLogger(resolvedLoggerName);
+            _log = LogManager.GetLogger(resolvedLoggerName);
         }
 
         #endregion
@@ -83,7 +83,7 @@ namespace LCT.Common
         /// <param name="message">The message to log.</param>
         public void Debug(object message)
         {
-            _fileLogger.Debug(message);
+            _log.Debug(message);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace LCT.Common
         /// <param name="exception">The exception to log.</param>
         public void Debug(object message, Exception exception)
         {
-            _fileLogger.Debug(message);
+            _log.Debug(message);
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace LCT.Common
         /// <param name="message">The message to log.</param>
         public void Info(object message)
         {
-            _fileLogger.Info(message);
+            _log.Info(message);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace LCT.Common
         /// <param name="exception">The exception to log.</param>
         public void Info(object message, Exception exception)
         {
-            _fileLogger.Info(message);
+            _log.Info(message);
         }
 
         /// <summary>
@@ -237,7 +237,7 @@ namespace LCT.Common
         /// <param name="message">The message to log.</param>
         public void Warn(object message)
         {
-            _fileLogger.Warn(message);
+            _log.Warn(message);
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace LCT.Common
         /// <param name="exception">The exception to log.</param>
         public void Warn(object message, Exception exception)
         {
-            _fileLogger.Warn(message);
+            _log.Warn(message);
         }
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace LCT.Common
         /// <param name="message">The message to log.</param>
         public void Error(object message)
         {
-            _fileLogger.Error(message);
+            _log.Error(message);
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace LCT.Common
         /// <param name="exception">The exception to log.</param>
         public void Error(object message, Exception exception)
         {
-            _fileLogger.Error(message);
+            _log.Error(message);
         }
 
         /// <summary>
@@ -391,7 +391,7 @@ namespace LCT.Common
         /// <param name="message">The message to log.</param>
         public void Fatal(object message)
         {
-            _fileLogger.Fatal(message);
+            _log.Fatal(message);
         }
 
         /// <summary>
@@ -401,7 +401,7 @@ namespace LCT.Common
         /// <param name="exception">The exception to log.</param>
         public void Fatal(object message, Exception exception)
         {
-            _fileLogger.Fatal(message);
+            _log.Fatal(message);
         }
 
         /// <summary>

@@ -5,14 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Interfaces;
-using LCT.ArtifactoryUploader;
 using Moq;
 using NUnit.Framework;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace AritfactoryUploader.UTest
+namespace LCT.ArtifactoryUploader.UTest
 {
     [TestFixture]
     public class ArtifactoryValidatorTest

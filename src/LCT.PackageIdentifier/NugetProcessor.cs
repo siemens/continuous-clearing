@@ -41,6 +41,7 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string ParsePackageConfigMethod = "ParsePackageConfig()";
         private const string NugetPackageNameFormat = "{0}.{1}.nupkg";
+        private const string FalseString = "false";
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private readonly IFrameworkPackages _frameworkPackages = frameworkPackages;
@@ -115,7 +116,7 @@ namespace LCT.PackageIdentifier
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += nodes.Count();
                 foreach (XElement element in nodes)
                 {
-                    string isDev = "false";
+                    string isDev = FalseString;
                     XAttribute idAttribute = element.Attribute("id");
                     XAttribute versionAttribute = element.Attribute("version");
                     XAttribute devDependencyAttribute = element.Attribute("developmentDependency");
@@ -594,7 +595,7 @@ namespace LCT.PackageIdentifier
                 var isDirectDep = NugetDevDependencyParser.NugetDirectDependencies
                     .Any(x => x.Contains(component.Name) && x.Contains(component.Version));
 
-                string siemensDirectValue = isDirectDep ? "true" : "false";
+                string siemensDirectValue = isDirectDep ? "true" : FalseString;
                 Logger.DebugFormat("AddSiemensDirectProperty(): Component [Name: {0}, Version: {1}] is a direct dependency. Setting SiemensDirect property to {2}.", component.Name, component.Version, siemensDirectValue);
                 component.Properties ??= new List<Property>();
                 var properties = component.Properties;
@@ -981,15 +982,14 @@ namespace LCT.PackageIdentifier
             Dictionary<string, Component> keyValuePairs = new Dictionary<string, Component>();
             foreach (var component in listComponentForBOM)
             {
-                if (!keyValuePairs.TryAdd(component.Purl, component))
+                if (!keyValuePairs.TryAdd(component.Purl, component) &&
+                    keyValuePairs[component.Purl].Properties[0].Value == FalseString &&
+                    component.Properties[0].Value == "true")
                 {
-                    if (keyValuePairs[component.Purl].Properties[0].Value == "false" && component.Properties[0].Value == "true")
-                    {
-                        //Already Comp with Development Dependent added as 'false' ,remove that Comp
-                        //& add New Comp as Development Dependent only if 'true'
-                        keyValuePairs.Remove(component.Purl);
-                        keyValuePairs.Add(component.Purl, component);
-                    }
+                    //Already Comp with Development Dependent added as 'false' ,remove that Comp
+                    //& add New Comp as Development Dependent only if 'true'
+                    keyValuePairs.Remove(component.Purl);
+                    keyValuePairs.Add(component.Purl, component);
                 }
             }
             BomCreator.bomKpiData.DuplicateComponents = listComponentForBOM.Count - keyValuePairs.Values.Count;
@@ -1176,7 +1176,7 @@ namespace LCT.PackageIdentifier
                         Version = lst.Value.Version,
                         Dependencies = depvalue,
                         Filepath = configFile,
-                        IsDev = (!isSelfContainedProject && IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys)) || lst.Value.Scope.ToString() == "DevDependency" ? "true" : "false",
+                        IsDev = (!isSelfContainedProject && IsFrameworkDependentComponent(lst.Value.Name, lst.Value.Version, uniqueFrameworkKeys)) || lst.Value.Scope.ToString() == "DevDependency" ? "true" : FalseString,
                     });
                 }
             }
@@ -1237,12 +1237,11 @@ namespace LCT.PackageIdentifier
             foreach (var key in uniqueFrameworkKeys)
             {
                 string runtime = key.Split('-')[0];
-                if (_listofFrameworkPackagesInInputFiles.TryGetValue(runtime, out var packages))
+                if (_listofFrameworkPackagesInInputFiles.TryGetValue(runtime, out var packages) &&
+                    packages.TryGetValue(name, out var pkgVersion) &&
+                    pkgVersion.ToNormalizedString() == version)
                 {
-                    if (packages.TryGetValue(name, out var pkgVersion) && pkgVersion.ToNormalizedString() == version)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;
@@ -1259,12 +1258,11 @@ namespace LCT.PackageIdentifier
         {
             foreach (var key in uniqueFrameworkKeys)
             {
-                if (_listofFrameworkPackages.TryGetValue(key, out var packages))
+                if (_listofFrameworkPackages.TryGetValue(key, out var packages) &&
+                    packages.TryGetValue(name, out var pkgVersion) &&
+                    pkgVersion.ToNormalizedString() == version)
                 {
-                    if (packages.TryGetValue(name, out var pkgVersion) && pkgVersion.ToNormalizedString() == version)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;
@@ -1384,14 +1382,14 @@ namespace LCT.PackageIdentifier
 
                 if (uniquePackages.Count != _listofFrameworkPackagesInInputFiles[frameworkKey].Count)
                 {
-                    Logger.Debug($"AddCompositionDetails: Removed {_listofFrameworkPackagesInInputFiles[frameworkKey].Count - uniquePackages.Count} duplicate packages for framework '{frameworkKey}'.");
+                    Logger.DebugFormat("AddCompositionDetails: Removed {0} duplicate packages for framework '{1}'.", _listofFrameworkPackagesInInputFiles[frameworkKey].Count - uniquePackages.Count, frameworkKey);
                 }
 
                 _listofFrameworkPackagesInInputFiles[frameworkKey] = uniquePackages;
                 totalCount = totalCount + uniquePackages.Count;
             }
 
-            Logger.Warn($"Total Framework packages marked as development dependencies: {totalCount}");
+            Logger.WarnFormat("Total Framework packages marked as development dependencies: {0}", totalCount);
             // Add compositions to the BOM
             _compositionBuilder.AddCompositionsToBom(bom, _listofFrameworkPackagesInInputFiles, runtimeInfo);
         }

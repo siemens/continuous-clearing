@@ -7,7 +7,6 @@
 using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
-using LCT.ArtifactoryUploader;
 using LCT.Services.Interface;
 using Moq;
 using NUnit.Framework;
@@ -15,7 +14,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace AritfactoryUploader.UTest
+namespace LCT.ArtifactoryUploader.UTest
 {
     public class JfrogRepoUpdaterTest
     {

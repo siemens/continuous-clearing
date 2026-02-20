@@ -196,7 +196,6 @@ namespace LCT.Common
             logBuilder.AppendLine(LogSeparator);
             logBuilder.AppendLine($"| {"Field",-20} | {"Value",-100} |");
             logBuilder.AppendLine(LogHeaderSeparator);
-            logBuilder.AppendLine($"| {"Time",-20} | {GetISTTime(),-100} |");
             logBuilder.AppendLine($"| {TableMessage,-20} | {details,-100} |");
             logBuilder.AppendLine($"| {"Context",-20} | {context,-100} |");
 
@@ -330,7 +329,6 @@ namespace LCT.Common
             logBuilder.AppendLine($"{LogSeparator}");
             logBuilder.AppendLine($"| {"Field",-20} | {"Value",-100} |");
             logBuilder.AppendLine(LogHeaderSeparator);
-            logBuilder.AppendLine($"| {"Time",-20} | {GetISTTime(),-100} |");
             logBuilder.AppendLine($"| {TableMessage,-20} | {details,-100} |");
             logBuilder.AppendLine($"| {"Description",-20} | {context,-100} |");
         }
@@ -625,7 +623,7 @@ namespace LCT.Common
             if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
-                Logger.Debug($"No components were found in the list");
+                Logger.Debug("No components were found in the list");
                 return;
             }
             // Build the table
@@ -651,7 +649,7 @@ namespace LCT.Common
             if (components == null || components.Count == 0)
             {
                 // Log a message indicating no components were found
-                Logger.Debug($"No components were found in the list");
+                Logger.Debug("No components were found in the list");
                 return;
             }
 
@@ -757,11 +755,7 @@ namespace LCT.Common
             // Log the table
             Logger.Debug(logBuilder.ToString());
         }
-        public static DateTime GetISTTime()
-        {
-            TimeZoneInfo istTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, istTimeZone);
-        }
+
         private static string MaskSensitiveData(string content)
         {
             // Mask API keys

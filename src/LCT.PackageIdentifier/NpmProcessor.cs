@@ -46,6 +46,7 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
         private const string Name = "name";
+        private const string FalseString = "false";
 
         private List<Component> listOfInternalComponents = new List<Component>();
         private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
@@ -67,10 +68,8 @@ namespace LCT.PackageIdentifier
             List<Dependency> dependencies = new List<Dependency>();
             int totalComponentsIdentified = 0;
             int totalUnsupportedComponentsIdentified = 0;
-            int duplicateComponents = 0;
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
-            duplicateComponents = CommonHelper.DuplicateComponents;
-            totalComponentsIdentified = componentsForBOM.Count + duplicateComponents;
+            totalComponentsIdentified = componentsForBOM.Count;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
             componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
@@ -88,6 +87,7 @@ namespace LCT.PackageIdentifier
             bom.Dependencies = dependencies;
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             bom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(bom.Components, bom.Dependencies);
+            CommonHelper.AddSiemensDirectProperty(ref bom);
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
@@ -251,7 +251,7 @@ namespace LCT.PackageIdentifier
 
             foreach (JProperty prop in depencyComponentList.Skip(1))
             {
-                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = FalseString };
                 if (string.IsNullOrEmpty(prop.Name))
                 {
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
@@ -270,7 +270,7 @@ namespace LCT.PackageIdentifier
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
                 string packageName = GetPackageName(properties, prop);
-
+                string bomrefName = packageName;
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
                 SetComponentGroupAndName(components, packageName);
@@ -280,7 +280,7 @@ namespace LCT.PackageIdentifier
                 components.Version = Convert.ToString(properties[Version]);
                 components.Manufacturer.BomRef = prop.Value[Dependencies]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
-                components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
 
                 CheckAndAddToBundleComponents(bundledComponents, prop, components);
                 string isDirect = GetIsDirect(directDependencies, prop);
@@ -384,7 +384,7 @@ namespace LCT.PackageIdentifier
             foreach (JProperty prop in depencyComponentList)
             {
                 Component components = new Component() { Manufacturer = new OrganizationalEntity() };
-                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = FalseString };
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
@@ -403,8 +403,8 @@ namespace LCT.PackageIdentifier
                 }
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
+                string bomrefName = prop.Name;
                 string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;
-
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
 
                 if (prop.Name.Contains('@'))
@@ -422,7 +422,7 @@ namespace LCT.PackageIdentifier
                 components.Version = Convert.ToString(properties[Version]);
                 components.Manufacturer.BomRef = prop.Value[Requires]?.ToString();
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
-                components.BomRef = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
                 components.Type = Component.Classification.Library;
                 string isDirect = GetIsDirect(directDependenciesList, prop);
                 Property siemensDirect = new Property() { Name = Dataconstant.Cdx_SiemensDirect, Value = isDirect };
@@ -559,7 +559,7 @@ namespace LCT.PackageIdentifier
                     continue;
                 }
 
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                Logger.DebugFormat("ParsingInputFileForBOM():FileName: {0}", filepath);
                 ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
             CommonHelper.EnrichCdxGenforPackagefilesData(
@@ -725,7 +725,7 @@ namespace LCT.PackageIdentifier
 
                     var dependency = new Dependency()
                     {
-                        Ref = component.Purl,
+                        Ref = component.BomRef,
                         Dependencies = subDependencies
                     };
                     Logger.DebugFormat("GetdependencyDetails():Final Dependency for Component: Ref = {0}, Sub-Dependencies = [{1}]\n", dependency.Ref, string.Join(", ", dependency.Dependencies.Select(d => d.Ref)));
@@ -747,7 +747,7 @@ namespace LCT.PackageIdentifier
         /// <returns>Formatted string safe for PURL composition.</returns>
         private static string StringFormat(string componentInfo)
         {
-            var replacements = new Dictionary<string, string> { { "@", "%40" }, { "\"", "" }, { "{", "" }, { "\r", "" }, { "}", "" }, { "\n", "" } };
+            var replacements = new Dictionary<string, string> { { "\"", "" }, { "{", "" }, { "\r", "" }, { "}", "" }, { "\n", "" } };
 
             var formattedstring = replacements.Aggregate(componentInfo, (current, replacement) => current.Replace(replacement.Key, replacement.Value));
             return formattedstring.Trim();
@@ -922,7 +922,7 @@ namespace LCT.PackageIdentifier
                             Dataconstant.ManullayAdded);
                         CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                             Dataconstant.Cdx_IsDevelopment,
-                            "false");
+                            FalseString);
                         component.Properties = properties;
                     }
                 }

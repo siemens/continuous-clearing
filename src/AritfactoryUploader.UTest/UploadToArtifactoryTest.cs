@@ -8,7 +8,6 @@ using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
 using LCT.APICommunications.Model.AQL;
-using LCT.ArtifactoryUploader;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
@@ -21,7 +20,7 @@ using System.IO;
 using System.Threading.Tasks;
 using UnitTestUtilities;
 
-namespace AritfactoryUploader.UTest
+namespace LCT.ArtifactoryUploader.UTest
 {
     public class UploadToArtifactoryTest
     {

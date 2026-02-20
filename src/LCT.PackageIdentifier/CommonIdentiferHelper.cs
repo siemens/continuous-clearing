@@ -98,6 +98,10 @@ namespace LCT.PackageIdentifier
             {
                 cdxGenBomData.Components = [.. cdxGenBomData.Components.Where(c => c.Type != Component.Classification.Application)];
                 CycloneDXBomParser.CheckValidComponentsForProjectType(cdxGenBomData.Components, appSettings.ProjectType);
+                if (cdxGenBomData.Dependencies != null)
+                {
+                    CycloneDXBomParser.CheckValidDependenciesForProjectType(cdxGenBomData.Dependencies, appSettings.ProjectType);
+                }
                 return cdxGenBomData;
             }
             return null;

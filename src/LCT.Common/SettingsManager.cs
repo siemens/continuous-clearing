@@ -51,12 +51,12 @@ namespace LCT.Common
             }
             if (args?.Length == 0)
             {
-                Logger.Debug($"ReadConfiguration():No arguments provided through command line.");
+                Logger.Debug("ReadConfiguration():No arguments provided through command line.");
                 DisplayHelp();
                 environmentHelper.CallEnvironmentExit(0);
             }
             string settingsFilePath = GetConfigFilePathFromArgs(args, jsonSettingsFileName);
-            Logger.Debug($"Settings File: {settingsFilePath}");
+            Logger.DebugFormat("Settings File: {0}", settingsFilePath);
             //add ut for reading - add json and then cmd args
             IConfigurationBuilder settingsConfigBuilder = new ConfigurationBuilder()
                                                                     .SetBasePath(BasePath)
@@ -73,13 +73,13 @@ namespace LCT.Common
             catch (InvalidDataException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}", ex, "InvalidDataException occurred while loading configuration.");
-                Logger.Error($"Failed to load configuration file. Please verify the JSON format in: {settingsFilePath}");
+                Logger.ErrorFormat("Failed to load configuration file. Please verify the JSON format in: {0}", settingsFilePath);
                 return default;
             }
             catch (FormatException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("ReadConfiguration()", $"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}", ex, "FormatException occurred while loading configuration.");
-                Logger.Error($"Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {settingsFilePath}");
+                Logger.ErrorFormat("Configuration file contains invalid format. Please check for missing quotes or invalid syntax in: {0}", settingsFilePath);
                 return default;
             }
 
@@ -92,7 +92,7 @@ namespace LCT.Common
                 return default;
             }
 
-            Logger.Debug($"ReadConfiguration():Successfully completed configuration reading.");
+            Logger.Debug("ReadConfiguration():Successfully completed configuration reading.");
 
             return appSettings;
         }
@@ -137,7 +137,7 @@ namespace LCT.Common
 
             if (!File.Exists(settingsFilePath))
             {
-                Logger.Debug($"SettingsFilePath: \"{settingsFilePath}\" does not exist. Using default settings.");
+                Logger.DebugFormat("SettingsFilePath: \"{0}\" does not exist. Using default settings.", settingsFilePath);
                 return defaultFile;
             }
 

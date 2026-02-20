@@ -10,13 +10,11 @@ using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Model;
 using LCT.SW360PackageCreator.Interfaces;
-using log4net;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
@@ -28,8 +26,6 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public class AlpinePackageDownloader : IPackageDownloader
     {
-
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Downloads the source package for the specified component and returns the local file path to the downloaded

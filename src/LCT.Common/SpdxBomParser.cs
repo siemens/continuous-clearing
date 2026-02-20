@@ -57,7 +57,7 @@ namespace LCT.Common
                     spdxBomData = JsonConvert.DeserializeObject<SpdxBomData>(json);
                     if (!IsValidSpdxVersion(spdxBomData))
                     {
-                        Logger.Warn($"    Invalid SPDX version found in this file path {filePath}. Expected 'SPDX-2.3', but found '{spdxBomData?.SpdxVersion}'. Only SPDX version 2.3 is supported.");
+                        Logger.WarnFormat("    Invalid SPDX version found in this file path {0}. Expected 'SPDX-2.3', but found '{1}'. Only SPDX version 2.3 is supported.", filePath, spdxBomData?.SpdxVersion);
                         return bom; // Return empty BOM
                     }
                     // Convert SpdxBomData to Bom here
@@ -65,7 +65,7 @@ namespace LCT.Common
                 }
                 else
                 {
-                    Logger.Error($"File not found: {filePath}. Please provide a valid file path.");
+                    Logger.ErrorFormat("File not found: {0}. Please provide a valid file path.", filePath);
                 }
             }
             catch (UnauthorizedAccessException ex)
@@ -83,7 +83,7 @@ namespace LCT.Common
                 LogHandlingHelper.ExceptionErrorHandling("Error occurred while reading the Spdx BOM file.", "ParseSPDXBom()", ex, $"File Path: {filePath}");
                 Logger.Error("JSON reader exception in reading SPDX BOM", ex);
             }
-            Logger.Debug($"SPDX BOM parsing completed. Final BOM contains {bom.Components?.Count ?? 0} components and {bom.Dependencies?.Count ?? 0} dependencies");
+            Logger.DebugFormat("SPDX BOM parsing completed. Final BOM contains {0} components and {1} dependencies", bom.Components?.Count ?? 0, bom.Dependencies?.Count ?? 0);
             return bom;
         }
 
@@ -112,7 +112,7 @@ namespace LCT.Common
 
             if (!isValid)
             {
-                Logger.Debug($"SPDX version validation failed. Expected: '{EXPECTED_SPDX_VERSION}', Found: '{spdxData.SpdxVersion}'");
+                Logger.DebugFormat("SPDX version validation failed. Expected: '{0}', Found: '{1}'", EXPECTED_SPDX_VERSION, spdxData.SpdxVersion);
             }
             return isValid;
         }

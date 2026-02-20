@@ -39,36 +39,40 @@ namespace LCT.Common
         public static void CheckValidComponentsFromSpdxfile(Bom bom, string projectType, ref Bom listOfUnsupportedComponents)
         {
             Logger.Debug("CheckValidComponentsFromSpdxfile():Start identifying Supported and unsupported packages from spdx input files");
-            List<Component> listUnsupportedComponents = new List<Component>();
-            List<Dependency> listUnsupportedDependencies = new List<Dependency>();
-            foreach (var component in bom.Components.ToList())
+
+            // Filter unsupported components using LINQ
+            var unsupportedComponents = bom.Components.Where(component =>
+                string.IsNullOrEmpty(component.Name) || string.IsNullOrEmpty(component.Version) ||
+                string.IsNullOrEmpty(component.Purl) ||
+                !component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()])).ToList();
+
+            // Log each unsupported component
+            foreach (var component in unsupportedComponents)
             {
-                if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
-                    && !string.IsNullOrEmpty(component.Purl) &&
-                    component.Purl.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
-                {
-                    //Taking Valid Components for perticular projects
-                }
-                else
-                {
-                    bom.Components.Remove(component);
-                    listUnsupportedComponents.Add(component);
-                    Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Name:{0},Version:{1},Purl:{2} identified as a unsupported component", component.Name, component.Version, component.Purl);
-                }
+                Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Name:{0},Version:{1},Purl:{2} identified as a unsupported component", component.Name, component.Version, component.Purl);
             }
-            foreach (var dependency in bom.Dependencies.ToList())
+
+            // Remove unsupported components from the BOM
+            foreach (var component in unsupportedComponents)
             {
-                if (string.IsNullOrEmpty(dependency.Ref) ||
-                    !dependency.Ref.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()]))
-                {
-                    bom.Dependencies.Remove(dependency);
-                    listUnsupportedDependencies.Add(dependency);
-                }
+                bom.Components.Remove(component);
             }
-            listOfUnsupportedComponents.Components.AddRange(listUnsupportedComponents);
-            listOfUnsupportedComponents.Dependencies.AddRange(listUnsupportedDependencies);
-            Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Total identified unsupported Components:{0}", listUnsupportedComponents.Count);
-            Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Total identified unsupported Dependencies:{0}", listUnsupportedDependencies.Count);
+
+            // Filter unsupported dependencies using LINQ
+            var unsupportedDependencies = bom.Dependencies.Where(dependency =>
+                string.IsNullOrEmpty(dependency.Ref) ||
+                !dependency.Ref.Contains(Dataconstant.PurlCheck()[projectType.ToUpper()])).ToList();
+
+            // Remove unsupported dependencies from the BOM
+            foreach (var dependency in unsupportedDependencies)
+            {
+                bom.Dependencies.Remove(dependency);
+            }
+
+            listOfUnsupportedComponents.Components.AddRange(unsupportedComponents);
+            listOfUnsupportedComponents.Dependencies.AddRange(unsupportedDependencies);
+            Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Total identified unsupported Components:{0}", unsupportedComponents.Count);
+            Logger.DebugFormat("CheckValidComponentsFromSpdxfile():Total identified unsupported Dependencies:{0}", unsupportedDependencies.Count);
             Logger.Debug("CheckValidComponentsFromSpdxfile():Completed the Supported and unsupported packages from spdx input files");
         }
 

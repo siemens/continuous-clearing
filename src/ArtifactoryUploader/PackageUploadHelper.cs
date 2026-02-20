@@ -69,14 +69,14 @@ namespace LCT.ArtifactoryUploader
                 }
                 else
                 {
-                    Logger.Error($"File not found: {comparisonBomFilePath}. Please provide a valid file path.");
+                    Logger.ErrorFormat("File not found: {0}. Please provide a valid file path.", comparisonBomFilePath);
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }
             catch (JsonReaderException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("GetComponentListFromComparisonBOM", $"Failed to deserialize the comparison BOM file at path: {comparisonBomFilePath}", ex, "JsonReaderException occurred while deserializing the comparison BOM.");
-                Logger.Error($"Exception occurred in reading the comparison BOM: {ex.Message}");
+                Logger.ErrorFormat("Exception occurred in reading the comparison BOM: {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             Logger.Debug("GetComponentListFromComparisonBOM(): Completed the reading and identifying components from bom file.");
@@ -451,7 +451,7 @@ namespace LCT.ArtifactoryUploader
                 IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
                 item.DestRepoName = null;
                 var responseContent = await responseMessage.Content.ReadAsStringAsync();
-                Logger.Debug($"JFrog Response - {responseContent}");
+                Logger.DebugFormat("JFrog Response - {0}", responseContent);
             }
             else
             {

@@ -50,9 +50,10 @@ namespace LCT.PackageIdentifier
             }
             // Log the Registered MSBuild version and path
             var instance = MSBuildLocator.QueryVisualStudioInstances().FirstOrDefault();
-            LoggerHelper.MSBuildVersionDisplay("MSBuild Registered Version:", $"{instance?.Version}");
-            Logger.Debug($"MSBuild Registered Version: {instance?.Version}");
-            Logger.Debug($"MSBuild Registered Path: {instance?.MSBuildPath}");
+            LoggerHelper.MSBuildVersionDisplay("MSBuild Registered Version:", instance?.Version?.ToString());
+            // Compliant solution: use message template and argument
+            Logger.DebugFormat("MSBuild Registered Version: {0}", instance?.Version);
+            Logger.DebugFormat("MSBuild Registered Path: {0}", instance?.MSBuildPath);
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace LCT.PackageIdentifier
 
             foreach (var assetsFile in assetsFiles)
             {
-                Logger.Debug($"Processing assets file: {assetsFile}");
+                Logger.DebugFormat("Processing assets file: {0}", assetsFile);
                 var runtimeInfo = TryGetRuntimeInfoFromAssetFile(assetsFile);
 
                 if (runtimeInfo != null)
@@ -372,47 +373,40 @@ namespace LCT.PackageIdentifier
                 return;
             }
 
-            Logger.Debug("----- .NET Runtime Information Summary -----");
-
+            // Reduced debug logging to 4 calls, preserving all key information
             if (!string.IsNullOrEmpty(info.ErrorMessage))
             {
-                Logger.Error($"Error: {info.ErrorMessage}");
+                Logger.ErrorFormat("Error: {0}", info.ErrorMessage);
                 if (!string.IsNullOrEmpty(info.ErrorDetails))
                     Logger.Error($"Details: {info.ErrorDetails}");
-                Logger.Debug("--------------------------------------------");
+                Logger.Debug("----- .NET Runtime Information Summary End -----");
                 return;
             }
 
-            Logger.Debug($"Project Name      : {info.ProjectName}");
-            Logger.Debug($"Project Path      : {info.ProjectPath}");
-            Logger.Debug($"SelfContained     : {info.IsSelfContained.ToString()}");
-            Logger.Debug($"Explicitly Set    : {info.SelfContainedExplicitlySet}");
-            Logger.Debug($"Evaluated Value   : {info.SelfContainedEvaluated}");
-            Logger.Debug($"Reason            : {info.SelfContainedReason}");
-
-            Logger.Debug("Runtime Identifiers:");
-            if (info.RuntimeIdentifiers != null && info.RuntimeIdentifiers.Count > 0)
-            {
-                foreach (var rid in info.RuntimeIdentifiers)
-                    Logger.Debug($"  - {rid}");
-            }
-            else
-            {
-                Logger.Debug("  (None)");
-            }
-
-            Logger.Debug("Framework References:");
-            if (info.FrameworkReferences != null && info.FrameworkReferences.Count > 0)
-            {
-                foreach (var fr in info.FrameworkReferences)
-                    Logger.Debug($"  - {fr.Name} (TargetingPackVersion: {fr.TargetingPackVersion})");
-            }
-            else
-            {
-                Logger.Debug("  (None)");
-            }
-
-            Logger.Debug("--------------------------------------------");
+            Logger.DebugFormat(
+                ".NET Runtime Info: Name={0}, Path={1}, SelfContained={2}, ExplicitlySet={3}",
+                info.ProjectName,
+                info.ProjectPath,
+                info.IsSelfContained,
+                info.SelfContainedExplicitlySet
+            );
+            Logger.DebugFormat(
+                "EvaluatedValue={0}, Reason={1}",
+                info.SelfContainedEvaluated,
+                info.SelfContainedReason
+            );
+            Logger.DebugFormat(
+                "Runtime Identifiers: {0}",
+                (info.RuntimeIdentifiers != null && info.RuntimeIdentifiers.Count > 0)
+                    ? string.Join(", ", info.RuntimeIdentifiers)
+                    : "(None)"
+            );
+            Logger.DebugFormat(
+                "Framework References: {0}",
+                (info.FrameworkReferences != null && info.FrameworkReferences.Count > 0)
+                    ? string.Join(", ", info.FrameworkReferences.Select(fr => $"{fr.Name} (TargetingPackVersion: {fr.TargetingPackVersion})"))
+                    : "(None)"
+            );
         }
 
         /// <summary>

@@ -114,9 +114,9 @@ namespace LCT.Common.ComplianceValidator
             Dictionary<string, ComplianceExceptionComponent> purlToComponent)
         {
             var groupMap = new Dictionary<(string warning, string recommendation), List<string>>();
-            foreach (var bom in bomDataList)
+            foreach (var externalId in bomDataList.Select(bom => bom.ComponentExternalId).Where(id => id != null))
             {
-                if (bom.ComponentExternalId != null && purlToComponent.TryGetValue(bom.ComponentExternalId, out var comp))
+                if (purlToComponent.TryGetValue(externalId, out var comp))
                 {
                     var warning = comp.ComplianceInstructions?.WarningMessage?.Trim() ?? string.Empty;
                     var recommendation = comp.ComplianceInstructions?.Recommendation?.Trim() ?? string.Empty;
@@ -127,7 +127,7 @@ namespace LCT.Common.ComplianceValidator
                         purlList = new List<string>();
                         groupMap[key] = purlList;
                     }
-                    purlList.Add(bom.ComponentExternalId);
+                    purlList.Add(externalId);
                 }
             }
             return groupMap;
@@ -147,19 +147,19 @@ namespace LCT.Common.ComplianceValidator
 
             if (!string.IsNullOrWhiteSpace(warning))
             {
-                PrintWarning($"[WARNING] {warning}");
+                PrintWarning("[WARNING] " + warning);
                 PrintWarning("Affected PURLs:");
                 foreach (var purl in purls)
                 {
-                    PrintWarning($"  {purl}");
+                    PrintWarning("  " + purl);
                 }
                 hasWarning = true;
             }
             if (!string.IsNullOrWhiteSpace(recommendation))
             {
-                PrintRecommendation($"[RECOMMENDATION] {recommendation}");
+                PrintRecommendation("[RECOMMENDATION] " + recommendation);
             }
-            Logger.Logger.Log(null, Level.Info, $"", null);
+            Logger.Logger.Log(null, Level.Info, "", null);
             return hasWarning;
         }
 
@@ -173,7 +173,7 @@ namespace LCT.Common.ComplianceValidator
             if (string.IsNullOrWhiteSpace(content))
                 return;
 
-            Logger.Logger.Log(null, Level.Info, $"{content}", null); // Green/info
+            Logger.Logger.Log(null, Level.Info, content, null); // Green/info
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace LCT.Common.ComplianceValidator
             if (string.IsNullOrWhiteSpace(content))
                 return;
 
-            Logger.Logger.Log(null, Level.Warn, $"{content}", null); // Orange/warn
+            Logger.Logger.Log(null, Level.Warn, content, null); // Orange/warn
         }
 
         /// <summary>

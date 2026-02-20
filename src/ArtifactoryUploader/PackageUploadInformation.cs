@@ -340,7 +340,7 @@ namespace LCT.ArtifactoryUploader
             string name,
             string filePath)
         {
-            Logger.Info($"\n{name}:\n");
+            Logger.InfoFormat("\n{0}:\n", name);
             DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
             DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
             DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
@@ -362,16 +362,15 @@ namespace LCT.ArtifactoryUploader
 
                     if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
-                        Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} {jfrogFoundPackage.OperationType} Failed!! {jfrogFoundPackage.SrcRepoName} ---> {jfrogFoundPackage.DestRepoName}");
+                        Logger.ErrorFormat("Package {0}-{1} {2} Failed!! {3} ---> {4}", jfrogFoundPackage.Name, jfrogFoundPackage.Version, jfrogFoundPackage.OperationType, jfrogFoundPackage.SrcRepoName, jfrogFoundPackage.DestRepoName);
                     }
                     else if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
                     {
-                        Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} not found in {jfrogFoundPackage.SrcRepoName}, Upload Failed!!");
+                        Logger.ErrorFormat("Package {0}-{1} not found in {2}, Upload Failed!!", jfrogFoundPackage.Name, jfrogFoundPackage.Version, jfrogFoundPackage.SrcRepoName);
                     }
                     else
                     {
-                        Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version}" +
-                                          $" from {jfrogFoundPackage.SrcRepoName} to {jfrogFoundPackage.DestRepoName}");
+                        Logger.InfoFormat("Successful{0} {1} package {2}-{3} from {4} to {5}", jfrogFoundPackage.DryRunSuffix, jfrogFoundPackage.OperationType, jfrogFoundPackage.Name, jfrogFoundPackage.Version, jfrogFoundPackage.SrcRepoName, jfrogFoundPackage.DestRepoName);
                     }
 
                 }
@@ -392,7 +391,7 @@ namespace LCT.ArtifactoryUploader
 
                 foreach (var jfrogNotFoundPackage in JfrogNotFoundPackages)
                 {
-                    Logger.Warn($"Package {jfrogNotFoundPackage.Name}-{jfrogNotFoundPackage.Version} is not found in jfrog");
+                    Logger.WarnFormat("Package {0}-{1} is not found in jfrog", jfrogNotFoundPackage.Name, jfrogNotFoundPackage.Version);
 
                 }
                 Logger.Info("\n");
@@ -412,7 +411,7 @@ namespace LCT.ArtifactoryUploader
 
                 foreach (var sucessfullPackage in SucessfullPackages)
                 {
-                    Logger.Info($"Package {sucessfullPackage.Name}-{sucessfullPackage.Version} is already uploaded");
+                    Logger.InfoFormat("Package {0}-{1} is already uploaded", sucessfullPackage.Name, sucessfullPackage.Version);
                 }
                 Logger.Info("\n");
 
@@ -426,7 +425,7 @@ namespace LCT.ArtifactoryUploader
         private static void WarningMessageForNoPackages(string filename)
         {
             if (!LoggerFactory.UseSpectreConsole)
-                Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+                Logger.WarnFormat("Artifactory upload will not be done due to Report not in Approved state and package details can be found at {0}\n", filename);
         }
 
         /// <summary>
@@ -797,6 +796,51 @@ namespace LCT.ArtifactoryUploader
             WarningMessageForNoPackages(filename);
         }
 
+        /// <summary>
+        /// Logs a detailed failure message based on uploader KPIs and terminates the process with a non-zero exit code.
+        /// </summary>
+        /// <param name="uploaderKpiData">
+        /// The KPI data containing counts of packages not existing in the repository and packages not actioned due to error.
+        /// </param>
+        /// <param name="environmentHelper">
+        /// The environment helper used to exit the process with the appropriate exit code.
+        /// </param>
+        /// <remarks>
+        /// This method constructs a contextual warning message indicating the cause of failure:
+        /// - Packages not existing in repository (remote cache)
+        /// - Packages not actioned due to error
+        /// If one or both counts are greater than zero, it logs the message and calls <see cref="EnvironmentHelper.CallEnvironmentExit(int)"/> with exit code 2.
+        /// </remarks>
+        public static void SetExitCode(UploaderKpiData uploaderKpiData, EnvironmentHelper environmentHelper)
+        {
+            var notInRepo = uploaderKpiData.PackagesNotExistingInRemoteCache;
+            var notUploadedError = uploaderKpiData.PackagesNotUploadedDueToError;
+
+            if (notInRepo <= 0 && notUploadedError <= 0)
+            {
+                return;
+            }
+
+            var reasons = new List<string>(2);
+            if (notInRepo > 0)
+            {
+                reasons.Add($"{notInRepo} package{PluralSuffix(notInRepo)} not found in repository");
+            }
+            if (notUploadedError > 0)
+            {
+                reasons.Add($"{notUploadedError} package{PluralSuffix(notUploadedError)} not actioned due to error");
+            }
+
+            string reasonMessage =
+                $"Artifactory uploader exited with warning, due to {string.Join(" and ", reasons)}. " +
+                "For more detailed packages information, check the above tables.";
+
+            Logger.Warn(reasonMessage);
+            environmentHelper.CallEnvironmentExit(2);
+            Logger.Debug("Setting ExitCode to 2");
+
+            static string PluralSuffix(int count) => count == 1 ? "" : "s";
+        }
         #endregion
     }
 }
