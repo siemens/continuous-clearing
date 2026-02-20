@@ -346,8 +346,7 @@ namespace LCT.Services
                     }
                     else
                     {
-                        Logger.Debug("Duplicate entries found in finalReleasesToBeLinked: " + release.Name + ":" + release.ReleaseId +
-                            " , with :" + value.Name + ":" + value.ReleaseId);
+                        Logger.DebugFormat("Duplicate entries found in finalReleasesToBeLinked: {0}:{1} , with :{2}:{3}",release.Name, release.ReleaseId, value.Name, value.ReleaseId);
                     }
                 }
 

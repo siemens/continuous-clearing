@@ -1331,13 +1331,12 @@ namespace LCT.PackageIdentifier
                 {
                     var targetFramework = target.TargetFramework;
                     var frameworkReferences = _frameworkPackages.GetFrameworkReferences(lockFile, target);
-                    foreach (var framework in frameworkReferences)
-                    {
-                        if (!uniqueKeys.Contains(targetFramework + "-" + framework))
-                        {
-                            uniqueKeys.Add(targetFramework + "-" + framework);
-                        }
-                    }
+
+                    var newKeys = frameworkReferences
+                        .Where(framework => !uniqueKeys.Contains(targetFramework + "-" + framework))
+                        .Select(framework => targetFramework + "-" + framework);
+
+                    uniqueKeys.AddRange(newKeys);
                 }
             }
             catch (IOException ex)
