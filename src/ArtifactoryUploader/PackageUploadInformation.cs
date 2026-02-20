@@ -811,39 +811,35 @@ namespace LCT.ArtifactoryUploader
         /// - Packages not actioned due to error
         /// If one or both counts are greater than zero, it logs the message and calls <see cref="EnvironmentHelper.CallEnvironmentExit(int)"/> with exit code 2.
         /// </remarks>
-        public static void SetExitCode(UploaderKpiData uploaderKpiData,EnvironmentHelper environmentHelper)
-        {           
-            if (uploaderKpiData.PackagesNotUploadedDueToError > 0 || uploaderKpiData.PackagesNotExistingInRemoteCache > 0)
+        public static void SetExitCode(UploaderKpiData uploaderKpiData, EnvironmentHelper environmentHelper)
+        {
+            var notInRepo = uploaderKpiData.PackagesNotExistingInRemoteCache;
+            var notUploadedError = uploaderKpiData.PackagesNotUploadedDueToError;
+
+            if (notInRepo <= 0 && notUploadedError <= 0)
             {
-                // Build a detailed failure message
-                var notInRepo = uploaderKpiData.PackagesNotExistingInRemoteCache;
-                var notUploadedError = uploaderKpiData.PackagesNotUploadedDueToError;
+                return;
+            }
 
-                string reasonMessage;
+            var reasons = new List<string>(2);
+            if (notInRepo > 0)
+            {
+                reasons.Add($"{notInRepo} package{PluralSuffix(notInRepo)} not found in repository");
+            }
+            if (notUploadedError > 0)
+            {
+                reasons.Add($"{notUploadedError} package{PluralSuffix(notUploadedError)} not actioned due to error");
+            }
 
-                if (notInRepo > 0 && notUploadedError > 0)
-                {
-                    reasonMessage =
-                        $"Artifactory uploader exited with warning, due to {notInRepo} package{(notInRepo == 1 ? "" : "s")} not found in repository and {notUploadedError} package{(notUploadedError == 1 ? "" : "s")} not actioned due to error. " +
-                        "For more detailed packages information, check the above tables.";
-                }
-                else if (notInRepo > 0)
-                {
-                    reasonMessage =
-                        $"Artifactory uploader exited with warning, due to {notInRepo} package{(notInRepo == 1 ? "" : "s")} not found in repository. " +
-                        "For more detailed packages information, check the above tables.";
-                }
-                else
-                {
-                    reasonMessage =
-                        $"Artifactory uploader exited with warning, due to {notUploadedError} package{(notUploadedError == 1 ? "" : "s")} not actioned due to error. " +
-                        "For more detailed packages information, check the above tables.";
-                }
+            string reasonMessage =
+                $"Artifactory uploader exited with warning, due to {string.Join(" and ", reasons)}. " +
+                "For more detailed packages information, check the above tables.";
 
-                Logger.Warn(reasonMessage);
-                environmentHelper.CallEnvironmentExit(2);
-                Logger.Debug("Setting ExitCode to 2");
-            }            
+            Logger.Warn(reasonMessage);
+            environmentHelper.CallEnvironmentExit(2);
+            Logger.Debug("Setting ExitCode to 2");
+
+            static string PluralSuffix(int count) => count == 1 ? "" : "s";
         }
         #endregion
     }
