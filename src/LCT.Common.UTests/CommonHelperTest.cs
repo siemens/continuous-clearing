@@ -1593,18 +1593,18 @@ namespace LCT.Common.UTest
             // Arrange lock file content
             var listOfComponentsFromLockFile = new List<Component>
             {
-                new Component { Name = "lockLib", Version = "1.0", Type = Component.Classification.Library }
+                new Component { Name = "lockLib", Version = "1.0", Type = Component.Classification.Library,BomRef="lockLib@1.0" }
             };
             var listOfDependenciesFromLockFile = new List<Dependency>
             {
-                new Dependency { Ref = "lockRef" }
+                new Dependency { Ref = "lockLib@1.0" }
             };
             var componentsForBOM = new List<Component>();
             var dependencies = new List<Dependency>();
 
             // cdxgen data
             var cdxComponent = new Component { Name = "cdxLib", Version = "3.0", Type = Component.Classification.Library };
-            var cdxDependency = new Dependency { Ref = "cdxRef" };
+            var cdxDependency = new Dependency { Ref = "lockLib@1.0" };
             var cdxGenBomData = new Bom
             {
                 Components = new List<Component> { cdxComponent },
@@ -1622,8 +1622,8 @@ namespace LCT.Common.UTest
             // Assert - cdxgen components and dependencies should be added
             Assert.That(componentsForBOM.Count, Is.EqualTo(1));
             Assert.That(dependencies.Count, Is.EqualTo(1));
-            Assert.IsTrue(componentsForBOM.Any(c => c.Name == "cdxLib" && c.Version == "3.0"));
-            Assert.IsTrue(dependencies.Any(d => d.Ref == "cdxRef"));
+            Assert.IsTrue(componentsForBOM.Any(c => c.Name == "lockLib" && c.Version == "1.0"));
+            Assert.IsTrue(dependencies.Any(d => d.Ref == "lockLib@1.0"));
         }
         #endregion
 

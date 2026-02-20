@@ -21,7 +21,7 @@ using System.IO;
 using System.Threading.Tasks;
 using UnitTestUtilities;
 
-namespace AritfactoryUploader.UTest
+namespace LCT.ArtifactoryUploader.UTest
 {
     public class UploadToArtifactoryTest
     {

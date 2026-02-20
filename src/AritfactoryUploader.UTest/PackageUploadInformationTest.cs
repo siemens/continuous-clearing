@@ -23,7 +23,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 
-namespace AritfactoryUploader.UTest
+namespace LCT.ArtifactoryUploader.UTest
 {
     public class PackageUploadInformationTest
     {
