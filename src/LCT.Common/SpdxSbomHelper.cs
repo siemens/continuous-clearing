@@ -39,7 +39,7 @@ namespace LCT.Common
         public static void CheckValidComponentsFromSpdxfile(Bom bom, string projectType, ref Bom listOfUnsupportedComponents)
         {
             Logger.Debug("CheckValidComponentsFromSpdxfile():Start identifying Supported and unsupported packages from spdx input files");
-            
+
             // Filter unsupported components using LINQ
             var unsupportedComponents = bom.Components.Where(component =>
                 string.IsNullOrEmpty(component.Name) || string.IsNullOrEmpty(component.Version) ||

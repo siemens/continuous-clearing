@@ -982,8 +982,8 @@ namespace LCT.PackageIdentifier
             Dictionary<string, Component> keyValuePairs = new Dictionary<string, Component>();
             foreach (var component in listComponentForBOM)
             {
-                if (!keyValuePairs.TryAdd(component.Purl, component) && 
-                    keyValuePairs[component.Purl].Properties[0].Value == FalseString && 
+                if (!keyValuePairs.TryAdd(component.Purl, component) &&
+                    keyValuePairs[component.Purl].Properties[0].Value == FalseString &&
                     component.Properties[0].Value == "true")
                 {
                     //Already Comp with Development Dependent added as 'false' ,remove that Comp
@@ -1238,7 +1238,7 @@ namespace LCT.PackageIdentifier
             {
                 string runtime = key.Split('-')[0];
                 if (_listofFrameworkPackagesInInputFiles.TryGetValue(runtime, out var packages) &&
-                    packages.TryGetValue(name, out var pkgVersion) && 
+                    packages.TryGetValue(name, out var pkgVersion) &&
                     pkgVersion.ToNormalizedString() == version)
                 {
                     return true;
@@ -1259,7 +1259,7 @@ namespace LCT.PackageIdentifier
             foreach (var key in uniqueFrameworkKeys)
             {
                 if (_listofFrameworkPackages.TryGetValue(key, out var packages) &&
-                    packages.TryGetValue(name, out var pkgVersion) && 
+                    packages.TryGetValue(name, out var pkgVersion) &&
                     pkgVersion.ToNormalizedString() == version)
                 {
                     return true;

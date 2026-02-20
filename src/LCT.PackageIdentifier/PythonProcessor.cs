@@ -315,7 +315,7 @@ namespace LCT.PackageIdentifier
             IdentifiedPythonPackages(filePath, PythonPackages);
             return PythonPackages;
         }
-              
+
 
         /// <summary>
         /// Gets Release ExternalId

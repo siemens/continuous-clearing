@@ -38,7 +38,7 @@ namespace LCT.Common
         /// Array of invalid characters for project names.
         /// </summary>
         private static readonly char[] InvalidProjectNameChars = new char[] { '/', '\\', '.' };
-               
+
 
         #endregion Fields
 
@@ -151,7 +151,7 @@ namespace LCT.Common
             {
                 DependencyFileNotFound = true;
                 Logger.Warn("    Cdxgen SBOM not provided for accurate dependencies");
-            }            
+            }
         }
 
         /// Removes excluded components from the component list.

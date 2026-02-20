@@ -1256,9 +1256,9 @@ namespace LCT.Common.Logging
             const string Feature = "Feature";
             const string TimeTakenBy = "Time Taken By";
             string separator = $"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}";
-            
-            string summaryHeader = "\nSummary :\n" + 
-                (!string.IsNullOrWhiteSpace(ProjectSummaryLink) ? ProjectSummaryLink + "\n" : "") + 
+
+            string summaryHeader = "\nSummary :\n" +
+                (!string.IsNullOrWhiteSpace(ProjectSummaryLink) ? ProjectSummaryLink + "\n" : "") +
                 separator;
             Logger.Info(summaryHeader);
             Logger.InfoFormat("{0,5}{1,-70} {2,5} {3,5} {4,5}\n{6}", "|", Feature, "|", Count, "|", "", separator);

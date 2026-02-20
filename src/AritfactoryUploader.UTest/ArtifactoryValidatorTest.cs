@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using LCT.APICommunications.Interfaces;
-using LCT.ArtifactoryUploader;
 using Moq;
 using NUnit.Framework;
 using System.Net;

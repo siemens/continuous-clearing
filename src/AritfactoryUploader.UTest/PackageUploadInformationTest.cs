@@ -6,12 +6,10 @@
 
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
-using LCT.ArtifactoryUploader;
 using LCT.ArtifactoryUploader.Model;
 using LCT.Common;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
-using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
@@ -31,7 +29,7 @@ namespace LCT.ArtifactoryUploader.UTest
 
         [SetUp]
         public void SetUp()
-        {           
+        {
             _memoryAppender = new MemoryAppender();
             BasicConfigurator.Configure(_memoryAppender);
             _memoryAppender.Clear();
@@ -833,9 +831,9 @@ namespace LCT.ArtifactoryUploader.UTest
 
             var jfrogFoundPackages = new List<ComponentsToArtifactory>
             {
-                new ComponentsToArtifactory 
-                { 
-                    Name = "FoundPkg", 
+                new ComponentsToArtifactory
+                {
+                    Name = "FoundPkg",
                     Version = "4.0.0",
                     ResponseMessage = new HttpResponseMessage
                     {
@@ -856,20 +854,20 @@ namespace LCT.ArtifactoryUploader.UTest
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             // Act
-            method.Invoke(null, new object[] 
-            { 
-                unknownPackages, 
-                jfrogNotFoundPackages, 
-                successfulPackages, 
-                jfrogFoundPackages, 
-                "TestPackageType", 
-                filepath 
+            method.Invoke(null, new object[]
+            {
+                unknownPackages,
+                jfrogNotFoundPackages,
+                successfulPackages,
+                jfrogFoundPackages,
+                "TestPackageType",
+                filepath
             });
 
             // Assert
             var events = _memoryAppender.GetEvents();
             Assert.IsTrue(events.Length > 0, "Expected log events to be captured");
-            
+
             var infoEvent = FindEventByLevel(events, Level.Info);
             Assert.IsNotNull(infoEvent, "Expected Info level log event");
             StringAssert.Contains("TestPackageType", infoEvent.RenderedMessage);
@@ -886,20 +884,20 @@ namespace LCT.ArtifactoryUploader.UTest
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             // Act
-            method.Invoke(null, new object[] 
-            { 
-                emptyList, 
-                emptyList, 
-                emptyList, 
-                emptyList, 
-                "EmptyPackageType", 
-                filepath 
+            method.Invoke(null, new object[]
+            {
+                emptyList,
+                emptyList,
+                emptyList,
+                emptyList,
+                "EmptyPackageType",
+                filepath
             });
 
             // Assert
             var events = _memoryAppender.GetEvents();
             Assert.IsTrue(events.Length > 0, "Expected at least one log event");
-            
+
             var infoEvent = FindEventByLevel(events, Level.Info);
             Assert.IsNotNull(infoEvent, "Expected Info level log event");
             StringAssert.Contains("EmptyPackageType", infoEvent.RenderedMessage);
@@ -911,9 +909,9 @@ namespace LCT.ArtifactoryUploader.UTest
             // Arrange
             var jfrogFoundPackages = new List<ComponentsToArtifactory>
             {
-                new ComponentsToArtifactory 
-                { 
-                    Name = "FailedPkg", 
+                new ComponentsToArtifactory
+                {
+                    Name = "FailedPkg",
                     Version = "1.0.0",
                     ResponseMessage = new HttpResponseMessage
                     {
@@ -933,14 +931,14 @@ namespace LCT.ArtifactoryUploader.UTest
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             // Act
-            method.Invoke(null, new object[] 
-            { 
-                emptyList, 
-                emptyList, 
-                emptyList, 
-                jfrogFoundPackages, 
-                "npm", 
-                filepath 
+            method.Invoke(null, new object[]
+            {
+                emptyList,
+                emptyList,
+                emptyList,
+                jfrogFoundPackages,
+                "npm",
+                filepath
             });
 
             // Assert
@@ -967,14 +965,14 @@ namespace LCT.ArtifactoryUploader.UTest
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             // Act
-            method.Invoke(null, new object[] 
-            { 
-                emptyList, 
-                jfrogNotFoundPackages, 
-                emptyList, 
-                emptyList, 
-                "NuGet", 
-                filepath 
+            method.Invoke(null, new object[]
+            {
+                emptyList,
+                jfrogNotFoundPackages,
+                emptyList,
+                emptyList,
+                "NuGet",
+                filepath
             });
 
             // Assert
@@ -1001,20 +999,20 @@ namespace LCT.ArtifactoryUploader.UTest
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             // Act
-            method.Invoke(null, new object[] 
-            { 
-                emptyList, 
-                emptyList, 
-                successfulPackages, 
-                emptyList, 
-                "Maven", 
-                filepath 
+            method.Invoke(null, new object[]
+            {
+                emptyList,
+                emptyList,
+                successfulPackages,
+                emptyList,
+                "Maven",
+                filepath
             });
 
             // Assert
             var events = _memoryAppender.GetEvents();
             Assert.IsTrue(events.Length >= 2, "Expected at least 2 log events");
-            
+
             // Check if any event contains the package name and success message
             var packageEvent = FindEventContaining(events, "UploadedPkg");
             Assert.IsNotNull(packageEvent, "Expected log event containing package name 'UploadedPkg'");
@@ -1042,9 +1040,9 @@ namespace LCT.ArtifactoryUploader.UTest
 
             var jfrogFoundPackages = new List<ComponentsToArtifactory>
             {
-                new ComponentsToArtifactory 
-                { 
-                    Name = "FoundPkg", 
+                new ComponentsToArtifactory
+                {
+                    Name = "FoundPkg",
                     Version = "4.0.0",
                     ResponseMessage = new HttpResponseMessage
                     {
@@ -1064,24 +1062,24 @@ namespace LCT.ArtifactoryUploader.UTest
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             // Act
-            method.Invoke(null, new object[] 
-            { 
-                unknownPackages, 
-                jfrogNotFoundPackages, 
-                successfulPackages, 
-                jfrogFoundPackages, 
-                "Python", 
-                filepath 
+            method.Invoke(null, new object[]
+            {
+                unknownPackages,
+                jfrogNotFoundPackages,
+                successfulPackages,
+                jfrogFoundPackages,
+                "Python",
+                filepath
             });
 
             // Assert
             var events = _memoryAppender.GetEvents();
             Assert.IsTrue(events.Length >= 4, "Expected at least 4 log events (one for each package type)");
-            
+
             // Verify package type name is logged
             var packageTypeEvent = FindEventContaining(events, "Python");
             Assert.IsNotNull(packageTypeEvent, "Expected Python package type to be logged");
-            
+
             // Verify warning event for not found packages
             var warnEvent = FindEventByLevel(events, Level.Warn);
             Assert.IsNotNull(warnEvent, "Expected warning for not found packages");

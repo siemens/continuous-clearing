@@ -103,7 +103,7 @@ namespace LCT.PackageIdentifier
                     CycloneDXBomParser.CheckValidDependenciesForProjectType(cdxGenBomData.Dependencies, appSettings.ProjectType);
                 }
                 return cdxGenBomData;
-            }            
+            }
             return null;
         }
 

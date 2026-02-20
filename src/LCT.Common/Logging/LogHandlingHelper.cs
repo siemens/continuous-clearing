@@ -755,7 +755,7 @@ namespace LCT.Common
             // Log the table
             Logger.Debug(logBuilder.ToString());
         }
-        
+
         private static string MaskSensitiveData(string content)
         {
             // Mask API keys

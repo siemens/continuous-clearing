@@ -9,13 +9,11 @@ using LCT.APICommunications.Model.AQL;
 using LCT.Common;
 using LCT.Facade.Interfaces;
 using LCT.Services.Interface;
-using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LCT.Services

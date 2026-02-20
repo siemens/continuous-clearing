@@ -404,7 +404,7 @@ namespace LCT.PackageIdentifier
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
                 string bomrefName = prop.Name;
-                string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;                
+                string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
 
                 if (prop.Name.Contains('@'))
@@ -747,7 +747,7 @@ namespace LCT.PackageIdentifier
         /// <returns>Formatted string safe for PURL composition.</returns>
         private static string StringFormat(string componentInfo)
         {
-            var replacements = new Dictionary<string, string> {{ "\"", "" }, { "{", "" }, { "\r", "" }, { "}", "" }, { "\n", "" } };
+            var replacements = new Dictionary<string, string> { { "\"", "" }, { "{", "" }, { "\r", "" }, { "}", "" }, { "\n", "" } };
 
             var formattedstring = replacements.Aggregate(componentInfo, (current, replacement) => current.Replace(replacement.Key, replacement.Value));
             return formattedstring.Trim();
