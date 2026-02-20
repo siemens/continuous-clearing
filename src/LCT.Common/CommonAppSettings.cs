@@ -183,9 +183,9 @@ namespace LCT.Common
                         m_InputFolder = value;
                     }
                 }
-                catch (DirectoryNotFoundException)
+                catch (DirectoryNotFoundException ex)
                 {
-                    Logger.Error($"Input file folder not found : {value}");
+                    Logger.Error("Input file folder not found", ex);
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }

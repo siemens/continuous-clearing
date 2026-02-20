@@ -188,40 +188,37 @@ namespace LCT.PackageIdentifier
         /// <param name="appSettings">Application settings used for SPDX validation and project type checks.</param>
         private void ProcessBomFiles(List<string> configFiles, List<Component> componentsForBOM, List<Component> componentsToBOM, List<Dependency> dependenciesForBOM, CommonAppSettings appSettings)
         {
-            foreach (string filepath in configFiles)
+            foreach (string filepath in configFiles.Where(f => !f.EndsWith(FileConstant.SBOMTemplateFileExtension)))
             {
-                if (!filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
+                Bom bomList;
+                if (filepath.EndsWith(FileConstant.SPDXFileExtension))
                 {
-                    Bom bomList;
-                    if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+                    Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+                    bomList = _spdxBomParser.ParseSPDXBom(filepath);
+                    IdentifiedMavenComponents(filepath, bomList.Components);
+                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
+                    SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
+                    ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+                    ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+                }
+                else
+                {
+                    bomList = ParseCycloneDXBom(filepath);
+                    if (bomList?.Components != null)
                     {
-                        BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
-                        Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-                        bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                        IdentifiedMavenComponents(filepath, bomList.Components);
-                        SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
-                        SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
-                        SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
-                        ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
-                        ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+                        CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
                     }
                     else
                     {
-                        bomList = ParseCycloneDXBom(filepath);
-                        if (bomList?.Components != null)
-                        {
-                            CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                        }
-                        else
-                        {
-                            Logger.WarnFormat("No components found in the BoM file : {0}", filepath);
-                            continue;
-                        }
+                        Logger.WarnFormat("No components found in the BoM file : {0}", filepath);
+                        continue;
                     }
-
-                    AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
-                    IdentifiedMavenComponents(filepath, bomList.Components);
                 }
+
+                AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
+                IdentifiedMavenComponents(filepath, bomList.Components);
             }
         }
 
@@ -257,13 +254,10 @@ namespace LCT.PackageIdentifier
         private static List<string> GetTemplateBomFilePaths(List<string> configFiles)
         {
             List<string> listOfTemplateBomfilePaths = new();
-            foreach (string filepath in configFiles)
+            foreach (string filepath in configFiles.Where(f => f.EndsWith(FileConstant.SBOMTemplateFileExtension)))
             {
-                if (filepath.EndsWith(FileConstant.SBOMTemplateFileExtension))
-                {
-                    Logger.DebugFormat("GetTemplateBomFilePaths():Template BOM file detected: {0}", filepath);
-                    listOfTemplateBomfilePaths.Add(filepath);
-                }
+                Logger.DebugFormat("GetTemplateBomFilePaths():Template BOM file detected: {0}", filepath);
+                listOfTemplateBomfilePaths.Add(filepath);
             }
             return listOfTemplateBomfilePaths;
         }

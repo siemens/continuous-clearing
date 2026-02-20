@@ -46,6 +46,7 @@ namespace LCT.PackageIdentifier
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
         private const string Name = "name";
+        private const string FalseString = "false";
 
         private List<Component> listOfInternalComponents = new List<Component>();
         private readonly IEnvironmentHelper environmentHelper = new EnvironmentHelper();
@@ -250,7 +251,7 @@ namespace LCT.PackageIdentifier
 
             foreach (JProperty prop in depencyComponentList.Skip(1))
             {
-                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = FalseString };
                 if (string.IsNullOrEmpty(prop.Name))
                 {
                     BomCreator.bomKpiData.ComponentsinPackageLockJsonFile--;
@@ -383,7 +384,7 @@ namespace LCT.PackageIdentifier
             foreach (JProperty prop in depencyComponentList)
             {
                 Component components = new Component() { Manufacturer = new OrganizationalEntity() };
-                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = "false" };
+                Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = FalseString };
 
                 var properties = JObject.Parse(Convert.ToString(prop.Value));
 
@@ -558,7 +559,7 @@ namespace LCT.PackageIdentifier
                     continue;
                 }
 
-                Logger.Debug($"ParsingInputFileForBOM():FileName: " + filepath);
+                Logger.DebugFormat("ParsingInputFileForBOM():FileName: {0}", filepath);
                 ProcessFileBasedOnType(filepath, appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             }
             CommonHelper.EnrichCdxGenforPackagefilesData(
@@ -921,7 +922,7 @@ namespace LCT.PackageIdentifier
                             Dataconstant.ManullayAdded);
                         CommonHelper.RemoveDuplicateAndAddProperty(ref properties,
                             Dataconstant.Cdx_IsDevelopment,
-                            "false");
+                            FalseString);
                         component.Properties = properties;
                     }
                 }

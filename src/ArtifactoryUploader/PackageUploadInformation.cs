@@ -340,7 +340,7 @@ namespace LCT.ArtifactoryUploader
             string name,
             string filePath)
         {
-            Logger.Info($"\n{name}:\n");
+            Logger.InfoFormat("\n{0}:\n", name);
             DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
             DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
             DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
@@ -362,16 +362,15 @@ namespace LCT.ArtifactoryUploader
 
                     if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
                     {
-                        Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} {jfrogFoundPackage.OperationType} Failed!! {jfrogFoundPackage.SrcRepoName} ---> {jfrogFoundPackage.DestRepoName}");
+                        Logger.ErrorFormat("Package {0}-{1} {2} Failed!! {3} ---> {4}", jfrogFoundPackage.Name, jfrogFoundPackage.Version, jfrogFoundPackage.OperationType, jfrogFoundPackage.SrcRepoName, jfrogFoundPackage.DestRepoName);
                     }
                     else if (jfrogFoundPackage.ResponseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
                     {
-                        Logger.Error($"Package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version} not found in {jfrogFoundPackage.SrcRepoName}, Upload Failed!!");
+                        Logger.ErrorFormat("Package {0}-{1} not found in {2}, Upload Failed!!", jfrogFoundPackage.Name, jfrogFoundPackage.Version, jfrogFoundPackage.SrcRepoName);
                     }
                     else
                     {
-                        Logger.Info($"Successful{jfrogFoundPackage.DryRunSuffix} {jfrogFoundPackage.OperationType} package {jfrogFoundPackage.Name}-{jfrogFoundPackage.Version}" +
-                                          $" from {jfrogFoundPackage.SrcRepoName} to {jfrogFoundPackage.DestRepoName}");
+                        Logger.InfoFormat("Successful{0} {1} package {2}-{3} from {4} to {5}", jfrogFoundPackage.DryRunSuffix, jfrogFoundPackage.OperationType, jfrogFoundPackage.Name, jfrogFoundPackage.Version, jfrogFoundPackage.SrcRepoName, jfrogFoundPackage.DestRepoName);
                     }
 
                 }
@@ -392,7 +391,7 @@ namespace LCT.ArtifactoryUploader
 
                 foreach (var jfrogNotFoundPackage in JfrogNotFoundPackages)
                 {
-                    Logger.Warn($"Package {jfrogNotFoundPackage.Name}-{jfrogNotFoundPackage.Version} is not found in jfrog");
+                    Logger.WarnFormat("Package {0}-{1} is not found in jfrog", jfrogNotFoundPackage.Name, jfrogNotFoundPackage.Version);
 
                 }
                 Logger.Info("\n");
@@ -412,7 +411,7 @@ namespace LCT.ArtifactoryUploader
 
                 foreach (var sucessfullPackage in SucessfullPackages)
                 {
-                    Logger.Info($"Package {sucessfullPackage.Name}-{sucessfullPackage.Version} is already uploaded");
+                    Logger.InfoFormat("Package {0}-{1} is already uploaded", sucessfullPackage.Name, sucessfullPackage.Version);
                 }
                 Logger.Info("\n");
 
@@ -426,7 +425,7 @@ namespace LCT.ArtifactoryUploader
         private static void WarningMessageForNoPackages(string filename)
         {
             if (!LoggerFactory.UseSpectreConsole)
-                Logger.Warn($"Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}\n");
+                Logger.WarnFormat("Artifactory upload will not be done due to Report not in Approved state and package details can be found at {0}\n", filename);
         }
 
         /// <summary>

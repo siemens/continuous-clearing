@@ -32,6 +32,7 @@ namespace LCT.Common.Logging
         private const string AlertConstant = "Alert";
         private const string BlueVersionMarkup = "[blue]Version[/]";
         private const string GreenNameMarkup = "[green]Name[/]";
+        private const string YellowColor = "yellow";
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
 
@@ -84,7 +85,7 @@ namespace LCT.Common.Logging
                  ex is System.IO.IOException ||
                  ex is PlatformNotSupportedException)
             {
-                Logger.Debug($"GetAutoConsoleWidth(): fallback due to {ex.GetType().Name} - {ex.Message}");
+                Logger.Debug("GetAutoConsoleWidth(): fallback", ex);
                 return 200;
             }
         }
@@ -167,7 +168,7 @@ namespace LCT.Common.Logging
             )
             {
                 WriteFallback(fallbackMessage, fallbackType);
-                Logger.Debug($"SafeSpectreAction suppressed exception: {ex.GetType().Name} - {ex.Message}");
+                Logger.Debug("SafeSpectreAction suppressed exception", ex);
             }
         }
 
@@ -674,7 +675,7 @@ namespace LCT.Common.Logging
 
             foreach (var projectType in projectTypes)
             {
-                Logger.Info($"{projectType}:\n\t");
+                Logger.InfoFormat("{0}:\n\t", projectType);
 
                 if (projectConfigMap.TryGetValue(projectType, out var config))
                 {
@@ -1140,7 +1141,7 @@ namespace LCT.Common.Logging
         /// <param name="title">The optional panel title.</param>
         /// <param name="borderStyle">The border style.</param>
         /// <param name="headerStyle">The header style.</param>
-        public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = "yellow")
+        public static void WriteStyledPanel(string content, string title = null, string borderStyle = "white", string headerStyle = YellowColor)
         {
             SafeSpectreAction(() =>
             {
@@ -1254,16 +1255,13 @@ namespace LCT.Common.Logging
             const string Count = "Count";
             const string Feature = "Feature";
             const string TimeTakenBy = "Time Taken By";
-            Logger.Info("\n");
-            Logger.Info("Summary :\n");
-            if (!string.IsNullOrWhiteSpace(ProjectSummaryLink))
-            {
-                Logger.Info($"{ProjectSummaryLink}");
-            }
             string separator = $"{"=",5}{string.Join("", Enumerable.Repeat("=", 88)),5}";
-            Logger.Info(separator);
-            Logger.Info($"{"|",5}{Feature,-70} {"|",5} {Count,5} {"|",5}");
-            Logger.Info(separator);
+            
+            string summaryHeader = "\nSummary :\n" + 
+                (!string.IsNullOrWhiteSpace(ProjectSummaryLink) ? ProjectSummaryLink + "\n" : "") + 
+                separator;
+            Logger.Info(summaryHeader);
+            Logger.InfoFormat("{0,5}{1,-70} {2,5} {3,5} {4,5}\n{6}", "|", Feature, "|", Count, "|", "", separator);
 
             foreach (var item in printData)
             {
@@ -1272,7 +1270,7 @@ namespace LCT.Common.Logging
 
             foreach (var item in printTimingData)
             {
-                Logger.Info($"\n{TimeTakenBy,8} {item.Key,-5} {":",1} {item.Value,8} s\n");
+                Logger.InfoFormat("\n{0,8} {1,-5} {2,1} {3,8} s\n", TimeTakenBy, item.Key, ":", item.Value);
             }
         }
 
@@ -1288,8 +1286,7 @@ namespace LCT.Common.Logging
 
             if ((key == "Packages Not Uploaded Due To Error" || key == "Packages Not Existing in Remote Cache") && value > 0)
             {
-                Logger.Error(row);
-                Logger.Error(separator);
+                Logger.ErrorFormat("{0}\n{1}", row, separator);
             }
             else
             {
@@ -1421,8 +1418,10 @@ namespace LCT.Common.Logging
         /// <returns>The color string for the item.</returns>
         private static string GetColorForItem(string key, int value, KpiNames kpiNames)
         {
+            const string GreenColor = "green";
+
             if (string.IsNullOrWhiteSpace(key) || kpiNames == null)
-                return "green";
+                return GreenColor;
 
             var errorGroup = new[]
             {
@@ -1478,21 +1477,21 @@ namespace LCT.Common.Logging
             bool Is(string candidate) => !string.IsNullOrEmpty(candidate) && key.Equals(candidate, StringComparison.Ordinal);
 
             if (errorGroup.Any(Is))
-                return value == 0 ? "red" : "green";
+                return value == 0 ? "red" : GreenColor;
 
             if (warningGroup.Any(Is))
-                return value == 0 ? "green" : "yellow";
+                return value == 0 ? GreenColor : YellowColor;
 
             if (infoGroup.Any(Is))
-                return value == 0 ? "green" : "red";
+                return value == 0 ? GreenColor : "red";
 
             if (alwaysGreen.Any(Is))
-                return "green";
+                return GreenColor;
 
             if (_colorCache.TryGetValue(key, out var cached))
                 return cached;
 
-            var colors = new[] { "green" };
+            var colors = new[] { GreenColor };
             var assigned = colors[_colorIndex % colors.Length];
             _colorCache[key] = assigned;
             _colorIndex++;
@@ -1587,12 +1586,12 @@ namespace LCT.Common.Logging
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                Logger.Debug($"{message}");
+                Logger.Debug(message);
                 WriteLine();
                 var content = new StringBuilder()
                     .Append($"[yellow]{message}[/]");
 
-                WriteStyledPanel(content.ToString(), "", "yellow", "yellow");
+                WriteStyledPanel(content.ToString(), "", YellowColor, YellowColor);
                 WriteLine();
             }
             else
@@ -1629,7 +1628,7 @@ namespace LCT.Common.Logging
             }
             else
             {
-                Logger.Info($"    Input file FOUND :{configFile}");
+                Logger.InfoFormat("    Input file FOUND :{0}", configFile);
             }
         }
 
@@ -1644,7 +1643,7 @@ namespace LCT.Common.Logging
             }
             else
             {
-                Logger.Info($"JFrog Connection was successfull!!");
+                Logger.Info("JFrog Connection was successfull!!");
             }
         }
 
@@ -1689,11 +1688,11 @@ namespace LCT.Common.Logging
             if (LoggerFactory.UseSpectreConsole)
             {
                 WriteInfoWithMarkup($"   [white]└──[/][yellow]{message}[/]");
-                Logger.Debug($"   └── {message}");
+                Logger.DebugFormat("   └── {0}", message);
             }
             else
             {
-                Logger.Warn($"\t{message}");
+                Logger.WarnFormat("\t{0}", message);
             }
         }
         /// <summary>
@@ -1705,11 +1704,11 @@ namespace LCT.Common.Logging
             if (LoggerFactory.UseSpectreConsole)
             {
                 WriteInfoWithMarkup($"   [white]└──[/][red]{message}[/]");
-                Logger.Debug($"   └── {message}");
+                Logger.DebugFormat("   └── {0}", message);
             }
             else
             {
-                Logger.Error($"\t{message}");
+                Logger.ErrorFormat("\t{0}", message);
             }
         }
         /// <summary>
@@ -1759,7 +1758,7 @@ namespace LCT.Common.Logging
             }
             else
             {
-                Logger.Info($"{message}{version}");
+                Logger.InfoFormat("{0}{1}", message, version);
             }
         }
         /// <summary>

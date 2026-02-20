@@ -49,7 +49,7 @@ namespace LCT.Common
                 }
                 else
                 {
-                    Logger.Error($"File not found: {filePath}. Please provide a valid file path.");
+                    Logger.ErrorFormat("File not found: {0}. Please provide a valid file path.", filePath);
                 }
 
             }
