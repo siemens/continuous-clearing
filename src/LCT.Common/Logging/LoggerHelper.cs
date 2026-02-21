@@ -33,6 +33,7 @@ namespace LCT.Common.Logging
         private const string BlueVersionMarkup = "[blue]Version[/]";
         private const string GreenNameMarkup = "[green]Name[/]";
         private const string YellowColor = "yellow";
+        private const string ComponentVersion = "version";
         private static readonly Dictionary<string, string> _colorCache = new Dictionary<string, string>();
         private static int _colorIndex = 0;
 
@@ -411,7 +412,7 @@ namespace LCT.Common.Logging
                 return;
             }
             const string Name = "Name";
-            const string Version = "Version";
+            const string Version = ComponentVersion;
 
             if (components.Count > 0)
             {
@@ -448,7 +449,7 @@ namespace LCT.Common.Logging
             }
 
             const string Name = "Name";
-            const string Version = "Version";
+            const string Version = ComponentVersion;
             const string URL = "SW360 Release URL";
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0 || DuplicateComponentsByPurlId.Count > 0)
             {
@@ -1561,7 +1562,7 @@ namespace LCT.Common.Logging
         public static void WriteInternalComponentsListToKpi(List<Component> internalComponents)
         {
             const string Name = "Name";
-            const string Version = "Version";
+            const string Version = ComponentVersion;
 
             if (internalComponents?.Count > 0)
             {
@@ -1782,7 +1783,7 @@ namespace LCT.Common.Logging
                 string separator = new string('-', totalWidth);
 
                 Logger.Logger.Log(null, Level.Alert, border, null);
-                Logger.Logger.Log(null, Level.Alert, string.Format("| {0,-45} | {1,-25} | {2,-120} |", "Name", "Version", "SW360 Component URL"), null);
+                Logger.Logger.Log(null, Level.Alert, string.Format("| {0,-45} | {1,-25} | {2,-120} |", "Name", ComponentVersion, "SW360 Component URL"), null);
                 Logger.Logger.Log(null, Level.Alert, border, null);
 
                 foreach (var item in duplicateComponents)

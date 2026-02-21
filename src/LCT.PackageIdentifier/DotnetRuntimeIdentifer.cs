@@ -378,7 +378,7 @@ namespace LCT.PackageIdentifier
             {
                 Logger.ErrorFormat("Error: {0}", info.ErrorMessage);
                 if (!string.IsNullOrEmpty(info.ErrorDetails))
-                    Logger.Error($"Details: {info.ErrorDetails}");
+                    Logger.ErrorFormat("Details: {0}", info.ErrorDetails);
                 Logger.Debug("----- .NET Runtime Information Summary End -----");
                 return;
             }

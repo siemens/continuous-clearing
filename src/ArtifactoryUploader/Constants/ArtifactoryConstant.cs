@@ -17,7 +17,7 @@ namespace ArtifactoryUploader.Constants
         #region Fields
 
         public const string Log4netArtifactoryUploaderConfigFileName = "log4netArtifactoryUploader.config";
-
+        public const string Cargo = "cargo";
         #endregion
     }
 }

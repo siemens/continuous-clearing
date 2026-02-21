@@ -6,6 +6,7 @@
 
 // Ignore Spelling: Jfrog
 
+using ArtifactoryUploader.Constants;
 using CycloneDX.Models;
 using LCT.APICommunications;
 using LCT.APICommunications.Model;
@@ -36,6 +37,7 @@ namespace LCT.ArtifactoryUploader
         private const string Conan = "CONAN";
         private const string Cargo = "CARGO";
         private const string Debian = "DEBIAN";
+        private const string NPM = "NPM";
 
         #endregion
 
@@ -150,7 +152,7 @@ namespace LCT.ArtifactoryUploader
             }
             if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
-                return "NPM";
+                return NPM;
             }
             else if (item.Purl.Contains("nuget", StringComparison.OrdinalIgnoreCase))
             {
@@ -172,7 +174,7 @@ namespace LCT.ArtifactoryUploader
             {
                 return Debian;
             }
-            else if (item.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
+            else if (item.Purl.Contains(ArtifactoryConstant.Cargo, StringComparison.OrdinalIgnoreCase))
             {
                 return Cargo;
             }
@@ -191,7 +193,7 @@ namespace LCT.ArtifactoryUploader
         public static string GetJfrogRepPath(ComponentsToArtifactory component)
         {
             string jfrogRepPath = string.Empty;
-            if (component.ComponentType == "NPM")
+            if (component.ComponentType == NPM)
             {
                 jfrogRepPath = $"{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
             }
@@ -255,7 +257,7 @@ namespace LCT.ArtifactoryUploader
                         return GetRepoName(packageType, appSettings.Conan.ReleaseRepo, appSettings.Conan.DevDepRepo, appSettings.Conan.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                     case "debian":
                         return GetRepoName(packageType, appSettings.Debian.ReleaseRepo, appSettings.Debian.DevDepRepo, appSettings.Debian.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
-                    case "cargo":
+                    case ArtifactoryConstant.Cargo:
                         return GetRepoName(packageType, appSettings.Cargo.ReleaseRepo, appSettings.Cargo.DevDepRepo, appSettings.Cargo.Artifactory.ThirdPartyRepos.FirstOrDefault(x => x.Upload)?.Name);
                 }
             }
@@ -273,7 +275,7 @@ namespace LCT.ArtifactoryUploader
         {
             switch (component.ComponentType)
             {
-                case "NPM":
+                case NPM:
                     if (aqlResult != null)
                     {
                         return $"{aqlResult.Path}";
@@ -317,7 +319,7 @@ namespace LCT.ArtifactoryUploader
         public static string GetCopyURL(ComponentsToArtifactory component)
         {
             string url = string.Empty;
-            if (component.ComponentType == "NPM")
+            if (component.ComponentType == NPM)
             {
                 url = $"{component.JfrogApi}{ApiConstant.CopyPackageApi}{component.SrcRepoPathWithFullName}" +
                $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
@@ -371,7 +373,7 @@ namespace LCT.ArtifactoryUploader
         public static string GetMoveURL(ComponentsToArtifactory component)
         {
             string url = string.Empty;
-            if (component.ComponentType == "NPM")
+            if (component.ComponentType == NPM)
             {
                 url = $"{component.JfrogApi}{ApiConstant.MovePackageApi}{component.SrcRepoPathWithFullName}" +
               $"?to=/{component.DestRepoName}/{component.Path}/{component.PypiOrNpmCompName}";
@@ -426,7 +428,7 @@ namespace LCT.ArtifactoryUploader
         {
             return component.ComponentType switch
             {
-                "NPM" => component.PypiOrNpmCompName,
+                NPM => component.PypiOrNpmCompName,
                 Nuget => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 Choco => $"{component.PackageName}.{component.Version}{ApiConstant.NugetExtension}",
                 Debian => $"{component.PackageName}_{component.Version.Replace(ApiConstant.DebianExtension, "") + "*"}",
@@ -465,7 +467,7 @@ namespace LCT.ArtifactoryUploader
         {
             switch (projectType)
             {
-                case "NPM":
+                case NPM:
                     displayPackagesInfo.UnknownPackagesNpm.Add(component);
                     break;
                 case Nuget:
@@ -566,9 +568,9 @@ namespace LCT.ArtifactoryUploader
                     return GetArtifactoryRepoName(aqlResultList, item);
                 }
             }
-            else if (item.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
+            else if (item.Purl.Contains(ArtifactoryConstant.Cargo, StringComparison.OrdinalIgnoreCase))
             {
-                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService, "cargo");
+                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService, ArtifactoryConstant.Cargo);
 
                 if (aqlResultList.Count > 0)
                 {
@@ -605,7 +607,7 @@ namespace LCT.ArtifactoryUploader
                             repoCache[repo] = componentRepoData;
                             aqlResultList.AddRange(componentRepoData);
                         }
-                        else if (packageType == "cargo")
+                        else if (packageType == ArtifactoryConstant.Cargo)
                         {
                             var componentRepoData = await jFrogService.GetCargoComponentDataByRepo(repo) ?? new List<AqlResult>();
                             repoCache[repo] = componentRepoData;
@@ -666,7 +668,7 @@ namespace LCT.ArtifactoryUploader
                                        x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) &&
                                        x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
             }
-            else if (component.Purl.Contains("cargo", StringComparison.OrdinalIgnoreCase))
+            else if (component.Purl.Contains(ArtifactoryConstant.Cargo, StringComparison.OrdinalIgnoreCase))
             {
                 return aqlResultList.Find(x => x.Properties != null &&
                                        x.Properties.Any(p => p.Key == "crate.name" && p.Value == jfrogpackageName) &&
