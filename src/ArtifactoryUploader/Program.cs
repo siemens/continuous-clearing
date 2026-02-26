@@ -79,7 +79,39 @@ namespace LCT.ArtifactoryUploader
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
+            //SBOMSigningValidation.PerformSbomSigning(appSettings, "Validate", bomFilePath);
+            if(appSettings.SbomSigning.EnableValidation)
+            {
+                try
+                {
+                    Logger.Logger.Log(null, Level.Notice, "Validating SBOM signature from Package Creator...", null);
+                    bool validationResult = SBOMSigningValidation.PerformSbomSigning(appSettings, "Validate", bomFilePath);
+                    if (validationResult)
+                    {
+                        Logger.Logger.Log(null, Level.Notice, "SBOM signature validation completed successfully.", null);
+                    }
+                    else
+                    {
+                        // VerifySignature is false - validation failed but we continue
+                        Logger.Logger.Log(null, Level.Warn, "SBOM signature validation failed, but continuing execution (VerifySignature is disabled).", null);
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // VerifySignature is true - validation failed and we must stop
+                    Logger.Error($"SBOM signature validation failed: {ex.Message}");
+                    Logger.Logger.Log(null, Level.Error, "Stopping execution due to signature validation failure.", null);
+                    environmentHelper.CallEnvironmentExit(-1);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Unexpected error during SBOM signature validation: {ex.Message}");
+                    Logger.Logger.Log(null, Level.Error, "Stopping execution due to validation error.", null);
+                    environmentHelper.CallEnvironmentExit(-1);
+                    return;
+                }
+            }
             //Uploading Package to artifactory
             PackageUploadHelper.JFrogService = GetJfrogService(appSettings);
             UploadToArtifactory.JFrogService = GetJfrogService(appSettings);

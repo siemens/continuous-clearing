@@ -68,6 +68,11 @@ namespace LCT.Common
         public Config Cargo { get; set; }
         public Config Choco { get; set; }
         public string Mode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// SBOM Signing configuration for automated signing after BOM generation
+        /// </summary>
+        public SbomSigningConfig SbomSigning { get; set; }
         public bool IsTestMode
         {
             get
@@ -76,6 +81,12 @@ namespace LCT.Common
             }
 
         }
+    }
+
+    public enum OperationType
+    {
+        Sign,
+        Validate
     }
     [ExcludeFromCodeCoverage]
     public class Telemetry

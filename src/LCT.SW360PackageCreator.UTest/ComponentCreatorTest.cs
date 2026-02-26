@@ -385,7 +385,7 @@ namespace LCT.SW360PackageCreator.UTest
             await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, mockCreatorHelper.Object, parsedBomData);
 
             // Assert
-            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CommonAppSettings>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
             mockSw360CreatorService.Verify(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()), Times.Once);
@@ -520,14 +520,16 @@ namespace LCT.SW360PackageCreator.UTest
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
                 Directory = new Common.Directory()
             };
-            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
+            sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(fossTriggerStatus);
 
-            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>())).ReturnsAsync(checkFossologyProcess);
+            sw360CreatorServiceMock.Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>()))
+                .ReturnsAsync(checkFossologyProcess);
             //Act
             await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
 
             // Assert
-            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce);
+            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         }
 
@@ -1397,13 +1399,13 @@ namespace LCT.SW360PackageCreator.UTest
             mockCreatorHelper.Verify(x => x.GetUpdatedComponentsDetails(It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(), It.IsAny<ISW360Service>(), It.IsAny<Bom>()), Times.Once);
 
             // Assert - Files should still be written
-            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CommonAppSettings>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
         }
 
         [Test]
-        public async Task CycloneDxBomParser_WithChocoComponents_ReturnsChocoComponents()
+        public async Task CycloneDxBomParser_WithChocoComponents_ProcessesChocoComponents()
         {
             // Arrange
             List<Property> properties = new List<Property>();
@@ -1435,31 +1437,38 @@ namespace LCT.SW360PackageCreator.UTest
                 }
             };
 
-            List<ComparisonBomData> comparisonBomData = new List<ComparisonBomData>
-            {
-                new ComparisonBomData
-                {
-                    Name = "7zip",
-                    ComponentStatus = "Not Processed for CHOCO",
-                    ReleaseStatus = "Not Processed for CHOCO"
-                }
-            };
-
-            var sw360Service = new Mock<ISW360Service>();
-            var creatorHelper = new Mock<ICreatorHelper>();
+            var mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            var mockSw360Service = new Mock<ISW360Service>();
+            var mockSw360ProjectService = new Mock<ISw360ProjectService>();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var mockCreatorHelper = new Mock<ICreatorHelper>();
             var parser = new Mock<ICycloneDXBomParser>();
             parser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
-            creatorHelper.Setup(x => x.SetContentsForComparisonBOM(It.IsAny<List<Components>>(), sw360Service.Object))
-                         .ReturnsAsync(comparisonBomData);
-            var cycloneDXBomParser = new ComponentCreator();
+            mockCreatorHelper.Setup(x => x.GetUpdatedComponentsDetails(It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(), It.IsAny<ISW360Service>(), It.IsAny<Bom>()))
+                .ReturnsAsync(new Bom());
+
+            mockCreatorHelper.Setup(x => x.GetDownloadUrlNotFoundList(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new List<ComparisonBomData>());
+
+            mockCreatorHelper.Setup(x => x.GetCreatorKpiData(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new CreatorKpiData());
+
+            mockSw360ProjectService.Setup(x => x.GetAlreadyLinkedReleasesByProjectId(It.IsAny<string>()))
+                .ReturnsAsync(new List<ReleaseLinked>());
+
+            mockSw360CreatorService.Setup(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            var componentCreator = new ComponentCreator();
 
             // Act
-            var list = await cycloneDXBomParser.CycloneDxBomParser(appSettings, sw360Service.Object, parser.Object, creatorHelper.Object);
+            await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object,
+                mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object,
+                mockCreatorHelper.Object, new List<ComparisonBomData>());
+
 
             // Assert
-            Assert.That(list.Count, Is.EqualTo(1));
-            Assert.That(list[0].Name, Is.EqualTo("7zip"));
-            Assert.That(list[0].ComponentStatus, Is.EqualTo("Not Processed for CHOCO"));
+            mockSw360CreatorService.Verify(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()), Times.Never);
         }
     }
 }

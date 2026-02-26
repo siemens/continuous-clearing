@@ -27,6 +27,12 @@ using Dependency = CycloneDX.Models.Dependency;
 using Directory = System.IO.Directory;
 using Level = log4net.Core.Level;
 using Metadata = CycloneDX.Models.Metadata;
+using SBOMSigning;
+using SBOMSigning.Enum;
+using SBOMSigning.Helpers;
+using SignatureHelper = SBOMSigning.Helpers.SignatureHelper;
+using OperationType = SBOMSigning.Enum.OperationType;
+using Azure;
 
 
 namespace LCT.PackageIdentifier
@@ -159,6 +165,7 @@ namespace LCT.PackageIdentifier
 
         /// <summary>
         /// Writes a CycloneDX BOM file to the output folder, optionally merging with existing BOMs when configured.
+        /// Signs the BOM and keeps only the signed version.
         /// </summary>
         /// <param name="appSettings">Application settings.</param>
         /// <param name="listOfComponentsToBom">BOM object containing components and metadata.</param>
@@ -180,15 +187,15 @@ namespace LCT.PackageIdentifier
                 listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, existingFilePath);
                 bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName,appSettings);
                 Logger.Debug($"WriteContentToCycloneDxBOM():Completed the appending components process.");
             }
             else
             {
                 string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
-                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName,appSettings);
             }
-
+           
         }
 
         /// <summary>

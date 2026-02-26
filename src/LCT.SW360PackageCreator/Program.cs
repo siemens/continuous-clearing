@@ -85,13 +85,46 @@ namespace LCT.SW360PackageCreator
             LoggerHelper.SpectreConsoleInitialMessage("Package creator");
 
             if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
+                Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);           
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
+            //Validating Singature
+            if (appSettings.SbomSigning.EnableValidation)
+            {
+                try
+                {
+                    Logger.Logger.Log(null, Level.Notice, "Validating SBOM signature from Package Identifier...", null);
+                    bool validationResult = SBOMSigningValidation.PerformSbomSigning(appSettings, "Validate", bomFilePath);
+                    if (validationResult)
+                    {
+                        Logger.Logger.Log(null, Level.Notice, "SBOM signature validation completed successfully.", null);
+                    }
+                    else
+                    {
+                        // VerifySignature is false - validation failed but we continue
+                        Logger.Logger.Log(null, Level.Warn, "SBOM signature validation failed, but continuing execution (VerifySignature is disabled).", null);
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // VerifySignature is true - validation failed and we must stop
+                    Logger.Error($"SBOM signature validation failed: {ex.Message}");
+                    Logger.Logger.Log(null, Level.Error, "Stopping execution due to signature validation failure.", null);
+                    environmentHelper.CallEnvironmentExit(-1);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Unexpected error during SBOM signature validation: {ex.Message}");
+                    Logger.Logger.Log(null, Level.Error, "Stopping execution due to validation error.", null);
+                    environmentHelper.CallEnvironmentExit(-1);
+                    return;
+                }
+            }
 
-            //Validate Fossology Url
-            if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
+                //Validate Fossology Url
+                if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
             {
                 HttpClient client = new HttpClient();
                 if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))

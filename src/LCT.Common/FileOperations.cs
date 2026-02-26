@@ -113,7 +113,7 @@ namespace LCT.Common
         /// <param name="fileNameWithExtension">The file name with extension.</param>
         /// <param name="projectName">The project name to prefix the file name.</param>
         /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
-        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
+        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName,CommonAppSettings appSettings)
         {
             try
             {
@@ -125,8 +125,23 @@ namespace LCT.Common
 
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, dataToWrite.ToString());
+                SBOMSigningValidation.RemoveExistingSignature(filePath);
                 Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
-
+                if (appSettings.SbomSigning.EnableSigning)
+                {
+                    try
+                    {
+                        //SBOMSigningValidation.RemoveExistingSignature(filePath);
+                        Logger.Logger.Log(null, log4net.Core.Level.Notice, "Signing SBOM file...", null);                       
+                        SBOMSigningValidation.PerformSbomSigning(appSettings, "sign", filePath);
+                        Logger.Logger.Log(null, log4net.Core.Level.Notice, "SBOM signing completed successfully.", null);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"SBOM signing failed: {ex.Message}");
+                        Logger.Warn("Unsigned BOM file will be retained due to signing failure.");
+                    }
+                }
             }
             catch (IOException e)
             {

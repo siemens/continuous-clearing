@@ -1,0 +1,294 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2024 Siemens AG
+// SPDX-License-Identifier: MIT
+// --------------------------------------------------------------------------------------------------------------------
+
+using Azure.Identity;
+using Azure.Security.KeyVault.Keys.Cryptography;
+using LCT.SBOMSigning;
+using log4net;
+using SBOMSigning.Interface;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+
+namespace SBOMSigning.Helpers
+{
+    public class CertificateHelper : ICertificateHelper
+    {
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        AppSettings appSettings;
+        public CertificateHelper(AppSettings commonAppSettings)
+        {
+            appSettings = commonAppSettings;
+        }
+        /// <summary>
+        /// Signs the sbom content
+        /// </summary>
+        /// <param name="bomcontent">args</param>
+        /// <returns>signature</returns>
+        public byte[] SignCertificate(string content)
+        {
+            if (appSettings.UseLocalCertificate)
+            {
+                return SignWithLocalCertificate(content);
+            }
+            else
+            {
+
+
+                byte[] signature = null;
+                string tenantId = appSettings.TenantId ?? string.Empty;
+                string clientId = appSettings.ClientId ?? string.Empty;
+                string clientSecret = appSettings.ClientSecret ?? string.Empty;
+                string certificateName = appSettings.CertificateName ?? string.Empty;
+                string kvUri = appSettings.KeyVaultURI ?? string.Empty;
+
+                var settings = new Dictionary<string, string>
+            {
+                { DataConstant.TenantId, tenantId },
+                { DataConstant.ClientId, clientId },
+                { DataConstant.ClientSecret, clientSecret },
+                { DataConstant.CertificateName,certificateName },
+                { DataConstant.KeyVaultURI, kvUri }
+            };
+
+                foreach (var setting in settings)
+                {
+                    if (string.IsNullOrEmpty(setting.Value))
+                    {
+                        Logger.Error($"The setting '{setting.Key}' is missing or empty. Please ensure you have provided all the required arguments.");
+                        throw new ArgumentException($"The setting '{setting.Key}' is missing or empty.");
+                    }
+                }
+
+
+                try
+                {
+                    var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
+                    var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
+
+                    byte[] dataToSign = Encoding.UTF8.GetBytes(content);
+
+                    using (var sha256 = SHA256.Create())
+                    {
+                        byte[] hash = sha256.ComputeHash(dataToSign);
+                        Logger.Info("Starting signing operation...");
+
+                        var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
+
+
+                        if (signResult.Signature != null)
+                        {
+                            signature = signResult.Signature;
+                        }
+                        else
+                        {
+                            Logger.Warn("Signature is null. Skipping file write operation.");
+                            throw new InvalidOperationException("Signature is null.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex.GetType().Namespace.StartsWith("Azure"))
+                    {
+                        Logger.Error($"Azure Exception: {ex.Message}");
+                        Logger.Debug($"StackTrace: {ex.StackTrace}");
+                    }
+                    else
+                    {
+                        Logger.Error($"Error occurred while signing the content: {ex.Message}");
+                        Logger.Debug($"StackTrace: {ex.StackTrace}");
+                    }
+                }
+
+                if (signature == null)
+                {
+                    Logger.Error("Signature is null.");
+                }
+                else
+                {
+                    Logger.Debug("Signature obtained successfully.");
+                }
+
+                return signature;
+            }
+        }
+
+
+        private byte[] SignWithLocalCertificate(string content)
+        {
+            try
+            {
+                using (var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(
+                    appSettings.LocalCertificatePath,
+                    appSettings.LocalCertificatePassword))
+                {
+                    using (var rsa = cert.GetRSAPrivateKey())
+                    {
+                        byte[] dataToSign = Encoding.UTF8.GetBytes(content);
+                        using (var sha256 = SHA256.Create())
+                        {
+                            byte[] hash = sha256.ComputeHash(dataToSign);
+                            Logger.Info("Starting local signing operation...");
+                            return rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error signing with local certificate: {ex.Message}");
+                throw;
+            }
+        }
+        /// <summary>
+        /// Signs the sbom content
+        /// </summary>
+        /// <param name="bomcontent">bomcontent</param>
+        /// <param name="signature">signature</param>
+        /// <returns>validation</returns>
+        public bool VerifySignature(string content, string signature)
+        {
+            if (appSettings.UseLocalCertificate)
+            {
+                return VerifyWithLocalCertificate(content, signature);
+            }
+            else { 
+                string tenantId = appSettings.TenantId ?? string.Empty;
+            string clientId = appSettings.ClientId ?? string.Empty;
+            string clientSecret = appSettings.ClientSecret ?? string.Empty;
+            string certificateName = appSettings.CertificateName ?? string.Empty;
+            string kvUri = appSettings.KeyVaultURI ?? string.Empty;
+            bool isValid = false;
+
+            var settings = new Dictionary<string, string>
+            {
+                { DataConstant.TenantId, tenantId },
+                { DataConstant.ClientId, clientId },
+                { DataConstant.ClientSecret, clientSecret },
+                { DataConstant.CertificateName,certificateName },
+                { DataConstant.KeyVaultURI, kvUri }
+            };
+
+            foreach (var setting in settings)
+            {
+                if (string.IsNullOrEmpty(setting.Value))
+                {
+                    Logger.Error($"The setting '{setting.Key}' is missing or empty. Please ensure you have provided all the required arguments.");
+                    throw new ArgumentException($"The setting '{setting.Key}' is missing or empty.");
+                }
+            }
+
+            try
+            {
+                var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+                var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
+
+
+                byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
+
+                using (var sha256 = SHA256.Create())
+                {
+                    byte[] hash = sha256.ComputeHash(dataToVerify);
+
+                    byte[] sign = Convert.FromBase64String(signature);
+
+
+                    VerifyResult verifyResult = cryptoClient.Verify(SignatureAlgorithm.RS256, hash, sign);
+
+
+                    isValid = verifyResult.IsValid;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.GetType().Namespace.StartsWith("Azure"))
+                {
+                    Logger.Error($"Azure Exception: {ex.Message}");
+                    Logger.Debug($"StackTrace: {ex.StackTrace}");
+                }
+                else
+                {
+                    Logger.Error($"Error occurred while validating the content: {ex.Message}");
+                    Logger.Debug($"StackTrace: {ex.StackTrace}");
+                }
+            }
+
+            return isValid;
+        }
+      }
+
+        private bool VerifyWithLocalCertificate(string content, string signature)
+        {
+            try
+            {
+                Logger.Info($"Loading certificate for verification from: {appSettings.LocalCertificatePath}");
+
+                if (!System.IO.File.Exists(appSettings.LocalCertificatePath))
+                {
+                    Logger.Error($"Certificate file not found: {appSettings.LocalCertificatePath}");
+                    return false;
+                }
+
+                using (var cert = new X509Certificate2(
+                    appSettings.LocalCertificatePath,
+                    appSettings.LocalCertificatePassword,
+                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet))
+                {
+                    Logger.Info($"Certificate loaded for verification. Subject: {cert.Subject}");
+
+                    using (var rsa = cert.GetRSAPublicKey())
+                    {
+                        if (rsa == null)
+                        {
+                            Logger.Error("Failed to extract RSA public key from certificate");
+                            return false;
+                        }
+
+                        Logger.Info($"RSA public key extracted. Key size: {rsa.KeySize} bits");
+
+                        byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
+                        byte[] signatureBytes = Convert.FromBase64String(signature);
+
+                        using (var sha256 = SHA256.Create())
+                        {
+                            byte[] hash = sha256.ComputeHash(dataToVerify);
+                            Logger.Info("Verifying signature...");
+
+                            bool isValid = rsa.VerifyHash(hash, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+                            if (isValid)
+                            {
+                                Logger.Info("Signature verification successful");
+                            }
+                            else
+                            {
+                                Logger.Warn("Signature verification failed");
+                            }
+
+                            return isValid;
+                        }
+                    }
+                }
+            }
+            catch (CryptographicException cryptoEx)
+            {
+                Logger.Error($"Cryptographic error during verification: {cryptoEx.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error verifying with local certificate: {ex.Message}");
+                Logger.Debug($"StackTrace: {ex.StackTrace}");
+                return false;
+            }
+        }
+
+    }
+}

@@ -33,7 +33,7 @@ namespace LCT.Common.Interface
         /// <param name="fileNameWithExtension">The file name with extension.</param>
         /// <param name="projectName">The project name associated with the file.</param>
         /// <returns>The path to the written BOM file.</returns>
-        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName);
+        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName, CommonAppSettings appSettings);
 
         /// <summary>
         /// Validates the given file path.
