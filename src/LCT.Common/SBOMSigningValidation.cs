@@ -1,4 +1,5 @@
 ﻿using CycloneDX.Models;
+using LCT.Common.Interface;
 using log4net;
 using log4net.Repository.Hierarchy;
 using Microsoft.Extensions.Logging;
@@ -22,59 +23,42 @@ namespace LCT.Common
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        /// <summary>
+        /// Signing sbom file
+        /// </summary>
+        /// <param name="appSettings"></param>
+        /// <param name="operationtype"></param>
+        /// <param name="bomfilepath"></param>
+        /// <returns></returns>
         public static bool PerformSbomSigning(CommonAppSettings appSettings,string operationtype, string bomfilepath)
         {            
             // Create AppSettings object for SBOMSigning tool
             var sbomSigningAppSettings = new SBOMSigning.AppSettings
             {
                 BomFilePath = bomfilepath,
-                //Operation = OperationType.Sign,
                 Operation = (global::SBOMSigning.Enum.OperationType)(operationtype.Equals("sign", StringComparison.OrdinalIgnoreCase) ? OperationType.Sign : OperationType.Validate),
                 KeyVaultURI = appSettings.SbomSigning.KeyVaultURI,
                 CertificateName = appSettings.SbomSigning.CertificateName,
                 ClientId = appSettings.SbomSigning.ClientId,
                 ClientSecret = appSettings.SbomSigning.ClientSecret,
-                TenantId = appSettings.SbomSigning.TenantId,
-                OutputFolderPath = appSettings.SbomSigning.OutputFolderPath,
-                LogFolderPath = appSettings.SbomSigning.LogFolderPath ?? appSettings.Directory.LogFolder,
-                UseLocalCertificate = appSettings.SbomSigning.UseLocalCertificate,
-                LocalCertificatePassword = appSettings.SbomSigning.LocalCertificatePassword,
-                LocalCertificatePath = appSettings.SbomSigning.LocalCertificatePath
+                TenantId = appSettings.SbomSigning.TenantId,               
+                IsSignVerifyRequired=appSettings.SbomSigning.IsSignVerifyRequired
             };
             var certificateHelper = new CertificateHelper(sbomSigningAppSettings);
             var signatureHelper = new SignatureHelper();
             var jsonFileHelper = new JsonFileHelper(sbomSigningAppSettings, certificateHelper, signatureHelper);
             bool isValid = true;
-            // This calls the same SignSBOMFile() method from the SBOMSigning project
+
             if ((int)sbomSigningAppSettings.Operation == (int)OperationType.Sign)
             {
                 jsonFileHelper.SignSBOMFile();
             }
             else if ((int)sbomSigningAppSettings.Operation == (int)OperationType.Validate)
             {
-                jsonFileHelper.ReadSBOMFile(sbomSigningAppSettings.BomFilePath, out isValid);
-                if (!isValid)
-                {
-                    // Check VerifySignature flag to determine behavior
-                    bool verifySignature = appSettings.SbomSigning?.IsSignVerifyRequired ?? true;
-
-                    if (verifySignature)
-                    {
-                        // Verification is enforced - throw exception to stop the process
-                        throw new InvalidOperationException($"SBOM signature verification failed for file: {bomfilepath}. Set 'VerifySignature' to false in SBOM signing configuration to continue despite validation failures.");
-                    }
-                    else
-                    {
-                        // Verification is not enforced - return false but don't throw
-                        return false;
-                    }
-                }
-
+                jsonFileHelper.ReadSBOMFile(sbomSigningAppSettings.BomFilePath, out isValid);               
                 return isValid;
             }
-
             return true;
-
         }
 
 
@@ -134,5 +118,61 @@ namespace LCT.Common
             }
         }
 
+        /// <summary>
+        /// Validates SBOM signature and handles exit behavior based on IsSignVerifyRequired flag.
+        /// This method encapsulates all validation logic including logging, error handling, and exit handling.
+        /// </summary>
+        /// <param name="appSettings">Application settings</param>
+        /// <param name="bomFilePath">Path to BOM file</param>
+        /// <param name="environmentHelper">Environment helper for exit handling</param>
+        public static void SigningVerification(CommonAppSettings appSettings, string bomFilePath, IEnvironmentHelper environmentHelper)
+        {
+            try
+            {
+                Logger.Logger.Log(null, log4net.Core.Level.Notice, "Validating SBOM signature...", null);
+
+                bool validationResult = PerformSbomSigning(appSettings, "Validate", bomFilePath);
+
+                if (validationResult)
+                {
+                    // Validation succeeded - continue
+                    Logger.Logger.Log(null, log4net.Core.Level.Notice,
+                        "SBOM signature validation completed successfully.", null);
+                }
+                else
+                {
+                    // Validation failed
+                    if (appSettings.SbomSigning.IsSignVerifyRequired)
+                    {
+                        // IsSignVerifyRequired is true - validation failed and we must stop
+                        Logger.Logger.Log(null, log4net.Core.Level.Error,
+                            "SBOM signature validation failed. Stopping execution due to IsSignVerifyRequired being true.", null);
+                        environmentHelper.CallEnvironmentExit(-1);
+                    }
+                    else
+                    {
+                        // IsSignVerifyRequired is false - validation failed but we continue with warning
+                        Logger.Logger.Log(null, log4net.Core.Level.Warn,
+                            "SBOM signature validation failed, but continuing execution (IsSignVerifyRequired is false).", null);
+                    }
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle specific InvalidOperationException
+                Logger.Error($"SBOM signature verification failed: {ex.Message}");
+                Logger.Logger.Log(null, log4net.Core.Level.Error, 
+                    "Stopping execution due to signature validation failure.", null);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (Exception ex)
+            {
+                // Handle any other unexpected exceptions
+                Logger.Error($"SBOM signature verification failed: {ex.Message}");
+                Logger.Logger.Log(null, log4net.Core.Level.Error, 
+                    "Stopping execution due to validation error.", null);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+        }
     }
 }

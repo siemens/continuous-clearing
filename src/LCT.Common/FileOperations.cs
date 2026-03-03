@@ -127,18 +127,16 @@ namespace LCT.Common
                 File.WriteAllText(filePath, dataToWrite.ToString());
                 SBOMSigningValidation.RemoveExistingSignature(filePath);
                 Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
-                if (appSettings.SbomSigning.EnableSigning)
+                if (appSettings.SbomSigning!=null)
                 {
                     try
                     {
-                        //SBOMSigningValidation.RemoveExistingSignature(filePath);
-                        Logger.Logger.Log(null, log4net.Core.Level.Notice, "Signing SBOM file...", null);                       
+                        Logger.Logger.Log(null, log4net.Core.Level.Notice, "Signing SBOM file...", null);
                         SBOMSigningValidation.PerformSbomSigning(appSettings, "sign", filePath);
-                        Logger.Logger.Log(null, log4net.Core.Level.Notice, "SBOM signing completed successfully.", null);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Logger.Error($"SBOM signing failed: {ex.Message}");
+                        Logger.Error($"SBOM signing failed");
                         Logger.Warn("Unsigned BOM file will be retained due to signing failure.");
                     }
                 }

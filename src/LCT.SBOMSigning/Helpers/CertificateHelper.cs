@@ -10,6 +10,7 @@ using log4net;
 using SBOMSigning.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -32,12 +33,7 @@ namespace SBOMSigning.Helpers
         /// <returns>signature</returns>
         public byte[] SignCertificate(string content)
         {
-            if (appSettings.UseLocalCertificate)
-            {
-                return SignWithLocalCertificate(content);
-            }
-            else
-            {
+            
 
 
                 byte[] signature = null;
@@ -48,23 +44,35 @@ namespace SBOMSigning.Helpers
                 string kvUri = appSettings.KeyVaultURI ?? string.Empty;
 
                 var settings = new Dictionary<string, string>
-            {
-                { DataConstant.TenantId, tenantId },
-                { DataConstant.ClientId, clientId },
-                { DataConstant.ClientSecret, clientSecret },
-                { DataConstant.CertificateName,certificateName },
-                { DataConstant.KeyVaultURI, kvUri }
-            };
-
-                foreach (var setting in settings)
                 {
-                    if (string.IsNullOrEmpty(setting.Value))
+                    { DataConstant.TenantId, tenantId },
+                    { DataConstant.ClientId, clientId },
+                    { DataConstant.ClientSecret, clientSecret },
+                    { DataConstant.CertificateName,certificateName },
+                    { DataConstant.KeyVaultURI, kvUri }
+                };
+
+                var missingSettings = settings
+                    .Where(s => string.IsNullOrEmpty(s.Value))
+                    .Select(s => s.Key)
+                    .ToList();
+
+                // Handle missing settings if any
+                if (missingSettings.Any())
+                {
+                    string missingSettingsList = string.Join(", ", missingSettings);
+
+                    if (appSettings.IsSignVerifyRequired)
                     {
-                        Logger.Error($"The setting '{setting.Key}' is missing or empty. Please ensure you have provided all the required arguments.");
-                        throw new ArgumentException($"The setting '{setting.Key}' is missing or empty.");
+                        string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
+                        throw new ArgumentException(errorMsg);
+                    }
+                    else
+                    {
+                        Logger.Warn($"Skipping SBOM signing due to missing credentials ({missingSettingsList}). Continuing as IsSignVerifyRequired is set to false.");
+                        return null; // Return null to indicate signing was skipped
                     }
                 }
-
 
                 try
                 {
@@ -118,35 +126,8 @@ namespace SBOMSigning.Helpers
 
                 return signature;
             }
-        }
-
-
-        private byte[] SignWithLocalCertificate(string content)
-        {
-            try
-            {
-                using (var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(
-                    appSettings.LocalCertificatePath,
-                    appSettings.LocalCertificatePassword))
-                {
-                    using (var rsa = cert.GetRSAPrivateKey())
-                    {
-                        byte[] dataToSign = Encoding.UTF8.GetBytes(content);
-                        using (var sha256 = SHA256.Create())
-                        {
-                            byte[] hash = sha256.ComputeHash(dataToSign);
-                            Logger.Info("Starting local signing operation...");
-                            return rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Error signing with local certificate: {ex.Message}");
-                throw;
-            }
-        }
+       
+        
         /// <summary>
         /// Signs the sbom content
         /// </summary>
@@ -154,13 +135,8 @@ namespace SBOMSigning.Helpers
         /// <param name="signature">signature</param>
         /// <returns>validation</returns>
         public bool VerifySignature(string content, string signature)
-        {
-            if (appSettings.UseLocalCertificate)
-            {
-                return VerifyWithLocalCertificate(content, signature);
-            }
-            else { 
-                string tenantId = appSettings.TenantId ?? string.Empty;
+        {            
+            string tenantId = appSettings.TenantId ?? string.Empty;
             string clientId = appSettings.ClientId ?? string.Empty;
             string clientSecret = appSettings.ClientSecret ?? string.Empty;
             string certificateName = appSettings.CertificateName ?? string.Empty;
@@ -176,33 +152,39 @@ namespace SBOMSigning.Helpers
                 { DataConstant.KeyVaultURI, kvUri }
             };
 
-            foreach (var setting in settings)
-            {
-                if (string.IsNullOrEmpty(setting.Value))
+                var missingSettings = settings
+                        .Where(s => string.IsNullOrEmpty(s.Value))
+                        .Select(s => s.Key)
+                        .ToList();
+
+                // Handle missing settings if any
+                if (missingSettings.Any())
                 {
-                    Logger.Error($"The setting '{setting.Key}' is missing or empty. Please ensure you have provided all the required arguments.");
-                    throw new ArgumentException($"The setting '{setting.Key}' is missing or empty.");
+                    string missingSettingsList = string.Join(", ", missingSettings);
+
+                    if (appSettings.IsSignVerifyRequired)
+                    {
+                        string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
+                        throw new ArgumentException(errorMsg);
+                    }
+                    else
+                    {
+                        Logger.Warn($"Skipping SBOM signing due to missing credentials ({missingSettingsList}). Continuing as IsSignVerifyRequired is set to false.");
+                        return false; // Return null to indicate signing was skipped
+                    }
                 }
-            }
 
-            try
-            {
-                var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-                var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
+                try
+                {
+                    var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+                    var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
+                    byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
 
-
-                byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
-
-                using (var sha256 = SHA256.Create())
+                    using (var sha256 = SHA256.Create())
                 {
                     byte[] hash = sha256.ComputeHash(dataToVerify);
-
                     byte[] sign = Convert.FromBase64String(signature);
-
-
                     VerifyResult verifyResult = cryptoClient.Verify(SignatureAlgorithm.RS256, hash, sign);
-
-
                     isValid = verifyResult.IsValid;
                 }
             }
@@ -221,74 +203,7 @@ namespace SBOMSigning.Helpers
             }
 
             return isValid;
-        }
-      }
-
-        private bool VerifyWithLocalCertificate(string content, string signature)
-        {
-            try
-            {
-                Logger.Info($"Loading certificate for verification from: {appSettings.LocalCertificatePath}");
-
-                if (!System.IO.File.Exists(appSettings.LocalCertificatePath))
-                {
-                    Logger.Error($"Certificate file not found: {appSettings.LocalCertificatePath}");
-                    return false;
-                }
-
-                using (var cert = new X509Certificate2(
-                    appSettings.LocalCertificatePath,
-                    appSettings.LocalCertificatePassword,
-                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet))
-                {
-                    Logger.Info($"Certificate loaded for verification. Subject: {cert.Subject}");
-
-                    using (var rsa = cert.GetRSAPublicKey())
-                    {
-                        if (rsa == null)
-                        {
-                            Logger.Error("Failed to extract RSA public key from certificate");
-                            return false;
-                        }
-
-                        Logger.Info($"RSA public key extracted. Key size: {rsa.KeySize} bits");
-
-                        byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
-                        byte[] signatureBytes = Convert.FromBase64String(signature);
-
-                        using (var sha256 = SHA256.Create())
-                        {
-                            byte[] hash = sha256.ComputeHash(dataToVerify);
-                            Logger.Info("Verifying signature...");
-
-                            bool isValid = rsa.VerifyHash(hash, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-                            if (isValid)
-                            {
-                                Logger.Info("Signature verification successful");
-                            }
-                            else
-                            {
-                                Logger.Warn("Signature verification failed");
-                            }
-
-                            return isValid;
-                        }
-                    }
-                }
-            }
-            catch (CryptographicException cryptoEx)
-            {
-                Logger.Error($"Cryptographic error during verification: {cryptoEx.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Error verifying with local certificate: {ex.Message}");
-                Logger.Debug($"StackTrace: {ex.StackTrace}");
-                return false;
-            }
-        }
+        }            
 
     }
 }

@@ -38,14 +38,26 @@ namespace SBOMSigning.Helpers
             Logger.Info($"Loading the BOM file : {appSettings.BomFilePath}");
 
             if (IsPropertyPresent(bomContent, DataConstant.Signature))
-            {
-                Logger.Warn("The SBOM loaded already contains a signature.");
-                throw new InvalidOperationException("The SBOM loaded already contains a signature.");
-            }
+            {                
+                string warningMessage = "SBOM signing failed: File already contains a signature.";
+                if (appSettings.IsSignVerifyRequired)
+                {
+                    Logger.Error("SBOM signing failed: File already contains a signature. IsSignVerifyRequired is set to true.");
+                    throw new InvalidOperationException(warningMessage);
+                }
+                else
+                {
+                    Logger.Warn("Skipping signing as SBOM already contains a signature. Continuing as IsSignVerifyRequired is set to false.");
+                    return appSettings.BomFilePath;
+                }
+            }        
 
-            //Logger.Info($"Certificate Name  : {appSettings.CertificateName}");
             var signatureInBytes = certificateHelper.SignCertificate(bomContent);
 
+            if (signatureInBytes == null)
+            {
+                return appSettings.BomFilePath;
+            }
             string base64Signature = Convert.ToBase64String(signatureInBytes);
 
             var signature = new Signature
@@ -69,8 +81,6 @@ namespace SBOMSigning.Helpers
         /// </summary>
         public void ReadSBOMFile(string sbomFilePath, out bool isValid)
         {
-
-
             if (string.IsNullOrEmpty(sbomFilePath))
             {
                 Logger.Error("Please provide a valid input filepath");
@@ -98,7 +108,7 @@ namespace SBOMSigning.Helpers
             }
             else
             {
-                Logger.Error("SBOM File provided is corrupted");
+                //Logger.Error("SBOM Veriication failed");
                 isValid = false;
             }
 
@@ -107,17 +117,8 @@ namespace SBOMSigning.Helpers
         {
             string dirPath = string.Empty;
             string filename = string.Empty;
-
-            if (string.IsNullOrEmpty(appSettings.OutputFolderPath))
-            {
-                dirPath = Path.GetDirectoryName(appSettings.BomFilePath);
-                filename = Path.GetFileName(appSettings.BomFilePath);
-            }
-            else
-            {
-                dirPath = appSettings.OutputFolderPath;
-            }
-
+            dirPath = Path.GetDirectoryName(appSettings.BomFilePath);
+            filename = Path.GetFileName(appSettings.BomFilePath);
 
             string signedSbomFilePath = Path.Combine(dirPath, $"{filename.Split(".")[0]}{DataConstant.SBOMExtension}");
             File.WriteAllText(signedSbomFilePath, array);
@@ -142,7 +143,6 @@ namespace SBOMSigning.Helpers
                         {
                             property.WriteTo(writer);
                         }
-
 
                         // Write new property
                         using (JsonDocument newPropertyDoc = JsonDocument.Parse(propertyValue))
