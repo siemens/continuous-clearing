@@ -79,7 +79,10 @@ namespace LCT.ArtifactoryUploader
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
+            if (appSettings.SbomSigning != null)
+            {
+                SBOMSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
+            }
             //Uploading Package to artifactory
             PackageUploadHelper.JFrogService = GetJfrogService(appSettings);
             UploadToArtifactory.JFrogService = GetJfrogService(appSettings);

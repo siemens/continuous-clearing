@@ -76,7 +76,7 @@ namespace LCT.ArtifactoryUploader
 
             // write final out put in the JSON file
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
-                FileConstant.BomFileName, appSettings.SW360.ProjectName);
+                FileConstant.BomFileName, appSettings.SW360.ProjectName, appSettings);
 
             // write KPI info to console table 
             if (Program.UploaderStopWatch != null)

@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LCT.CycloneDxProcessor\LCT.CycloneDxProcessor.csproj" />
+    <ProjectReference Include="..\LCT.SBOMSigningVerification\LCT.SBOMSigningVerification.csproj" />
     <ProjectReference Include="..\LCT.Telemetry\LCT.Telemetry.csproj" />
   </ItemGroup>
 

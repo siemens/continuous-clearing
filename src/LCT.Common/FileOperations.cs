@@ -26,6 +26,7 @@ namespace LCT.Common
         #region Fields
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
         #endregion
 
@@ -113,20 +114,31 @@ namespace LCT.Common
         /// <param name="fileNameWithExtension">The file name with extension.</param>
         /// <param name="projectName">The project name to prefix the file name.</param>
         /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
-        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
+        public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName, CommonAppSettings appSettings)
         {
             try
             {
                 Logger.DebugFormat("WriteContentToOutputBomFile(): Starting to write BOM content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}", folderPath, fileNameWithExtension, projectName);
                 string fileName = $"{projectName}_{fileNameWithExtension}";
-
                 string filePath = CatoolBomFilePath = Path.Combine(folderPath, fileName);
                 Logger.DebugFormat(LogMessage, filePath);
-
                 BackupTheGivenFile(folderPath, fileName);
-                File.WriteAllText(filePath, dataToWrite.ToString());
-                Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
+                string bomContent = dataToWrite.ToString();
 
+                if (appSettings.SbomSigning != null)
+                {
+                    try
+                    {
+                        bomContent = SBOMSigningValidation.PerformSbomSigning(appSettings, "sign", filePath, bomContent);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"SBOM signing failed: {ex.Message}");
+                        environmentHelper.CallEnvironmentExit(-1);
+                    }
+                }
+                File.WriteAllText(filePath, bomContent);
+                Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
             }
             catch (IOException e)
             {
