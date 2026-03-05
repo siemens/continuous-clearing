@@ -14,11 +14,11 @@ namespace LCT.SBOMSigningVerification.Helpers
 {
     public class JsonFileHelper : IJsonFileHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
-        AppSettings appSettings;
-        private ICertificateHelper certificateHelper;
-        private ISignatureHelper signatureHelper;
+        readonly AppSettings appSettings;
+        private readonly ICertificateHelper certificateHelper;
+        private readonly ISignatureHelper signatureHelper;
         public JsonFileHelper(AppSettings commonAppSettings, ICertificateHelper certificateHelper, ISignatureHelper signatureHelper)
         {
             appSettings = commonAppSettings;
@@ -30,8 +30,11 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// </summary>
         public string SignSBOMFile()
         {
-            var originalSbom = appSettings.bomcontent;            
+            var originalSbom = appSettings.bomcontent;
+
+            #pragma warning disable CS8604 // Possible null reference argument.
             string bomContent = signatureHelper.RemoveSignature(originalSbom);
+            #pragma warning restore CS8604 // Possible null reference argument.
             if (IsPropertyPresent(bomContent, DataConstant.Signature))
             {
                 string warningMessage = "SBOM signing failed: File already contains a signature.";
@@ -49,10 +52,10 @@ namespace LCT.SBOMSigningVerification.Helpers
 
             var signatureInBytes = certificateHelper.SignCertificate(bomContent);
 
-            if (signatureInBytes == null)
-            {
-                return bomContent;
-            }
+            if (signatureInBytes == null || signatureInBytes.Length == 0)
+{
+    return bomContent;
+}
             string base64Signature = Convert.ToBase64String(signatureInBytes);
 
             var signature = new Signature
@@ -67,7 +70,7 @@ namespace LCT.SBOMSigningVerification.Helpers
             var signatureJson = JsonSerializer.Serialize(signature, options);
 
             var array = AddPropertyToJson(bomContent, DataConstant.Signature, signatureJson);
-            Logger.Logger.Log(null, log4net.Core.Level.Info, "SBOM Signing Completed Successfully", null);
+            Logger.Logger.Log(null, log4net.Core.Level.Info, "SBOM Signed Successfully", null);
             return array;
 
         }
@@ -83,13 +86,12 @@ namespace LCT.SBOMSigningVerification.Helpers
                 return;
             }
 
-            //Logger.Info("Reading the SBOM file...");
             string sbomContent = File.ReadAllText(sbomFilePath);
 
-            Signature signature = signatureHelper.ExtractSignature(sbomContent);
-            if (signature == null)
+            Signature? signature = signatureHelper.ExtractSignature(sbomContent);
+            if (signature == null || string.IsNullOrEmpty(signature.Value))
             {
-                Logger.Error("No signature was found in the SBOM file to validate!");
+                Logger.Warn("No signature was found in the SBOM file to validate!");
                 isValid = false;
                 return;
             }
@@ -103,24 +105,10 @@ namespace LCT.SBOMSigningVerification.Helpers
             }
             else
             {
-                //Logger.Error("SBOM Veriication failed");
                 isValid = false;
             }
-
         }
-        private static string WriteSignedBOMIntoFile(string array, AppSettings appSettings)
-        {
-            string dirPath = string.Empty;
-            string filename = string.Empty;
-            dirPath = Path.GetDirectoryName(appSettings.BomFilePath);
-            filename = Path.GetFileName(appSettings.BomFilePath);
-
-            string signedSbomFilePath = Path.Combine(dirPath, $"{filename.Split(".")[0]}{DataConstant.SBOMExtension}");
-            File.WriteAllText(signedSbomFilePath, array);
-
-            Logger.Info($"Signing of SBOM successful. File located at: {signedSbomFilePath}\n");
-            return signedSbomFilePath;
-        }
+        
         private static string AddPropertyToJson(string jsonString, string propertyName, string propertyValue)
         {
             using (JsonDocument document = JsonDocument.Parse(jsonString))

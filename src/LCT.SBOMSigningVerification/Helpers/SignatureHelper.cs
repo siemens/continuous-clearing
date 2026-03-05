@@ -21,7 +21,7 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// </summary>
         /// <param name="sbomContent">sbomContent</param>
         /// <returns>signature</returns>
-        public Signature ExtractSignature(string sbomContent)
+        public Signature? ExtractSignature(string sbomContent)
         {
             var sbomJson = JsonDocument.Parse(sbomContent);
             if (sbomJson.RootElement.TryGetProperty(DataConstant.Signature, out JsonElement signatureElement))

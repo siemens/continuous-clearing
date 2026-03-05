@@ -27,7 +27,8 @@ namespace LCT.Common
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-
+        static readonly ISbomSigningValidation sbomSigningValidation = new SbomSigningValidation();
+      
         #endregion
 
         #region Properties
@@ -129,11 +130,11 @@ namespace LCT.Common
                 {
                     try
                     {
-                        bomContent = SBOMSigningValidation.PerformSbomSigning(appSettings, "sign", filePath, bomContent);
+                        bomContent = sbomSigningValidation.PerformSbomSigning(appSettings, "sign", filePath, bomContent);
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"SBOM signing failed: {ex.Message}");
+                        Logger.Error("SBOM signing failed ", ex);
                         environmentHelper.CallEnvironmentExit(-1);
                     }
                 }

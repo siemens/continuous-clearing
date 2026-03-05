@@ -16,8 +16,8 @@ namespace LCT.SBOMSigningVerification.Helpers
 {
     public class CertificateHelper : ICertificateHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        AppSettings appSettings;
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType ?? typeof(CertificateHelper));
+        readonly AppSettings appSettings;
         public CertificateHelper(AppSettings commonAppSettings)
         {
             appSettings = commonAppSettings;
@@ -28,99 +28,99 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <param name="bomcontent">args</param>
         /// <returns>signature</returns>
         public byte[] SignCertificate(string content)
-        {
-                byte[] signature = null;
-                string tenantId = appSettings.TenantId ?? string.Empty;
-                string clientId = appSettings.ClientId ?? string.Empty;
-                string clientSecret = appSettings.ClientSecret ?? string.Empty;
-                string certificateName = appSettings.CertificateName ?? string.Empty;
-                string kvUri = appSettings.KeyVaultURI ?? string.Empty;
+        {           
+            byte[]? signature = null;
+            string tenantId = appSettings.TenantId ?? string.Empty;
+            string clientId = appSettings.ClientId ?? string.Empty;
+            string clientSecret = appSettings.ClientSecret ?? string.Empty;
+            string certificateName = appSettings.CertificateName ?? string.Empty;
+            string kvUri = appSettings.KeyVaultURI ?? string.Empty;
 
-                var settings = new Dictionary<string, string>
+            var settings = new Dictionary<string, string>
+            {
+                { DataConstant.TenantId, tenantId },
+                { DataConstant.ClientId, clientId },
+                { DataConstant.ClientSecret, clientSecret },
+                { DataConstant.CertificateName,certificateName },
+                { DataConstant.KeyVaultURI, kvUri }
+            };
+
+            var missingSettings = settings
+                .Where(s => string.IsNullOrEmpty(s.Value))
+                .Select(s => s.Key)
+                .ToList();
+
+            // Handle missing settings if any
+            if (missingSettings.Count != 0)
+            {
+                string missingSettingsList = string.Join(", ", missingSettings);
+
+                if (appSettings.IsSignVerifyRequired)
                 {
-                    { DataConstant.TenantId, tenantId },
-                    { DataConstant.ClientId, clientId },
-                    { DataConstant.ClientSecret, clientSecret },
-                    { DataConstant.CertificateName,certificateName },
-                    { DataConstant.KeyVaultURI, kvUri }
-                };
-
-                var missingSettings = settings
-                    .Where(s => string.IsNullOrEmpty(s.Value))
-                    .Select(s => s.Key)
-                    .ToList();
-
-                // Handle missing settings if any
-                if (missingSettings.Any())
+                    string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
+                    throw new ArgumentException(errorMsg);
+                }
+                else
                 {
-                    string missingSettingsList = string.Join(", ", missingSettings);
+                    Logger.WarnFormat("Skipping SBOM signing due to missing credentials ({0}) and Continuing execution as IsSignVerifyRequired is set to false.", missingSettingsList);
+                    return Array.Empty<byte>(); // Return empty array to indicate signing was skipped
+                }
+            }
 
-                    if (appSettings.IsSignVerifyRequired)
+            try
+            {
+                var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
+                var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
+
+                byte[] dataToSign = Encoding.UTF8.GetBytes(content);
+
+                using (var sha256 = SHA256.Create())
+                {
+                    byte[] hash = sha256.ComputeHash(dataToSign);
+
+                    var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
+
+
+                    if (signResult.Signature != null)
                     {
-                        string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
-                        throw new ArgumentException(errorMsg);
+                        signature = signResult.Signature;
                     }
                     else
                     {
-                        Logger.Warn($"Skipping SBOM signing due to missing credentials ({missingSettingsList}). Continuing as IsSignVerifyRequired is set to false.");
-                        return null; // Return null to indicate signing was skipped
+                        Logger.Warn("Signature is null. Skipping file write operation.");
+                        throw new InvalidOperationException("Signature is null.");
                     }
                 }
-
-                try
+            }
+            catch (Exception ex)
+            {
+                var exNamespace = ex.GetType().Namespace;
+                if (!string.IsNullOrEmpty(exNamespace) && exNamespace.StartsWith("Azure"))
                 {
-                    var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-                    var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
-
-                    byte[] dataToSign = Encoding.UTF8.GetBytes(content);
-
-                    using (var sha256 = SHA256.Create())
-                    {
-                        byte[] hash = sha256.ComputeHash(dataToSign);
-                        //Logger.Info("Starting signing operation...");
-
-                        var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
-
-
-                        if (signResult.Signature != null)
-                        {
-                            signature = signResult.Signature;
-                        }
-                        else
-                        {
-                            Logger.Warn("Signature is null. Skipping file write operation.");
-                            throw new InvalidOperationException("Signature is null.");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (ex.GetType().Namespace.StartsWith("Azure"))
-                    {
-                        Logger.Error($"Azure Exception: {ex.Message}");
-                        Logger.Debug($"StackTrace: {ex.StackTrace}");
-                    }
-                    else
-                    {
-                        Logger.Error($"Error occurred while signing the content: {ex.Message}");
-                        Logger.Debug($"StackTrace: {ex.StackTrace}");
-                    }
-                }
-
-                if (signature == null)
-                {
-                    Logger.Error("Signature is null.");
+                    Logger.Error("Azure Exception: {0}", ex);
+                    Logger.DebugFormat("StackTrace: {0}", ex.StackTrace);
                 }
                 else
                 {
                     Logger.Debug("Signature obtained successfully.");
                 }
-
-                return signature;
             }
-              
 
+            if (signature == null)
+            {
+                Logger.Error("Signature is null.");
+                return Array.Empty<byte>();
+            }
+            else
+            {
+                Logger.Debug("Signature obtained successfully.");
+            }
+
+            return signature;
+        }
+        
+        
         /// <summary>
         /// Signs the sbom content
         /// </summary>
@@ -128,7 +128,7 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <param name="signature">signature</param>
         /// <returns>validation</returns>
         public bool VerifySignature(string content, string signature)
-        {                        
+        {            
                 string tenantId = appSettings.TenantId ?? string.Empty;
                 string clientId = appSettings.ClientId ?? string.Empty;
                 string clientSecret = appSettings.ClientSecret ?? string.Empty;
@@ -151,7 +151,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                         .ToList();
 
                 // Handle missing settings if any
-                if (missingSettings.Any())
+                if (missingSettings.Count != 0)
                 {
                     string missingSettingsList = string.Join(", ", missingSettings);
 
@@ -162,7 +162,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                     }
                     else
                     {
-                        Logger.Warn($"Skipping SBOM signing due to missing credentials ({missingSettingsList}). Continuing as IsSignVerifyRequired is set to false.");
+                        Logger.WarnFormat("Skipping SBOM signing due to missing credentials ({0}) and Continuing execution as IsSignVerifyRequired is set to false.", missingSettingsList);
                         return false; // Return null to indicate signing was skipped
                     }
                 }
@@ -183,20 +183,21 @@ namespace LCT.SBOMSigningVerification.Helpers
                 }
                 catch (Exception ex)
                 {
-                    if (ex.GetType().Namespace.StartsWith("Azure"))
+                    var exNamespace = ex.GetType().Namespace;
+                    if (!string.IsNullOrEmpty(exNamespace) && exNamespace.StartsWith("Azure"))
                     {
-                        Logger.Error($"Azure Exception: {ex.Message}");
-                        Logger.Debug($"StackTrace: {ex.StackTrace}");
+                        Logger.Error("Azure Exception: {0}", ex);
+                        Logger.DebugFormat("StackTrace: {0}", ex.StackTrace);
                     }
                     else
                     {
-                        Logger.Error($"Error occurred while validating the content: {ex.Message}");
-                        Logger.Debug($"StackTrace: {ex.StackTrace}");
+                        Logger.Debug("Signature obtained successfully.");
                     }
+
                 }
 
                 return isValid;
-            }
-       
+            }              
+
     }
 }

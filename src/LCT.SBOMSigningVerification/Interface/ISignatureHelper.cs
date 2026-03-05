@@ -9,7 +9,7 @@ namespace LCT.SBOMSigningVerification.Interface
 {
     public interface ISignatureHelper
     {
-        Signature ExtractSignature(string sbomContent);
+        Signature? ExtractSignature(string sbomContent);
         string RemoveSignature(string sbomContent);
     }
 }
