@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LCT.Telemetry", "LCT.Teleme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LCT.Telemetry.UTest", "Telemetry.UTest\LCT.Telemetry.UTest.csproj", "{A0632D1A-6BDD-47BC-A258-ECB386E5BA4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LCT.SBOMSigningVerification", "LCT.SBOMSigningVerification\LCT.SBOMSigningVerification.csproj", "{FB75C370-1FFD-4592-BCD5-109E3C60CE94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{A0632D1A-6BDD-47BC-A258-ECB386E5BA4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0632D1A-6BDD-47BC-A258-ECB386E5BA4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0632D1A-6BDD-47BC-A258-ECB386E5BA4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB75C370-1FFD-4592-BCD5-109E3C60CE94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB75C370-1FFD-4592-BCD5-109E3C60CE94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB75C370-1FFD-4592-BCD5-109E3C60CE94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB75C370-1FFD-4592-BCD5-109E3C60CE94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
