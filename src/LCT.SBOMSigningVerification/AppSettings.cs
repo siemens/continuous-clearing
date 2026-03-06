@@ -20,9 +20,7 @@ namespace LCT.SBOMSigningVerification
 
         public bool SBOMVerify { get; set; }
 
-        public bool UseLocalCertificate { get; set; }
-        public string LocalCertificatePath { get; set; }
-        public string LocalCertificatePassword { get; set; }
+     
 
     }
 }

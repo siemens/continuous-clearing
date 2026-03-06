@@ -44,10 +44,8 @@ namespace LCT.Common
                 ClientSecret = appSettings.SbomSigning.ClientSecret,
                 TenantId = appSettings.SbomSigning.TenantId,
                 SBOMVerify = appSettings.SbomSigning.SBOMVerify,
-                bomcontent = bomContent,
-                UseLocalCertificate = appSettings.SbomSigning.UseLocalCertificate,
-                LocalCertificatePassword = appSettings.SbomSigning.LocalCertificatePassword,
-                LocalCertificatePath = appSettings.SbomSigning.LocalCertificatePath
+                bomcontent = bomContent
+                
             };
 
             var certificateHelper = new CertificateHelper(sbomSigningAppSettings);

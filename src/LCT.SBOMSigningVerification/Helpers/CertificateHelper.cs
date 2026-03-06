@@ -28,13 +28,7 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <param name="bomcontent">args</param>
         /// <returns>signature</returns>
         public byte[] SignCertificate(string content)
-        {
-            if (appSettings.UseLocalCertificate)
-            {
-                return SignWithLocalCertificate(content);
-            }
-            else
-            {
+        {           
                 string tenantId = appSettings.TenantId ?? string.Empty;
             string clientId = appSettings.ClientId ?? string.Empty;
             string clientSecret = appSettings.ClientSecret ?? string.Empty;
@@ -92,35 +86,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                 throw; // ✅ Re-throw to propagate the error
             }            
         }
-        }
-
-
-        private byte[] SignWithLocalCertificate(string content)
-        {
-            try
-            {
-                using (var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(
-                    appSettings.LocalCertificatePath,
-                    appSettings.LocalCertificatePassword))
-                {
-                    using (var rsa = cert.GetRSAPrivateKey())
-                    {
-                        byte[] dataToSign = Encoding.UTF8.GetBytes(content);
-                        using (var sha256 = SHA256.Create())
-                        {
-                            byte[] hash = sha256.ComputeHash(dataToSign);
-                            Logger.Info("Starting local signing operation...");
-                            return rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Error signing with local certificate: {ex.Message}");
-                throw;
-            }
-        }
+        
 
         /// <summary>
         /// Signs the sbom content
@@ -130,12 +96,7 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <returns>validation</returns>
         public bool VerifySignature(string content, string signature)
         {
-            if (appSettings.UseLocalCertificate)
-            {
-                return VerifyWithLocalCertificate(content, signature);
-            }
-            else
-            {
+            
                 string tenantId = appSettings.TenantId ?? string.Empty;
                 string clientId = appSettings.ClientId ?? string.Empty;
                 string clientSecret = appSettings.ClientSecret ?? string.Empty;
@@ -200,72 +161,6 @@ namespace LCT.SBOMSigningVerification.Helpers
 
                 return isValid;
             }
-        }
-
-        private bool VerifyWithLocalCertificate(string content, string signature)
-        {
-            try
-            {
-                Logger.Info($"Loading certificate for verification from: {appSettings.LocalCertificatePath}");
-
-                if (!System.IO.File.Exists(appSettings.LocalCertificatePath))
-                {
-                    Logger.Error($"Certificate file not found: {appSettings.LocalCertificatePath}");
-                    return false;
-                }
-
-                using (var cert = new X509Certificate2(
-                    appSettings.LocalCertificatePath,
-                    appSettings.LocalCertificatePassword,
-                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet))
-                {
-                    Logger.Info($"Certificate loaded for verification. Subject: {cert.Subject}");
-
-                    using (var rsa = cert.GetRSAPublicKey())
-                    {
-                        if (rsa == null)
-                        {
-                            Logger.Error("Failed to extract RSA public key from certificate");
-                            return false;
-                        }
-
-                        Logger.Info($"RSA public key extracted. Key size: {rsa.KeySize} bits");
-
-                        byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
-                        byte[] signatureBytes = Convert.FromBase64String(signature);
-
-                        using (var sha256 = SHA256.Create())
-                        {
-                            byte[] hash = sha256.ComputeHash(dataToVerify);
-                            Logger.Info("Verifying signature...");
-
-                            bool isValid = rsa.VerifyHash(hash, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-                            if (isValid)
-                            {
-                                Logger.Info("Signature verification successful");
-                            }
-                            else
-                            {
-                                Logger.Warn("Signature verification failed");
-                            }
-
-                            return isValid;
-                        }
-                    }
-                }
-            }
-            catch (CryptographicException cryptoEx)
-            {
-                Logger.Error($"Cryptographic error during verification: {cryptoEx.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Error verifying with local certificate: {ex.Message}");
-                Logger.Debug($"StackTrace: {ex.StackTrace}");
-                return false;
-            }
-        }
+       
     }
 }
