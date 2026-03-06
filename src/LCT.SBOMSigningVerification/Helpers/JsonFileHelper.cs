@@ -33,7 +33,7 @@ namespace LCT.SBOMSigningVerification.Helpers
             var originalSbom = appSettings.bomcontent;
 
             #pragma warning disable CS8604 // Possible null reference argument.
-            string bomContent = signatureHelper.RemoveSignature(originalSbom);
+            string bomContent = signatureHelper.RemoveSignature1(originalSbom);
             #pragma warning restore CS8604 // Possible null reference argument.
             if (IsPropertyPresent(bomContent, DataConstant.Signature))
             {
@@ -78,7 +78,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                 string errorMsg = $"Signature is null";
                 throw new ArgumentException(errorMsg);
             }
-            string originalSbom = signatureHelper.RemoveSignature(sbomContent);
+            string originalSbom = signatureHelper.RemoveSignature1(sbomContent);
             isValid = certificateHelper.VerifySignature(originalSbom, signature.Value);            
         }
         
