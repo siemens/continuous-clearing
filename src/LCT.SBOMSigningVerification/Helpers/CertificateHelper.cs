@@ -65,19 +65,26 @@ namespace LCT.SBOMSigningVerification.Helpers
             {
                 var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
                 var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
+
                 byte[] dataToSign = Encoding.UTF8.GetBytes(content);
 
-                var signResult = cryptoClient.SignData(SignatureAlgorithm.RS256, dataToSign);
-
-                if (signResult?.Signature == null || signResult.Signature.Length == 0)
+                // ✅ Compute hash first (consistent with local signing)
+                using (var sha256 = SHA256.Create())
                 {
-                    string errorMsg = "Azure Key Vault returned null or empty signature.";
-                    Logger.Error(errorMsg);
-                    throw new InvalidOperationException(errorMsg);
-                }
+                    byte[] hash = sha256.ComputeHash(dataToSign);
 
-                Logger.Debug("Signature generated successfully.");
-                return signResult.Signature;
+                    // ✅ Sign the HASH, not the raw data
+                    var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
+
+                    if (signResult?.Signature == null || signResult.Signature.Length == 0)
+                    {
+                        string errorMsg = "Azure Key Vault returned null or empty signature.";
+                        Logger.Error(errorMsg);
+                        throw new InvalidOperationException(errorMsg);
+                    }
+
+                    return signResult.Signature;
+                }
             }
             catch (Exception ex)
             {
