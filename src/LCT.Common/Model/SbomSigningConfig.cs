@@ -20,7 +20,10 @@ namespace LCT.Common.Model
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string TenantId { get; set; }
-        public bool SBOMVerify { get; set; }       
+        public bool SBOMVerify { get; set; }
+        public bool UseLocalCertificate { get; set; }
+        public string LocalCertificatePath { get; set; }
+        public string LocalCertificatePassword { get; set; }
 
     }
 }
