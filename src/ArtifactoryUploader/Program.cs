@@ -11,6 +11,7 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
@@ -36,6 +37,8 @@ namespace LCT.ArtifactoryUploader
         public static Stopwatch UploaderStopWatch { get; set; }
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+        static readonly ISbomSigningValidation sbomSigningValidation = new SbomSigningValidation();
+
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();
@@ -79,7 +82,10 @@ namespace LCT.ArtifactoryUploader
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
+            if (appSettings.SbomSigning.SBOMVerify)
+            {
+                sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
+            }
             //Uploading Package to artifactory
             PackageUploadHelper.JFrogService = GetJfrogService(appSettings);
             UploadToArtifactory.JFrogService = GetJfrogService(appSettings);

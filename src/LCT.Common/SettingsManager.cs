@@ -174,8 +174,7 @@ namespace LCT.Common
                     identifierReqParameters.Add($"Jfrog.Token");
                     identifierReqParameters.Add($"Jfrog.URL");
                 }
-
-
+                
                 //Check if ProjectType contains a value and add InternalRepos key accordingly
                 if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
                 {
@@ -195,7 +194,7 @@ namespace LCT.Common
                 "Sw360.Token",
                 "SW360.URL",
                 "Directory.OutputFolder"
-            };
+            };                
                 CheckForMissingParameter(appSettings, creatorReqParameters);
             }
             else
@@ -205,8 +204,8 @@ namespace LCT.Common
             {
                 "Jfrog.URL",
                 "Directory.OutputFolder",
-                "Jfrog.Token",
-            };
+                "Jfrog.Token"
+            };               
                 CheckForMissingParameter(appSettings, uploaderReqParameters);
             }
             Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has completed\n");

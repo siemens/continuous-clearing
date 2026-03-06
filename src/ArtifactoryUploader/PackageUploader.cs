@@ -71,12 +71,20 @@ namespace LCT.ArtifactoryUploader
 
             //update Jfrog Repository Path For Successfully Uploaded Items
             m_ComponentsInBOM = await JfrogRepoUpdater.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
+            if (m_ComponentsInBOM.Metadata != null)
+            {
+                m_ComponentsInBOM.Metadata.Timestamp = DateTime.UtcNow;
+            }
+            if (appSettings.SbomSigning.SBOMVerify)
+            {
+                m_ComponentsInBOM.Signature = null;
+            }
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
 
             // write final out put in the JSON file
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
-                FileConstant.BomFileName, appSettings.SW360.ProjectName);
+                FileConstant.BomFileName, appSettings.SW360.ProjectName, appSettings);
 
             // write KPI info to console table 
             if (Program.UploaderStopWatch != null)

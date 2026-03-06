@@ -8,6 +8,7 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
+using LCT.Common.Interface;
 using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
@@ -40,6 +41,7 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private static List<ComparisonBomData> parsedBomData;
+        static ISbomSigningValidation sbomSigningValidation = new SbomSigningValidation();
 
         protected Program() { }
 
@@ -89,6 +91,11 @@ namespace LCT.SW360PackageCreator
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
+
+            if (appSettings.SbomSigning.SBOMVerify)
+            {
+                sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
+            }
 
             //Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)

@@ -341,11 +341,19 @@ namespace LCT.SW360PackageCreator
 
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
+            if (bom.Metadata != null)
+            {
+                bom.Metadata.Timestamp = DateTime.UtcNow;
+            }
+            if (appSettings.SbomSigning.SBOMVerify)
+            {
+                bom.Signature = null;
+            }
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
 
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
-                FileConstant.BomFileName, appSettings.SW360.ProjectName);
+                FileConstant.BomFileName, appSettings.SW360.ProjectName, appSettings);
 
             // write download url not found list into .json file
             var downloadUrlNotFoundList = creatorHelper.GetDownloadUrlNotFoundList(UpdatedCompareBomData);
