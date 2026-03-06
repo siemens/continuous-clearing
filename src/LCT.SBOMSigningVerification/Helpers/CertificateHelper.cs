@@ -66,24 +66,17 @@ namespace LCT.SBOMSigningVerification.Helpers
             {
                 var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
                 var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
-                byte[] dataToSign = Encoding.UTF8.GetBytes(content);
+                byte[] dataToSign = Encoding.UTF8.GetBytes(content);               
+                var signResult = cryptoClient.SignData(SignatureAlgorithm.RS256, dataToSign);
 
-                using (var sha256 = SHA256.Create())
+                if (signResult.Signature != null)
                 {
-                    byte[] hash = sha256.ComputeHash(dataToSign);
-
-                    var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
-
-
-                    if (signResult.Signature != null)
-                    {
-                        signature = signResult.Signature;
-                    }
-                    else
-                    {
-                        string errorMsg = "Azure Key Vault returned null or empty signature.";                                 
-                        throw new InvalidOperationException(errorMsg);
-                    }
+                    signature = signResult.Signature;
+                }
+                else
+                {
+                    string errorMsg = "Azure Key Vault returned null or empty signature.";
+                    throw new InvalidOperationException(errorMsg);
                 }
             }
             catch (Exception ex)
@@ -102,8 +95,7 @@ namespace LCT.SBOMSigningVerification.Helpers
 
             // Fix: Ensure non-null return value
             return signature ?? Array.Empty<byte>();
-        }
-      
+        }     
 
         /// <summary>
         /// Signs the sbom content
