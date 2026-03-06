@@ -82,7 +82,7 @@ namespace LCT.ArtifactoryUploader
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            if (appSettings.SbomSigning != null)
+            if (appSettings.SbomSigning.SBOMVerify)
             {
                 sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
             }

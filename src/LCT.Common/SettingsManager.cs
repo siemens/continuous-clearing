@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -152,103 +151,65 @@ namespace LCT.Common
         /// <param name="currentExe">The current executable type (Identifier, Creator, or other).</param>
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
-            if (appSettings == null) throw new ArgumentNullException(nameof(appSettings));
 
-            Logger.Debug("CheckRequiredArgsToRun(): Validating mandatory parameters has started");
-
-            var required = new List<string>();
-
-            switch (currentExe?.Trim())
+            if (currentExe == "Identifier")
             {
-                case "Identifier":
-                    // Base parameters
-                    required.AddRange(new[]
-                    {
-                "Directory.InputFolder",
-                "Directory.OutputFolder",
-                "ProjectType"
-            });
+                Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has started");
+                //Required parameters to run Package Identifier
+                List<string> identifierReqParameters = new List<string>()
+                {
+                    "Directory.InputFolder",
+                    "Directory.OutputFolder",
+                    "ProjectType"
+                };
 
-                    // Conditional features
-                    AddSw360IfConfigured(required, appSettings);
-                    AddJfrogIfConfigured(required, appSettings);
-                    AddSigningIfRequired(required, appSettings);
-
-                    // Internal repos when applicable
-                    if (!string.IsNullOrWhiteSpace(appSettings.ProjectType) &&
-                        appSettings.Jfrog != null &&
-                        !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
+                if (appSettings.SW360 != null)
+                {
+                    identifierReqParameters.Add($"SW360.ProjectID");
+                    identifierReqParameters.Add($"SW360.Token");
+                    identifierReqParameters.Add($"SW360.URL");
+                }
+                if (appSettings.Jfrog != null)
+                {
+                    identifierReqParameters.Add($"Jfrog.Token");
+                    identifierReqParameters.Add($"Jfrog.URL");
+                }
+                
+                //Check if ProjectType contains a value and add InternalRepos key accordingly
+                if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
+                {
+                    if (appSettings.Jfrog != null && !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        required.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
+                        identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
                     }
-                    break;
-
-                case "Creator":
-                    required.AddRange(new[]
-                    {
+                }
+                CheckForMissingParameter(appSettings, identifierReqParameters);
+            }
+            else if (currentExe == "Creator")
+            {
+                //Required parameters to run SW360Component Creator
+                List<string> creatorReqParameters = new List<string>()
+            {
                 "SW360.ProjectID",
-                "SW360.Token",   // NOTE: standardizing casing from "Sw360.Token"
+                "Sw360.Token",
                 "SW360.URL",
                 "Directory.OutputFolder"
-            });
-                    AddSigningIfRequired(required, appSettings);
-                    break;
-
-                case "Uploader":
-                default:
-                    required.AddRange(new[]
-                    {
+            };                
+                CheckForMissingParameter(appSettings, creatorReqParameters);
+            }
+            else
+            {
+                //Required parameters to run Artifactory Uploader
+                List<string> uploaderReqParameters = new List<string>()
+            {
                 "Jfrog.URL",
                 "Directory.OutputFolder",
                 "Jfrog.Token"
-            });
-                    AddSigningIfRequired(required, appSettings);
-                    break;
+            };               
+                CheckForMissingParameter(appSettings, uploaderReqParameters);
             }
-
-            // Remove potential duplicates and validate
-            CheckForMissingParameter(appSettings, required.Distinct(StringComparer.Ordinal).ToList());
-
-            Logger.Debug("CheckRequiredArgsToRun(): Validating mandatory parameters has completed");
+            Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has completed\n");
         }
-
-        private static void AddSw360IfConfigured(List<string> required, CommonAppSettings appSettings)
-        {
-            if (appSettings?.SW360 == null) return;
-
-            required.AddRange(new[]
-            {
-                "SW360.ProjectID",
-                "SW360.Token",
-                "SW360.URL"
-            });
-        }
-
-        private static void AddJfrogIfConfigured(List<string> required, CommonAppSettings appSettings)
-        {
-            if (appSettings?.Jfrog == null) return;
-
-            required.AddRange(new[]
-            {
-                "Jfrog.Token",
-                "Jfrog.URL"
-            });
-        }
-
-        private static void AddSigningIfRequired(List<string> required, CommonAppSettings appSettings)
-        {
-            if (appSettings?.SbomSigning?.IsSignVerifyRequired != true) return;
-
-            required.AddRange(new[]
-            {
-                "SbomSigning.KeyVaultURI",
-                "SbomSigning.CertificateName",
-                "SbomSigning.ClientId",
-                "SbomSigning.ClientSecret",
-                "SbomSigning.TenantId"
-            });
-        }
-
 
         /// <summary>
         /// Checks for missing required parameters in the application settings.

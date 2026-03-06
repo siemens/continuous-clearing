@@ -37,25 +37,11 @@ namespace LCT.SBOMSigningVerification.Helpers
             #pragma warning restore CS8604 // Possible null reference argument.
             if (IsPropertyPresent(bomContent, DataConstant.Signature))
             {
-                string warningMessage = "SBOM signing failed: File already contains a signature.";
-                if (appSettings.IsSignVerifyRequired)
-                {
-                    Logger.Error("SBOM signing failed: File already contains a signature. IsSignVerifyRequired is set to true.");
-                    throw new InvalidOperationException(warningMessage);
-                }
-                else
-                {
-                    Logger.Warn("Skipping signing as SBOM already contains a signature. Continuing as IsSignVerifyRequired is set to false.");
-                    return bomContent;
-                }
+                string errormessage = "File already contains a signature.";               
+                throw new InvalidOperationException(errormessage);                           
             }
 
-            var signatureInBytes = certificateHelper.SignCertificate(bomContent);
-
-            if (signatureInBytes == null || signatureInBytes.Length == 0)
-{
-    return bomContent;
-}
+            var signatureInBytes = certificateHelper.SignCertificate(bomContent);            
             string base64Signature = Convert.ToBase64String(signatureInBytes);
 
             var signature = new Signature
@@ -85,28 +71,15 @@ namespace LCT.SBOMSigningVerification.Helpers
                 isValid = false;
                 return;
             }
-
             string sbomContent = File.ReadAllText(sbomFilePath);
-
             Signature? signature = signatureHelper.ExtractSignature(sbomContent);
             if (signature == null || string.IsNullOrEmpty(signature.Value))
             {
-                Logger.Warn("No signature was found in the SBOM file to validate!");
-                isValid = false;
-                return;
+                string errorMsg = $"Signature is null";
+                throw new ArgumentException(errorMsg);
             }
-
             string originalSbom = signatureHelper.RemoveSignature(sbomContent);
-
-            isValid = certificateHelper.VerifySignature(originalSbom, signature.Value);
-            if (isValid)
-            {
-                Logger.Info($"SBOM Signature is Valid");
-            }
-            else
-            {
-                isValid = false;
-            }
+            isValid = certificateHelper.VerifySignature(originalSbom, signature.Value);            
         }
         
         private static string AddPropertyToJson(string jsonString, string propertyName, string propertyValue)

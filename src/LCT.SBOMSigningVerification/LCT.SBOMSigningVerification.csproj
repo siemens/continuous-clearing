@@ -8,11 +8,11 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<WarningLevel>4</WarningLevel>
 		<PlatformTarget></PlatformTarget>
-		<OutputPath>..\out</OutputPath>
+		<OutputPath>..\..\out</OutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<OutputPath>..\out</OutputPath>
+		<OutputPath>..\..\out</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

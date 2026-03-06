@@ -55,24 +55,17 @@ namespace LCT.SBOMSigningVerification.Helpers
             {
                 string missingSettingsList = string.Join(", ", missingSettings);
 
-                if (appSettings.IsSignVerifyRequired)
+                if (appSettings.SBOMVerify)
                 {
                     string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
                     throw new ArgumentException(errorMsg);
-                }
-                else
-                {
-                    Logger.WarnFormat("Skipping SBOM signing due to missing credentials ({0}) and Continuing execution as IsSignVerifyRequired is set to false.", missingSettingsList);
-                    return Array.Empty<byte>(); // Return empty array to indicate signing was skipped
-                }
+                }                
             }
 
             try
             {
                 var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
                 var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
-
                 byte[] dataToSign = Encoding.UTF8.GetBytes(content);
 
                 using (var sha256 = SHA256.Create())
@@ -88,8 +81,8 @@ namespace LCT.SBOMSigningVerification.Helpers
                     }
                     else
                     {
-                        Logger.Warn("Signature is null. Skipping file write operation.");
-                        throw new InvalidOperationException("Signature is null.");
+                        string errorMsg = "Azure Key Vault returned null or empty signature.";                                 
+                        throw new InvalidOperationException(errorMsg);
                     }
                 }
             }
@@ -107,20 +100,11 @@ namespace LCT.SBOMSigningVerification.Helpers
                 }
             }
 
-            if (signature == null)
-            {
-                Logger.Error("Signature is null.");
-                return Array.Empty<byte>();
-            }
-            else
-            {
-                Logger.Debug("Signature obtained successfully.");
-            }
-
-            return signature;
+            // Fix: Ensure non-null return value
+            return signature ?? Array.Empty<byte>();
         }
-        
-        
+      
+
         /// <summary>
         /// Signs the sbom content
         /// </summary>
@@ -128,7 +112,7 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <param name="signature">signature</param>
         /// <returns>validation</returns>
         public bool VerifySignature(string content, string signature)
-        {            
+        {
                 string tenantId = appSettings.TenantId ?? string.Empty;
                 string clientId = appSettings.ClientId ?? string.Empty;
                 string clientSecret = appSettings.ClientSecret ?? string.Empty;
@@ -155,16 +139,11 @@ namespace LCT.SBOMSigningVerification.Helpers
                 {
                     string missingSettingsList = string.Join(", ", missingSettings);
 
-                    if (appSettings.IsSignVerifyRequired)
+                    if (appSettings.SBOMVerify)
                     {
                         string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
                         throw new ArgumentException(errorMsg);
-                    }
-                    else
-                    {
-                        Logger.WarnFormat("Skipping SBOM signing due to missing credentials ({0}) and Continuing execution as IsSignVerifyRequired is set to false.", missingSettingsList);
-                        return false; // Return null to indicate signing was skipped
-                    }
+                    }                   
                 }
 
                 try
@@ -197,7 +176,6 @@ namespace LCT.SBOMSigningVerification.Helpers
                 }
 
                 return isValid;
-            }              
-
+            }       
     }
 }

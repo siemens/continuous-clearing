@@ -18,11 +18,7 @@ namespace LCT.SBOMSigningVerification
         public string? bomcontent { get; set; }
         public OperationType Operation { get; set; }
 
-        public bool IsSignVerifyRequired { get; set; }
-
-        public bool UseLocalCertificate { get; set; }
-        public string LocalCertificatePath { get; set; }
-        public string LocalCertificatePassword { get; set; }
+        public bool SBOMVerify { get; set; }        
 
 
     }

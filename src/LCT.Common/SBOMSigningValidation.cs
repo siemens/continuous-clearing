@@ -43,8 +43,8 @@ namespace LCT.Common
                 ClientId = appSettings.SbomSigning.ClientId,
                 ClientSecret = appSettings.SbomSigning.ClientSecret,
                 TenantId = appSettings.SbomSigning.TenantId,
-                IsSignVerifyRequired = appSettings.SbomSigning.IsSignVerifyRequired,               
-                bomcontent = bomContent               
+                SBOMVerify = appSettings.SbomSigning.SBOMVerify,
+                bomcontent = bomContent
             };
 
             var certificateHelper = new CertificateHelper(sbomSigningAppSettings);
@@ -107,36 +107,32 @@ namespace LCT.Common
 
                 if (validationResult)
                 {
-                    // Validation succeeded - continue
                     Logger.Logger.Log(null, log4net.Core.Level.Notice,
                         "SBOM Verified successfully.", null);
                 }
                 else
                 {
-                    // Validation failed
-                    if (appSettings.SbomSigning.IsSignVerifyRequired)
-                    {
-                        // IsSignVerifyRequired is true - validation failed and we must stop
-                        Logger.Logger.Log(null, log4net.Core.Level.Error,
-                            "SBOM signature verification failed. Stopping execution as IsSignVerifyRequired is set to true.", null);
-                        environmentHelper.CallEnvironmentExit(-1);
-                    }
-                    else
-                    {
-                        // IsSignVerifyRequired is false - validation failed but we continue with warning
-                        Logger.Logger.Log(null, log4net.Core.Level.Warn,
-                            "SBOM signature verification failed, but continuing execution as IsSignVerifyRequired is set to false.", null);
-                    }
+                    Logger.Error("SBOM signature verification failed.");
+                    environmentHelper.CallEnvironmentExit(-1);
+                    return;
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Error("SBOM signature verification failed ", ex);
+                string errorMsg = $"SBOM Verification failed: {ex.Message}";
+                Logger.Error(errorMsg, ex);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (ArgumentException ex)
+            {
+                string errorMsg = $"SBOM Verification failed: {ex.Message}";
+                Logger.Error(errorMsg, ex);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (Exception ex)
             {
-                Logger.Error("SBOM signature verification failed ", ex);
+                string errorMsg = $"SBOM Verification failed: {ex.Message}";
+                Logger.Error(errorMsg, ex);
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }

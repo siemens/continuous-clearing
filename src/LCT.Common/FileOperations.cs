@@ -126,15 +126,28 @@ namespace LCT.Common
                 BackupTheGivenFile(folderPath, fileName);
                 string bomContent = dataToWrite.ToString();
 
-                if (appSettings.SbomSigning != null)
+                if (appSettings.SbomSigning.SBOMVerify)
                 {
                     try
                     {
                         bomContent = sbomSigningValidation.PerformSbomSigning(appSettings, "sign", filePath, bomContent);
                     }
+                    catch (InvalidOperationException ex)
+                    {
+                        string errorMsg = $"SBOM signing failed: {ex.Message}";
+                        Logger.Error(errorMsg, ex);
+                        environmentHelper.CallEnvironmentExit(-1);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        string errorMsg = $"SBOM signing failed: Configuration error - {ex.Message}";
+                        Logger.Error(errorMsg, ex);
+                        environmentHelper.CallEnvironmentExit(-1);
+                    }
                     catch (Exception ex)
                     {
-                        Logger.Error("SBOM signing failed ", ex);
+                        string errorMsg = $"SBOM signing failed: Unexpected error - {ex.Message}";
+                        Logger.Error(errorMsg, ex);
                         environmentHelper.CallEnvironmentExit(-1);
                     }
                 }
