@@ -71,7 +71,10 @@ namespace LCT.ArtifactoryUploader
 
             //update Jfrog Repository Path For Successfully Uploaded Items
             m_ComponentsInBOM = await JfrogRepoUpdater.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
-
+            if (m_ComponentsInBOM.Metadata != null)
+            {
+                m_ComponentsInBOM.Metadata.Timestamp = DateTime.UtcNow;
+            }
             var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
 
             // write final out put in the JSON file

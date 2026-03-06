@@ -341,7 +341,10 @@ namespace LCT.SW360PackageCreator
 
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
-
+            if (bom.Metadata != null)
+            {
+                bom.Metadata.Timestamp = DateTime.UtcNow;
+            }
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
 
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
