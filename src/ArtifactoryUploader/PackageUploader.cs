@@ -75,7 +75,10 @@ namespace LCT.ArtifactoryUploader
             {
                 m_ComponentsInBOM.Metadata.Timestamp = DateTime.UtcNow;
             }
-            m_ComponentsInBOM.Signature = null;
+            if (appSettings.SbomSigning.SBOMVerify)
+            {
+                m_ComponentsInBOM.Signature = null;
+            }
 
             var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
 
