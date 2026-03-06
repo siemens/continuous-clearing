@@ -29,7 +29,6 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <returns>signature</returns>
         public byte[] SignCertificate(string content)
         {           
-            byte[]? signature = null;
             string tenantId = appSettings.TenantId ?? string.Empty;
             string clientId = appSettings.ClientId ?? string.Empty;
             string clientSecret = appSettings.ClientSecret ?? string.Empty;
@@ -66,35 +65,26 @@ namespace LCT.SBOMSigningVerification.Helpers
             {
                 var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
                 var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
-                byte[] dataToSign = Encoding.UTF8.GetBytes(content);               
+                byte[] dataToSign = Encoding.UTF8.GetBytes(content);
+
                 var signResult = cryptoClient.SignData(SignatureAlgorithm.RS256, dataToSign);
 
-                if (signResult.Signature != null)
-                {
-                    signature = signResult.Signature;
-                }
-                else
+                if (signResult?.Signature == null || signResult.Signature.Length == 0)
                 {
                     string errorMsg = "Azure Key Vault returned null or empty signature.";
+                    Logger.Error(errorMsg);
                     throw new InvalidOperationException(errorMsg);
                 }
+
+                Logger.Debug("Signature generated successfully.");
+                return signResult.Signature;
             }
             catch (Exception ex)
             {
-                var exNamespace = ex.GetType().Namespace;
-                if (!string.IsNullOrEmpty(exNamespace) && exNamespace.StartsWith("Azure"))
-                {
-                    Logger.Error("Azure Exception: {0}", ex);
-                    Logger.DebugFormat("StackTrace: {0}", ex.StackTrace);
-                }
-                else
-                {
-                    Logger.Debug("Signature obtained successfully.");
-                }
-            }
-
-            // Fix: Ensure non-null return value
-            return signature ?? Array.Empty<byte>();
+                string errorMsg = $"Failed to sign SBOM content: {ex.Message}";
+                Logger.Error(errorMsg, ex);
+                throw; // ✅ Re-throw to propagate the error
+            }            
         }     
 
         /// <summary>
