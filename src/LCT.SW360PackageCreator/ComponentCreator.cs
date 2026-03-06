@@ -345,6 +345,8 @@ namespace LCT.SW360PackageCreator
             {
                 bom.Metadata.Timestamp = DateTime.UtcNow;
             }
+            bom.Signature = null;
+
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
 
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,

@@ -75,6 +75,8 @@ namespace LCT.ArtifactoryUploader
             {
                 m_ComponentsInBOM.Metadata.Timestamp = DateTime.UtcNow;
             }
+            m_ComponentsInBOM.Signature = null;
+
             var formattedString = CycloneDX.Json.Serializer.Serialize(m_ComponentsInBOM);
 
             // write final out put in the JSON file
