@@ -128,6 +128,7 @@ namespace LCT.Common
 
                 if (appSettings.SbomSigning.SBOMVerify)
                 {
+                    Logger.Debug("starting signing");
                     try
                     {
                         bomContent = sbomSigningValidation.PerformSbomSigning(appSettings, "sign", filePath, bomContent);
