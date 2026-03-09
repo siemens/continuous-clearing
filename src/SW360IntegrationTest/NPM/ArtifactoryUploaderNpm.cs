@@ -32,6 +32,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.JfrogNpmInternalDestRepoName,testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL,testParameters.JfrogApi,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.DryRun, false.ToString()
             });
 

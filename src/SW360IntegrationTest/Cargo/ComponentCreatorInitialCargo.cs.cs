@@ -44,6 +44,7 @@ namespace SW360IntegrationTest.Cargo
                 TestConstant.JfrogCargoInternalRepo,"Cargo-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.ProjectType, "Cargo",
                 TestConstant.Mode,""
                 });
@@ -65,6 +66,7 @@ namespace SW360IntegrationTest.Cargo
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""
             }),
                 "Test to run Package Creator EXE execution");

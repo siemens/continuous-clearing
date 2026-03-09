@@ -87,5 +87,6 @@ namespace TestUtilities
         public const string JFrogApiURL = "--JFrog:URL";
         public const string DryRun = "--JFrog:DryRun";
         public const string Appsettings = "--settingsfilepath";
+        public const string SBOMSignVerify = "--SbomSigning:SBOMSignVerify";
     }
 }

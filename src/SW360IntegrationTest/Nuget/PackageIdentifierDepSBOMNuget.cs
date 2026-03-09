@@ -51,6 +51,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.JfrogNugetInternalRepo,"Nuget-test",
                 TestConstant.ProjectType,"Nuget",
                 TestConstant.Mode,""}),

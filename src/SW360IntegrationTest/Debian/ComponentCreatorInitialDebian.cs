@@ -47,6 +47,7 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.JfrogDebianInternalRepo,"Debian-test",
                 TestConstant.ProjectType,"DEBIAN",
                 TestConstant.Mode,""});
@@ -69,6 +70,7 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.ProjectType,"DEBIAN",
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.Mode,""}),
                 "Test to run component creator EXE execution");

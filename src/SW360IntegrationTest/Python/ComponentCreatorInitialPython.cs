@@ -48,6 +48,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.JfrogPoetryInternalRepo,"Pypi-test",
                 TestConstant.ProjectType,"POETRY",
                 TestConstant.Mode,""});
@@ -70,6 +71,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""});
 
             Assert.IsTrue(returnValue == 0 || returnValue == 2, "Test to run Package Creator EXE execution");
