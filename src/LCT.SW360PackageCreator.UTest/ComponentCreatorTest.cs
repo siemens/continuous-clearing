@@ -346,6 +346,10 @@ namespace LCT.SW360PackageCreator.UTest
                     ProjectID = "projectId",
                     ProjectName = "projectName"
                 },
+                SbomSigning = new SbomSigningConfig
+                {
+                    SBOMSignVerify = false
+                },
                 Directory = new Common.Directory()
                 {
                     OutputFolder = "outputFolder"
@@ -1342,6 +1346,10 @@ namespace LCT.SW360PackageCreator.UTest
 
             var appSettings = new CommonAppSettings
             {
+                SbomSigning = new SbomSigningConfig
+                {
+                    SBOMSignVerify = false
+                },
                 SW360 = new SW360
                 {
                     URL = "http://sw360.example.com",
