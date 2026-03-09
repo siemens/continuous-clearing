@@ -127,7 +127,7 @@ namespace LCT.Common
 
                 BackupTheGivenFile(folderPath, fileName);
                 string bomContent = dataToWrite.ToString();
-                if (appSettings.SbomSigning.SBOMSignVerify)
+                if ((bool)appSettings?.SbomSigning?.SBOMSignVerify)
                 {
                     try
                     {

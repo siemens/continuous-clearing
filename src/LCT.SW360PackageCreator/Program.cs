@@ -92,7 +92,7 @@ namespace LCT.SW360PackageCreator
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
 
 
-            if (appSettings.SbomSigning.SBOMSignVerify)
+            if ((bool)appSettings?.SbomSigning?.SBOMSignVerify)
             {
                 sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
             }
