@@ -24,19 +24,94 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <returns>signature</returns>
         public byte[] SignCertificate(string content)
         {            
-            string tenantId = appSettings.TenantId ?? string.Empty;
-            string clientId = appSettings.ClientId ?? string.Empty;
-            string clientSecret = appSettings.ClientSecret ?? string.Empty;
-            string certificateName = appSettings.CertificateName ?? string.Empty;
-            string kvUri = appSettings.KeyVaultURI ?? string.Empty;
+                ValidateAzureKeyVaultSettings();
 
+                try
+                {
+                    var clientSecretCredential = new ClientSecretCredential(
+                        appSettings.TenantId,
+                        appSettings.ClientId,
+                        appSettings.ClientSecret);
+
+                    var cryptoClient = new CryptographyClient(
+                        new Uri($"{appSettings.KeyVaultURI}/keys/{appSettings.CertificateName}"),
+                        clientSecretCredential);
+
+                    byte[] dataToSign = Encoding.UTF8.GetBytes(content);
+                    byte[] hash = SHA256.HashData(dataToSign);
+                    var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
+
+                    if (signResult?.Signature == null || signResult.Signature.Length == 0)
+                    {
+                        const string errorMsg = "Azure Key Vault returned null or empty signature.";
+                        Logger.Error(errorMsg);
+                        throw new InvalidOperationException(errorMsg);
+                    }
+
+                    return signResult.Signature;
+                }
+                catch (Exception ex)
+                {
+                    string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
+                    Logger.Error(contextMsg, ex);
+                    throw new InvalidOperationException(contextMsg, ex);
+                }
+
+            }
+
+        /// <summary>
+        /// Verifying signature
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="signature"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public bool VerifySignature(string content, string signature)
+        {
+                ValidateAzureKeyVaultSettings();
+
+                try
+                {
+                    var clientSecretCredential = new ClientSecretCredential(
+                        appSettings.TenantId,
+                        appSettings.ClientId,
+                        appSettings.ClientSecret);
+
+                    var cryptoClient = new CryptographyClient(
+                        new Uri($"{appSettings.KeyVaultURI}/keys/{appSettings.CertificateName}"),
+                        clientSecretCredential);
+
+                    byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
+                    byte[] hash = SHA256.HashData(dataToVerify);
+                    byte[] sign = Convert.FromBase64String(signature);
+
+                    VerifyResult verifyResult = cryptoClient.Verify(SignatureAlgorithm.RS256, hash, sign);
+
+                    return verifyResult.IsValid;
+                }
+                catch (Exception ex)
+                {
+                    string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
+                    Logger.Error(contextMsg, ex);
+                    throw new InvalidOperationException(contextMsg, ex);
+                }
+
+            }
+
+
+        /// <summary>
+        /// Validates that all required Azure Key Vault settings are present and not empty.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when one or more required settings are missing or empty.</exception>
+        private void ValidateAzureKeyVaultSettings()
+        {
             var settings = new Dictionary<string, string>
             {
-                { DataConstant.TenantId, tenantId },
-                { DataConstant.ClientId, clientId },
-                { DataConstant.ClientSecret, clientSecret },
-                { DataConstant.CertificateName,certificateName },
-                { DataConstant.KeyVaultURI, kvUri }
+                { DataConstant.TenantId, appSettings.TenantId ?? string.Empty },
+                { DataConstant.ClientId, appSettings.ClientId ?? string.Empty },
+                { DataConstant.ClientSecret, appSettings.ClientSecret ?? string.Empty },
+                { DataConstant.CertificateName, appSettings.CertificateName ?? string.Empty },
+                { DataConstant.KeyVaultURI, appSettings.KeyVaultURI ?? string.Empty }
             };
 
             var missingSettings = settings
@@ -44,111 +119,13 @@ namespace LCT.SBOMSigningVerification.Helpers
                 .Select(s => s.Key)
                 .ToList();
 
-            // Handle missing settings if any
             if (missingSettings.Count != 0)
             {
                 string missingSettingsList = string.Join(", ", missingSettings);
                 string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
                 throw new ArgumentException(errorMsg);
             }
-            try
-            {
-                var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-                var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
-
-                byte[] dataToSign = Encoding.UTF8.GetBytes(content);
-
-                using (var sha256 = SHA256.Create())
-                {
-                    byte[] hash = sha256.ComputeHash(dataToSign);
-                    var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
-
-                    if (signResult?.Signature == null || signResult.Signature.Length == 0)
-                    {
-                        string errorMsg = "Azure Key Vault returned null or empty signature.";
-                        Logger.Error(errorMsg);
-                        throw new InvalidOperationException(errorMsg);
-                    }
-
-                    return signResult.Signature;
-                }
-            }
-            catch (Exception ex)
-            {
-                string contextMsg = $"Error occurred while validating the content for certificate '{certificateName}' in Key Vault '{kvUri}': {ex.Message}";
-                Logger.Error(contextMsg, ex);
-                throw new InvalidOperationException(contextMsg, ex);
-            }
-
         }
-        
-
-
-        public bool VerifySignature(string content, string signature)
-        {
-            
-                string tenantId = appSettings.TenantId ?? string.Empty;
-                string clientId = appSettings.ClientId ?? string.Empty;
-                string clientSecret = appSettings.ClientSecret ?? string.Empty;
-                string certificateName = appSettings.CertificateName ?? string.Empty;
-                string kvUri = appSettings.KeyVaultURI ?? string.Empty;
-                bool isValid = false;
-
-                var settings = new Dictionary<string, string>
-            {
-                { DataConstant.TenantId, tenantId },
-                { DataConstant.ClientId, clientId },
-                { DataConstant.ClientSecret, clientSecret },
-                { DataConstant.CertificateName,certificateName },
-                { DataConstant.KeyVaultURI, kvUri }
-            };
-
-
-                var missingSettings = settings
-                            .Where(s => string.IsNullOrEmpty(s.Value))
-                            .Select(s => s.Key)
-                            .ToList();
-
-                if (missingSettings.Count != 0)
-                {
-                    string missingSettingsList = string.Join(", ", missingSettings);
-                    string errorMsg = $"The following required settings are missing or empty: {missingSettingsList}. Please ensure you have provided all the required arguments.";
-                    throw new ArgumentException(errorMsg);
-                }
-
-                try
-                {
-                    var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-                    var cryptoClient = new CryptographyClient(new Uri($"{kvUri}/keys/{certificateName}"), clientSecretCredential);
-
-
-                    byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
-
-                    using (var sha256 = SHA256.Create())
-                    {
-                        byte[] hash = sha256.ComputeHash(dataToVerify);
-
-                        byte[] sign = Convert.FromBase64String(signature);
-
-
-                        VerifyResult verifyResult = cryptoClient.Verify(SignatureAlgorithm.RS256, hash, sign);
-
-
-                        isValid = verifyResult.IsValid;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string contextMsg = $"Error occurred while validating the content for certificate '{certificateName}' in Key Vault '{kvUri}': {ex.Message}";
-                    Logger.Error(contextMsg, ex);
-                    throw new InvalidOperationException(contextMsg, ex);
-                }
-
-                return isValid;
-            }
-        
-
     }
 
 }

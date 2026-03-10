@@ -14,6 +14,10 @@ namespace LCT.SBOMSigningVerification.Helpers
         readonly AppSettings appSettings;
         private readonly ICertificateHelper certificateHelper;
         private readonly ISignatureHelper signatureHelper;
+        private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new()
+        {
+            WriteIndented = true
+        };
         public JsonFileHelper(AppSettings commonAppSettings, ICertificateHelper certificateHelper, ISignatureHelper signatureHelper)
         {
             appSettings = commonAppSettings;
@@ -25,11 +29,11 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// </summary>
         public string SignSBOMFile()
         {
-            var originalSbom = appSettings.bomcontent;
+            var originalSbom = appSettings.bomcontent ?? throw new InvalidOperationException("BOM content cannot be null.");
             string bomContent = signatureHelper.RemoveSignature(originalSbom);
             if (IsPropertyPresent(bomContent, DataConstant.Signature))
             {
-                string errormessage = "File already contains a signature.";
+                const string errormessage = "File already contains a signature.";
                 throw new InvalidOperationException(errormessage);
             }
             var signatureInBytes = certificateHelper.SignCertificate(bomContent);
@@ -40,11 +44,8 @@ namespace LCT.SBOMSigningVerification.Helpers
                 Algorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
                 Value = base64Signature
             };
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            var signatureJson = JsonSerializer.Serialize(signature, options);
+            
+            var signatureJson = JsonSerializer.Serialize(signature, CachedJsonSerializerOptions);
 
             var array = AddPropertyToJson(bomContent, DataConstant.Signature, signatureJson);
             Logger.Logger.Log(null, log4net.Core.Level.Info, "SBOM Signed Successfully", null);
@@ -65,7 +66,7 @@ namespace LCT.SBOMSigningVerification.Helpers
             Signature? signature = signatureHelper.ExtractSignature(sbomContent);
             if (signature == null || string.IsNullOrEmpty(signature.Value))
             {
-                string errorMsg = $"Signature is null";
+                const string errorMsg = $"Signature is null";
                 throw new ArgumentException(errorMsg);
             }
             string originalSbom = signatureHelper.RemoveSignature(sbomContent);

@@ -27,7 +27,7 @@ namespace LCT.Common
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-        static readonly ISbomSigningValidation sbomSigningValidation = new SbomSigningValidation();
+        static readonly SbomSigningValidation sbomSigningValidation = new();
 
         #endregion
 
@@ -127,7 +127,7 @@ namespace LCT.Common
 
                 BackupTheGivenFile(folderPath, fileName);
                 string bomContent = dataToWrite.ToString();
-                if ((bool)appSettings?.SbomSigning?.SBOMSignVerify)
+                if (appSettings.SbomSigning.SBOMSignVerify)
                 {
                     try
                     {

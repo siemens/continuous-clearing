@@ -41,8 +41,9 @@ namespace LCT.SW360PackageCreator
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private static List<ComparisonBomData> parsedBomData;
-        static ISbomSigningValidation sbomSigningValidation = new SbomSigningValidation();
-        protected Program() { }
+        static readonly SbomSigningValidation sbomSigningValidation = new();
+
+		protected Program() { }
 
         /// <summary>
         /// Initializes and executes the package creator application workflow. This includes reading configuration
@@ -92,7 +93,7 @@ namespace LCT.SW360PackageCreator
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
 
 
-            if ((bool)appSettings?.SbomSigning?.SBOMSignVerify)
+            if (appSettings.SbomSigning.SBOMSignVerify)
             {
                 sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
             }

@@ -71,7 +71,7 @@ namespace LCT.ArtifactoryUploader
 
             //update Jfrog Repository Path For Successfully Uploaded Items
             m_ComponentsInBOM = await JfrogRepoUpdater.UpdateJfrogRepoPathForSucessfullyUploadedItems(m_ComponentsInBOM, displayPackagesInfo);
-            if((bool)appSettings.SbomSigning?.SBOMSignVerify)
+            if(appSettings.SbomSigning.SBOMSignVerify)
             {
                 m_ComponentsInBOM.Metadata.Timestamp = DateTime.UtcNow;
                 m_ComponentsInBOM.Signature = null;

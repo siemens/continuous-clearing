@@ -37,8 +37,7 @@ namespace LCT.ArtifactoryUploader
         public static Stopwatch UploaderStopWatch { get; set; }
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-        static readonly ISbomSigningValidation sbomSigningValidation = new SbomSigningValidation();
-
+        static readonly SbomSigningValidation sbomSigningValidation = new();
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();
@@ -82,7 +81,7 @@ namespace LCT.ArtifactoryUploader
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            if ((bool)appSettings?.SbomSigning?.SBOMSignVerify)
+            if (appSettings.SbomSigning.SBOMSignVerify)
             {
                 sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
             }

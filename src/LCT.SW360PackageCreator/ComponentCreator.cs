@@ -341,7 +341,7 @@ namespace LCT.SW360PackageCreator
 
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
-            if ((bool)(appSettings.SbomSigning?.SBOMSignVerify))
+            if (appSettings.SbomSigning.SBOMSignVerify)
             {
                 bom.Metadata.Timestamp = DateTime.UtcNow;
                 bom.Signature = null;
