@@ -1,7 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
-// SPDX-License-Identifier: MIT
-// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2026 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
 using LCT.Common.Interface;
@@ -45,7 +46,7 @@ namespace LCT.Common
                 TenantId = appSettings.SbomSigning.TenantId,
                 SBOMSignVerify = appSettings.SbomSigning.SBOMSignVerify,
                 bomcontent = bomContent
-               
+                
             };
 
             var certificateHelper = new CertificateHelper(sbomSigningAppSettings);
@@ -125,7 +126,7 @@ namespace LCT.Common
                 Logger.Error(errorMsg, ex);
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
                 Logger.Error(errorMsg, ex);

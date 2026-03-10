@@ -1,4 +1,11 @@
-﻿using Azure.Identity;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2026 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+
+using Azure.Identity;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using LCT.SBOMSigningVerification.Interface;
 using log4net;
@@ -23,7 +30,7 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <param name="bomcontent">args</param>
         /// <returns>signature</returns>
         public byte[] SignCertificate(string content)
-        {            
+        {           
                 ValidateAzureKeyVaultSettings();
 
                 try
@@ -58,7 +65,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                 }
 
             }
-
+        
         /// <summary>
         /// Verifying signature
         /// </summary>

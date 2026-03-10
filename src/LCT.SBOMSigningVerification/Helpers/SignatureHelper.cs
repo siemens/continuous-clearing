@@ -1,11 +1,13 @@
-﻿using LCT.SBOMSigningVerification.Interface;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2026 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using LCT.SBOMSigningVerification.Interface;
 using LCT.SBOMSigningVerification.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace LCT.SBOMSigningVerification.Helpers
 {

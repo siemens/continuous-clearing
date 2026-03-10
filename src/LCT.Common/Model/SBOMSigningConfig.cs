@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2026 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
 
 namespace LCT.Common.Model
 {
@@ -14,7 +15,7 @@ namespace LCT.Common.Model
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string TenantId { get; set; }
-        public bool SBOMSignVerify { get; set; } = true;
+        public bool SBOMSignVerify { get; set; } = true;       
 
     }
 }

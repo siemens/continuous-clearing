@@ -1,4 +1,11 @@
-﻿using LCT.SBOMSigningVerification.Interface;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2026 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+
+using LCT.SBOMSigningVerification.Interface;
 using LCT.SBOMSigningVerification.Model;
 using log4net;
 using System.Reflection;
