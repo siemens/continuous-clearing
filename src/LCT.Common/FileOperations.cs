@@ -154,11 +154,24 @@ namespace LCT.Common
                 }
                 File.WriteAllText(filePath, bomContent);
                 Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
+                //if (File.Exists(filePath))
+                //{
+                //    FileInfo bomFileInfo = new FileInfo(filePath);
+                //    Console.WriteLine($"##vso[task.setvariable variable=LatestFilePath]{Path.GetFileName(filePath)}");
+                //    Console.WriteLine($"##vso[task.setvariable variable=LatestFileTimestampUtc]{bomFileInfo.LastWriteTimeUtc}");
+                //}
+
                 if (File.Exists(filePath))
                 {
-                    FileInfo bomFileInfo = new FileInfo(filePath);
-                    Console.WriteLine($"##vso[task.setvariable variable=LatestFilePath]{Path.GetFileName(filePath)}");
-                    Console.WriteLine($"##vso[task.setvariable variable=LatestFileTimestampUtc]{bomFileInfo.LastWriteTimeUtc}");
+                    var fi = new FileInfo(filePath);
+                    // Emit both full path & file name for maximum flexibility
+                    Console.WriteLine($"##vso[task.setvariable variable=LatestFileFullPath]{fi.FullName}");
+                    Console.WriteLine($"##vso[task.setvariable variable=LatestFileName]{fi.Name}");
+                    Console.WriteLine($"##vso[task.setvariable variable=LatestFileTimestampUtc]{fi.LastWriteTimeUtc:o}");
+                }
+                else
+                {
+                    Console.WriteLine("##vso[task.logissue type=error]File not found in console app logic");
                 }
 
             }
