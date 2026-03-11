@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace LCT.SBOMSigningVerification.Model
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class Signature
     {
         [JsonPropertyName("algorithm")]
