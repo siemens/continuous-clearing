@@ -126,7 +126,7 @@ namespace LCT.Common
                 Logger.Error(errorMsg, ex);
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            catch (CustomException ex)
+            catch (Exception ex)
             {
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
                 Logger.Error(errorMsg, ex);

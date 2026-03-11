@@ -145,7 +145,7 @@ namespace LCT.Common
                         Logger.Error(errorMsg, ex);
                         environmentHelper.CallEnvironmentExit(-1);
                     }
-                    catch (CustomException ex)
+                    catch (Exception ex)
                     {
                         string errorMsg = $"SBOM signing failed: Unexpected error - {ex.Message}";
                         Logger.Error(errorMsg, ex);
@@ -153,13 +153,7 @@ namespace LCT.Common
                     }
                 }
                 File.WriteAllText(filePath, bomContent);
-                Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
-                if (File.Exists(filePath))
-                {
-                    FileInfo bomFileInfo = new FileInfo(filePath);
-                    Console.WriteLine($"##vso[task.setvariable variable=LatestFilePath]{Path.GetFileName(filePath)}");
-                    Console.WriteLine($"##vso[task.setvariable variable=LatestFileTimestampUtc]{bomFileInfo.LastWriteTimeUtc}");
-                }
+                Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");               
 
             }
             catch (IOException e)

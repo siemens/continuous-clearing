@@ -55,7 +55,7 @@ namespace LCT.SBOMSigningVerification.Helpers
             var signatureJson = JsonSerializer.Serialize(signature, CachedJsonSerializerOptions);
 
             var array = AddPropertyToJson(bomContent, DataConstant.Signature, signatureJson);
-            Logger.Logger.Log(null, log4net.Core.Level.Info, "SBOM Signed Successfully", null);
+            Logger.Logger.Log(null, log4net.Core.Level.Notice, "SBOM Signed Successfully", null);
             return array;
 
         }
