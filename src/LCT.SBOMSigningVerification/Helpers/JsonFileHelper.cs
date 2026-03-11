@@ -64,11 +64,16 @@ namespace LCT.SBOMSigningVerification.Helpers
         {
             if (string.IsNullOrEmpty(sbomFilePath))
             {
-                Logger.Error("Please provide a valid input filepath");
-                isValid = false;
-                return;
+                const string errormessage = "SBOM file path cannot be null or empty";
+                throw new ArgumentNullException(nameof(sbomFilePath), errormessage);
             }
 
+            // Check if file exists
+            if (!File.Exists(sbomFilePath))
+            {
+                throw new FileNotFoundException("SBOM file not found", sbomFilePath);
+            }
+         
             string sbomContent = File.ReadAllText(sbomFilePath);
             Signature? signature = signatureHelper.ExtractSignature(sbomContent);
             if (signature == null || string.IsNullOrEmpty(signature.Value))

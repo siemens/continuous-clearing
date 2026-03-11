@@ -126,12 +126,18 @@ namespace LCT.Common
                 Logger.Error(errorMsg, ex);
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            catch (Exception ex)
+            catch (FileNotFoundException ex)
             {
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
                 Logger.Error(errorMsg, ex);
                 environmentHelper.CallEnvironmentExit(-1);
             }
+            catch (ArgumentNullException ex)
+            {
+                string errorMsg = $"SBOM Verification failed: {ex.Message}";
+                Logger.Error(errorMsg, ex);
+                environmentHelper.CallEnvironmentExit(-1);
+            }          
         }
     }
 }

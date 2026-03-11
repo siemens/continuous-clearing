@@ -144,13 +144,7 @@ namespace LCT.Common
                         string errorMsg = $"SBOM signing failed: Configuration error - {ex.Message}";
                         Logger.Error(errorMsg, ex);
                         environmentHelper.CallEnvironmentExit(-1);
-                    }
-                    catch (Exception ex)
-                    {
-                        string errorMsg = $"SBOM signing failed: Unexpected error - {ex.Message}";
-                        Logger.Error(errorMsg, ex);
-                        environmentHelper.CallEnvironmentExit(-1);
-                    }
+                    }                    
                 }
                 File.WriteAllText(filePath, bomContent);
                 Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");               
