@@ -5,8 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace LCT.Common.Model
 {
+    [ExcludeFromCodeCoverage]
     public class SbomSigningConfig
     {
 
