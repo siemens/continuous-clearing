@@ -119,7 +119,7 @@ To ensure a smooth operation of the Continuous Clearing Tool, please follow thes
    - **SBOM Signing Requirements** (Optional):
      - Access to Azure Key Vault containing the signing certificate
      - Azure AD App Registration with appropriate permissions
-     - Values from the `devops-clearing` variable group (see [SBOM Signing Configuration](#sbom-signing-configuration))
+     - Values from the `devops-clearing` variable group.
 
 ## Pipeline Configuration
 For certain scenarios, the tool uses predefined exit codes, which are described below:
@@ -310,7 +310,7 @@ example.spdx.sbom.json.pem # Public certificate file
 
 ## SBOM Signing and Verification
 
-### Overview {#sbom-signing-overview}
+### Overview
 
 The Continuous Clearing Tool provides comprehensive SBOM (Software Bill of Materials) signing and verification capabilities to ensure the integrity and authenticity of generated SBOMs. This feature uses Azure Key Vault for secure certificate management and cryptographic operations.
 
@@ -326,18 +326,7 @@ The Continuous Clearing Tool provides comprehensive SBOM (Software Bill of Mater
 3. **Signature Embedding**: The cryptographic signature is embedded directly into the SBOM JSON structure
 4. **Verification**: Signed SBOMs can be verified at any time to ensure they haven't been tampered with
 
-### Configuration {#sbom-signing-configuration}
-
-#### Azure Key Vault Setup
-Before using SBOM signing, ensure you have:
-1. **Azure Key Vault**: A Key Vault instance containing the signing certificate
-2. **Certificate**: RSA certificate stored in the Key Vault for signing operations
-3. **Azure AD App Registration**: Service principal with appropriate permissions to access the Key Vault
-4. **Key Vault Permissions**: The App Registration must have the following permissions:
-   - `Key Vault Crypto User` role or equivalent permissions
-   - Access to sign and verify operations on the certificate
-
-#### Configuration Parameters
+### Configuration Parameters
 
 The SBOM signing feature can be configured in two ways:
 
@@ -349,7 +338,7 @@ The SBOM signing feature can be configured in two ways:
     "CertificateName": "your-signing-certificate", 
     "ClientId": "your-app-registration-client-id",
     "ClientSecret": "your-app-registration-client-secret",
-    "TenantId": "your-azure-tenant-id",
+    "TenantId": "your-azure-tenant-id", Siemens AG tenant id by default
     "SBOMSignVerify": true
   }
 }
@@ -441,14 +430,7 @@ steps:
       -v $(Build.SourcesDirectory)/config:/etc/CATool 
       ghcr.io/siemens/continuous-clearing 
       dotnet PackageIdentifier.dll 
-      --settingsfilepath /etc/CATool/appSettings.json
-      --SbomSigning:KeyVaultURI $(keyVaultUri)
-      --SbomSigning:CertificateName $(certificateName) 
-      --SbomSigning:ClientId $(clientId)
-      --SbomSigning:ClientSecret $(clientSecret)
-      --SbomSigning:TenantId $(tenantId)
-      --SbomSigning:SBOMSignVerify true
-```
+      ```
 
 ### Parameters Reference {#sbom-signing-parameters-reference}
 
@@ -498,16 +480,14 @@ When signing is enabled, the generated SBOM will include a `signature` section:
 
 1. **Credential Management**: 
    - SBOM signing credentials are managed centrally through the `devops-clearing` variable group
-   - Variables are automatically secured and rotated by the infrastructure team
    - No need to manage signing credentials in individual projects
 
 2. **Certificate Management**:
    - Certificates are centrally managed in Azure Key Vault
-   - Certificate rotation is handled by the infrastructure team
    - All projects use the same trusted signing certificate
 
 3. **Access Control**:
-   - Access to the `devops-clearing` variable group is controlled by the infrastructure team
+   - Access to the `devops-clearing` variable group
    - Request access via **@SI CM Ticket**
    - No direct access to Azure Key Vault credentials required
 
@@ -553,7 +533,7 @@ Description for the settings in appSettings.json file
 | 21   | SbomSigning.CertificateName               | Name of the certificate in Key Vault                          | No*             | `"signing-certificate"`                                                   |
 | 22   | SbomSigning.ClientId                      | Azure AD App Registration Client ID                           | No*             | `"12345678-1234-1234-1234-123456789abc"`                                 |
 | 23   | SbomSigning.ClientSecret                  | Azure AD App Registration Client Secret                       | No*             | `"your-client-secret"`                                                    |
-| 24   | SbomSigning.TenantId                      | Azure Tenant ID                                               | No*             | `"your-tenant-id"`                                                        |
+| 24   | SbomSigning.TenantId                      | Siemens AG Tenant ID                                               | No*             | `"your-tenant-id"`                                                        |
 | 25   | SbomSigning.SBOMSignVerify                | Enable mandatory SBOM signing                                 | No              | `true` (default)                                                          |
 
 **\*Required when SbomSigning.SBOMSignVerify is true**
@@ -881,16 +861,6 @@ To decide which version is used you can check this mapping table https://bitbuck
    * Check if there are any action items to be handled from the user's end.(In this case the exit code with which the pipeline will fail is **2**)
 
    * Check if the proxy settings environment variables for sw360 is rightly configured in the build machine.
-
-3. **SBOM Signing Issues**:
-   
-   * **Azure Key Vault Access Denied**: Ensure the App Registration has the correct permissions to access the Key Vault and the certificate.
-   
-   * **Certificate Not Found**: Verify the certificate name matches exactly what's stored in the Key Vault.
-   
-   * **Authentication Failures**: Check that the Client ID, Client Secret, and Tenant ID are correct and the secret hasn't expired.
-   
-   * **Missing Signing Credentials**: When `SBOMSignVerify` is true, all signing parameters are mandatory. Ensure all credentials are provided.
 
 # Manual Update
 
