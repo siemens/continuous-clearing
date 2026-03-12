@@ -7,6 +7,7 @@
 
 namespace LCT.SBOMSigningVerification
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static class DataConstant
     {
         public const string TenantId = "TenantId";

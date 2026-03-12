@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LCT.Telemetry.UTest", "Tele
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LCT.SBOMSigningVerification", "LCT.SBOMSigningVerification\LCT.SBOMSigningVerification.csproj", "{FB75C370-1FFD-4592-BCD5-109E3C60CE94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LCT.SBOMSigningVerification.UTest", "LCT.SBOMSigningVerification.UTest\LCT.SBOMSigningVerification.UTest.csproj", "{CDD23A5F-263E-4496-84F8-D9D02253899E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,6 +141,10 @@ Global
 		{FB75C370-1FFD-4592-BCD5-109E3C60CE94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB75C370-1FFD-4592-BCD5-109E3C60CE94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB75C370-1FFD-4592-BCD5-109E3C60CE94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDD23A5F-263E-4496-84F8-D9D02253899E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDD23A5F-263E-4496-84F8-D9D02253899E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDD23A5F-263E-4496-84F8-D9D02253899E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDD23A5F-263E-4496-84F8-D9D02253899E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +161,7 @@ Global
 		{BD44EDF9-DE47-40B6-AA1F-9935455A0E91} = {9EB2283A-19DA-4DC8-907A-A22EE30B6C85}
 		{7DB37334-8EFC-4750-A97D-D6885E0118BD} = {9EB2283A-19DA-4DC8-907A-A22EE30B6C85}
 		{A0632D1A-6BDD-47BC-A258-ECB386E5BA4E} = {9EB2283A-19DA-4DC8-907A-A22EE30B6C85}
+		{CDD23A5F-263E-4496-84F8-D9D02253899E} = {9EB2283A-19DA-4DC8-907A-A22EE30B6C85}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F02FC756-D33C-421D-9734-4D7D4FB860CD}

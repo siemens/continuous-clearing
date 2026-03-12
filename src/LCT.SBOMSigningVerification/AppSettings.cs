@@ -8,6 +8,7 @@ using LCT.SBOMSigningVerification.Enum;
 
 namespace LCT.SBOMSigningVerification
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class AppSettings
     {
         public string? BomFilePath { get; set; }
