@@ -79,7 +79,7 @@ Welcome to the Continuous Clearing Tool, your automated solution for streamlinin
 - **FOSSology Code Scanning**: Initiates jobs for code scans in FOSSology, ensuring compliance and thorough analysis.
 - **SBOM Generation**: Produces a Software Bill of Materials (SBOM) file detailing the nested descriptions of software artifact components and associated metadata.
 - **Complete Dependency Mapping**: Generates SBOMs with a comprehensive `dependencies` section that lists all direct and transitive package relationships, providing full traceability for compliance, security, and auditing.
-- **SBOM Cryptographic Signing**: Provides cryptographic signing and verification capabilities to ensure SBOM integrity and authenticity using Azure Key Vault.
+- **SBOM Signing**: Provides cryptographic signing and verification capabilities to ensure SBOM integrity and authenticity using Azure Key Vault.
 
 ## Benefits
 - **Efficiency in Component Management**: Reduces the manual effort required to create and manage components in SW360.
@@ -116,7 +116,7 @@ To ensure a smooth operation of the Continuous Clearing Tool, please follow thes
        2. Required credentials include the client ID and client secret.
    - **Artifactory Token**:
      - Necessary for uploading cleared, internal, and development packages into JFrog Artifactory. Users must obtain their own JFrog Artifactory token.
-   - **SBOM Signing Requirements** (Optional):
+   - **SBOM Signing Requirements**:
      - Access to Azure Key Vault containing the signing certificate
      - Azure AD App Registration with appropriate permissions
      - Values from the `devops-clearing` variable group.
@@ -315,7 +315,7 @@ example.spdx.sbom.json.pem # Public certificate file
 The Continuous Clearing Tool provides comprehensive SBOM (Software Bill of Materials) signing and verification capabilities to ensure the integrity and authenticity of generated SBOMs. This feature uses Azure Key Vault for secure certificate management and cryptographic operations.
 
 **Key Features:**
-- **Cryptographic Signing**: Signs SBOMs using RSA-SHA256 algorithm with certificates stored in Azure Key Vault
+- **Signing**: Signs SBOMs using RSA-SHA256 algorithm with certificates stored in Azure Key Vault
 - **Signature Verification**: Validates SBOM signatures to ensure integrity and authenticity
 - **Mandatory Signing**: Option to enforce SBOM signing for all generated SBOMs
 - **Flexible Configuration**: Can be enabled/disabled based on project requirements
