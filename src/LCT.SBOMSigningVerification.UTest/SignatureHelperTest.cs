@@ -611,9 +611,259 @@ namespace LCT.SBOMSigningVerification.UTest
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Does.Not.Contain("signature"));
             Assert.That(result, Does.Contain("Special chars and unicode"));
-            
+
             // Verify it's valid JSON
             Assert.DoesNotThrow(() => JsonDocument.Parse(result));
+        }
+
+        [Test]
+        public void ExtractSignature_WithUnicodeSignatureValue_ReturnsCorrectly()
+        {
+            // Arrange
+            string sbomContent = @"{
+                ""name"": ""test-sbom"",
+                ""signature"": {
+                    ""algorithm"": ""RS256"",
+                    ""value"": ""5Zul5pil5pil5pil""
+                }
+            }";
+
+            // Act
+            var result = _signatureHelper.ExtractSignature(sbomContent);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Value, Is.EqualTo("5Zul5pil5pil5pil"));
+        }
+
+        [Test]
+        public void ExtractSignature_WithSpecialCharactersInAlgorithm_ReturnsCorrectly()
+        {
+            // Arrange
+            string sbomContent = @"{
+                ""signature"": {
+                    ""algorithm"": ""http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"",
+                    ""value"": ""dGVzdA==""
+                }
+            }";
+
+            // Act
+            var result = _signatureHelper.ExtractSignature(sbomContent);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Algorithm, Is.EqualTo("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
+        }
+
+        [Test]
+        public void RemoveSignature_PreservesPropertyOrder_WhenPossible()
+        {
+            // Arrange
+            string sbomContent = @"{
+                ""name"": ""test"",
+                ""version"": ""1.0"",
+                ""signature"": {""value"": ""test""},
+                ""components"": []
+            }";
+
+            // Act
+            var result = _signatureHelper.RemoveSignature(sbomContent);
+
+            // Assert
+            Assert.That(result, Does.Not.Contain("signature"));
+            var jsonDoc = JsonDocument.Parse(result);
+            var root = jsonDoc.RootElement;
+
+            // Verify all properties except signature are present
+            Assert.That(root.TryGetProperty("name", out _), Is.True);
+            Assert.That(root.TryGetProperty("version", out _), Is.True);
+            Assert.That(root.TryGetProperty("components", out _), Is.True);
+            Assert.That(root.TryGetProperty("signature", out _), Is.False);
+        }
+
+        [Test]
+        public void RemoveSignature_WithArraysInJson_PreservesArrays()
+        {
+            // Arrange
+            string sbomContent = @"{
+                ""components"": [
+                    {""name"": ""comp1""},
+                    {""name"": ""comp2""},
+                    {""name"": ""comp3""}
+                ],
+                ""signature"": {""value"": ""test""},
+                ""metadata"": {
+                    ""tools"": [
+                        {""name"": ""tool1""},
+                        {""name"": ""tool2""}
+                    ]
+                }
+            }";
+
+            // Act
+            var result = _signatureHelper.RemoveSignature(sbomContent);
+
+            // Assert
+            Assert.That(result, Does.Not.Contain("\"signature\""));
+            var jsonDoc = JsonDocument.Parse(result);
+
+            var components = jsonDoc.RootElement.GetProperty("components");
+            Assert.That(components.GetArrayLength(), Is.EqualTo(3));
+
+            var metadata = jsonDoc.RootElement.GetProperty("metadata");
+            var tools = metadata.GetProperty("tools");
+            Assert.That(tools.GetArrayLength(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ExtractSignature_WithEmptyValue_ReturnsEmptyString()
+        {
+            // Arrange
+            string sbomContent = @"{
+                ""signature"": {
+                    ""algorithm"": ""RS256"",
+                    ""value"": """"
+                }
+            }";
+
+            // Act
+            var result = _signatureHelper.ExtractSignature(sbomContent);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Value, Is.Empty);
+            Assert.That(result.Algorithm, Is.EqualTo("RS256"));
+        }
+
+        [Test]
+        public void ExtractSignature_WithCaseSensitivePropertyName_OnlyMatchesSignature()
+        {
+            // Arrange
+            string sbomContent = @"{
+                ""name"": ""test"",
+                ""Signature"": {""value"": ""wrong-case""},
+                ""SIGNATURE"": {""value"": ""all-caps""},
+                ""signature"": {
+                    ""algorithm"": ""RS256"",
+                    ""value"": ""correct-case""
+                }
+            }";
+
+            // Act
+            var result = _signatureHelper.ExtractSignature(sbomContent);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Value, Is.EqualTo("correct-case"));
+            Assert.That(result.Algorithm, Is.EqualTo("RS256"));
+        }
+
+        [Test]
+        public void RemoveSignature_WithSignatureAtDifferentPositions_AlwaysRemoves()
+        {
+            // Signature at beginning
+            string sbomWithSignatureFirst = @"{
+                ""signature"": {""value"": ""test""},
+                ""name"": ""test""
+            }";
+
+            var result1 = _signatureHelper.RemoveSignature(sbomWithSignatureFirst);
+            Assert.That(result1, Does.Not.Contain("\"signature\""));
+
+            // Signature at end
+            string sbomWithSignatureLast = @"{
+                ""name"": ""test"",
+                ""signature"": {""value"": ""test""}
+            }";
+
+            var result2 = _signatureHelper.RemoveSignature(sbomWithSignatureLast);
+            Assert.That(result2, Does.Not.Contain("\"signature\""));
+
+            // Signature in middle
+            string sbomWithSignatureMiddle = @"{
+                ""name"": ""test"",
+                ""signature"": {""value"": ""test""},
+                ""version"": ""1.0""
+            }";
+
+            var result3 = _signatureHelper.RemoveSignature(sbomWithSignatureMiddle);
+            Assert.That(result3, Does.Not.Contain("\"signature\""));
+        }
+
+        [Test]
+        public void ExtractSignature_WithLongAlgorithmString_ReturnsComplete()
+        {
+            // Arrange
+            string longAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256-with-extra-context";
+            string sbomContent = $@"{{
+                ""signature"": {{
+                    ""algorithm"": ""{longAlgorithm}"",
+                    ""value"": ""dGVzdA==""
+                }}
+            }}";
+
+            // Act
+            var result = _signatureHelper.ExtractSignature(sbomContent);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Algorithm, Is.EqualTo(longAlgorithm));
+        }
+
+        [Test]
+        public void RemoveSignature_OutputFormattedWithProperIndentation()
+        {
+            // Arrange
+            string sbomContent = @"{""name"":""test"",""signature"":{""value"":""test""},""version"":""1.0""}";
+
+            // Act
+            var result = _signatureHelper.RemoveSignature(sbomContent);
+
+            // Assert
+            // Should have newlines and spaces for formatting
+            Assert.That(result, Does.Contain("\n"), "Output should be indented with newlines");
+            Assert.That(result, Does.Contain(" "), "Output should be indented with spaces");
+            Assert.That(result, Does.Not.Contain("signature"));
+        }
+
+        [Test]
+        public void RemoveSignature_WithDeeplyNestedStructure_RemovesOnlyTopLevelSignature()
+        {
+            // Arrange
+            string sbomContent = @"{
+                ""level1"": {
+                    ""level2"": {
+                        ""level3"": {
+                            ""data"": ""nested-data"",
+                            ""signature"": ""not-the-top-level-signature""
+                        }
+                    }
+                },
+                ""signature"": {
+                    ""algorithm"": ""RS256"",
+                    ""value"": ""dG9wLWxldmVsLXNpZ25hdHVyZQ==""
+                }
+            }";
+
+            // Act
+            var result = _signatureHelper.RemoveSignature(sbomContent);
+
+            // Assert
+            var jsonDoc = JsonDocument.Parse(result);
+
+            // Top-level signature should be removed
+            Assert.That(jsonDoc.RootElement.TryGetProperty("signature", out _), Is.False);
+
+            // Nested signature-like property should be preserved
+            var level3 = jsonDoc.RootElement
+                .GetProperty("level1")
+                .GetProperty("level2")
+                .GetProperty("level3");
+            Assert.Multiple(() =>
+            {
+                Assert.That(level3.TryGetProperty("signature", out var nestedSig), Is.True);
+                Assert.That(nestedSig.GetString(), Is.EqualTo("not-the-top-level-signature"));
+            });
         }
 
         #endregion

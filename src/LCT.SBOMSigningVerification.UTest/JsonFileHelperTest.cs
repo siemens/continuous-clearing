@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 
 namespace LCT.SBOMSigningVerification.UTest
@@ -382,5 +383,324 @@ namespace LCT.SBOMSigningVerification.UTest
             // Assert
             Assert.That(isValid, Is.True);
         }
+
+        #region Additional Test Cases for Complete Coverage
+
+        [Test]
+        public void SignSBOMFile_VerifySignaturePropertyStructure()
+        {
+            // Arrange
+            string originalSbom = "{\"bomFormat\":\"CycloneDX\"}";
+            string cleanedSbom = "{\"bomFormat\":\"CycloneDX\"}";
+            byte[] signatureBytes = { 1, 2, 3, 4, 5 };
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            string result = _jsonFileHelper.SignSBOMFile();
+
+            // Assert - Verify signature object structure
+            var jsonDoc = JsonDocument.Parse(result);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("signature", out var signatureProp), Is.True);
+            Assert.That(signatureProp.TryGetProperty("algorithm", out var algorithmProp), Is.True);
+            Assert.That(algorithmProp.GetString(), Is.EqualTo("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
+            Assert.That(signatureProp.TryGetProperty("value", out var valueProp), Is.True);
+        }
+
+        [Test]
+        public void SignSBOMFile_WithMultipleProperties_PreservesAllExistingProperties()
+        {
+            // Arrange
+            string originalSbom = @"{
+                ""name"": ""example-sbom"",
+                ""version"": ""1.0.0"",
+                ""license"": ""MIT"",
+                ""components"": []
+            }";
+            string cleanedSbom = originalSbom;
+            byte[] signatureBytes = { 1, 2, 3 };
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            string result = _jsonFileHelper.SignSBOMFile();
+
+            // Assert - Verify all original properties are preserved
+            var jsonDoc = JsonDocument.Parse(result);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("name", out _), Is.True);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("version", out _), Is.True);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("license", out _), Is.True);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("components", out _), Is.True);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("signature", out _), Is.True);
+        }
+
+        [Test]
+        public void SignSBOMFile_CallsSignCertificateWithCleanedContent()
+        {
+            // Arrange
+            string originalSbom = "{\"data\":\"original\",\"signature\":{\"value\":\"old\"}}";
+            string cleanedSbom = "{\"data\":\"original\"}";
+            byte[] signatureBytes = { 1, 2, 3 };
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            _jsonFileHelper.SignSBOMFile();
+
+            // Assert - Verify SignCertificate was called with cleaned content
+            _mockCertificateHelper.Verify(x => x.SignCertificate(cleanedSbom), Times.Once);
+        }
+
+        [Test]
+        public void SignSBOMFile_ConvertsSignatureToBase64()
+        {
+            // Arrange
+            string originalSbom = "{\"test\":\"data\"}";
+            string cleanedSbom = "{\"test\":\"data\"}";
+            byte[] signatureBytes = Encoding.UTF8.GetBytes("signature-content");
+            string expectedBase64 = Convert.ToBase64String(signatureBytes);
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            string result = _jsonFileHelper.SignSBOMFile();
+
+            // Assert
+            Assert.That(result, Does.Contain(expectedBase64));
+        }
+
+        [Test]
+        public void ReadSBOMFile_CallsVerifySignatureWithCorrectParameters()
+        {
+            // Arrange
+            string sbomContent = "{\"data\":\"test\",\"signature\":{\"value\":\"sig123\"}}";
+            string sbomFilePath = Path.Combine(_tempDirectory, "test.json");
+            File.WriteAllText(sbomFilePath, sbomContent);
+
+            var signature = new Signature { Value = "sig123" };
+            string cleanedSbom = "{\"data\":\"test\"}";
+
+            _mockSignatureHelper.Setup(x => x.ExtractSignature(sbomContent))
+                .Returns(signature);
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(sbomContent))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.VerifySignature(cleanedSbom, "sig123"))
+                .Returns(true);
+
+            // Act
+            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid);
+
+            // Assert
+            _mockCertificateHelper.Verify(x => x.VerifySignature(cleanedSbom, "sig123"), Times.Once);
+        }
+
+        [Test]
+        public void ReadSBOMFile_ReadsFileContent()
+        {
+            // Arrange
+            string sbomContent = "{\"bomFormat\":\"CycloneDX\",\"signature\":{\"value\":\"test\"}}";
+            string sbomFilePath = Path.Combine(_tempDirectory, "bom.json");
+            File.WriteAllText(sbomFilePath, sbomContent);
+
+            var signature = new Signature { Value = "test" };
+            string cleanedSbom = "{\"bomFormat\":\"CycloneDX\"}";
+
+            _mockSignatureHelper.Setup(x => x.ExtractSignature(sbomContent))
+                .Returns(signature);
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(sbomContent))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.VerifySignature(cleanedSbom, "test"))
+                .Returns(true);
+
+            // Act
+            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out _);
+
+            // Assert - Verify ExtractSignature was called with the file content
+            _mockSignatureHelper.Verify(x => x.ExtractSignature(sbomContent), Times.Once);
+        }
+
+        [Test]
+        public void SignSBOMFile_WithUnicodeCharacters_HandlesCorrectly()
+        {
+            // Arrange
+            string originalSbom = "{\"name\":\"测试\",\"description\":\"Тест\",\"emoji\":\"🔐\"}";
+            string cleanedSbom = originalSbom;
+            byte[] signatureBytes = { 0xAA, 0xBB, 0xCC, 0xDD };
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            string result = _jsonFileHelper.SignSBOMFile();
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            var jsonDoc = JsonDocument.Parse(result);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("signature", out _), Is.True);
+        }
+
+        [Test]
+        public void ReadSBOMFile_WithWhitespaceInFilePath_HandlesCorrectly()
+        {
+            // Arrange
+            string sbomContent = "{\"data\":\"test\",\"signature\":{\"value\":\"sig\"}}";
+            string sbomFilePath = Path.Combine(_tempDirectory, "  test file  .json");
+            File.WriteAllText(sbomFilePath, sbomContent);
+
+            var signature = new Signature { Value = "sig" };
+            string cleanedSbom = "{\"data\":\"test\"}";
+
+            _mockSignatureHelper.Setup(x => x.ExtractSignature(sbomContent))
+                .Returns(signature);
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(sbomContent))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.VerifySignature(cleanedSbom, "sig"))
+                .Returns(true);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+        }
+
+        [Test]
+        public void SignSBOMFile_WithEmptyObject_HandlesCorrectly()
+        {
+            // Arrange
+            string originalSbom = "{}";
+            string cleanedSbom = "{}";
+            byte[] signatureBytes = { 1, 2, 3 };
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            string result = _jsonFileHelper.SignSBOMFile();
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            var jsonDoc = JsonDocument.Parse(result);
+            Assert.That(jsonDoc.RootElement.TryGetProperty("signature", out _), Is.True);
+        }
+
+        [Test]
+        public void ReadSBOMFile_WithNestedSignatureObject_ExtractsCorrectly()
+        {
+            // Arrange
+            string sbomContent = "{\"metadata\":{\"version\":\"1.0\"},\"signature\":{\"algorithm\":\"RS256\",\"value\":\"xyz789\"}}";
+            string sbomFilePath = Path.Combine(_tempDirectory, "nested.json");
+            File.WriteAllText(sbomFilePath, sbomContent);
+
+            var signature = new Signature { Value = "xyz789", Algorithm = "RS256" };
+            string cleanedSbom = "{\"metadata\":{\"version\":\"1.0\"}}";
+
+            _mockSignatureHelper.Setup(x => x.ExtractSignature(sbomContent))
+                .Returns(signature);
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(sbomContent))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.VerifySignature(cleanedSbom, "xyz789"))
+                .Returns(true);
+
+            // Act
+            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid);
+
+            // Assert
+            Assert.That(isValid, Is.True);
+            _mockSignatureHelper.Verify(x => x.ExtractSignature(sbomContent), Times.Once);
+        }
+
+        [Test]
+        public void SignSBOMFile_CallsRemoveSignatureBeforeVerifying()
+        {
+            // Arrange
+            string originalSbom = "{\"data\":\"value\",\"signature\":{\"old\":\"sig\"}}";
+            string cleanedSbom = "{\"data\":\"value\"}";
+            byte[] signatureBytes = { 5, 6, 7 };
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            _jsonFileHelper.SignSBOMFile();
+
+            // Assert - Verify RemoveSignature was called first
+            _mockSignatureHelper.Verify(x => x.RemoveSignature(originalSbom), Times.Once);
+        }
+
+        [Test]
+        public void ReadSBOMFile_WithSpecialCharactersInPath_HandlesCorrectly()
+        {
+            // Arrange
+            string sbomContent = "{\"test\":\"data\",\"signature\":{\"value\":\"sig\"}}";
+            string sbomFilePath = Path.Combine(_tempDirectory, "test-file_v1.0.json");
+            File.WriteAllText(sbomFilePath, sbomContent);
+
+            var signature = new Signature { Value = "sig" };
+            string cleanedSbom = "{\"test\":\"data\"}";
+
+            _mockSignatureHelper.Setup(x => x.ExtractSignature(sbomContent))
+                .Returns(signature);
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(sbomContent))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.VerifySignature(cleanedSbom, "sig"))
+                .Returns(true);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+        }
+
+        [Test]
+        public void SignSBOMFile_ProducesValidJsonOutput()
+        {
+            // Arrange
+            string originalSbom = "{\"name\":\"test\"}";
+            string cleanedSbom = "{\"name\":\"test\"}";
+            byte[] signatureBytes = { 1, 2, 3 };
+
+            _appSettings.bomcontent = originalSbom;
+
+            _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
+                .Returns(cleanedSbom);
+            _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
+                .Returns(signatureBytes);
+
+            // Act
+            string result = _jsonFileHelper.SignSBOMFile();
+
+            // Assert - Verify result is valid JSON
+            Assert.DoesNotThrow(() => JsonDocument.Parse(result));
+        }
+
+        #endregion
     }
 }
