@@ -51,6 +51,7 @@ namespace SW360IntegrationTest.Choco
                 TestConstant.JfrogChocoInternalRepo,"choco-test",
                 TestConstant.ProjectType,"CHOCO",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
         }

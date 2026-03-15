@@ -17,6 +17,9 @@
     "InputFolder": "/PathToInputDirectory", //Input File path. For Docker run set as /mnt/Input
     "OutputFolder": "/PathToOutputDirectory" //Output Bom Folder path. For Docker run set as /mnt/Output    
   },
+  "SbomSigning": {
+    "SBOMSignVerify": false
+  },
   "Npm": {
     "Include": [
       "p*-lock.json",

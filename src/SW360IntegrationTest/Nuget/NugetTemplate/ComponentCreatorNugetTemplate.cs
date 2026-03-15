@@ -47,6 +47,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.JfrogNugetInternalRepo,"Nuget-test",
                 TestConstant.ProjectType,"NUGET",
                 TestConstant.Mode,""});
@@ -71,6 +72,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""});
 
             Assert.IsTrue(value == 0 || value == 2,

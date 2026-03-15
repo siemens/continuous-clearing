@@ -48,6 +48,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogMavenInternalRepo,"Maven-test",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.ProjectType,"MAVEN",
                 TestConstant.Mode,""});
             }
@@ -69,6 +70,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""}),
                 "Test to run Package Creator EXE execution");
         }
