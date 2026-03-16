@@ -16,14 +16,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Identity" Version="1.12.0" />
+		<PackageReference Include="Azure.Identity" Version="1.17.1" />
 		<PackageReference Include="Azure.Security.KeyVault.Certificates" Version="4.6.0" />
 		<PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.6.0" />
 		<PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.6.0" />
-		<PackageReference Include="CycloneDX.Core" Version="5.2.0" />
-		<PackageReference Include="CycloneDX.Utils" Version="5.2.0" />
 		<PackageReference Include="log4net" Version="2.0.15" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>

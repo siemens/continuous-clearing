@@ -110,8 +110,7 @@ namespace LCT.Common
                 if (validationResult)
                 {
                     // Validation succeeded - continue
-                    Logger.Logger.Log(null, log4net.Core.Level.Notice,
-                        "SBOM Verified successfully.", null);
+                    Logger.Info("SBOM Verified successfully.");
                 }
                 else
                 {
