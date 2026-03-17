@@ -101,13 +101,13 @@ namespace LCT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Get Available Releases", "GetAvailableReleasesInSw360()", ex, "");
-                Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
+                Logger.ErrorFormat("SW360 server is not accessible,Please wait for sometime and re run the pipeline again. {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Get Available Releases", "GetAvailableReleasesInSw360()", ex, "");
-                Logger.Error("SW360 server is not accessible,Please wait for sometime and re run the pipeline again");
+                Logger.ErrorFormat("SW360 server is not accessible,Please wait for sometime and re run the pipeline again. {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             Logger.Debug("GetAvailableReleasesInSw360():Completed to getting available releases in sw360");
@@ -316,14 +316,14 @@ namespace LCT.Services
             catch (IOException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("DownloadReleaseSourceCode", $"MethodName:DownloadReleaseSourceCode(), ComponentName:{componentName}, Version:{version}", ex, "An I/O error occurred while trying to download the component source.");
-                Logger.Warn($"Component download failed :{componentName}");
+                Logger.WarnFormat("Component download failed: {0}", componentName);
 
                 return componentName;
             }
             catch (WebException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("DownloadReleaseSourceCode", $"MethodName:DownloadReleaseSourceCode(), ComponentName:{componentName}, Version:{version}", e, "A network error occurred while trying to download the component source.");
-                Logger.Warn($"Component download failed :{componentName}");
+                Logger.WarnFormat("Component download failed: {0}", componentName);
 
                 return componentName;
             }

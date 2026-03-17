@@ -133,7 +133,7 @@ namespace LCT.APICommunications
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"{ex.Message}");
+                Logger.Debug("Request timeout occurred", ex);
                 Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
                 environmentHelper.CallEnvironmentExit(-1);
 

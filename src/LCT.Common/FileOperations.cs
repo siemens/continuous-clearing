@@ -30,6 +30,8 @@ namespace LCT.Common
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         static readonly SbomSigningValidation sbomSigningValidation = new();
         private static readonly SignatureHelper signatureHelper = new();
+        private const string ResultFailure = "failure";
+        private const string ResultSuccess = "success";
         #endregion
 
         #region Properties
@@ -90,20 +92,20 @@ namespace LCT.Common
             catch (IOException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (UnauthorizedAccessException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (SecurityException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             Logger.Debug($"WriteContentToFile():Completed writing content to the file.\n");
-            return "success";
+            return ResultSuccess;
 
         }
 
@@ -138,13 +140,13 @@ namespace LCT.Common
                     catch (InvalidOperationException ex)
                     {
                         string errorMsg = $"SBOM signing failed: {ex.Message}";
-                        Logger.Error(errorMsg, ex);
+                        Logger.ErrorFormat(errorMsg);
                         environmentHelper.CallEnvironmentExit(-1);
                     }
                     catch (ArgumentException ex)
                     {
                         string errorMsg = $"SBOM signing failed: Configuration error - {ex.Message}";
-                        Logger.Error(errorMsg, ex);
+                        Logger.ErrorFormat(errorMsg);
                         environmentHelper.CallEnvironmentExit(-1);
                     }                    
                 }
@@ -155,20 +157,20 @@ namespace LCT.Common
             catch (IOException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (UnauthorizedAccessException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (SecurityException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             Logger.Debug($"WriteContentToOutputBomFile():Completed writing content to the file.");
-            return "success";
+            return ResultSuccess;
 
         }
 
@@ -265,20 +267,20 @@ namespace LCT.Common
             catch (IOException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (UnauthorizedAccessException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (SecurityException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             Logger.Debug($"WriteContentToCycloneDXFile():Completed writing content to the file.");
-            return "success";
+            return ResultSuccess;
 
         }
 
@@ -345,20 +347,20 @@ namespace LCT.Common
             catch (IOException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (UnauthorizedAccessException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (SecurityException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             Logger.Debug($"WriteContentToReportNotApprovedFile():Completed writing content to the file.");
-            return "success";
+            return ResultSuccess;
 
         }
 
@@ -388,20 +390,20 @@ namespace LCT.Common
             catch (IOException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (UnauthorizedAccessException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             catch (SecurityException e)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return "failure";
+                return ResultFailure;
             }
             Logger.Debug($"WriteContentToMultipleVersionsFile():Completed writing content to the file.");
-            return "success";
+            return ResultSuccess;
 
         }
 

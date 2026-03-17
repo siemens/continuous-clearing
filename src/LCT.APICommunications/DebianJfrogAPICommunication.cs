@@ -18,7 +18,7 @@ namespace LCT.APICommunications
     /// <summary>
     /// Provides Debian-specific JFrog Artifactory API communication operations.
     /// </summary>
-    public class DebianJfrogAPICommunication : JfrogApicommunication
+    public class DebianJfrogApiCommunication : JfrogApicommunication
     {
         #region Fields
 
@@ -46,13 +46,13 @@ namespace LCT.APICommunications
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DebianJfrogAPICommunication"/> class.
+        /// Initializes a new instance of the <see cref="DebianJfrogApiCommunication"/> class.
         /// </summary>
         /// <param name="repoDomainName">The repository domain name.</param>
         /// <param name="srcrepoName">The source repository name.</param>
         /// <param name="repoCredentials">The repository credentials.</param>
         /// <param name="timeout">The timeout in seconds.</param>
-        public DebianJfrogAPICommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
+        public DebianJfrogApiCommunication(string repoDomainName, string srcrepoName, ArtifactoryCredentials repoCredentials, int timeout) : base(repoDomainName, srcrepoName, repoCredentials, timeout)
         {
             TimeoutInSec = timeout;
         }
@@ -130,7 +130,7 @@ namespace LCT.APICommunications
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"{ex.Message}");
+                Logger.Debug("Request timeout occurred", ex);
                 Logger.Error("A timeout error is thrown from Jfrog server,Please wait for sometime and re run the pipeline again");
                 environmentHelper.CallEnvironmentExit(-1);
 

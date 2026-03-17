@@ -54,7 +54,7 @@ namespace LCT.PackageIdentifier
             else
             {
                 LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "DisplayIncludeFiles()", $"Unable to retrieve exclude files because an invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
-                Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                Logger.ErrorFormat("Invalid ProjectType - {0}", appSettings.ProjectType);
             }
             Logger.Debug("DisplayIncludeFiles():Completed getting include files list.\n");
             return totalString;
@@ -94,7 +94,7 @@ namespace LCT.PackageIdentifier
             else
             {
                 LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "DisplayExcludeFiles()", $"Unable to retrieve exclude files because an invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
-                Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                Logger.ErrorFormat("Invalid ProjectType - {0}", appSettings.ProjectType);
             }
             Logger.Debug("DisplayExcludeFiles():Completed getting exclude files list.\n");
             return totalString;
@@ -152,7 +152,7 @@ namespace LCT.PackageIdentifier
             else
             {
                 LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "GetInternalRepolist()", $"Unable to retrieve exclude files because an invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
-                Logger.Error($"Invalid ProjectType - {appSettings.ProjectType}");
+                Logger.ErrorFormat("Invalid ProjectType - {0}", appSettings.ProjectType);
             }
             Logger.Debug("GetInternalRepolist():Completed retrieving the internal repository list.\n");
             return listOfInternalRepoList;

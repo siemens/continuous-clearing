@@ -58,7 +58,7 @@ namespace LCT.PackageIdentifier
             string firstFilePath = string.Empty;
             if (filePaths != null && filePaths.Count != 0)
             {
-                firstFilePath = filePaths.First();
+                firstFilePath = filePaths[0];
                 if (filePaths.Count > 1)
                 {
                     Logger.Logger.Log(null, Level.Alert, "Multiple Template files are given", null);
@@ -139,7 +139,8 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Debug($"TemplateComponentUpdation():No Details updated for SBOM Template component " + sbomcomp.Name + " : " + sbomcomp.Version);
+                Logger.DebugFormat("TemplateComponentUpdation():No Details updated for SBOM Template component {0} : {1}",
+                    sbomcomp.Name, sbomcomp.Version);
             }
         }
 

@@ -133,7 +133,7 @@ namespace LCT.APICommunications
             }
             catch (TaskCanceledException ex)
             {
-                Logger.Debug($"{ex.Message}");
+                Logger.DebugFormat(ex.Message);
                 ExceptionHandling.TaskCancelledException(ex, "Jfrog");
                 environmentHelper.CallEnvironmentExit(-1);
             }

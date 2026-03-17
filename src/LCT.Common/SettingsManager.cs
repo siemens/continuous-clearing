@@ -40,7 +40,7 @@ namespace LCT.Common
         /// </summary>
         /// <param name="args">args</param>
         /// <returns>AppSettings</returns>
-        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName, IEnvironmentHelper environmentHelper)
+        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName, IEnvironmentHelper environmentHelper) where T : class
         {
             Logger.Debug("ReadConfiguration():Start reading configuration.");
 
@@ -177,12 +177,11 @@ namespace LCT.Common
 
 
                 //Check if ProjectType contains a value and add InternalRepos key accordingly
-                if (!string.IsNullOrWhiteSpace(appSettings.ProjectType))
+                if (!string.IsNullOrWhiteSpace(appSettings.ProjectType) &&
+                    appSettings.Jfrog != null &&
+                    !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (appSettings.Jfrog != null && !appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
-                    }
+                    identifierReqParameters.Add($"{appSettings.ProjectType}.Artifactory.InternalRepos");
                 }
                 CheckForMissingParameter(appSettings, identifierReqParameters);
             }

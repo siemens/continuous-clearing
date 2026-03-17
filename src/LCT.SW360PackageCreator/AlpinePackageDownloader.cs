@@ -26,6 +26,7 @@ namespace LCT.SW360PackageCreator
     /// </summary>
     public class AlpinePackageDownloader : IPackageDownloader
     {
+        private const string PatchFileExtension = ".patch";
 
         /// <summary>
         /// Downloads the source package for the specified component and returns the local file path to the downloaded
@@ -61,7 +62,7 @@ namespace LCT.SW360PackageCreator
                 {
                     var fileName = name.Trim();
                     string buildFileLocation = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
-                    if (System.IO.File.Exists(buildFileLocation) && !fileName.EndsWith(".patch"))
+                    if (System.IO.File.Exists(buildFileLocation) && !fileName.EndsWith(PatchFileExtension))
                     {
 
                         string destFile = System.IO.Path.Combine(Directory.CreateDirectory(localPathforDownload + "BuildFiles").ToString(), fileName);
@@ -138,7 +139,7 @@ namespace LCT.SW360PackageCreator
             string[] buildFilesList = sourceData.Split("\n");
             string sourceCodezippedFolder = string.Empty;
 
-            if (sourceData.Contains(".patch") && (downloadPath.EndsWith(".gz") || downloadPath.EndsWith(".bz2")))
+            if (sourceData.Contains(PatchFileExtension) && (downloadPath.EndsWith(".gz") || downloadPath.EndsWith(".bz2")))
             {
                 try
                 {
@@ -146,7 +147,7 @@ namespace LCT.SW360PackageCreator
                     string rootPath = localPathforDownload;
                     string[] directoriesOfSourceFolder = Directory.GetDirectories(rootPath, "*", SearchOption.TopDirectoryOnly);
                     sourceCodezippedFolder = directoriesOfSourceFolder[0];
-                    if (sourceData.Contains(".patch"))
+                    if (sourceData.Contains(PatchFileExtension))
                     {
                         Process p = new Process();
 
@@ -167,7 +168,7 @@ namespace LCT.SW360PackageCreator
                     {
                         var fileName = fileNames.Trim();
                         string patchFileFolder = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + component.Name + Dataconstant.ForwardSlash + fileName;
-                        if (fileName.Contains(".patch") && File.Exists(patchFileFolder))
+                        if (fileName.Contains(PatchFileExtension) && File.Exists(patchFileFolder))
                         {
                             ApplyPatchsToSourceCode(patchFileFolder, sourceCodezippedFolder);
                         }
