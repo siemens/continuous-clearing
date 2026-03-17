@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
+using LCT.SBOMSigningVerification.Helpers;
 
 namespace LCT.Common
 {
@@ -28,7 +29,7 @@ namespace LCT.Common
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         static readonly SbomSigningValidation sbomSigningValidation = new();
-
+        private static readonly SignatureHelper signatureHelper = new();
         #endregion
 
         #region Properties
@@ -127,6 +128,7 @@ namespace LCT.Common
 
                 BackupTheGivenFile(folderPath, fileName);
                 string bomContent = dataToWrite.ToString();
+                bomContent = signatureHelper.RemoveSignature(bomContent);
                 if (appSettings.SbomSigning.SBOMSignVerify)
                 {
                     try
