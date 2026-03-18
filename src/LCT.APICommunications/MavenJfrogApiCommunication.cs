@@ -50,7 +50,7 @@ namespace LCT.APICommunications
         /// </summary>
         /// <param name="credentials">The artifactory credentials.</param>
         /// <returns>A configured HTTP client instance.</returns>
-        private static HttpClient GetHttpClient(ArtifactoryCredentials credentials)
+        private static new HttpClient GetHttpClient(ArtifactoryCredentials credentials)
         {
             var handler = new RetryHttpClientHandler()
             {

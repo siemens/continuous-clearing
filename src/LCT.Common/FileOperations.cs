@@ -74,7 +74,7 @@ namespace LCT.Common
         /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
-            try
+            return ExecuteFileOperation(FileOperationsMessage, nameof(WriteContentToFile), $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}", () =>
             {
                 Logger.DebugFormat("WriteContentToFile(): Starting to write content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}", folderPath, fileNameWithExtension, projectName);
 
@@ -88,25 +88,7 @@ namespace LCT.Common
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, jsonString);
                 Logger.Debug("WriteContentToFile():Content successfully written to file.");
-            }
-            catch (IOException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (SecurityException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            Logger.Debug($"WriteContentToFile():Completed writing content to the file.\n");
-            return ResultSuccess;
-
+            });
         }
 
         /// <summary>
@@ -120,7 +102,7 @@ namespace LCT.Common
         /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToOutputBomFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName, CommonAppSettings appSettings)
         {
-            try
+            return ExecuteFileOperation(FileOperationsMessage, nameof(WriteContentToOutputBomFile), $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}", () =>
             {
                 Logger.DebugFormat("WriteContentToOutputBomFile(): Starting to write BOM content to file. FolderPath: {0}, FileName: {1}, ProjectName: {2}", folderPath, fileNameWithExtension, projectName);
                 string fileName = $"{projectName}_{fileNameWithExtension}";
@@ -148,30 +130,11 @@ namespace LCT.Common
                         string errorMsg = $"SBOM signing failed: Configuration error - {ex.Message}";
                         Logger.ErrorFormat(errorMsg);
                         environmentHelper.CallEnvironmentExit(-1);
-                    }                    
+                    }
                 }
                 File.WriteAllText(filePath, bomContent);
-                Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");               
-
-            }
-            catch (IOException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (SecurityException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(FileOperationsMessage, "WriteContentToOutputBomFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            Logger.Debug($"WriteContentToOutputBomFile():Completed writing content to the file.");
-            return ResultSuccess;
-
+                Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
+            });
         }
 
         /// <summary>
@@ -253,7 +216,7 @@ namespace LCT.Common
         /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToCycloneDXFile<T>(T dataToWrite, string filePath, string fileNameWithExtension)
         {
-            try
+            return ExecuteFileOperation("Write content to CycloneDX File", nameof(WriteContentToCycloneDXFile), $"FolderPath: {filePath}, FileName: {fileNameWithExtension}", () =>
             {
                 Logger.DebugFormat("WriteContentToCycloneDXFile(): Starting to write content to CycloneDX file. FolderPath: {0}, FileName: {1}", filePath, fileNameWithExtension);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented);
@@ -262,26 +225,7 @@ namespace LCT.Common
                 File.Copy(fileNameWithExtension, filePath);
                 File.WriteAllText(filePath, jsonString);
                 Logger.Debug("WriteContentToCycloneDXFile():Content successfully written to CycloneDX file.");
-
-            }
-            catch (IOException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (SecurityException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to CycloneDX File", "WriteContentToCycloneDXFile()", e, $"FolderPath: {filePath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            Logger.Debug($"WriteContentToCycloneDXFile():Completed writing content to the file.");
-            return ResultSuccess;
-
+            });
         }
 
         /// <summary>
@@ -333,7 +277,7 @@ namespace LCT.Common
         /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToReportNotApprovedFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string name)
         {
-            try
+            return ExecuteFileOperation("Write content to Report Not Approved File", nameof(WriteContentToReportNotApprovedFile), $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}", () =>
             {
                 Logger.DebugFormat("WriteContentToReportNotApprovedFile(): Starting to write content to Report Not Approved file. FolderPath: {0}, FileName: {1}, Name: {2}", folderPath, fileNameWithExtension, name);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -343,30 +287,13 @@ namespace LCT.Common
                 Logger.DebugFormat(LogMessage, filePath);
                 File.WriteAllText(filePath, jsonString);
                 Logger.Debug("WriteContentToReportNotApprovedFile():Content successfully written to the file.");
-            }
-            catch (IOException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            catch (SecurityException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to Report Not Approved File", "WriteContentToReportNotApprovedFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
-                return ResultFailure;
-            }
-            Logger.Debug($"WriteContentToReportNotApprovedFile():Completed writing content to the file.");
-            return ResultSuccess;
-
+            });
         }
 
         /// <summary>
         /// Writes the content to a file for tracking multiple versions.
         /// </summary>
+        /// <typeparam name="T">The type of data to write.</typeparam>
         /// <typeparam name="T">The type of data to write.</typeparam>
         /// <param name="dataToWrite">The data to write to the file.</param>
         /// <param name="folderPath">The folder path where the file will be written.</param>
@@ -375,7 +302,7 @@ namespace LCT.Common
         /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
         public string WriteContentToMultipleVersionsFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string projectName)
         {
-            try
+            return ExecuteFileOperation("Write content to Multiple Versions File", nameof(WriteContentToMultipleVersionsFile), $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}", () =>
             {
                 Logger.DebugFormat("WriteContentToMultipleVersionsFile(): Starting to write content to Multiple Versions file. FolderPath: {0}, FileName: {1}, ProjectName: {2}", folderPath, fileNameWithExtension, projectName);
                 string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -386,25 +313,40 @@ namespace LCT.Common
                 BackupTheGivenFile(folderPath, fileName);
                 File.WriteAllText(filePath, jsonString);
                 Logger.Debug("WriteContentToMultipleVersionsFile():Content successfully written to the file.");
+            });
+        }
+
+        /// <summary>
+        /// Executes a file operation with centralized exception handling for IO, access, and security errors.
+        /// </summary>
+        /// <param name="operationDescription">A description of the operation for error logging.</param>
+        /// <param name="methodName">The name of the calling method.</param>
+        /// <param name="errorContext">Additional context information for error logging.</param>
+        /// <param name="fileAction">The file operation action to execute.</param>
+        /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
+        private static string ExecuteFileOperation(string operationDescription, string methodName, string errorContext, Action fileAction)
+        {
+            try
+            {
+                fileAction();
             }
             catch (IOException e)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
+                LogHandlingHelper.ExceptionErrorHandling(operationDescription, $"{methodName}()", e, errorContext);
                 return ResultFailure;
             }
             catch (UnauthorizedAccessException e)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
+                LogHandlingHelper.ExceptionErrorHandling(operationDescription, $"{methodName}()", e, errorContext);
                 return ResultFailure;
             }
             catch (SecurityException e)
             {
-                LogHandlingHelper.ExceptionErrorHandling("Write content to Multiple Versions File", "WriteContentToMultipleVersionsFile()", e, $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}");
+                LogHandlingHelper.ExceptionErrorHandling(operationDescription, $"{methodName}()", e, errorContext);
                 return ResultFailure;
             }
-            Logger.Debug($"WriteContentToMultipleVersionsFile():Completed writing content to the file.");
+            Logger.DebugFormat("{0}():Completed writing content to the file.", methodName);
             return ResultSuccess;
-
         }
 
         /// <summary>
