@@ -160,7 +160,7 @@ namespace LCT.PackageIdentifier
             }
             else
             {
-                Logger.Debug($"\tSkipping '{configFile}' due to exclusion pattern.");
+                Logger.DebugFormat("\tSkipping '{0}' due to exclusion pattern.", configFile);
             }
         }
 
@@ -178,7 +178,7 @@ namespace LCT.PackageIdentifier
 
             foreach (string exclusionPattern in exclusionPatterns)
             {
-                Regex exRegex = new Regex(exclusionPattern);
+                Regex exRegex = new Regex(exclusionPattern, RegexOptions.None, TimeSpan.FromSeconds(5));
                 if (exRegex.IsMatch(filePath))
                 {
                     return true;

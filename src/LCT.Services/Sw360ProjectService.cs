@@ -64,13 +64,13 @@ namespace LCT.Services
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error($"Failed to connect SW360 : {ex.Message}");
+                Logger.ErrorFormat("Failed to connect SW360. {0}", ex.Message);
                 LogHandlingHelper.ExceptionErrorHandling("HTTP request to SW360 failed", "GetProjectNameByProjectIDFromSW360()", ex, $"Project ID: {projectId}");
                 Environment.ExitCode = -1;
             }
             catch (AggregateException ex)
             {
-                Logger.Error($"Failed to connect SW360 : {ex.Message}");
+                Logger.ErrorFormat("Failed to connect SW360. {0}", ex.Message);
                 LogHandlingHelper.ExceptionErrorHandling("An aggregate exception occurred while connecting to SW360", "GetProjectNameByProjectIDFromSW360()", ex, $"Project ID: {projectId}");
                 Environment.ExitCode = -1;
             }
@@ -91,12 +91,13 @@ namespace LCT.Services
                 HttpResponseMessage projectResponsebyId = await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
                 if (projectResponsebyId.StatusCode != HttpStatusCode.OK)
                 {
-                    Logger.Debug($"GetProjectReleasesByProjectIdFromSw360()-{projectResponsebyId.StatusCode}:{projectResponsebyId.ReasonPhrase}");
+                    Logger.DebugFormat("GetProjectReleasesByProjectIdFromSw360()-{0}:{1}",
+                        projectResponsebyId.StatusCode, projectResponsebyId.ReasonPhrase);
                     return alreadyLinkedReleases;
                 }
 
-                Logger.Debug($"GetProjectReleasesByProjectIdFromSw360():Success StatusCode:{projectResponsebyId.StatusCode} " +
-              $"& ReasonPhrase :{projectResponsebyId.ReasonPhrase}");
+                Logger.DebugFormat("GetProjectReleasesByProjectIdFromSw360():Success StatusCode:{0} & ReasonPhrase:{1}",
+                   projectResponsebyId.StatusCode, projectResponsebyId.ReasonPhrase);
 
                 string result = projectResponsebyId.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var projectReleases = JsonConvert.DeserializeObject<ProjectReleases>(result);

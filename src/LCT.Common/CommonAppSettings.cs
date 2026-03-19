@@ -125,12 +125,10 @@ namespace LCT.Common
             set
             {
                 if (!AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader") &&
+                    !string.IsNullOrEmpty(value))
                 {
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
-                    }
+                    m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
                 }
             }
         }

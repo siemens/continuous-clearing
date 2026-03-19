@@ -206,7 +206,8 @@ namespace LCT.PackageIdentifier
                     multipleVersions.Npm.Add(jsonComponents);
                 }
                 fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Npm.Count} and details can be found at {filePath}\n");
+                Logger.WarnFormat("\nTotal Multiple versions detected {0} and details can be found at {1}\n",
+                    multipleVersions.Npm.Count, filePath);
             }
             else
             {
@@ -225,7 +226,8 @@ namespace LCT.PackageIdentifier
                 myDeserializedClass.Npm = npmComponents;
 
                 fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {npmComponents.Count} and details can be found at {filePath}\n");
+                Logger.WarnFormat("\nTotal Multiple versions detected {0} and details can be found at {1}\n",
+                    npmComponents.Count, filePath);
             }
         }
 

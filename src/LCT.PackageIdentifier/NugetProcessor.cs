@@ -131,7 +131,7 @@ namespace LCT.PackageIdentifier
 
                     if (idAttribute?.Value == null)
                     {
-                        Logger.Error($"\t{packagesFilePath}: ID attribute not found.");
+                        Logger.ErrorFormat("\t{0}: ID attribute not found.", packagesFilePath);
                         LogHandlingHelper.BasicErrorHandling("Missing ID Attribute", ParsePackageConfigMethod, $"ID attribute not found in file: {packagesFilePath}", $"Identify ID attribute in this file:{packagesFilePath}");
                         continue;
                     }
@@ -882,7 +882,8 @@ namespace LCT.PackageIdentifier
                     multipleVersions.Nuget.Add(jsonComponents);
                 }
                 fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Nuget.Count} and details can be found at {filePath}\n");
+                Logger.WarnFormat("\nTotal Multiple versions detected {0} and details can be found at {1}\n",
+                    multipleVersions.Nuget.Count, filePath);
             }
             else
             {
@@ -901,7 +902,8 @@ namespace LCT.PackageIdentifier
                 myDeserializedClass.Nuget = nugetComponents;
 
                 fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {nugetComponents.Count} and details can be found at {filePath}\n");
+                Logger.WarnFormat("\nTotal Multiple versions detected {0} and details can be found at {1}\n",
+                    nugetComponents.Count, filePath);
             }
         }
 
@@ -1022,7 +1024,7 @@ namespace LCT.PackageIdentifier
             else
             {
                 LogHandlingHelper.BasicErrorHandling("FileNotFound", "ParseInputFiles()", $"Input file not found or unsupported: {filepath}", $"provide {FileConstant.NugetAssetFile} or packages.config filesin this path :{filepath} ");
-                Logger.Warn($"Input file NOT_FOUND :{filepath}");
+                Logger.WarnFormat("Input file NOT_FOUND: {0}", filepath);
             }
             IdentifiedNugetPackages(filepath, listofComponents);
         }
@@ -1059,7 +1061,7 @@ namespace LCT.PackageIdentifier
                     }
                     else
                     {
-                        Logger.Debug($"\tSkipping '{csprojFile}' due to exclusion pattern.");
+                        Logger.DebugFormat("\tSkipping '{0}' due to exclusion pattern.", csprojFile);
                     }
                 }
             }
@@ -1192,11 +1194,7 @@ namespace LCT.PackageIdentifier
         {
             if (lst.Value.Dependencies.Count > 0)
             {
-                foreach (var item in lst.Value.Dependencies)
-                {
-                    var depvaltestue = item.PackageUrl;
-                    depvalue.Add(depvaltestue);
-                }
+                depvalue.AddRange(lst.Value.Dependencies.Select(item => item.PackageUrl));
             }
 
         }

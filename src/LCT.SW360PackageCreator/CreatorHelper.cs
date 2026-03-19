@@ -44,6 +44,7 @@ namespace LCT.SW360PackageCreator
         List<Components> DuplicateComponentsByPurlId = new List<Components>();
         private const string SOURCE = "SOURCE";
         private const string AlpinePackageType = "ALPINE";
+        private const string DebianPackageType = "DEBIAN";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
         /// <summary>
@@ -130,11 +131,11 @@ namespace LCT.SW360PackageCreator
         private async Task<string> GetAttachmentUrlList(ComparisonBomData component, Dictionary<string, string> AttachmentUrlList, string localPathforDownload)
         {
             string downloadPath = string.Empty;
-            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
                 {
-                    downloadPath = await _packageDownloderList["DEBIAN"].DownloadPackage(component, localPathforDownload);
+                    downloadPath = await _packageDownloderList[DebianPackageType].DownloadPackage(component, localPathforDownload);
                 }
             }
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]))
@@ -350,7 +351,7 @@ namespace LCT.SW360PackageCreator
                 mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
                 mapper.AlpineSource = item.AlpineSourceData;
 
-                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
                 {
                     SetDebianUrls(item, releasesInfo, mapper);
                 }
@@ -542,7 +543,7 @@ namespace LCT.SW360PackageCreator
             string localPathforDownload = string.Empty;
             try
             {
-                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
