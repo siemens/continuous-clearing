@@ -231,7 +231,7 @@ namespace LCT.PackageIdentifier
                     return await ComponentIdentification(appSettings, parser);
                 default:
                     LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "CallPackageParser()", $"Invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
-                    Logger.Error($"GenerateBom():Invalid ProjectType - {appSettings.ProjectType}");
+                    Logger.ErrorFormat("GenerateBom():Invalid ProjectType - {0}", appSettings.ProjectType);
                     break;
             }
             return new Bom();
@@ -275,14 +275,9 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
-                    foreach (var component in bom.Components)
+                    foreach (var component in bom.Components.Where(c => !c.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType)))
                     {
-                        bool propertyExists = component.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType);
-                        if (!propertyExists)
-                        {
-                            component.Properties.Add(projectType);
-                        }
-
+                        component.Properties.Add(projectType);
                     }
                 }
                 bom.Metadata = metadata;

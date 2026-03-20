@@ -60,7 +60,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                 catch (Exception ex)
                 {
                     string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
-                    Logger.Error(contextMsg, ex);
+                    Logger.ErrorFormat(contextMsg);
                     throw new InvalidOperationException(contextMsg, ex);
                 }
 
@@ -99,7 +99,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                 catch (Exception ex)
                 {
                     string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
-                    Logger.Error(contextMsg, ex);
+                    Logger.ErrorFormat(contextMsg);
                     throw new InvalidOperationException(contextMsg, ex);
                 }
 

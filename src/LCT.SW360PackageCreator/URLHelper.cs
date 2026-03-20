@@ -45,6 +45,8 @@ namespace LCT.SW360PackageCreator
         public CommonAppSettings CommonAppSettings { get; } = new CommonAppSettings();
 
         private const string SrcUrlFailWarnFormat = "Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url";
+        private const string AportsDirectoryName = "aports";
+        private const string SourcePackageType = "source";
 
         private bool _disposed;
 
@@ -61,7 +63,7 @@ namespace LCT.SW360PackageCreator
             try
             {
                 string localPathforSourceRepo = GetDownloadPathForAlpineRepo();
-                string fullPath = Path.Combine(localPathforSourceRepo, "aports");
+                string fullPath = Path.Combine(localPathforSourceRepo, AportsDirectoryName);
                 var alpineDistro = GetAlpineDistro(bomRef);
                 if (!Directory.Exists(fullPath))
                 {
@@ -117,10 +119,10 @@ namespace LCT.SW360PackageCreator
             AlpinePackage sourceURLDetails = new AlpinePackage { Name = name, Version = version };
             try
             {
-                var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
+                var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + AportsDirectoryName + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
                 if (Directory.Exists(pkgFolderName))
                 {
-                    var pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
+                    var pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + AportsDirectoryName + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
                     if (File.Exists(pkgFilePath))
                     {
                         var sourceData = GetSourceFromAPKBUILD(localPathforSourceRepo, name);
@@ -153,10 +155,10 @@ namespace LCT.SW360PackageCreator
             string pkgFilePath = string.Empty;
             try
             {
-                var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
+                var pkgFolderName = localPathforSourceRepo + Dataconstant.ForwardSlash + AportsDirectoryName + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name;
                 if (Directory.Exists(pkgFolderName))
                 {
-                    pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + "aports" + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
+                    pkgFilePath = localPathforSourceRepo + Dataconstant.ForwardSlash + AportsDirectoryName + Dataconstant.ForwardSlash + "main" + Dataconstant.ForwardSlash + name + Dataconstant.ForwardSlash + "APKBUILD";
                     if (File.Exists(pkgFilePath))
                     {
                         var apkBuildTxt = File.ReadAllText(pkgFilePath);
@@ -714,7 +716,7 @@ namespace LCT.SW360PackageCreator
         private async Task<DebianPackage> GetSourceUrl(string name, string version)
         {
             DebianPackage sourceURLDetails = new DebianPackage { Name = name, Version = version };
-            string packageType = "source";
+            string packageType = SourcePackageType;
             sourceURLDetails = await GetArchiveResponse(sourceURLDetails, packageType);
 
             if (string.IsNullOrEmpty(sourceURLDetails.JsonText))
@@ -745,7 +747,7 @@ namespace LCT.SW360PackageCreator
                 // clearing previous responses for current component
                 packageDetails.JsonText = string.Empty;
 
-                if (packageType == "source")
+                if (packageType == SourcePackageType)
                 {
                     URL = $"{CommonAppSettings.SnapshotBaseURL}package/{packageDetails.Name}" +
                         $"{Dataconstant.ForwardSlash}{packageDetails.Version}{Dataconstant.SourceURLSuffix}";
@@ -763,7 +765,7 @@ namespace LCT.SW360PackageCreator
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("GetArchiveResponse", $"MethodName:GetArchiveResponse(), PackageName: {packageDetails.Name}, PackageType: {packageType}", ex, "An HTTP request error occurred while trying to fetch the archive response.");
-                if (!ex.Message.Contains("404") && packageType == "source")
+                if (!ex.Message.Contains("404") && packageType == SourcePackageType)
                 {
                     packageDetails.IsRetryRequired = true;
                     Logger.DebugFormat("GetArchiveResponse:File Name : {0}, Added for Retry.", packageDetails.Name);
@@ -780,7 +782,7 @@ namespace LCT.SW360PackageCreator
         /// <returns>debian package</returns>
         private async Task<DebianPackage> GetSourceDetialsFromType(string packageType, DebianPackage sourceURLDetails)
         {
-            if (packageType == "source")
+            if (packageType == SourcePackageType)
             {
                 sourceURLDetails = GetSourceURLFromJsonTextForSourceType(sourceURLDetails);
             }
@@ -855,9 +857,9 @@ namespace LCT.SW360PackageCreator
                     string binary_version = dependencyToken.Value<string>("binary_version");
                     if (binary_version == sourceURLDetails.Version)
                     {
-                        string source = dependencyToken.Value<string>("source");
+                        string source = dependencyToken.Value<string>(SourcePackageType);
                         string sourceVersion = dependencyToken.Value<string>("version");
-                        sourceURLDetails = await GetArchiveResponse(new DebianPackage() { Name = source, Version = sourceVersion }, "source");
+                        sourceURLDetails = await GetArchiveResponse(new DebianPackage() { Name = source, Version = sourceVersion }, SourcePackageType);
                         if (!string.IsNullOrEmpty(sourceURLDetails.JsonText))
                         {
                             sourceURLDetails.Name = source;

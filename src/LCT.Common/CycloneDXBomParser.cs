@@ -89,16 +89,10 @@ namespace LCT.Common
             {
                 return bom;
             }
-            foreach (var component in template.Components)
-            {
-                if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version)
-                    && !string.IsNullOrEmpty(component.Purl))
-                {
-                    //Taking SBOM Template Components
-
-                    bom.Components.Add(component);
-                }
-            }
+            bom.Components.AddRange(template.Components.Where(component =>
+            !string.IsNullOrEmpty(component.Name) &&
+            !string.IsNullOrEmpty(component.Version) &&
+            !string.IsNullOrEmpty(component.Purl)));
 
             //Taking SBOM Template Metadata
             bom.Metadata = template.Metadata;
@@ -124,8 +118,8 @@ namespace LCT.Common
                 else
                 {
                     bom.Remove(component);
-                    Logger.Debug("CheckValidComponenstForProjectType(): " +
-                        "Not valid Component / Purl ID " + component.Purl + " for Project Type :" + projectType);
+                    Logger.DebugFormat("CheckValidComponentsForProjectType(): Not valid Component / Purl ID {0} for Project Type: {1}",
+                    component.Purl, projectType);
                 }
             }
         }

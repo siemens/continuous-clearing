@@ -35,6 +35,7 @@ namespace LCT.PackageIdentifier
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+        private const string PoetryProjectType = "POETRY";
 
         /// <summary>
         ///Parses PackageFile
@@ -48,7 +49,7 @@ namespace LCT.PackageIdentifier
         {
             Logger.Debug("ParsePackageFile():Starting to parse package files for BOM.");
             List<string> configFiles = FolderScanner.FileScanner(appSettings.Directory.InputFolder, appSettings.Poetry, environmentHelper);
-            List<PythonPackage> listofComponents = new List<PythonPackage>();
+            List<PythonPackage> listofComponents;
             Bom bom = new Bom();
             List<Component> listComponentForBOM = new List<Component>();
             List<Dependency> dependencies = new List<Dependency>();
@@ -182,7 +183,7 @@ namespace LCT.PackageIdentifier
                 {
                     Name = node["name"].ToString(),
                     Version = node["version"].ToString(),
-                    PurlID = Dataconstant.PurlCheck()["POETRY"] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
+                    PurlID = Dataconstant.PurlCheck()[PoetryProjectType] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
                     // By Default Tommy.TomlLazy is coming instead of Null or empty
                     Isdevdependent = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy"),
                     FoundType = Dataconstant.Discovered,
@@ -245,11 +246,11 @@ namespace LCT.PackageIdentifier
 
             if (string.IsNullOrEmpty(value))
             {
-                return Dataconstant.PurlCheck()["POETRY"] + "/" + valuePair.Key + "@" + "*";
+                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + valuePair.Key + "@" + "*";
             }
             else
             {
-                return Dataconstant.PurlCheck()["POETRY"] + "/" + valuePair.Key + "@" + value;
+                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + valuePair.Key + "@" + value;
             }
         }
 
@@ -295,7 +296,7 @@ namespace LCT.PackageIdentifier
                 };
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["POETRY"]))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[PoetryProjectType]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
@@ -328,7 +329,7 @@ namespace LCT.PackageIdentifier
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.PurlCheck()["POETRY"]}{Dataconstant.ForwardSlash}{name}@{version}";
+            return $"{Dataconstant.PurlCheck()[PoetryProjectType]}{Dataconstant.ForwardSlash}{name}@{version}";
         }
 
         /// <summary>

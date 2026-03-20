@@ -122,19 +122,19 @@ namespace LCT.Common
             catch (InvalidOperationException ex)
             {
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
-                Logger.Error(errorMsg, ex);
+                Logger.ErrorFormat(errorMsg);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (FileNotFoundException ex)
             {
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
-                Logger.Error(errorMsg, ex);
+                Logger.ErrorFormat(errorMsg);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (ArgumentNullException ex)
             {
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
-                Logger.Error(errorMsg, ex);
+                Logger.ErrorFormat(errorMsg);
                 environmentHelper.CallEnvironmentExit(-1);
             }          
         }
