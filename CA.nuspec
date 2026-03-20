@@ -250,5 +250,6 @@
 	<file src="out\net8.0\Azure.Security.KeyVault.Certificates.dll" target="tools\Azure.Security.KeyVault.Certificates.dll"/>
 	<file src="out\net8.0\Azure.Security.KeyVault.Keys.dll" target="tools\Azure.Security.KeyVault.Keys.dll"/>
 	<file src="out\net8.0\Azure.Security.KeyVault.Secrets.dll" target="tools\Azure.Security.KeyVault.Secrets.dll"/>
+    <file src="out\net8.0\LCT.SBOMSigningVerification.dll" target="tools\LCT.SBOMSigningVerification.dll"/>	  
   </files>
 </package>
