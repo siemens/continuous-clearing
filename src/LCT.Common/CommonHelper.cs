@@ -530,7 +530,7 @@ namespace LCT.Common
             }
             else if (clearingState == "CLOSED")
             {
-                Logger.Error("Provided Sw360 project is not in active state. Please make sure you added the correct project details that are in an active state.");
+                Logger.Error("Provided SW360 project has the project state closed. Please make sure you added the correct project details.");
                 Logger.DebugFormat("ValidateSw360Project(): Sw360 project {0} is in {1} state.", Name, clearingState);
                 return -1;
             }
