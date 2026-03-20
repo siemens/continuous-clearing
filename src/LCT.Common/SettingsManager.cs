@@ -174,8 +174,7 @@ namespace LCT.Common
                     identifierReqParameters.Add($"Jfrog.Token");
                     identifierReqParameters.Add($"Jfrog.URL");
                 }
-
-
+                AddSbomSigningRequiredParameters(appSettings, identifierReqParameters);
                 //Check if ProjectType contains a value and add InternalRepos key accordingly
                 if (!string.IsNullOrWhiteSpace(appSettings.ProjectType) &&
                     appSettings.Jfrog != null &&
@@ -195,6 +194,7 @@ namespace LCT.Common
                 "SW360.URL",
                 "Directory.OutputFolder"
             };
+                AddSbomSigningRequiredParameters(appSettings, creatorReqParameters);
                 CheckForMissingParameter(appSettings, creatorReqParameters);
             }
             else
@@ -206,11 +206,28 @@ namespace LCT.Common
                 "Directory.OutputFolder",
                 "Jfrog.Token",
             };
+                AddSbomSigningRequiredParameters(appSettings, uploaderReqParameters);
+
                 CheckForMissingParameter(appSettings, uploaderReqParameters);
             }
             Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has completed\n");
         }
-
+        // <summary>
+        /// Adds SBOM signing required parameters to the parameter list if SBOM signing is enabled.
+        /// </summary>
+        /// <param name="appSettings">The application settings.</param>
+        /// <param name="requiredParameters">The list of required parameters to add SBOM signing parameters to.</param>
+        private static void AddSbomSigningRequiredParameters(CommonAppSettings appSettings, List<string> requiredParameters)
+        {
+            if (appSettings.SbomSigning.SBOMSignVerify)
+            {
+                requiredParameters.Add("SbomSigning.KeyVaultURI");
+                requiredParameters.Add("SbomSigning.CertificateName");
+                requiredParameters.Add("SbomSigning.ClientId");
+                requiredParameters.Add("SbomSigning.ClientSecret");
+                requiredParameters.Add("SbomSigning.TenantId");
+            }
+        }
         /// <summary>
         /// Checks for missing required parameters in the application settings.
         /// </summary>
