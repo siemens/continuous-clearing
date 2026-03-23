@@ -115,11 +115,7 @@ To ensure a smooth operation of the Continuous Clearing Tool, please follow thes
        1. Users can generate a token from their functional account.
        2. Required credentials include the client ID and client secret.
    - **Artifactory Token**:
-     - Necessary for uploading cleared, internal, and development packages into JFrog Artifactory. Users must obtain their own JFrog Artifactory token.
-   - **SBOM Signing Requirements**:
-     - Access to Azure Key Vault containing the signing certificate
-     - Azure AD App Registration with appropriate permissions
-     - Values from the `devops-clearing` variable group.
+     - Necessary for uploading cleared, internal, and development packages into JFrog Artifactory. Users must obtain their own JFrog Artifactory token.   
 
 ## Pipeline Configuration
 For certain scenarios, the tool uses predefined exit codes, which are described below:
@@ -357,27 +353,9 @@ The SBOM signing feature can be configured in two ways:
   - Skip signing operations entirely
   - Continue normal processing without signature validation
 
-### Azure DevOps Pipeline Integration
 
-#### Simple Variable Group Integration
-
-The SBOM signing credentials are automatically handled when using the Continuous Clearing Tool templates. You only need to:
-
-1. **Include the variable group** in your pipeline:
-```yaml
-variables:
-- group: devops-clearing
-```
-
-2. **Use the templates** as documented - SBOM signing parameters are already configured by default in the templates.
-
-#### Variable Group Setup
-
-**Contact Information:**
-> The job uses the variable group `devops-clearing`. Please contact the infrastructure team (request via **@SI CM Ticket**) to get access to the variable group when using the template in your pipelines.
 
 **Required Variables:**
-The `devops-clearing` variable group contains the following pre-configured variables:
 
 | Variable Name | Description | 
 |---------------|-------------|
@@ -387,63 +365,7 @@ The `devops-clearing` variable group contains the following pre-configured varia
 | `clientSecret` | Client Secret of the App Registration with access to the Key Vault |
 | `tenantId` | Azure tenant ID, defaults to Siemens AG |
 
-#### Pipeline Configuration Example
-
-**Recommended Approach (using templates):**
-```yaml
-# Azure DevOps Pipeline Example - Template Usage
-variables:
-- group: devops-clearing  # This is all you need to add!
-
-steps:
-- template: pipeline/build/pipeline-template-step-install-run-cctool-binary.yml@Templates_Pipeline
-  parameters:
-    workingDirectory: $(Build.SourcesDirectory)/MyProject
-    sw360Token: '$(sw360ApiKey)'
-    sw360ProjectId: '$(sw360ProjectID)'
-    sw360ProjectName: 'My Project'
-    projectDefinitions:
-    - projectType: 'NuGet'
-      inputFolder: $(Build.SourcesDirectory)/src
-      exclude: 'Test'
-    outputFolder: '$(Build.SourcesDirectory)/output'
-    JfrogToken: '$(jfrogToken)'
-    # SBOM signing is automatically enabled with devops-clearing variable group
-```
-
-**Manual Approach (if not using templates):**
-```yaml
-# Azure DevOps Pipeline Example - Manual Configuration
-variables:
-- group: devops-clearing
-
-steps:
-- task: Docker@2
-  displayName: 'Run Continuous Clearing Tool with SBOM Signing'
-  inputs:
-    command: 'run'
-    image: 'ghcr.io/siemens/continuous-clearing:latest'
-    arguments: >
-      --rm -v $(Build.SourcesDirectory)/input:/mnt/Input 
-      -v $(Build.SourcesDirectory)/output:/mnt/Output 
-      -v $(Build.SourcesDirectory)/logs:/var/log 
-      -v $(Build.SourcesDirectory)/config:/etc/CATool 
-      ghcr.io/siemens/continuous-clearing 
-      dotnet PackageIdentifier.dll 
-      ```
-
-### Parameters Reference {#sbom-signing-parameters-reference}
-
-| Parameter | Type | Default | Required | Description |
-|-----------|------|---------|----------|-------------|
-| `SBOMSignVerify` | boolean | `true` | No | Controls whether SBOM signing is mandatory. When `true`, signing is required and the tool will fail if credentials are missing. When `false`, signing is skipped entirely. |
-| `KeyVaultURI` | string | From variable group | Yes* | The full URI of the Azure Key Vault containing the signing certificate. Format: `https://your-keyvault.vault.azure.net/` |
-| `CertificateName` | string | From variable group | Yes* | The name of the certificate stored in the Key Vault to use for signing operations. |
-| `ClientId` | string | From variable group | Yes* | Client ID of the Azure AD App Registration that has permissions to access the Key Vault. |
-| `ClientSecret` | string | From variable group | Yes* | Client Secret of the Azure AD App Registration. Should be passed securely via pipeline variables. |
-| `TenantId` | string | From variable group | Yes* | Azure tenant ID where the Key Vault and App Registration are located. For Siemens, this is typically the Siemens AG tenant. |
-
-**\*Required when `SBOMSignVerify` is `true`. When using templates with the `devops-clearing` variable group, these values are automatically provided.**
+**\*Required when `SBOMSignVerify` is `true`. 
 
 #### Signed SBOM Structure
 
@@ -478,20 +400,11 @@ When signing is enabled, the generated SBOM will include a `signature` section:
 
 #### Security Considerations
 
-1. **Credential Management**: 
-   - SBOM signing credentials are managed centrally through the `devops-clearing` variable group
-   - No need to manage signing credentials in individual projects
-
-2. **Certificate Management**:
+1. **Certificate Management**:
    - Certificates are centrally managed in Azure Key Vault
    - All projects use the same trusted signing certificate
 
-3. **Access Control**:
-   - Access to the `devops-clearing` variable group
-   - Request access via **@SI CM Ticket**
-   - No direct access to Azure Key Vault credentials required
-
-4. **Validation**:
+2. **Validation**:
    - Always verify signed SBOMs in downstream processes
    - Implement signature verification in your SBOM consumption workflows
    - Log and alert on signature validation failures
@@ -718,8 +631,6 @@ repository: Templates_Pipeline
 
 The sample default app settings file is located at templates\sample-default-app-settings.json and can be customized as needed.
 
-**SBOM Signing Configuration**: When using the templates with the `devops-clearing` variable group, SBOM signing is automatically enabled with default values. The templates handle all SBOM signing parameters internally, so no manual configuration is required in your pipeline parameters.
-
 ### Add a New Template Calling Step
 #### NuGet Template Example
 ```yaml
@@ -736,7 +647,6 @@ The sample default app settings file is located at templates\sample-default-app-
       exclude: 'Test'
     outputFolder: '$(Build.SourcesDirectory)/output'
     JfrogToken: '$(jfrogToken)'
-    # SBOM signing is automatically enabled with devops-clearing variable group
 ```
 
 #### Docker Template Example
@@ -753,7 +663,6 @@ The sample default app settings file is located at templates\sample-default-app-
       imageName: 'myapp'
     outputFolder: '$(Build.SourcesDirectory)/output'
     JfrogToken: '$(jfrogToken)'
-    # SBOM signing is automatically enabled with devops-clearing variable group
 ```
 
 ### Project Definitions Structure
@@ -811,7 +720,6 @@ Both templates share common parameters with some implementation-specific differe
 | `excludeComponents` | string | '' | Semicolon-separated list of components to exclude |:x:|
 | `appSettingsPath` | string | '' | Your own AppSettings.json path |:x:|
 
-**Note:** SBOM signing parameters are automatically configured when using the templates with the `devops-clearing` variable group. No manual configuration of SBOM signing parameters is required.
 
 ### Binary Template Specific Parameters
 
