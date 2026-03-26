@@ -60,6 +60,31 @@ parameters:
   - name: appSettingsPath
     type: string
     default: ''
+    
+  # Template parameters for Signing sbom
+  - name: keyVaultUri
+    type: string
+    default: $(devops--clearing-sbom-signing-vaulturl)
+  
+  - name: certificateName
+    type: string
+    default: $(devops--clearing-sbom-signing-certname)
+  
+  - name: clientId
+    type: string
+    default: $(devops--clearing-sbom-signing-clientid)
+  
+  - name: clientSecret
+    type: string
+    default: $(devops--clearing-sbom-signing-clientsecret)
+    
+  - name: tenantId
+    type: string
+    default: '38ae3bcd-9579-4fd4-adda-b42e1495d55a' # Siemens AG Tenant
+
+  - name: SBOMSignVerify
+    type: boolean
+    default: True
 
 steps:
   - task: CmdLine@2
