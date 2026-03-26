@@ -28,7 +28,9 @@ jobs:
 - job: 'UnitTests'
   displayName: 'Run Unit Tests'
   pool:
-    vmImage: 'ubuntu-latest'
+    name: "managed-pipeline-agents"
+    demands:
+      - ImageOverride -equals ubuntu-2025
 
   steps:
   - checkout: self
@@ -112,7 +114,9 @@ jobs:
 - job: 'IntegrationTests'
   displayName: 'Run Integration Tests'
   pool:
-    vmImage: 'ubuntu-latest'
+    name: "managed-pipeline-agents"
+    demands:
+      - ImageOverride -equals ubuntu-2025
 
   steps:
     - checkout: self
@@ -240,7 +244,9 @@ jobs:
   - IntegrationTests
   displayName: 'Run SonarQube Analysis'
   pool:
-    vmImage: 'ubuntu-latest'
+    name: "managed-pipeline-agents"
+    demands:
+      - ImageOverride -equals ubuntu-2025
 
   steps:
   - checkout: self
