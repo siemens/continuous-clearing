@@ -102,6 +102,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.ProjectType, "NPM",
                 TestConstant.Mode,"test"
             }),

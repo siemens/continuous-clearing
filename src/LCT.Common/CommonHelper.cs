@@ -813,7 +813,7 @@ namespace LCT.Common
                     {
                         name = $"{component.Group}/{component.Name}";
                     }
-                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
+                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()), RegexOptions.None, TimeSpan.FromSeconds(5))) &&
                         (component.Version.Contains(excludedcomponent[1], StringComparison.InvariantCultureIgnoreCase) || excludedcomponent[1].Equals("*", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         noOfExcludedComponents++;

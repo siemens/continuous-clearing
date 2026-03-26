@@ -45,6 +45,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.JfrogNpmInternalRepo,"Npm-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.ProjectType, "NPM",
@@ -68,6 +69,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.FossologyURL,testParameters.FossUrl }), "Test to run Package Creator EXE execution");
         }
 

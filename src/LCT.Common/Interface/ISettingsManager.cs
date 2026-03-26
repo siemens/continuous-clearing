@@ -18,7 +18,7 @@ namespace LCT.Common.Interface
         /// <param name="jsonSettingsFileName">The name of the JSON settings file.</param>
         /// <param name="environmentHelper">The environment helper for system interactions.</param>
         /// <returns>An instance of the application settings type T.</returns>
-        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName, IEnvironmentHelper environmentHelper);
+        public T ReadConfiguration<T>(string[] args, string jsonSettingsFileName, IEnvironmentHelper environmentHelper) where T : class;
 
         /// <summary>
         /// Checks that all required arguments are present to run the application.

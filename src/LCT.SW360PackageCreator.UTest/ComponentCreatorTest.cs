@@ -346,6 +346,10 @@ namespace LCT.SW360PackageCreator.UTest
                     ProjectID = "projectId",
                     ProjectName = "projectName"
                 },
+                SbomSigning = new SbomSigningConfig
+                {
+                    SBOMSignVerify = false
+                },
                 Directory = new Common.Directory()
                 {
                     OutputFolder = "outputFolder"
@@ -385,7 +389,7 @@ namespace LCT.SW360PackageCreator.UTest
             await componentCreator.CreateComponentInSw360(appSettings, mockSw360CreatorService.Object, mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object, mockCreatorHelper.Object, parsedBomData);
 
             // Assert
-            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CommonAppSettings>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
             mockSw360CreatorService.Verify(x => x.LinkReleasesToProject(It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()), Times.Once);
@@ -1342,6 +1346,10 @@ namespace LCT.SW360PackageCreator.UTest
 
             var appSettings = new CommonAppSettings
             {
+                SbomSigning = new SbomSigningConfig
+                {
+                    SBOMSignVerify = false
+                },
                 SW360 = new SW360
                 {
                     URL = "http://sw360.example.com",
@@ -1397,7 +1405,7 @@ namespace LCT.SW360PackageCreator.UTest
             mockCreatorHelper.Verify(x => x.GetUpdatedComponentsDetails(It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(), It.IsAny<ISW360Service>(), It.IsAny<Bom>()), Times.Once);
 
             // Assert - Files should still be written
-            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockFileOperations.Verify(x => x.WriteContentToOutputBomFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CommonAppSettings>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteCreatorKpiDataToConsole(It.IsAny<CreatorKpiData>()), Times.Once);
             mockCreatorHelper.Verify(x => x.WriteSourceNotFoundListToConsole(It.IsAny<List<ComparisonBomData>>(), It.IsAny<CommonAppSettings>()), Times.Once);
         }
@@ -1461,6 +1469,204 @@ namespace LCT.SW360PackageCreator.UTest
             Assert.That(list[0].Name, Is.EqualTo("7zip"));
             Assert.That(list[0].ComponentStatus, Is.EqualTo("Not Processed for CHOCO"));
         }
+
+        #region SBOM Signing Condition Tests
+
+        [Test]
+        public async Task CreateComponentInSw360_WithSBOMSignVerifyEnabled_UpdatesTimestampAndClearsSignature()
+        {
+            // Tests: if (appSettings.SbomSigning.SBOMSignVerify) with TRUE condition
+            // Should update Metadata.Timestamp and set Signature to null
+
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ProjectName = "TestProject",
+                    ProjectID = "project123",
+                    URL = "https://sw360.example.com",
+                    Fossology = new Fossology { URL = "https://fossology.example.com/" }
+                },
+                SbomSigning = new SbomSigningConfig { SBOMSignVerify = true },
+                Directory = new Common.Directory { OutputFolder = Path.GetTempPath() }
+            };
+
+            var parsedBomData = new List<ComparisonBomData>
+            {
+                new ComparisonBomData { Name = "TestComponent", Version = "1.0.0" }
+            };
+
+            var mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            var mockSw360Service = new Mock<ISW360Service>();
+            var mockSw360ProjectService = new Mock<ISw360ProjectService>();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var mockCreatorHelper = new Mock<ICreatorHelper>();
+
+            var bomWithTimestamp = new Bom
+            {
+                Metadata = new Metadata { Timestamp = DateTime.MinValue },
+                Components = new List<Component>()
+            };
+
+            mockCreatorHelper
+                .Setup(x => x.GetUpdatedComponentsDetails(
+                    It.IsAny<List<Components>>(),
+                    It.IsAny<List<ComparisonBomData>>(),
+                    It.IsAny<ISW360Service>(),
+                    It.IsAny<Bom>()))
+                .ReturnsAsync(bomWithTimestamp);
+
+            mockCreatorHelper.Setup(x => x.GetDownloadUrlNotFoundList(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new List<ComparisonBomData>());
+            mockCreatorHelper.Setup(x => x.GetCreatorKpiData(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new CreatorKpiData());
+            mockSw360ProjectService.Setup(x => x.GetAlreadyLinkedReleasesByProjectId(It.IsAny<string>()))
+                .ReturnsAsync(new List<ReleaseLinked>());
+            mockSw360CreatorService.Setup(x => x.LinkReleasesToProject(
+                It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            // Act
+            await _componentCreator.CreateComponentInSw360(
+                appSettings, mockSw360CreatorService.Object, mockSw360Service.Object,
+                mockSw360ProjectService.Object, mockFileOperations.Object,
+                mockCreatorHelper.Object, parsedBomData);
+
+            // Assert - Verify that WriteContentToOutputBomFile was called with the BOM
+            mockFileOperations.Verify(
+                x => x.WriteContentToOutputBomFile(
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<CommonAppSettings>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task CreateComponentInSw360_WithSBOMSignVerifyDisabled_KeepsOriginalBom()
+        {
+            // Tests: if (appSettings.SbomSigning.SBOMSignVerify) with FALSE condition
+            // Should NOT modify Metadata.Timestamp when disabled
+
+            // Arrange
+            var appSettings = new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    ProjectName = "TestProject",
+                    ProjectID = "project123",
+                    URL = "https://sw360.example.com",
+                    Fossology = new Fossology { URL = "https://fossology.example.com/" }
+                },
+                SbomSigning = new SbomSigningConfig { SBOMSignVerify = false },
+                Directory = new Common.Directory { OutputFolder = Path.GetTempPath() }
+            };
+
+            var parsedBomData = new List<ComparisonBomData>();
+
+            var mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            var mockSw360Service = new Mock<ISW360Service>();
+            var mockSw360ProjectService = new Mock<ISw360ProjectService>();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var mockCreatorHelper = new Mock<ICreatorHelper>();
+
+            var originalTimestamp = new DateTime(2023, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+            var bom = new Bom
+            {
+                Metadata = new Metadata { Timestamp = originalTimestamp },
+                Components = new List<Component>()
+            };
+
+            mockCreatorHelper
+                .Setup(x => x.GetUpdatedComponentsDetails(
+                    It.IsAny<List<Components>>(),
+                    It.IsAny<List<ComparisonBomData>>(),
+                    It.IsAny<ISW360Service>(),
+                    It.IsAny<Bom>()))
+                .ReturnsAsync(bom);
+
+            mockCreatorHelper.Setup(x => x.GetDownloadUrlNotFoundList(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new List<ComparisonBomData>());
+            mockCreatorHelper.Setup(x => x.GetCreatorKpiData(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new CreatorKpiData());
+            mockSw360ProjectService.Setup(x => x.GetAlreadyLinkedReleasesByProjectId(It.IsAny<string>()))
+                .ReturnsAsync(new List<ReleaseLinked>());
+            mockSw360CreatorService.Setup(x => x.LinkReleasesToProject(
+                It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            // Act
+            await _componentCreator.CreateComponentInSw360(
+                appSettings, mockSw360CreatorService.Object, mockSw360Service.Object,
+                mockSw360ProjectService.Object, mockFileOperations.Object,
+                mockCreatorHelper.Object, parsedBomData);
+
+            // Assert
+            mockFileOperations.Verify(
+                x => x.WriteContentToOutputBomFile(
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<CommonAppSettings>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task CreateComponentInSw360_ConditionBranchCoverage_TestsBothPaths()
+        {
+            // Tests both if condition paths: SBOMSignVerify = true and false
+
+            var mockSw360CreatorService = new Mock<ISw360CreatorService>();
+            var mockSw360Service = new Mock<ISW360Service>();
+            var mockSw360ProjectService = new Mock<ISw360ProjectService>();
+            var mockFileOperations = new Mock<IFileOperations>();
+            var mockCreatorHelper = new Mock<ICreatorHelper>();
+
+            // Setup mocks
+            mockCreatorHelper.Setup(x => x.GetUpdatedComponentsDetails(
+                It.IsAny<List<Components>>(), It.IsAny<List<ComparisonBomData>>(),
+                It.IsAny<ISW360Service>(), It.IsAny<Bom>()))
+                .ReturnsAsync(new Bom { Metadata = new Metadata { Timestamp = DateTime.UtcNow }, Components = new List<Component>() });
+
+            mockCreatorHelper.Setup(x => x.GetDownloadUrlNotFoundList(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new List<ComparisonBomData>());
+            mockCreatorHelper.Setup(x => x.GetCreatorKpiData(It.IsAny<List<ComparisonBomData>>()))
+                .Returns(new CreatorKpiData());
+            mockSw360ProjectService.Setup(x => x.GetAlreadyLinkedReleasesByProjectId(It.IsAny<string>()))
+                .ReturnsAsync(new List<ReleaseLinked>());
+            mockSw360CreatorService.Setup(x => x.LinkReleasesToProject(
+                It.IsAny<List<ReleaseLinked>>(), It.IsAny<List<ReleaseLinked>>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            // Test Case 1: SBOMSignVerify = true
+            var appSettingsEnabled = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectName = "Test", ProjectID = "id", URL = "http://test.com", Fossology = new Fossology { URL = "http://foss.com/" } },
+                SbomSigning = new SbomSigningConfig { SBOMSignVerify = true },
+                Directory = new Common.Directory { OutputFolder = Path.GetTempPath() }
+            };
+
+            await _componentCreator.CreateComponentInSw360(appSettingsEnabled, mockSw360CreatorService.Object,
+                mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object,
+                mockCreatorHelper.Object, new List<ComparisonBomData>());
+
+            // Test Case 2: SBOMSignVerify = false
+            var appSettingsDisabled = new CommonAppSettings
+            {
+                SW360 = new SW360 { ProjectName = "Test", ProjectID = "id", URL = "http://test.com", Fossology = new Fossology { URL = "http://foss.com/" } },
+                SbomSigning = new SbomSigningConfig { SBOMSignVerify = false },
+                Directory = new Common.Directory { OutputFolder = Path.GetTempPath() }
+            };
+
+            await _componentCreator.CreateComponentInSw360(appSettingsDisabled, mockSw360CreatorService.Object,
+                mockSw360Service.Object, mockSw360ProjectService.Object, mockFileOperations.Object,
+                mockCreatorHelper.Object, new List<ComparisonBomData>());
+
+            // Assert
+            mockFileOperations.Verify(
+                x => x.WriteContentToOutputBomFile(
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<CommonAppSettings>()),
+                Times.Exactly(2), "WriteContentToOutputBomFile should be called for both conditions");
+        }
+
+        #endregion
     }
 }
-

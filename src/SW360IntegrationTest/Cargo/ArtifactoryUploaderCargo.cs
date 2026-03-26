@@ -33,6 +33,7 @@ namespace SW360IntegrationTest.Cargo
                 TestConstant.JfrogCargoInternalDestRepoName, testParameters.InternalDestinationRepoName,
                 TestConstant.JFrogApiURL, testParameters.JfrogApi,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.DryRun, false.ToString()
             });
 

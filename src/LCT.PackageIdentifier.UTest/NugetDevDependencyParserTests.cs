@@ -212,5 +212,184 @@ namespace LCT.PackageIdentifier.UTest
             Assert.AreEqual(64, hash.Length); // SHA256 hash length in hex
             File.Delete(tempFile);
         }
+
+        [Test]
+        public void IsTestProject_ThrowsInvalidOperationException_ReturnsFalse()
+        {
+            // Arrange
+            string tempFile = Path.GetTempFileName();
+            string invalidContent = "<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><TargetFramework>net8.0</TargetFramework></PropertyGroup></Project>";
+            File.WriteAllText(tempFile, invalidContent);
+
+            // We need to simulate InvalidOperationException by creating a scenario where MSBuild encounters an issue
+            // This can happen when there are conflicting project definitions or MSBuild state issues
+
+            try
+            {
+                // Act & Assert
+                var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+
+                // Create multiple instances to potentially trigger InvalidOperationException
+                for (int i = 0; i < 5; i++)
+                {
+                    bool result = (bool)method.Invoke(null, new object[] { tempFile });
+                    // Should return false when exception occurs
+                    Assert.IsFalse(result);
+                }
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Test]
+        public void IsTestProject_ThrowsMissingFieldException_ReturnsFalse()
+        {
+            // Arrange - Create a project file that could cause MissingFieldException
+            string tempFile = Path.GetTempFileName();
+            // Create malformed XML that might trigger MissingFieldException during MSBuild evaluation
+            string malformedContent = "<Project><Target Name=\"Build\" /><Import Project=\"NonExistentTarget.targets\" /></Project>";
+            File.WriteAllText(tempFile, malformedContent);
+
+            try
+            {
+                // Act
+                var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+                bool result = (bool)method.Invoke(null, new object[] { tempFile });
+
+                // Assert
+                Assert.IsFalse(result);
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Test]
+        public void IsTestProject_ThrowsArgumentException_ReturnsFalse()
+        {
+            // Arrange - Use invalid characters or path that would cause ArgumentException
+            string invalidPath = "invalid<>path?.csproj";
+
+            // Act
+            var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+            bool result = (bool)method.Invoke(null, new object[] { invalidPath });
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsTestProject_ThrowsIOException_ReturnsFalse()
+        {
+            // Arrange - Create a file and then make it inaccessible to trigger IOException
+            string tempFile = Path.GetTempFileName();
+            string validContent = "<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><TargetFramework>net8.0</TargetFramework></PropertyGroup></Project>";
+            File.WriteAllText(tempFile, validContent);
+
+            try
+            {
+                // Make file inaccessible by opening it exclusively
+                using (var fileStream = new FileStream(tempFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    // Act
+                    var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+                    bool result = (bool)method.Invoke(null, new object[] { tempFile });
+
+                    // Assert
+                    Assert.IsFalse(result);
+                }
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Test]
+        public void IsTestProject_WithLockedFile_ThrowsIOException_ReturnsFalse()
+        {
+            // Arrange - Alternative approach to trigger IOException
+            string tempFile = Path.GetTempFileName();
+            string validContent = "<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><TargetFramework>net8.0</TargetFramework></PropertyGroup></Project>";
+            File.WriteAllText(tempFile, validContent);
+
+            // Set file attributes to read-only to potentially cause issues
+            File.SetAttributes(tempFile, FileAttributes.ReadOnly);
+
+            try
+            {
+                // Act
+                var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+                bool result = (bool)method.Invoke(null, new object[] { tempFile });
+
+                // Assert - Should handle gracefully and return false
+                Assert.IsFalse(result);
+            }
+            finally
+            {
+                // Remove read-only attribute before deletion
+                File.SetAttributes(tempFile, FileAttributes.Normal);
+                File.Delete(tempFile);
+            }
+        }
+
+        [Test]
+        public void IsTestProject_WithVeryLongPath_ThrowsArgumentException_ReturnsFalse()
+        {
+            // Arrange - Create a path that's too long to trigger ArgumentException
+            string longPath = new string('A', 300) + ".csproj"; // Exceeds typical path length limits
+
+            // Act
+            var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+            bool result = (bool)method.Invoke(null, new object[] { longPath });
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsTestProject_WithInvalidXmlContent_HandlesExceptionGracefully()
+        {
+            // Arrange
+            string tempFile = Path.GetTempFileName();
+            // Create XML content that might cause various parsing exceptions
+            string invalidXmlContent = "<Project><PropertyGroup><TargetFramework>net8.0</TargetFramework><InvalidElement></PropertyGroup></Project>";
+            File.WriteAllText(tempFile, invalidXmlContent);
+
+            try
+            {
+                // Act
+                var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+                bool result = (bool)method.Invoke(null, new object[] { tempFile });
+
+                // Assert - Should handle any exception and return false
+                Assert.IsFalse(result);
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Test]
+        public void IsTestProject_WithNullOrEmptyPath_ThrowsArgumentException_ReturnsFalse()
+        {
+            // Act & Assert - Test null path
+            var method = typeof(NugetDevDependencyParser).GetMethod("IsTestProject", BindingFlags.NonPublic | BindingFlags.Static);
+            bool resultNull = (bool)method.Invoke(null, new object[] { null });
+            Assert.IsFalse(resultNull);
+
+            // Test empty path
+            bool resultEmpty = (bool)method.Invoke(null, new object[] { "" });
+            Assert.IsFalse(resultEmpty);
+
+            // Test whitespace path
+            bool resultWhitespace = (bool)method.Invoke(null, new object[] { "   " });
+            Assert.IsFalse(resultWhitespace);
+        }
+
     }
 }

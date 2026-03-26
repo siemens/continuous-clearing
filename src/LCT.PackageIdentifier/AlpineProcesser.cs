@@ -183,12 +183,14 @@ namespace LCT.PackageIdentifier
                 {
 
                     alpinePackages.Add(package);
-                    Logger.Debug($"ExtractDetailsForJson():ValidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                    Logger.DebugFormat("ExtractDetailsForJson():ValidComponent : Component Details : {0} @ {1} @ {2}",
+                    package.Name, package.Version, package.PurlID);
                 }
                 else
                 {
                     BomCreator.bomKpiData.ComponentsExcluded++;
-                    Logger.Debug($"ExtractDetailsForJson():InvalidComponent : Component Details : {package.Name} @ {package.Version} @ {package.PurlID}");
+                    Logger.DebugFormat("ExtractDetailsForJson():InvalidComponent : Component Details : {0} @ {1} @ {2}",
+                    package.Name, package.Version, package.PurlID);
                 }
             }
             if (bom.Dependencies != null)
