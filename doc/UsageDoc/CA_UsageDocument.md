@@ -199,7 +199,7 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
   * **Project Type :** **Maven**
 
-    * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the PATH variable.
+    * [Apache Maven](https://maven.apache.org/download.cgi) has to be installed in the build machine and added in the PATH variable.
       *Add the cycloneDX Maven Plugin to the main pom.xml* and run the command to generate the input bom file.
 
       ```
@@ -213,17 +213,33 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       ```
         mvn clean install -DskipTests=true 
       ```
-    * **Alternative SBOM generation (cdxgen)**
-    * Prerequisites:
-      * Node.js and Git installed
-      * Install cdxgen: `npm i -g @cyclonedx/cdxgen` or use `npx @cyclonedx/cdxgen`
-    * Usage:
-      * From the project root (where `pom.xml` is present), run:
+    * **Note** : To enable development dependency identification, provide **two BOM files** in the input folder.
+
+        **Step 1** - Generate full BOM (all scopes including test, provided):
+
         ```
-        cdxgen -r . -o cdx_dep.json --spec-version 1.6
+          mvn install cyclonedx:makeAggregateBom -DincludeTestScope=true -DoutputName=bom
         ```
-        
-    * Place the generated `cdx_dep.json` in the input directory .
+
+        **Step 2** - Generate production-only BOM (compile and runtime scopes only):
+
+        ```
+          mvn install cyclonedx:makeAggregateBom -DincludeTestScope=false -DoutputName=bom-without
+        ```
+
+        **Step 3** - Place both generated files in the same input folder:
+
+        ```
+          InputFolder/
+            ├── bom.cdx.json           ← all dependencies (including test/dev)
+            └── bom-without.cdx.json   ← production dependencies only
+        ```
+
+        CCTool will compare the two files. Any package present in `bom.cdx.json` but absent from `bom-without.cdx.json` will be marked as a development dependency (`IsDevelopment = true`).
+
+        > **Note** : The file names `bom.cdx.json` and `bom-without.cdx.json` are not compulsory. Any two files matching the `Include` pattern (`*.cdx.json` by default in appSettings.json) will work. CCTool automatically treats the file with **more components** as the full BOM and the file with **fewer components** as the production BOM — file naming and scan order do not matter.
+
+        > **Note** : If only one BOM file is provided, CCTool will **not** identify any development dependencies - all packages will be treated as production dependencies.
 
 
   * **Project Type :** **Python**
