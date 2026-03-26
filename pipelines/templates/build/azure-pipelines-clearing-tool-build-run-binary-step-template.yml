@@ -105,9 +105,21 @@ steps:
             "--SW360:Fossology:URL", "${{ parameters.fossologyUrl }}",
             "--JFrog:URL", "${{ parameters.JfrogUrl }}",
             "--Jfrog:Token", "${{ parameters.JfrogToken }}",
+            "--SbomSigning:SBOMSignVerify", "${{ parameters.SBOMSignVerify }}",
             "--settingsfilepath", "${{ parameters.appSettingsPath }}"
           )
-
+          if ('${{ parameters.SBOMSignVerify }}' -eq 'true') {
+              $args += "--SbomSigning:KeyVaultUri"
+              $args += "${{ parameters.keyVaultUri }}"
+              $args += "--SbomSigning:CertificateName"
+              $args += "${{ parameters.certificateName }}"
+              $args += "--SbomSigning:ClientId"
+              $args += "${{ parameters.clientId }}"
+              $args += "--SbomSigning:ClientSecret"
+              $args += "${{ parameters.clientSecret }}"
+              $args += "--SbomSigning:TenantId"
+              $args += "${{ parameters.tenantId }}"
+          }
           $projectTypes = @()
           $parameters.projectDefinitions | ForEach-Object { $projectTypes += $_.projectType }
           $index = [array]::IndexOf($projectTypes, "${{ project.projectType }}")
@@ -134,6 +146,12 @@ steps:
           --SW360:URL "${{ parameters.sw360Url }}" `
           --SW360:Token "${{ parameters.sw360Token }}" `
           --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --SbomSigning:SBOMSignVerify "${{ parameters.SBOMSignVerify }}" `
+          --SbomSigning:KeyVaultUri "${{ parameters.keyVaultUri }}" `
+          --SbomSigning:CertificateName "${{ parameters.certificateName }}" `
+          --SbomSigning:ClientId "${{ parameters.clientId }}" `
+          --SbomSigning:ClientSecret "${{ parameters.clientSecret }}" `
+          --SbomSigning:TenantId "${{ parameters.tenantId }}" `
           --settingsfilepath "${{ parameters.appSettingsPath }}"
 
   - task: PowerShell@2
@@ -154,6 +172,12 @@ steps:
           --JFrog:URL "${{ parameters.JfrogUrl }}" `
           --Jfrog:Token "${{ parameters.JfrogToken }}" `
           --JFrog:DryRun "${{ parameters.jfrogDryRun }}" `
+          --SbomSigning:SBOMSignVerify "${{ parameters.SBOMSignVerify }}" `
+          --SbomSigning:KeyVaultUri "${{ parameters.keyVaultUri }}" `
+          --SbomSigning:CertificateName "${{ parameters.certificateName }}" `
+          --SbomSigning:ClientId "${{ parameters.clientId }}" `
+          --SbomSigning:ClientSecret "${{ parameters.clientSecret }}" `
+          --SbomSigning:TenantId "${{ parameters.tenantId }}" `
           --settingsfilepath "${{ parameters.appSettingsPath }}"
 
   - task: PublishBuildArtifacts@1
