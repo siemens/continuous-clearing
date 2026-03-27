@@ -961,7 +961,7 @@ namespace LCT.Common
             }
             bom.Components = bomComponentsList;
         }
-       
+
         #endregion
 
 

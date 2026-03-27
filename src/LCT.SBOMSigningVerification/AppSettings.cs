@@ -21,7 +21,7 @@ namespace LCT.SBOMSigningVerification
         public OperationType Operation { get; set; }
 
         public bool? SBOMSignVerify { get; set; }
-        
+
 
     }
 }

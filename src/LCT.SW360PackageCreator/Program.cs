@@ -8,7 +8,6 @@ using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.ComplianceValidator;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;
@@ -43,7 +42,7 @@ namespace LCT.SW360PackageCreator
         private static List<ComparisonBomData> parsedBomData;
         static readonly SbomSigningValidation sbomSigningValidation = new();
 
-		protected Program() { }
+        protected Program() { }
 
         /// <summary>
         /// Initializes and executes the package creator application workflow. This includes reading configuration

@@ -151,7 +151,7 @@ namespace SW360IntegrationTest.Conan
             var releasesInfo = JsonConvert.DeserializeObject<ReleasesInfo>(releaseResponseBody);
 
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
-            _=releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
+            _ = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
 
             //Assert
             Assert.AreEqual(expectedname, name, "Test Project Name");

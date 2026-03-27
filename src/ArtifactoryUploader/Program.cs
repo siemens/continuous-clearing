@@ -11,7 +11,6 @@ using LCT.APICommunications.Interfaces;
 using LCT.APICommunications.Model;
 using LCT.Common;
 using LCT.Common.Constants;
-using LCT.Common.Interface;
 using LCT.Common.Logging;
 using LCT.Common.Model;
 using LCT.Facade;

@@ -11,7 +11,6 @@ using LCT.SBOMSigningVerification.Interface;
 using log4net;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace LCT.SBOMSigningVerification.Helpers
@@ -30,42 +29,42 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <param name="bomcontent">args</param>
         /// <returns>signature</returns>
         public byte[] SignCertificate(string content)
-        {           
-                ValidateAzureKeyVaultSettings();
+        {
+            ValidateAzureKeyVaultSettings();
 
-                try
+            try
+            {
+                var clientSecretCredential = new ClientSecretCredential(
+                    appSettings.TenantId,
+                    appSettings.ClientId,
+                    appSettings.ClientSecret);
+
+                var cryptoClient = new CryptographyClient(
+                    new Uri($"{appSettings.KeyVaultURI}/keys/{appSettings.CertificateName}"),
+                    clientSecretCredential);
+
+                byte[] dataToSign = Encoding.UTF8.GetBytes(content);
+                byte[] hash = SHA256.HashData(dataToSign);
+                var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
+
+                if (signResult?.Signature == null || signResult.Signature.Length == 0)
                 {
-                    var clientSecretCredential = new ClientSecretCredential(
-                        appSettings.TenantId,
-                        appSettings.ClientId,
-                        appSettings.ClientSecret);
-
-                    var cryptoClient = new CryptographyClient(
-                        new Uri($"{appSettings.KeyVaultURI}/keys/{appSettings.CertificateName}"),
-                        clientSecretCredential);
-
-                    byte[] dataToSign = Encoding.UTF8.GetBytes(content);
-                    byte[] hash = SHA256.HashData(dataToSign);
-                    var signResult = cryptoClient.Sign(SignatureAlgorithm.RS256, hash);
-
-                    if (signResult?.Signature == null || signResult.Signature.Length == 0)
-                    {
-                        const string errorMsg = "Azure Key Vault returned null or empty signature.";
-                        Logger.Error(errorMsg);
-                        throw new InvalidOperationException(errorMsg);
-                    }
-
-                    return signResult.Signature;
-                }
-                catch (Exception ex)
-                {
-                    string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
-                    Logger.ErrorFormat(contextMsg);
-                    throw new InvalidOperationException(contextMsg, ex);
+                    const string errorMsg = "Azure Key Vault returned null or empty signature.";
+                    Logger.Error(errorMsg);
+                    throw new InvalidOperationException(errorMsg);
                 }
 
+                return signResult.Signature;
             }
-        
+            catch (Exception ex)
+            {
+                string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
+                Logger.ErrorFormat(contextMsg);
+                throw new InvalidOperationException(contextMsg, ex);
+            }
+
+        }
+
         /// <summary>
         /// Verifying signature
         /// </summary>
@@ -75,35 +74,35 @@ namespace LCT.SBOMSigningVerification.Helpers
         /// <exception cref="InvalidOperationException"></exception>
         public bool VerifySignature(string content, string signature)
         {
-                ValidateAzureKeyVaultSettings();
+            ValidateAzureKeyVaultSettings();
 
-                try
-                {
-                    var clientSecretCredential = new ClientSecretCredential(
-                        appSettings.TenantId,
-                        appSettings.ClientId,
-                        appSettings.ClientSecret);
+            try
+            {
+                var clientSecretCredential = new ClientSecretCredential(
+                    appSettings.TenantId,
+                    appSettings.ClientId,
+                    appSettings.ClientSecret);
 
-                    var cryptoClient = new CryptographyClient(
-                        new Uri($"{appSettings.KeyVaultURI}/keys/{appSettings.CertificateName}"),
-                        clientSecretCredential);
+                var cryptoClient = new CryptographyClient(
+                    new Uri($"{appSettings.KeyVaultURI}/keys/{appSettings.CertificateName}"),
+                    clientSecretCredential);
 
-                    byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
-                    byte[] hash = SHA256.HashData(dataToVerify);
-                    byte[] sign = Convert.FromBase64String(signature);
+                byte[] dataToVerify = Encoding.UTF8.GetBytes(content);
+                byte[] hash = SHA256.HashData(dataToVerify);
+                byte[] sign = Convert.FromBase64String(signature);
 
-                    VerifyResult verifyResult = cryptoClient.Verify(SignatureAlgorithm.RS256, hash, sign);
+                VerifyResult verifyResult = cryptoClient.Verify(SignatureAlgorithm.RS256, hash, sign);
 
-                    return verifyResult.IsValid;
-                }
-                catch (Exception ex)
-                {
-                    string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
-                    Logger.ErrorFormat(contextMsg);
-                    throw new InvalidOperationException(contextMsg, ex);
-                }
-
+                return verifyResult.IsValid;
             }
+            catch (Exception ex)
+            {
+                string contextMsg = $"Error occurred while validating the content for certificate '{appSettings.CertificateName}' in Key Vault '{appSettings.KeyVaultURI}': {ex.Message}";
+                Logger.ErrorFormat(contextMsg);
+                throw new InvalidOperationException(contextMsg, ex);
+            }
+
+        }
 
 
         /// <summary>

@@ -7,7 +7,6 @@ using LCT.SBOMSigningVerification.Helpers;
 using LCT.SBOMSigningVerification.Interface;
 using LCT.SBOMSigningVerification.Model;
 using Moq;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Text;
@@ -29,7 +28,7 @@ namespace LCT.SBOMSigningVerification.UTest
         {
             _mockCertificateHelper = new Mock<ICertificateHelper>();
             _mockSignatureHelper = new Mock<ISignatureHelper>();
-            
+
             _appSettings = new AppSettings
             {
                 bomcontent = "{\"name\":\"test-sbom\",\"version\":\"1.0.0\"}",
@@ -37,7 +36,7 @@ namespace LCT.SBOMSigningVerification.UTest
             };
 
             _jsonFileHelper = new JsonFileHelper(_appSettings, _mockCertificateHelper.Object, _mockSignatureHelper.Object);
-            
+
             // Create temp directory for file operations
             _tempDirectory = Path.Combine(Path.GetTempPath(), "JsonFileHelperTest", Guid.NewGuid().ToString());
             Directory.CreateDirectory(_tempDirectory);
@@ -58,9 +57,9 @@ namespace LCT.SBOMSigningVerification.UTest
             // Arrange
             string originalSbom = "{\"name\":\"test-sbom\",\"signature\":{\"value\":\"existing\"}}";
             string cleanedSbomWithSignature = "{\"name\":\"test-sbom\",\"signature\":{\"value\":\"existing\"}}"; // Simulate that signature wasn't removed properly
-            
+
             _appSettings.bomcontent = originalSbom;
-            
+
             _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
                 .Returns(cleanedSbomWithSignature); // This simulates a scenario where signature removal failed
 
@@ -76,9 +75,9 @@ namespace LCT.SBOMSigningVerification.UTest
             string originalSbom = "{\"name\":\"test-sbom\",\"version\":\"1.0.0\"}";
             string cleanedSbom = "{\"name\":\"test-sbom\",\"version\":\"1.0.0\"}";
             byte[] signatureBytes = Convert.FromBase64String("dGVzdC1zaWduYXR1cmU=");
-            
+
             _appSettings.bomcontent = originalSbom;
-            
+
             _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
                 .Returns(cleanedSbom);
             _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
@@ -99,9 +98,9 @@ namespace LCT.SBOMSigningVerification.UTest
             // Arrange
             string originalSbom = "{\"name\":\"test-sbom\",\"version\":\"1.0.0\"}";
             string cleanedSbom = "{\"name\":\"test-sbom\",\"version\":\"1.0.0\"}";
-            
+
             _appSettings.bomcontent = originalSbom;
-            
+
             _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
                 .Returns(cleanedSbom);
             _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
@@ -118,9 +117,9 @@ namespace LCT.SBOMSigningVerification.UTest
             // Arrange
             string originalSbom = "{\"name\":\"test-sbom\",\"version\":\"1.0.0\"}";
             string cleanedSbom = "{\"name\":\"test-sbom\",\"version\":\"1.0.0\"}";
-            
+
             _appSettings.bomcontent = originalSbom;
-            
+
             _mockSignatureHelper.Setup(x => x.RemoveSignature(originalSbom))
                 .Returns(cleanedSbom);
             _mockCertificateHelper.Setup(x => x.SignCertificate(cleanedSbom))
@@ -295,7 +294,7 @@ namespace LCT.SBOMSigningVerification.UTest
         {
             // Arrange
             _appSettings.bomcontent = "invalid json";
-            
+
             // SignatureHelper.RemoveSignature will throw JsonException for invalid JSON
             _mockSignatureHelper.Setup(x => x.RemoveSignature("invalid json"))
                 .Throws<JsonException>();
@@ -337,11 +336,11 @@ namespace LCT.SBOMSigningVerification.UTest
                     ""timestamp"": ""2024-01-01T00:00:00Z""
                 }
             }";
-            
+
             byte[] signatureBytes = Convert.FromBase64String("Y29tcGxleC1zaWduYXR1cmU=");
-            
+
             _appSettings.bomcontent = complexSbom;
-            
+
             _mockSignatureHelper.Setup(x => x.RemoveSignature(It.IsAny<string>()))
                 .Returns(complexSbom);
             _mockCertificateHelper.Setup(x => x.SignCertificate(It.IsAny<string>()))
@@ -354,7 +353,7 @@ namespace LCT.SBOMSigningVerification.UTest
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Does.Contain("signature"));
             Assert.That(result, Does.Contain("Y29tcGxleC1zaWduYXR1cmU="));
-            
+
             // Verify the result is valid JSON
             Assert.DoesNotThrow(() => JsonDocument.Parse(result));
         }

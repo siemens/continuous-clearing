@@ -18,7 +18,7 @@ namespace LCT.Common.Model
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string TenantId { get; set; }
-        public bool SBOMSignVerify { get; set; } = true;       
+        public bool SBOMSignVerify { get; set; } = true;
 
     }
 }

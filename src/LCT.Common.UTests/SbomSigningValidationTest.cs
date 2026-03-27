@@ -170,7 +170,7 @@ namespace LCT.Common.UTest
                 Assert.Fail($"Unexpected exception for unknown operation: {ex.GetType().Name}: {ex.Message}");
             }
         }
-        
+
         [Test]
         public void PerformSbomOperation_WithNullBomFilePath_ThrowsException()
         {
@@ -290,7 +290,7 @@ namespace LCT.Common.UTest
             }
 
             // Both should either succeed or fail the same way
-            Assert.That((signException == null), Is.EqualTo(operationException == null), 
+            Assert.That((signException == null), Is.EqualTo(operationException == null),
                 "PerformSbomSigning and PerformSbomOperation should behave the same");
         }
 
@@ -438,7 +438,7 @@ namespace LCT.Common.UTest
                 Assert.Pass();
             }
         }
-               
+
 
         #endregion
 
@@ -712,7 +712,7 @@ namespace LCT.Common.UTest
                 // Expected when operation fails, but proves signature
             }
         }
-                
+
 
         [Test]
         public void SigningVerification_ReturnsVoid()
@@ -798,7 +798,7 @@ namespace LCT.Common.UTest
             }
         }
 
-        
+
         #endregion
 
         #region SigningVerification - Validation Result Handling Tests
@@ -864,7 +864,7 @@ namespace LCT.Common.UTest
             _sbomSigningValidation.SigningVerification(_validAppSettings, invalidBomFilePath, mockHelper.Object);
 
             // Assert
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once,
                 "Environment.Exit should be called with -1 when validation fails");
         }
 
@@ -912,7 +912,7 @@ namespace LCT.Common.UTest
             _sbomSigningValidation.SigningVerification(invalidAppSettings, bomFilePath, mockHelper.Object);
 
             // Assert
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once,
                 "Environment.Exit should be called on InvalidOperationException");
         }
 
@@ -930,7 +930,7 @@ namespace LCT.Common.UTest
             _sbomSigningValidation.SigningVerification(_validAppSettings, nonExistentFilePath, mockHelper.Object);
 
             // Assert
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once,
                 "Environment.Exit should be called on FileNotFoundException");
         }
 
@@ -954,7 +954,7 @@ namespace LCT.Common.UTest
 
             // Assert
             // Should call exit when ArgumentNullException occurs
-            mockHelper.Verify(x => x.CallEnvironmentExit(It.IsAny<int>()), Times.AtLeastOnce, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(It.IsAny<int>()), Times.AtLeastOnce,
                 "Environment.Exit should be called on ArgumentNullException");
         }
 
@@ -997,7 +997,7 @@ namespace LCT.Common.UTest
 
             // Assert
             mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once);
-            mockHelper.Verify(x => x.CallEnvironmentExit(It.Is<int>(code => code != -1)), Times.Never, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(It.Is<int>(code => code != -1)), Times.Never,
                 "Exit should only be called with code -1");
         }
 
@@ -1161,7 +1161,7 @@ namespace LCT.Common.UTest
             }
 
             // Assert - either threw or called exit
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce,
                 "Environment.Exit should be called when ArgumentNullException occurs");
         }
 
@@ -1207,7 +1207,7 @@ namespace LCT.Common.UTest
             }
 
             // Assert
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce,
                 "Exit code should always be -1 for ArgumentNullException");
             mockHelper.Verify(x => x.CallEnvironmentExit(It.Is<int>(code => code != -1)), Times.Never);
         }
@@ -1283,7 +1283,7 @@ namespace LCT.Common.UTest
             }
 
             // Assert - all parts of the handler should execute
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce,
                 "CallEnvironmentExit should be called (part of exception handler)");
         }
 
@@ -1443,7 +1443,7 @@ namespace LCT.Common.UTest
             }
 
             // Assert
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce,
                 "Exit should be called at least once in exception handler");
         }
 
@@ -1466,7 +1466,7 @@ namespace LCT.Common.UTest
             }
 
             // Assert
-            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce, 
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.AtLeastOnce,
                 "Mock helper should verify CallEnvironmentExit(-1) was called");
         }
 

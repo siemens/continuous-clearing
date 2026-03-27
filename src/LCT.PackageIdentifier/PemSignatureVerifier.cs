@@ -77,14 +77,14 @@ namespace LCT.PackageIdentifier
             catch (FormatException ex)
             {
                 Logger.DebugFormat("Error loading PEM content: {0}", ex.Message);
-                Logger.Debug("Attempting to load as public key...",ex);
+                Logger.Debug("Attempting to load as public key...", ex);
                 return ValidateSignedFileFromPublicKey(documentPath, signaturePath, pemFilePath);
             }
             //IF System.Security.Cryptography.CryptographicException is thrown, it indicates that the PEM content is not a valid certificate.
             catch (CryptographicException ex)
             {
                 Logger.DebugFormat("Error loading as certificate: {0}", ex.Message);
-                Logger.Debug("Attempting to load as public key...",ex);
+                Logger.Debug("Attempting to load as public key...", ex);
                 return ValidateSignedFileFromPublicKey(documentPath, signaturePath, pemFilePath);
             }
         }

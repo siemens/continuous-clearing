@@ -7,6 +7,7 @@
 using CycloneDX.Models;
 using LCT.Common.Constants;
 using LCT.Common.Interface;
+using LCT.SBOMSigningVerification.Helpers;
 using log4net;
 using Newtonsoft.Json;
 using System;
@@ -15,7 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using LCT.SBOMSigningVerification.Helpers;
 
 namespace LCT.Common
 {
