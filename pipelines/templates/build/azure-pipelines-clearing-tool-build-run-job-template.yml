@@ -56,9 +56,9 @@ jobs:
     displayName: ${{ parameters.jobDisplayName }}
 
     pool:
-    name: "managed-pipeline-agents"
-    demands:
-      - ImageOverride -equals ubuntu-24.04
+      name: "managed-pipeline-agents"
+      demands:
+        - ImageOverride -equals ubuntu-24.04
 
     steps:
       - checkout: self
