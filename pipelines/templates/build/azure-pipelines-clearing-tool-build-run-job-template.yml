@@ -54,6 +54,12 @@ parameters:
 jobs:
   - job: ${{ parameters.jobName }}
     displayName: ${{ parameters.jobDisplayName }}
+
+    pool:
+    name: "managed-pipeline-agents"
+    demands:
+      - ImageOverride -equals ubuntu-24.04
+
     steps:
       - checkout: self
       - checkout: git://Continuous-Clearing/ca-tool-config-and-testdata@refs/heads/main

@@ -77,7 +77,6 @@ parameters:
     type: boolean
     default: True
 
-
 steps:
   - task: CmdLine@2
     displayName: 'Build CA Tool'
