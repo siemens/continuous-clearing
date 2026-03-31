@@ -71,7 +71,7 @@ parameters:
     
   - name: tenantId
     type: string
-    default: $(SBOMSignInTenentID) # Siemens AG Tenant
+    default: $(SBOMSignInTenentID) 
 
   - name: SBOMSignVerify
     type: boolean

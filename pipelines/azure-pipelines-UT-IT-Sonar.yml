@@ -30,7 +30,7 @@ jobs:
   pool:
     name: "managed-pipeline-agents"
     demands:
-      - ImageOverride -equals ubuntu-24.04
+      - ImageOverride -equals ubuntu-latest
 
   steps:
   - checkout: self
@@ -116,7 +116,7 @@ jobs:
   pool:
     name: "managed-pipeline-agents"
     demands:
-      - ImageOverride -equals ubuntu-24.04
+      - ImageOverride -equals ubuntu-latest
 
   steps:
     - checkout: self
@@ -246,7 +246,7 @@ jobs:
   pool:
     name: "managed-pipeline-agents"
     demands:
-      - ImageOverride -equals ubuntu-24.04
+      - ImageOverride -equals ubuntu-latest
 
   steps:
   - checkout: self
