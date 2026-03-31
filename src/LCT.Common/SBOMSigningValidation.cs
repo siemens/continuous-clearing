@@ -4,11 +4,9 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using CycloneDX.Models;
 using LCT.Common.Interface;
 using LCT.SBOMSigningVerification.Helpers;
 using log4net;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
@@ -46,7 +44,7 @@ namespace LCT.Common
                 TenantId = appSettings.SbomSigning.TenantId,
                 SBOMSignVerify = appSettings.SbomSigning.SBOMSignVerify,
                 bomcontent = bomContent
-                
+
             };
 
             var certificateHelper = new CertificateHelper(sbomSigningAppSettings);
@@ -115,8 +113,8 @@ namespace LCT.Common
                 else
                 {
                     Logger.Error("SBOM signature verification failed ");
-                    environmentHelper.CallEnvironmentExit(-1);                 
-                    
+                    environmentHelper.CallEnvironmentExit(-1);
+
                 }
             }
             catch (InvalidOperationException ex)
@@ -136,7 +134,7 @@ namespace LCT.Common
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
                 Logger.ErrorFormat(errorMsg);
                 environmentHelper.CallEnvironmentExit(-1);
-            }          
+            }
         }
     }
 }

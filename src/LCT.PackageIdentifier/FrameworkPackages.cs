@@ -54,7 +54,7 @@ namespace LCT.PackageIdentifier
                         var frameworkReferences = GetFrameworkReferences(lockFile, target);
                         if (!uniqueTargets.TryGetValue(target.TargetFramework, out var value))
                         {
-                            value = (new HashSet<string>(), target); 
+                            value = (new HashSet<string>(), target);
                             uniqueTargets[target.TargetFramework] = value;
                         }
                         foreach (var reference in frameworkReferences)
@@ -85,7 +85,7 @@ namespace LCT.PackageIdentifier
                         getFrameworkPackagesMethod,
                         target.Key,
                         [.. target.Value.References],
-                        target.Value.LockFileTarget); 
+                        target.Value.LockFileTarget);
                 }
             }
             catch (ArgumentException ex)

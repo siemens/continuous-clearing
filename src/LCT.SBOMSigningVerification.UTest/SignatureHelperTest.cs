@@ -4,8 +4,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using LCT.SBOMSigningVerification.Helpers;
-using LCT.SBOMSigningVerification.Model;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -292,7 +290,7 @@ namespace LCT.SBOMSigningVerification.UTest
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Does.Not.Contain("signature"));
-            
+
             // Verify other properties are preserved
             Assert.That(result, Does.Contain("bomFormat"));
             Assert.That(result, Does.Contain("CycloneDX"));
@@ -426,7 +424,7 @@ namespace LCT.SBOMSigningVerification.UTest
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Does.Contain("\n")); // Should have newlines (indentation)
             Assert.That(result, Does.Not.Contain("signature"));
-            
+
             // Verify it's properly formatted JSON
             var parsedResult = JsonDocument.Parse(result);
             Assert.That(parsedResult.RootElement.GetProperty("name").GetString(), Is.EqualTo("test"));
@@ -465,11 +463,11 @@ namespace LCT.SBOMSigningVerification.UTest
             Assert.That(extractedSignature, Is.Not.Null);
             Assert.That(extractedSignature.Algorithm, Is.EqualTo("RS256"));
             Assert.That(extractedSignature.Value, Is.EqualTo("dGVzdC1zaWduYXR1cmU="));
-            
+
             Assert.That(cleanedSbom, Does.Not.Contain("signature"));
             Assert.That(cleanedSbom, Does.Contain("name"));
             Assert.That(cleanedSbom, Does.Contain("components"));
-            
+
             Assert.That(extractedFromCleaned, Is.Null);
         }
 
@@ -483,7 +481,7 @@ namespace LCT.SBOMSigningVerification.UTest
                 componentsList.Add($@"{{""name"":""component{i}"",""version"":""1.0.{i}""}}");
             }
             var components = string.Join(",", componentsList);
-            
+
             string largeSbom = $@"{{
                 ""name"": ""large-sbom"",
                 ""version"": ""1.0.0"",
@@ -513,7 +511,7 @@ namespace LCT.SBOMSigningVerification.UTest
                 componentsList.Add($@"{{""name"":""component{i}"",""version"":""1.0.{i}""}}");
             }
             var components = string.Join(",", componentsList);
-            
+
             string largeSbom = $@"{{
                 ""name"": ""large-sbom"",
                 ""components"": [{components}],
@@ -531,7 +529,7 @@ namespace LCT.SBOMSigningVerification.UTest
             Assert.That(result, Does.Not.Contain("signature"));
             Assert.That(result, Does.Contain("component1"));
             Assert.That(result, Does.Contain("component1000"));
-            
+
             // Verify it's valid JSON
             Assert.DoesNotThrow(() => JsonDocument.Parse(result));
         }

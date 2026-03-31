@@ -19,7 +19,6 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -225,7 +224,7 @@ namespace LCT.PackageIdentifier
             return hashCode?.Trim() ?? string.Empty;
         }
 
-        
+
 
         /// <summary>
         /// Builds a display name for a component including group if available.

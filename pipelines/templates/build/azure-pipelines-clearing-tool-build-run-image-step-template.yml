@@ -52,6 +52,31 @@ parameters:
     type: string
     default: ''
 
+ # Template parameters for Signing sbom
+  - name: keyVaultUri
+    type: string
+    default: $(devops--clearing-sbom-signing-vaulturl)
+  
+  - name: certificateName
+    type: string
+    default: $(devops--clearing-sbom-signing-certname)
+  
+  - name: clientId
+    type: string
+    default: $(devops--clearing-sbom-signing-clientid)
+  
+  - name: clientSecret
+    type: string
+    default: $(devops--clearing-sbom-signing-clientsecret)
+    
+  - name: tenantId
+    type: string
+    default: $(SBOMSignInTenentID) 
+
+  - name: SBOMSignVerify
+    type: boolean
+    default: True
+
 steps:
   - task: CmdLine@2
     displayName: 'Build CA Tool'
@@ -114,8 +139,21 @@ steps:
             "--SW360:Fossology:URL", "${{ parameters.fossologyUrl }}",
             "--JFrog:URL", "${{ parameters.JfrogUrl }}",
             "--Jfrog:Token", "${{ parameters.JfrogToken }}",
+            "--SbomSigning:SBOMSignVerify", "${{ parameters.SBOMSignVerify }}",
             "--settingsfilepath", "/etc/CATool/$settingsFileName"
           )
+          if ('${{ parameters.SBOMSignVerify }}' -eq 'true') {
+              $args += "--SbomSigning:KeyVaultUri"
+              $args += "${{ parameters.keyVaultUri }}"
+              $args += "--SbomSigning:CertificateName"
+              $args += "${{ parameters.certificateName }}"
+              $args += "--SbomSigning:ClientId"
+              $args += "${{ parameters.clientId }}"
+              $args += "--SbomSigning:ClientSecret"
+              $args += "${{ parameters.clientSecret }}"
+              $args += "--SbomSigning:TenantId"
+              $args += "${{ parameters.tenantId }}"
+          }
 
           $projectTypes = @()
           $parameters.projectDefinitions | ForEach-Object { $projectTypes += $_.projectType }
@@ -158,6 +196,12 @@ steps:
           --SW360:URL "${{ parameters.sw360Url }}" `
           --SW360:Token "${{ parameters.sw360Token }}" `
           --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
+          --SbomSigning:SBOMSignVerify "${{ parameters.SBOMSignVerify }}" `
+          --SbomSigning:KeyVaultUri "${{ parameters.keyVaultUri }}" `
+          --SbomSigning:CertificateName "${{ parameters.certificateName }}" `
+          --SbomSigning:ClientId "${{ parameters.clientId }}" `
+          --SbomSigning:ClientSecret "${{ parameters.clientSecret }}" `
+          --SbomSigning:TenantId "${{ parameters.tenantId }}" `
           --settingsfilepath /etc/CATool/$settingsFileName
 
   - task: PowerShell@2
@@ -187,6 +231,13 @@ steps:
           --JFrog:URL "${{ parameters.JfrogUrl }}" `
           --JFrog:Token "${{ parameters.JfrogToken }}" `
           --JFrog:DryRun "${{ parameters.JfrogDryRun }}" `
+          --JFrog:DryRun "${{ parameters.JfrogDryRun }}" `
+          --SbomSigning:SBOMSignVerify "${{ parameters.SBOMSignVerify }}" `
+          --SbomSigning:KeyVaultUri "${{ parameters.keyVaultUri }}" `
+          --SbomSigning:CertificateName "${{ parameters.certificateName }}" `
+          --SbomSigning:ClientId "${{ parameters.clientId }}" `
+          --SbomSigning:ClientSecret "${{ parameters.clientSecret }}" `
+          --SbomSigning:TenantId "${{ parameters.tenantId }}" `
           --settingsfilepath /etc/CATool/$settingsFileName
 
   - task: PublishBuildArtifacts@1

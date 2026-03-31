@@ -51,7 +51,7 @@ namespace LCT.SBOMSigningVerification.Helpers
                 Algorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
                 Value = base64Signature
             };
-            
+
             var signatureJson = JsonSerializer.Serialize(signature, CachedJsonSerializerOptions);
 
             var array = AddPropertyToJson(bomContent, DataConstant.Signature, signatureJson);
@@ -73,7 +73,7 @@ namespace LCT.SBOMSigningVerification.Helpers
             {
                 throw new FileNotFoundException("SBOM file not found", sbomFilePath);
             }
-         
+
             string sbomContent = File.ReadAllText(sbomFilePath);
             Signature? signature = signatureHelper.ExtractSignature(sbomContent);
             if (signature == null || string.IsNullOrEmpty(signature.Value))
@@ -127,4 +127,4 @@ namespace LCT.SBOMSigningVerification.Helpers
             }
         }
     }
-    }
+}

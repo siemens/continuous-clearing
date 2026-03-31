@@ -192,13 +192,13 @@ namespace LCT.APICommunications
             {
                 LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex,
             "TaskCanceledException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
-                Logger.ErrorFormat("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}",  ex.Message);
+                Logger.ErrorFormat("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex, "");
-                Logger.ErrorFormat("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}" , ex.Message);
+                Logger.ErrorFormat("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
