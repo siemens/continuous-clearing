@@ -68,6 +68,8 @@ namespace LCT.Common
         public Config Cargo { get; set; }
         public Config Choco { get; set; }
         public string Mode { get; set; } = string.Empty;
+        public SbomSigningConfig SbomSigning { get; set; }
+
         public bool IsTestMode
         {
             get
@@ -123,12 +125,10 @@ namespace LCT.Common
             set
             {
                 if (!AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader") &&
+                    !string.IsNullOrEmpty(value))
                 {
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
-                    }
+                    m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
                 }
             }
         }

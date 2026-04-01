@@ -70,7 +70,10 @@ namespace LCT.ArtifactoryUploader.UTest
             {
                 ProjectName = "Test"
             };
-
+            commonAppSettings.SbomSigning = new SbomSigningConfig
+            {
+                SBOMSignVerify = false
+            };
             IJFrogService jFrogService = GetJfrogService(commonAppSettings);
             PackageUploadHelper.JFrogService = jFrogService;
             UploadToArtifactory.JFrogService = jFrogService;

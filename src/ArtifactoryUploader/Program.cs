@@ -36,6 +36,7 @@ namespace LCT.ArtifactoryUploader
         public static Stopwatch UploaderStopWatch { get; set; }
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
+        static readonly SbomSigningValidation sbomSigningValidation = new();
         static async Task Main(string[] args)
         {
             UploaderStopWatch = new Stopwatch();
@@ -79,7 +80,10 @@ namespace LCT.ArtifactoryUploader
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-
+            if (appSettings.SbomSigning.SBOMSignVerify)
+            {
+                sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
+            }
             //Uploading Package to artifactory
             PackageUploadHelper.JFrogService = GetJfrogService(appSettings);
             UploadToArtifactory.JFrogService = GetJfrogService(appSettings);

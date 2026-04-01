@@ -245,7 +245,8 @@ namespace LCT.PackageIdentifier
                     multipleVersions.Conan.Add(jsonComponents);
                 }
                 fileOperations.WriteContentToMultipleVersionsFile(multipleVersions, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {multipleVersions.Conan.Count} and details can be found at {filePath}\n");
+                Logger.WarnFormat("\nTotal Multiple versions detected {0} and details can be found at {1}\n",
+                    multipleVersions.Conan.Count, filePath);
             }
             else
             {
@@ -265,7 +266,8 @@ namespace LCT.PackageIdentifier
                 myDeserializedClass.Conan = conanComponents;
 
                 fileOperations.WriteContentToMultipleVersionsFile(myDeserializedClass, appSettings.Directory.OutputFolder, FileConstant.multipleversionsFileName, defaultProjectName);
-                Logger.Warn($"\nTotal Multiple versions detected {conanComponents.Count} and details can be found at {filePath}\n");
+                Logger.WarnFormat("\nTotal Multiple versions detected {0} and details can be found at {1}\n",
+                conanComponents.Count, filePath);
             }
         }
 

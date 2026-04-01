@@ -124,31 +124,31 @@ namespace LCT.PackageIdentifier
             catch (InvalidProjectFileException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
-                Logger.Warn($"Failed to read project file, evaluation fails for : " + projectPath);
+                Logger.WarnFormat("Failed to read project file, evaluation fails for: {0}", projectPath);
                 return false;
             }
             catch (InvalidOperationException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
-                Logger.Warn($"Failed to read project file, Maybe there is already an equivalent project loaded in the project collection " + projectPath);
+                Logger.WarnFormat("Failed to read project file, Maybe there is already an equivalent project loaded in the project collection {0}", projectPath);
                 return false;
             }
             catch (MissingFieldException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
-                Logger.Warn($"Unable to read project file : " + projectPath);
+                Logger.WarnFormat("Unable to read project file: {0}", projectPath);
                 return false;
             }
             catch (ArgumentException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
-                Logger.Warn($"Unable to read project file : " + projectPath);
+                Logger.WarnFormat("Unable to read project file: {0}", projectPath);
                 return false;
             }
             catch (IOException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(EvaluateTestProjectContext, IsTestProjectMethod, ex, $"Failed to read project file: {projectPath}");
-                Logger.Warn($"Unable to read project file : " + projectPath);
+                Logger.WarnFormat("Unable to read project file: {0}", projectPath);
                 return false;
             }
 
@@ -187,10 +187,10 @@ namespace LCT.PackageIdentifier
                 {
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        Logger.Debug($"ParseJsonFile():Windows Asset FileName: " + assetFile.PackageSpec.RestoreMetadata.ProjectPath);
+                        Logger.DebugFormat("ParseJsonFile():Windows Asset FileName: {0}", assetFile.PackageSpec.RestoreMetadata.ProjectPath);
                         isTestProject = IsTestProject(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
                         container.Name = Path.GetFileName(assetFile.PackageSpec.RestoreMetadata.ProjectPath);
-                        Logger.Debug($"ParseJsonFile():Windows Asset File: IsTestProject: " + isTestProject);
+                        Logger.DebugFormat("ParseJsonFile():Windows Asset File: IsTestProject: {0}", isTestProject);
                     }
                     else
                     {
@@ -218,7 +218,7 @@ namespace LCT.PackageIdentifier
             catch (InvalidProjectFileException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("InvalidProjectFileException", "ParseJsonFile()", ex, $"File Path: {filePath}");
-                Logger.Warn($"InvalidProjectFileException : While parsing project asset file : " + filePath + " Error : " + ex.Message + "\n");
+                Logger.WarnFormat("InvalidProjectFileException: While parsing project asset file: {0}", filePath);
             }
         }
 
@@ -278,10 +278,10 @@ namespace LCT.PackageIdentifier
             }
             if (!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
             {
-                Logger.Debug($"ParseJsonFile():Linux Asset FileName: " + csprojFilePath);
+                Logger.DebugFormat("ParseJsonFile():Linux Asset FileName: {0}", csprojFilePath);
                 isTestProject = IsTestProject(csprojFilePath);
                 container.Name = Path.GetFileName(csprojFilePath);
-                Logger.Debug($"ParseJsonFile():Linux Asset File: IsTestProject: " + isTestProject);
+                Logger.DebugFormat("ParseJsonFile():Linux Asset File: IsTestProject: {0}", isTestProject);
             }
             else
             {
@@ -415,13 +415,14 @@ namespace LCT.PackageIdentifier
             if (count == 0)
             {
                 LogHandlingHelper.BasicErrorHandling("Calculate hash of package", "CalculateHashOfPackage()", $"Unable to find NuGet package {nuGetComponent.PackageUrl} in {packagePath}", "");
-                Logger.Error("Unable to find NuGet package " + nuGetComponent.PackageUrl + " in " + packagePath);
+                Logger.ErrorFormat("Unable to find NuGet package {0} in {1}", nuGetComponent.PackageUrl, packagePath);
                 return;
             }
 
             if (count > 1)
             {
-                Logger.Warn($"Found multiple NuGet packages files of : " + nuGetComponent.PackageUrl + " in : " + packagePath + "  " + JsonSerializer.Serialize(foundFiles) + "\n");
+                Logger.WarnFormat("Found multiple NuGet packages files of: {0} in: {1}  {2}",
+            nuGetComponent.PackageUrl, packagePath, JsonSerializer.Serialize(foundFiles));
             }
 
             string filePath = foundFiles.First();

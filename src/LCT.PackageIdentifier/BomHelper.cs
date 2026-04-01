@@ -19,7 +19,6 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -225,42 +224,7 @@ namespace LCT.PackageIdentifier
             return hashCode?.Trim() ?? string.Empty;
         }
 
-        /// <summary>
-        /// Executes Maven dependency:list to generate a dependency output file. (Obsolete)
-        /// </summary>
-        /// <param name="bomFilePath">Path to the POM or BOM file.</param>
-        /// <param name="depFilePath">Output dependency file path.</param>
-        /// <returns>Result containing process stdout/stderr.</returns>
-        [Obsolete("not used")]
-        [ExcludeFromCodeCoverage]
-        public static Result GetDependencyList(string bomFilePath, string depFilePath)
-        {
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            Process p = new Process();
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.RedirectStandardInput = true;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
 
-            if (isWindows)
-            {
-                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                p.StartInfo.Arguments = $"/c mvn -f \"{bomFilePath}\" dependency:list -DoutputFile=\"{depFilePath}\" -DappendOutput=\"true\"";
-
-            }
-            else
-            {
-                p.StartInfo.FileName = Path.Combine(@"mvn");
-                p.StartInfo.Arguments = $"-f {bomFilePath} dependency:list -DoutputFile={depFilePath} -DappendOutput=true";
-
-            }
-            var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
-            Result result = processResult?.Result;
-            return result;
-
-
-        }
 
         /// <summary>
         /// Builds a display name for a component including group if available.

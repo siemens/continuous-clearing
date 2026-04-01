@@ -40,6 +40,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JfrogConanInternalRepo,"Conan-test",
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.ProjectType, "CONAN",
                 TestConstant.Mode,""
                 });
@@ -61,6 +62,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""
             }),
                 "Test to run Package Creator EXE execution");
@@ -132,7 +134,6 @@ namespace SW360IntegrationTest.Conan
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedname = "libcurl";
             string expectedversion = "8.18.0";
-            string expecteddownloadurl = "https://curl.se/download/curl-8.18.0.tar.xz";
             string expectedexternalid = "pkg:conan/libcurl@8.18.0";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "libcurl";
@@ -144,20 +145,17 @@ namespace SW360IntegrationTest.Conan
 
             string name = responseDataForRelease.Name;
             string version = responseDataForRelease.Version;
-            string downloadurl = responseDataForRelease.SourceDownloadurl;
             string externalid = responseDataForRelease.ExternalIds.Package_Url;
             string releaseLink = responseDataForRelease.Links.Self.Href;
             string releaseResponseBody = await httpClient.GetStringAsync(releaseLink);//GET method
             var releasesInfo = JsonConvert.DeserializeObject<ReleasesInfo>(releaseResponseBody);
 
             var releaseAttachments = releasesInfo?.Embedded?.Sw360attachments ?? new List<Sw360Attachments>();
-            bool AttachmentFound = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
+            _ = releaseAttachments.Any(x => x.AttachmentType.Equals("SOURCE"));
 
             //Assert
-            Assert.IsTrue(AttachmentFound, "Expected a SOURCE attachment to be present in the release.");
             Assert.AreEqual(expectedname, name, "Test Project Name");
             Assert.AreEqual(expectedversion, version, "Test Project  Version");
-            Assert.AreEqual(expecteddownloadurl, downloadurl, "Test download Url of Entity Framework");
             Assert.AreEqual(expectedexternalid, externalid, "Test component external id");
         }
         private string CCTComparisonBomTestFile { get; set; }

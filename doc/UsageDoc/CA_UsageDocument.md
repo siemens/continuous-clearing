@@ -22,6 +22,11 @@
   - [SPDX SBOM Signature Validator](#spdx-sbom-signature-validator)
     - [File Naming Convention](#file-naming-convention-1)
     - [Validation Process](#validation-process)
+  - [SBOM Signing and Verification](#sbom-signing-and-verification)
+    - [Overview](#sbom-signing-overview)
+    - [Configuration](#sbom-signing-configuration)
+    - [Azure DevOps Pipeline Integration](#azure-devops-pipeline-integration)
+    - [Parameters Reference](#sbom-signing-parameters-reference)
     - [**Configuring the Continuous Clearing Tool**](#configuring-the-continuous-clearing-tool)
       - [**Method 1 - Only AppSettings**](#method-1---only-appsettings)
     - [Below rows repeat for each supported package type.](#below-rows-repeat-for-each-supported-package-type)
@@ -74,11 +79,13 @@ Welcome to the Continuous Clearing Tool, your automated solution for streamlinin
 - **FOSSology Code Scanning**: Initiates jobs for code scans in FOSSology, ensuring compliance and thorough analysis.
 - **SBOM Generation**: Produces a Software Bill of Materials (SBOM) file detailing the nested descriptions of software artifact components and associated metadata.
 - **Complete Dependency Mapping**: Generates SBOMs with a comprehensive `dependencies` section that lists all direct and transitive package relationships, providing full traceability for compliance, security, and auditing.
+- **SBOM Signing**: Provides cryptographic signing and verification capabilities to ensure SBOM integrity and authenticity using Azure Key Vault.
 
 ## Benefits
 - **Efficiency in Component Management**: Reduces the manual effort required to create and manage components in SW360.
 - **Error Reduction**: Minimizes the risk of manual errors while creating components and identifying the correct version of source codes from public repositories.
 - **Harmonized Component Creation**: Streamlines and harmonizes the creation of third-party components by automatically filling in necessary information in SW360.
+- **Security and Trust**: Ensures SBOM integrity through cryptographic signatures, providing confidence in supply chain security.
 
 ## Usage
 Simply integrate the Continuous Clearing Tool into your project workflow to experience seamless clearing processes and enhanced productivity.
@@ -108,7 +115,7 @@ To ensure a smooth operation of the Continuous Clearing Tool, please follow thes
        1. Users can generate a token from their functional account.
        2. Required credentials include the client ID and client secret.
    - **Artifactory Token**:
-     - Necessary for uploading cleared, internal, and development packages into JFrog Artifactory. Users must obtain their own JFrog Artifactory token.
+     - Necessary for uploading cleared, internal, and development packages into JFrog Artifactory. Users must obtain their own JFrog Artifactory token.   
 
 ## Pipeline Configuration
 For certain scenarios, the tool uses predefined exit codes, which are described below:
@@ -192,7 +199,7 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
   * **Project Type :** **Maven**
 
-    * [Apache Maven](https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip) has to be installed in the build machine and added in the PATH variable.
+    * [Apache Maven](https://maven.apache.org/download.cgi) has to be installed in the build machine and added in the PATH variable.
       *Add the cycloneDX Maven Plugin to the main pom.xml* and run the command to generate the input bom file.
 
       ```
@@ -206,17 +213,33 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       ```
         mvn clean install -DskipTests=true 
       ```
-    * **Alternative SBOM generation (cdxgen)**
-    * Prerequisites:
-      * Node.js and Git installed
-      * Install cdxgen: `npm i -g @cyclonedx/cdxgen` or use `npx @cyclonedx/cdxgen`
-    * Usage:
-      * From the project root (where `pom.xml` is present), run:
+    * **Note** : To enable development dependency identification, provide **two BOM files** in the input folder.
+
+        **Step 1** - Generate full BOM (all scopes including test, provided):
+
         ```
-        cdxgen -r . -o cdx_dep.json --spec-version 1.6
+          mvn install cyclonedx:makeAggregateBom -DincludeTestScope=true -DoutputName=bom
         ```
-        
-    * Place the generated `cdx_dep.json` in the input directory .
+
+        **Step 2** - Generate production-only BOM (compile and runtime scopes only):
+
+        ```
+          mvn install cyclonedx:makeAggregateBom -DincludeTestScope=false -DoutputName=bom-without
+        ```
+
+        **Step 3** - Place both generated files in the same input folder:
+
+        ```
+          InputFolder/
+            ├── bom.cdx.json           ← all dependencies (including test/dev)
+            └── bom-without.cdx.json   ← production dependencies only
+        ```
+
+        CCTool will compare the two files. Any package present in `bom.cdx.json` but absent from `bom-without.cdx.json` will be marked as a development dependency (`IsDevelopment = true`).
+
+        > **Note** : The file names `bom.cdx.json` and `bom-without.cdx.json` are not compulsory. Any two files matching the `Include` pattern (`*.cdx.json` by default in appSettings.json) will work. CCTool automatically treats the file with **more components** as the full BOM and the file with **fewer components** as the production BOM — file naming and scan order do not matter.
+
+        > **Note** : If only one BOM file is provided, CCTool will **not** identify any development dependencies - all packages will be treated as production dependencies.
 
 
   * **Project Type :** **Python**
@@ -297,6 +320,110 @@ example.spdx.sbom.json.pem # Public certificate file
 2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
 3. Performs signature verification using the public certificate
 
+## SBOM Signing and Verification
+
+### Overview
+
+The Continuous Clearing Tool provides comprehensive SBOM (Software Bill of Materials) signing and verification capabilities to ensure the integrity and authenticity of generated SBOMs. This feature uses Azure Key Vault for secure certificate management and cryptographic operations.
+
+**Key Features:**
+- **Signing**: Signs SBOMs using RSA-SHA256 algorithm with certificates stored in Azure Key Vault
+- **Signature Verification**: Validates SBOM signatures to ensure integrity and authenticity
+- **Mandatory Signing**: Option to enforce SBOM signing for all generated SBOMs
+- **Flexible Configuration**: Can be enabled/disabled based on project requirements
+
+**Workflow:**
+1. **SBOM Generation**: Tool generates a CycloneDX SBOM during the package identification process
+2. **Automatic Signing**: If signing is enabled, the SBOM is automatically signed using Azure Key Vault
+3. **Signature Embedding**: The cryptographic signature is embedded directly into the SBOM JSON structure
+4. **Verification**: Signed SBOMs can be verified at any time to ensure they haven't been tampered with
+
+### Configuration Parameters
+
+The SBOM signing feature can be configured in two ways:
+
+1. **Through appSettings.json** (for standalone execution):
+```json
+{
+  "SbomSigning": {
+    "KeyVaultURI": "https://your-keyvault.vault.azure.net/",
+    "CertificateName": "your-signing-certificate", 
+    "ClientId": "your-app-registration-client-id",
+    "ClientSecret": "your-app-registration-client-secret",
+    "TenantId": "your-azure-tenant-id", Siemens AG tenant id by default
+    "SBOMSignVerify": true
+  }
+}
+```
+
+2. **Through Azure DevOps Variable Groups** (recommended for pipeline execution)
+
+**Configuration Behavior:**
+- **SBOMSignVerify = true (Default)**: SBOM signing is **mandatory**. The tool will:
+  - Generate signed SBOMs automatically
+  - Fail if signing credentials are missing or invalid
+  - Ensure all output SBOMs contain valid cryptographic signatures
+
+- **SBOMSignVerify = false**: SBOM signing is **optional**. The tool will:
+  - Generate unsigned SBOMs (standard workflow)
+  - Skip signing operations entirely
+  - Continue normal processing without signature validation
+
+
+
+**Required Variables:**
+
+| Variable Name | Description | 
+|---------------|-------------|
+| `keyVaultUri` | The Key Vault containing the certificate to be used |
+| `certificateName` | The certificate name stored in the Key Vault |
+| `clientId` | Client ID of the App Registration with access to the Key Vault |
+| `clientSecret` | Client Secret of the App Registration with access to the Key Vault |
+| `tenantId` | Azure tenant ID, defaults to Siemens AG |
+
+**\*Required when `SBOMSignVerify` is `true`. 
+
+#### Signed SBOM Structure
+
+When signing is enabled, the generated SBOM will include a `signature` section:
+
+```json
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-01-15T10:30:00Z",
+    // ... other metadata
+  },
+  "components": [
+    // ... component list
+  ],
+  "dependencies": [
+    // ... dependency mappings  
+  ],
+  "signature": {
+    "algorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+    "value": "MEUCIQDw8yKn...base64-encoded-signature...xyz="
+  }
+}
+```
+
+**Signature Details:**
+- **Algorithm**: Uses RSA-SHA256 (`http://www.w3.org/2001/04/xmldsig-more#rsa-sha256`)
+- **Value**: Base64-encoded cryptographic signature of the SBOM content (excluding the signature field itself)
+- **Process**: The tool removes any existing signature, computes the hash of the clean SBOM, signs the hash, and embeds the signature
+
+#### Security Considerations
+
+1. **Certificate Management**:
+   - Certificates are centrally managed in Azure Key Vault
+   - All projects use the same trusted signing certificate
+
+2. **Validation**:
+   - Always verify signed SBOMs in downstream processes
+   - Implement signature verification in your SBOM consumption workflows
+   - Log and alert on signature validation failures
 
 ### **Configuring the Continuous Clearing Tool**
 
@@ -331,26 +458,35 @@ Description for the settings in appSettings.json file
 | 17   | Jfrog.URL                                 | URL of JFrog Artifactory                                      | Yes             | [https://jfrog.example.com](https://jfrog.example.com)                 |
 | 18   | Jfrog.Token                               | Token for authenticating to JFrog                             | Yes             | `xxxxxx`                                                                   |
 | 19   | Jfrog.DryRun                              | Enable dry run (no actual copy/move)                          | No              | `True`                                                                    |
+| 20   | SbomSigning.KeyVaultURI                   | Azure Key Vault URI containing signing certificate            | No*             | `"https://your-keyvault.vault.azure.net/"`                               |
+| 21   | SbomSigning.CertificateName               | Name of the certificate in Key Vault                          | No*             | `"signing-certificate"`                                                   |
+| 22   | SbomSigning.ClientId                      | Azure AD App Registration Client ID                           | No*             | `"12345678-1234-1234-1234-123456789abc"`                                 |
+| 23   | SbomSigning.ClientSecret                  | Azure AD App Registration Client Secret                       | No*             | `"your-client-secret"`                                                    |
+| 24   | SbomSigning.TenantId                      | Siemens AG Tenant ID                                               | No*             | `"your-tenant-id"`                                                        |
+| 25   | SbomSigning.SBOMSignVerify                | Enable mandatory SBOM signing                                 | No              | `true` (default)                                                          |
+
+**\*Required when SbomSigning.SBOMSignVerify is true**
 
 ### Below rows repeat for each supported package type.
 
 | S.No | Argument Name                   | Description                           | Is it Mandatory | Example                                   |
 | ---- | ------------------------------- | ------------------------------------- | --------------- | ----------------------------------------- |
-| 20   | Npm.Include                     | File patterns to include for NPM      | Yes             | `["p*-lock.json", "*.cdx.json"]`         |
-| 21   | Npm.Exclude                     | Folders/files to exclude for NPM      | No              | `["node_modules"]`                        |
-| 22   | Npm.Artifactory.ThirdPartyRepos | 3rd-party NPM repos and upload toggle | Yes             | `[{"Name": "npm-remote", "Upload": true}]` |
-| 23   | Npm.Artifactory.InternalRepos   | Internal NPM repos                    | Yes             | `["npm-internal"]`                         |
-| 24   | Npm.Artifactory.DevRepos        | Development NPM repos                 | Yes             | `["npm-dev"]`                              |
-| 25   | Npm.Artifactory.RemoteRepos     | Remote NPM repos                      | Yes             | `["npm-remote"]`                           |
-| 26   | Npm.ReleaseRepo                 | NPM release repository name           | Yes             | `"npm-release"`                             |
-| 27   | Npm.DevDepRepo                  | NPM dev dependency repo name          | Yes             | `"npm-devdep"`                              |
+| 26   | Npm.Include                     | File patterns to include for NPM      | Yes             | `["p*-lock.json", "*.cdx.json"]`         |
+| 27   | Npm.Exclude                     | Folders/files to exclude for NPM      | No              | `["node_modules"]`                        |
+| 28   | Npm.Artifactory.ThirdPartyRepos | 3rd-party NPM repos and upload toggle | Yes             | `[{"Name": "npm-remote", "Upload": true}]` |
+| 29   | Npm.Artifactory.InternalRepos   | Internal NPM repos                    | Yes             | `["npm-internal"]`                         |
+| 30   | Npm.Artifactory.DevRepos        | Development NPM repos                 | Yes             | `["npm-dev"]`                              |
+| 31   | Npm.Artifactory.RemoteRepos     | Remote NPM repos                      | Yes             | `["npm-remote"]`                           |
+| 32   | Npm.ReleaseRepo                 | NPM release repository name           | Yes             | `"npm-release"`                             |
+| 33   | Npm.DevDepRepo                  | NPM dev dependency repo name          | Yes             | `"npm-devdep"`                              |
+
 
 #### **Method 2 - Only Cmd paramaters**
 You can also pass the above mentioned arguments in the command line.
 Note: If the second approach is followed then make sure you provide all the settings mentioned in the appsettings.json in the command line
 
 #### **Method 3 (Recommended) - AppSettings + Cmd paramaters**
-- **Secrets Management**: Sensitive data such as the JFrog token and the SW360 token should be passed as secure variables via command line parameters. This practice ensures that confidential information remains protected.
+- **Secrets Management**: Sensitive data such as the JFrog token, SW360 token, and SBOM signing credentials should be passed as secure variables via command line parameters. This practice ensures that confidential information remains protected.
 
 - **Project Configuration**:
   - Project-specific details such as the project type, SW360 project ID, project name, and directories can be conveniently passed as command line parameters. This allows for flexible and dynamic execution based on project requirements.
@@ -393,6 +529,10 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
   **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json`
 
+* **With SBOM Signing enabled** (credentials from appSettings.json or command line parameters):
+
+  **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json --SbomSigning:SBOMSignVerify true --SbomSigning:KeyVaultURI "https://your-keyvault.vault.azure.net/" --SbomSigning:CertificateName "your-certificate" --SbomSigning:ClientId "your-client-id" --SbomSigning:ClientSecret "your-client-secret" --SbomSigning:TenantId "your-tenant-id"`
+
 ### SW360 Package Creator
 
 * In order to run the SW360PackageCreator.dll , execute the below command.
@@ -422,6 +562,10 @@ Continuous Clearing Tool can be executed as container or as binaries,
 * In order to run the PackageIdentifier.exe, execute the below command.
 
   **Example** : `PackageIdentifier.exe --settingsfilepath /<PathToConfig>/appSettings.json`
+
+* **With SBOM Signing enabled** (credentials from appSettings.json or command line parameters):
+
+  **Example** : `PackageIdentifier.exe --settingsfilepath /<PathToConfig>/appSettings.json --SbomSigning:SBOMSignVerify true --SbomSigning:KeyVaultURI "https://your-keyvault.vault.azure.net/" --SbomSigning:CertificateName "your-certificate" --SbomSigning:ClientId "your-client-id" --SbomSigning:ClientSecret "your-client-secret" --SbomSigning:TenantId "your-tenant-id"`
 
 ### SW360 Package Creator
 
@@ -544,9 +688,9 @@ The `projectDefinitions` parameter accepts an array of objects with project-spec
 ```yaml
 
 projectDefinitions:
-- projectType: 'NuGet'               # Mandatory - Project type (NuGet, Debian, npm, etc.)
-  inputFolder: '/path/to/input'      # Mandatory - Folder containing project files
-  exclude: 'Test;Temp'               # Optional - semicolon-separated exclusion list
+- projectType: 'NuGet'               # Mandatory - Project type (NuGet, Debian, npm, etc.)
+  inputFolder: '/path/to/input'      # Mandatory - Folder containing project files
+  exclude: 'Test;Temp'               # Optional - semicolon-separated exclusion list
 
 ```
 
@@ -556,9 +700,9 @@ For Docker/image-based scanning, additional parameters are available:
 
 projectDefinitions:
 - projectType: 'Debian' # Mandatory - Project type (NuGet, Debian, npm, etc.)
-  inputFolder: '/path/to/input' # Mandatory - Folder containing project files
-  imageName: 'debian'                # Mandatory - Only if you want to run against an image on the machine
-  imageVersion: 'bookworm-slim'      # Optional  - Version of the Docker image, by default will use the latest image tag
+  inputFolder: '/path/to/input' # Mandatory - Folder containing project files
+  imageName: 'debian'                # Mandatory - Only if you want to run against an image on the machine
+  imageVersion: 'bookworm-slim'      # Optional  - Version of the Docker image, by default will use the latest image tag
 
 ```
 
@@ -574,10 +718,10 @@ Both templates share common parameters with some implementation-specific differe
 | Parameter | Type | Default | Description |Mandatory|
 |-----------|------|---------|-------------|---------|
 | `sw360Token` | string | '' | SW360 authentication token |:white_check_mark:|
-| `sw360ProjectId` | string | '' | Target SW360 project ID  |:white_check_mark:|
-| `sw360ProjectName` | string | '' | SW360 project name  |:white_check_mark:|
-| `projectDefinitions` | object | [] | List of project configurations to scan  |:white_check_mark:|
-| `outputFolder` | string | '' | Output directory for reports and artifacts  |:white_check_mark:|
+| `sw360ProjectId` | string | '' | Target SW360 project ID  |:white_check_mark:|
+| `sw360ProjectName` | string | '' | SW360 project name  |:white_check_mark:|
+| `projectDefinitions` | object | [] | List of project configurations to scan  |:white_check_mark:|
+| `outputFolder` | string | '' | Output directory for reports and artifacts  |:white_check_mark:|
 | `PackageCreatorEnabled` | boolean | true | Enable/disable SW360 package creation |:x:|
 | `ArtifactoryUploaderEnabled` | boolean | true | Enable/disable Artifactory uploads |:x:|
 | `JfrogToken` | string | '' | JFrog Artifactory authentication token |:white_check_mark:|
@@ -656,6 +800,8 @@ For reporting any bug or enhancement and for your feedbacks click [here](https:/
 | ----------------- | ------------------------- |
 | BOM               | Bill of Material          |
 | apiAuthToken      | SW360 authorization token |
+| SBOM Signing      | Cryptographic signing of Software Bill of Materials using digital certificates |
+| Azure Key Vault   | Microsoft Azure service for securely storing certificates, keys, and secrets |
 
 ## Acknowledgments
 
@@ -678,4 +824,4 @@ This project integrates dependency data from cdxgen to enhance SBOM dependency a
 * FOSSology API Guide: [https://www.fossology.org/get-started/basic-rest-api-calls/](https://www.fossology.org/get-started/basic-rest-api-calls/)
 * cdxgen: https://github.com/cdxgen/cdxgen
 
-Copyright © Siemens AG ▪ 2025
+Copyright © Siemens AG ▪ 2026

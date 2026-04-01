@@ -33,6 +33,7 @@ namespace TestUtilities
         public string FossologyTrigger { get; set; }
         public string TelemetryEnable { get; set; }
 
+        public string SBOMSignVerify { get; set; }
         public TestParamMaven()
         {
             SW360AuthTokenType = s_Config["SW360AuthTokenType"];
@@ -51,6 +52,7 @@ namespace TestUtilities
             DevDestinationRepoName = "maven-test";
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
             TelemetryEnable = s_Config["TelemetryEnable"];
+            SBOMSignVerify = s_Config["SBOMSignVerify"];
         }
     }
 }

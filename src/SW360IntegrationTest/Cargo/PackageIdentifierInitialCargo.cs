@@ -52,6 +52,7 @@ namespace SW360IntegrationTest.Cargo
                 TestConstant.ArtifactoryKey, testParameters.ArtifactoryUploadApiKey,
                 TestConstant.JfrogCargoInternalRepo,"Cargo-test",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.ProjectType,"Cargo",
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");

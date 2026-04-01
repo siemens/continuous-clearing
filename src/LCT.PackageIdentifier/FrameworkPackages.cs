@@ -44,7 +44,7 @@ namespace LCT.PackageIdentifier
         {
             try
             {
-                var uniqueTargets = new Dictionary<NuGetFramework, HashSet<string>>();
+                var uniqueTargets = new Dictionary<NuGetFramework, (HashSet<string> References, LockFileTarget LockFileTarget)>();
 
                 foreach (var lockFilePath in lockFilePaths)
                 {
@@ -52,14 +52,14 @@ namespace LCT.PackageIdentifier
                     foreach (var target in lockFile.Targets)
                     {
                         var frameworkReferences = GetFrameworkReferences(lockFile, target);
-                        if (!uniqueTargets.TryGetValue(target.TargetFramework, out HashSet<string> value))
+                        if (!uniqueTargets.TryGetValue(target.TargetFramework, out var value))
                         {
-                            value = new HashSet<string>();
+                            value = (new HashSet<string>(), target);
                             uniqueTargets[target.TargetFramework] = value;
                         }
                         foreach (var reference in frameworkReferences)
                         {
-                            value.Add(reference);
+                            value.References.Add(reference);
                         }
                     }
                 }
@@ -81,7 +81,11 @@ namespace LCT.PackageIdentifier
 
                 foreach (var target in uniqueTargets)
                 {
-                    InvokeGetFrameworkPackagesMethod(getFrameworkPackagesMethod, target.Key, target.Value.ToArray(), null);
+                    InvokeGetFrameworkPackagesMethod(
+                        getFrameworkPackagesMethod,
+                        target.Key,
+                        [.. target.Value.References],
+                        target.Value.LockFileTarget);
                 }
             }
             catch (ArgumentException ex)

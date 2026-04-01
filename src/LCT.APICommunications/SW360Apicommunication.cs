@@ -82,7 +82,7 @@ namespace LCT.APICommunications
             catch (TaskCanceledException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Get sw360 Projects details", $"MethodName:GetProjects(),A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again", ex, "");
-                Logger.Error("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again");
+                Logger.ErrorFormat("A timeout error is thrown from SW360 server,Please wait for sometime and re run the pipeline again. {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             return result;
@@ -183,8 +183,8 @@ namespace LCT.APICommunications
                     LogHandlingHelper.BasicErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()",
                 $"SW360 server is not accessible. StatusCode: {responseMessage?.StatusCode}, ReasonPhrase: {responseMessage?.ReasonPhrase}",
                 "Please wait for some time and re-run the pipeline.");
-                    Logger.Error("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again." +
-                        " StatusCode:" + responseMessage?.StatusCode + " & ReasonPharse :" + responseMessage?.ReasonPhrase);
+                    Logger.ErrorFormat("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again..." +
+                        "StatusCode:{0} & ReasonPhrase:{1}", responseMessage?.StatusCode, responseMessage?.ReasonPhrase);
                     environmentHelper.CallEnvironmentExit(-1);
                 }
             }
@@ -192,20 +192,20 @@ namespace LCT.APICommunications
             {
                 LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex,
             "TaskCanceledException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
-                Logger.Error("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
+                Logger.ErrorFormat("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex, "");
-                Logger.Error("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
+                Logger.ErrorFormat("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             catch (InvalidOperationException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex,
             "InvalidOperationException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
-                Logger.Error("InvalidOperationException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error :" + ex.Message);
+                Logger.ErrorFormat("InvalidOperationException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
                 environmentHelper.CallEnvironmentExit(-1);
             }
             return result;

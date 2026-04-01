@@ -530,7 +530,7 @@ namespace LCT.Common
             }
             else if (clearingState == "CLOSED")
             {
-                Logger.Error("Provided Sw360 project is not in active state. Please make sure you added the correct project details that are in an active state.");
+                Logger.Error("Provided SW360 project has the project state closed. Please make sure you added the correct project details.");
                 Logger.DebugFormat("ValidateSw360Project(): Sw360 project {0} is in {1} state.", Name, clearingState);
                 return -1;
             }
@@ -813,7 +813,7 @@ namespace LCT.Common
                     {
                         name = $"{component.Group}/{component.Name}";
                     }
-                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()))) &&
+                    if (excludedcomponent.Length > 0 && (Regex.IsMatch(name.ToLowerInvariant(), WildcardToRegex(excludedcomponent[0].ToLowerInvariant()), RegexOptions.None, TimeSpan.FromSeconds(5))) &&
                         (component.Version.Contains(excludedcomponent[1], StringComparison.InvariantCultureIgnoreCase) || excludedcomponent[1].Equals("*", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         noOfExcludedComponents++;
@@ -961,7 +961,7 @@ namespace LCT.Common
             }
             bom.Components = bomComponentsList;
         }
-       
+
         #endregion
 
 

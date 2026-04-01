@@ -164,8 +164,8 @@ namespace LCT.SW360PackageCreator
             if (componentsData.ProjectType.Equals(DebianProjectType, StringComparison.InvariantCultureIgnoreCase) &&
                 (currName != componentsData.Name || currVersion != componentsData.Version))
             {
-                Logger.Debug($"Source name found for binary package {currName}-{currVersion} --" +
-                    $" Source name and version ==> {componentsData.Name}-{componentsData.Version}");
+                Logger.DebugFormat("Source name found for binary package {0}-{1} -- Source name and version ==> {2}-{3}",
+                    currName, currVersion, componentsData.Name, componentsData.Version);
 
                 //Update local Bom if any source or version details is changed for Debian Components
                 currBom = bom.Components?.Find(val => val.Name == currName && val.Version == currVersion);
@@ -341,11 +341,15 @@ namespace LCT.SW360PackageCreator
 
             // update comparison bom data
             bom = await creatorHelper.GetUpdatedComponentsDetails(ListofBomComponents, UpdatedCompareBomData, sw360Service, bom);
-
+            if (appSettings.SbomSigning.SBOMSignVerify)
+            {
+                bom.Metadata.Timestamp = DateTime.UtcNow;
+                bom.Signature = null;
+            }
             var formattedString = CycloneDX.Json.Serializer.Serialize(bom);
 
             fileOperations.WriteContentToOutputBomFile(formattedString, bomGenerationPath,
-                FileConstant.BomFileName, appSettings.SW360.ProjectName);
+                FileConstant.BomFileName, appSettings.SW360.ProjectName, appSettings);
 
             // write download url not found list into .json file
             var downloadUrlNotFoundList = creatorHelper.GetDownloadUrlNotFoundList(UpdatedCompareBomData);
@@ -397,12 +401,9 @@ namespace LCT.SW360PackageCreator
                 if (Directory.GetDirectories(localPathforSourceRepo).Length != 0)
                 {
                     DirectoryInfo di = new DirectoryInfo(localPathforSourceRepo);
-                    foreach (DirectoryInfo dir in di.GetDirectories())
+                    foreach (DirectoryInfo dir in di.GetDirectories().Where(d => !d.Name.Equals("aports")))
                     {
-                        if (!dir.Name.Equals("aports"))
-                        {
-                            dir.Delete(true);
-                        }
+                        dir.Delete(true);
                     }
                 }
 
@@ -666,7 +667,7 @@ namespace LCT.SW360PackageCreator
                 FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcess(item.ReleaseID, sw360link);
                 if (!string.IsNullOrEmpty(fossResult?.Links?.Self?.Href))
                 {
-                    Logger.Debug($"{fossResult.Content?.Message}");
+                    Logger.DebugFormat("Fossology trigger result: {0}", fossResult.Content?.Message);
                     uploadId = await CheckFossologyProcessStatus(fossResult.Links?.Self?.Href, sw360CreatorService, item);
                 }
 

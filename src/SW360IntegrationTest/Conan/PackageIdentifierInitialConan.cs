@@ -45,6 +45,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.JfrogConanInternalRepo,"Conan-test",
                 TestConstant.ProjectType,"Conan",
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
+                TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""}),
                 "Test to run  Package Identifier EXE execution");
         }

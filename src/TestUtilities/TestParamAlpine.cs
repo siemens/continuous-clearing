@@ -27,6 +27,7 @@ namespace TestUtilities
         public string JfrogApi { get; set; }
         public string FossologyTrigger { get; set; }
         public string TelemetryEnable { get; set; }
+        public string SBOMSignVerify { get; set; }
 
         public TestParamAlpine()
         {
@@ -43,6 +44,7 @@ namespace TestUtilities
             RemoveDevDependency = s_Config["RemoveDevDependency"];
             FossologyTrigger = s_Config["EnableFossologyTrigger"];
             TelemetryEnable = s_Config["TelemetryEnable"];
+            SBOMSignVerify = s_Config["SBOMSignVerify"];
         }
     }
 }
