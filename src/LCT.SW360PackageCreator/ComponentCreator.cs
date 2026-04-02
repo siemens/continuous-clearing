@@ -878,7 +878,8 @@ namespace LCT.SW360PackageCreator
 
             if (releasesInfo.AdditionalData != null &&
                 releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
-                fossologyUrl.Contains(appSettings?.SW360?.Fossology?.URL))
+                !string.IsNullOrEmpty(appSettings?.SW360?.Fossology?.URL) &&
+                fossologyUrl.Contains(appSettings.SW360.Fossology.URL))
             {
                 item.FossologyLink = fossologyUrl;
                 item.FossologyUploadId = uploadId;
