@@ -34,7 +34,7 @@ namespace LCT.PackageIdentifier
         /// <param name="aqlResults">List of AQL results to inspect.</param>
         /// <returns>Repository name matching the preferred order or a sentinel when not found.</returns>
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults)
+        public static string GetRepodetailsFromPerticularOrder(List<AqlResult> aqlResults, Component component)
         {
             Logger.Debug("GetRepodetailsFromPerticularOrder(): Starting repository details retrieval from AQL results.");
 
@@ -45,7 +45,7 @@ namespace LCT.PackageIdentifier
             }
 
             Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): Total repositories identified from AQL result: {0}", aqlResults.Count);
-            var repoKeywords = new[] { "release", "devdep", "dev" };
+            var repoKeywords = FindRepositoryOrder(component);
             string repo = FindRepositoryByKeywords(aqlResults, repoKeywords);
 
             if (repo != null)
@@ -56,6 +56,15 @@ namespace LCT.PackageIdentifier
             repo = aqlResults.FirstOrDefault()?.Repo ?? NotFoundInRepo;
             Logger.DebugFormat("GetRepodetailsFromPerticularOrder(): No specific repository found. Returning repository or 'Not Found in Repo': {0}", repo);
             return repo;
+        }
+        private static string[] FindRepositoryOrder(Component component)
+        {
+            bool isDevelopment = component?.Properties?.Any(p => p.Name == Dataconstant.Cdx_IsDevelopment && p.Value == "true") == true;
+            if (isDevelopment)
+            {
+                return ["devdep", "release", "dev"];
+            }
+            return ["release", "devdep", "dev"];
         }
         private static string FindRepositoryByKeywords(List<AqlResult> aqlResults, string[] keywords)
         {

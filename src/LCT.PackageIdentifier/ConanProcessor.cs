@@ -608,7 +608,7 @@ namespace LCT.PackageIdentifier
             var aqllist = aqlResultList.FindAll(x => x.Path.Contains(
                 jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
             Logger.DebugFormat("GetArtifactoryRepoName(): Searching for component in JFrog repository with name: {0}.", jfrogcomponentPath);
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist, component);
 
             return repoName;
         }

@@ -18,10 +18,18 @@ namespace LCT.PackageIdentifier.UTest
     {
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
 
+        private static Component CreateDevComponent() => new Component
+        {
+            Properties = new List<Property>
+            {
+                new Property { Name = Dataconstant.Cdx_IsDevelopment, Value = "true" }
+            }
+        };
+
         [Test]
         public void GetRepodetailsFromPerticularOrder_InputIsNull_ReturnsNotFound()
         {
-            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(null);
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(null, null);
             Assert.AreEqual(NotFoundInRepo, result);
         }
 
@@ -32,7 +40,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 new AqlResult { Repo = "release-repo" }
             };
-            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, null);
             Assert.AreEqual("release-repo", result);
         }
 
@@ -43,7 +51,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 new AqlResult { Repo = "devdep-repo" }
             };
-            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, null);
             Assert.AreEqual("devdep-repo", result);
         }
 
@@ -54,7 +62,7 @@ namespace LCT.PackageIdentifier.UTest
             {
                 new AqlResult { Repo = "dev-repo" }
             };
-            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, null);
             Assert.AreEqual("dev-repo", result);
         }
 
@@ -65,7 +73,71 @@ namespace LCT.PackageIdentifier.UTest
             {
                 new AqlResult { Repo = "generic-repo" }
             };
-            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, null);
+            Assert.AreEqual("generic-repo", result);
+        }
+
+        [Test]
+        public void GetRepodetailsFromPerticularOrder_NonDevComponent_PrefersReleaseOverDevdep()
+        {
+            var aqlResults = new List<AqlResult>
+            {
+                new AqlResult { Repo = "devdep-repo" },
+                new AqlResult { Repo = "release-repo" }
+            };
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, null);
+            Assert.AreEqual("release-repo", result);
+        }
+
+        [Test]
+        public void GetRepodetailsFromPerticularOrder_DevComponent_InputIsNull_ReturnsNotFound()
+        {
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(null, CreateDevComponent());
+            Assert.AreEqual(NotFoundInRepo, result);
+        }
+
+        [Test]
+        public void GetRepodetailsFromPerticularOrder_DevComponent_PrefersDevdepOverRelease()
+        {
+            var aqlResults = new List<AqlResult>
+            {
+                new AqlResult { Repo = "release-repo" },
+                new AqlResult { Repo = "devdep-repo" }
+            };
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, CreateDevComponent());
+            Assert.AreEqual("devdep-repo", result);
+        }
+
+        [Test]
+        public void GetRepodetailsFromPerticularOrder_DevComponent_NoDevdep_ReturnsReleaseRepo()
+        {
+            var aqlResults = new List<AqlResult>
+            {
+                new AqlResult { Repo = "release-repo" }
+            };
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, CreateDevComponent());
+            Assert.AreEqual("release-repo", result);
+        }
+
+        [Test]
+        public void GetRepodetailsFromPerticularOrder_DevComponent_OnlyDevRepo_ReturnsDevRepo()
+        {
+            var aqlResults = new List<AqlResult>
+            {
+                new AqlResult { Repo = "dev-repo" }
+            };
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, CreateDevComponent());
+            Assert.AreEqual("dev-repo", result);
+        }
+
+        [Test]
+        public void GetRepodetailsFromPerticularOrder_DevComponent_NoSpecificRepo_ReturnsFirstRepo()
+        {
+            var aqlResults = new List<AqlResult>
+            {
+                new AqlResult { Repo = "generic-repo" }
+            };
+            var result = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, CreateDevComponent());
             Assert.AreEqual("generic-repo", result);
         }
 

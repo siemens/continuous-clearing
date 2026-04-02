@@ -303,7 +303,7 @@ namespace LCT.PackageIdentifier
             jfrogRepoPackageName = aqlResultList.FirstOrDefault(x => x.Name.Contains(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
             && x.Name.Contains(".deb", StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
             Logger.DebugFormat("Repo Name for the package {0} is {1}", jfrogcomponentName, repoName);
 
             if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
@@ -318,7 +318,7 @@ namespace LCT.PackageIdentifier
                     jfrogRepoPackageName = aqlResultList.FirstOrDefault(x => x.Name.Contains(
                         jfrogcomponentName, StringComparison.OrdinalIgnoreCase)
                     && x.Name.Contains(".deb", StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
-                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
                 }
             }
 
