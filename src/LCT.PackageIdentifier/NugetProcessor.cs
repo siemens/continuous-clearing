@@ -412,7 +412,7 @@ namespace LCT.PackageIdentifier
                 aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                 jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
             }
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
             Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Repository name identified: {0}.", repoName);
 
             if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
@@ -431,7 +431,7 @@ namespace LCT.PackageIdentifier
                         aqlResults = aqlResultList.FindAll(x => x.Name.Equals(
                         jfrogcomponentName, StringComparison.OrdinalIgnoreCase));
                     }
-                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
                 }
             }
 

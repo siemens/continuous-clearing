@@ -222,7 +222,7 @@ namespace LCT.PackageIdentifier
                 jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase));
             jfrogPackageName = jfrogPackageNameWhlExten;
 
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
 
             if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
@@ -233,7 +233,7 @@ namespace LCT.PackageIdentifier
                     var aqllist = aqlResultList.FindAll(x => x.Name.Contains(fullNameVersion, StringComparison.OrdinalIgnoreCase)
                     && x.Name.EndsWith(ApiConstant.CargoExtension));
                     jfrogPackageName = fullNameVersion;
-                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist);
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist, component);
                 }
             }
 
