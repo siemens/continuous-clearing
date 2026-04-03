@@ -132,6 +132,10 @@ namespace LCT.Common
                         environmentHelper.CallEnvironmentExit(-1);
                     }
                 }
+                else
+                {
+                    Logger.Warn("SBOM signing is mandatory. SBOMSignVerify must be set to true.");
+                }
                 File.WriteAllText(filePath, bomContent);
                 Logger.Debug("WriteContentToOutputBomFile():Content successfully written to file.");
             });
