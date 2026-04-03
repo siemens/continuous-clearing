@@ -252,6 +252,10 @@
 	  <file src="out\net8.0\Azure.Security.KeyVault.Secrets.dll" target="tools\Azure.Security.KeyVault.Secrets.dll"/>
     <file src="out\net8.0\LCT.SBOMSigningVerification.dll" target="tools\LCT.SBOMSigningVerification.dll"/>
     <file src="out\net8.0\System.ClientModel.dll" target="tools\System.ClientModel.dll"/>
-    <file src="out\net8.0\Microsoft.Identity.Client.dll" target="tools\Microsoft.Identity.Client.dll"/>    
+    <file src="out\net8.0\Microsoft.Identity.Client.dll" target="tools\Microsoft.Identity.Client.dll"/>
+    <file src="out\net8.0\Microsoft.Bcl.AsyncInterfaces.dll" target="tools\Microsoft.Bcl.AsyncInterfaces.dll"/>
+    <file src="out\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll" target="tools\Microsoft.Identity.Client.Extensions.Msal.dll"/>
+    <file src="out\net8.0\Microsoft.IdentityModel.Abstractions.dll" target="tools\Microsoft.IdentityModel.Abstractions.dll"/>
+    <file src="out\net8.0\System.Memory.Data.dll" target="tools\System.Memory.Data.dll"/>
   </files>
 </package>
