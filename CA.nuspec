@@ -246,10 +246,12 @@
     <file src="out\net8.0\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
     <file src="out\net8.0\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
     <file src="out\net8.0\Azure.Core.dll" target="tools\Azure.Core.dll"/>
-	<file src="out\net8.0\Azure.Identity.dll" target="tools\Azure.Identity.dll"/>
-	<file src="out\net8.0\Azure.Security.KeyVault.Certificates.dll" target="tools\Azure.Security.KeyVault.Certificates.dll"/>
-	<file src="out\net8.0\Azure.Security.KeyVault.Keys.dll" target="tools\Azure.Security.KeyVault.Keys.dll"/>
-	<file src="out\net8.0\Azure.Security.KeyVault.Secrets.dll" target="tools\Azure.Security.KeyVault.Secrets.dll"/>
-    <file src="out\net8.0\LCT.SBOMSigningVerification.dll" target="tools\LCT.SBOMSigningVerification.dll"/>	  
+	  <file src="out\net8.0\Azure.Identity.dll" target="tools\Azure.Identity.dll"/>
+	  <file src="out\net8.0\Azure.Security.KeyVault.Certificates.dll" target="tools\Azure.Security.KeyVault.Certificates.dll"/>
+	  <file src="out\net8.0\Azure.Security.KeyVault.Keys.dll" target="tools\Azure.Security.KeyVault.Keys.dll"/>
+	  <file src="out\net8.0\Azure.Security.KeyVault.Secrets.dll" target="tools\Azure.Security.KeyVault.Secrets.dll"/>
+    <file src="out\net8.0\LCT.SBOMSigningVerification.dll" target="tools\LCT.SBOMSigningVerification.dll"/>
+    <file src="out\net8.0\System.ClientModel.dll" target="tools\System.ClientModel.dll"/>
+    <file src="out\net8.0\Microsoft.Identity.Client.dll" target="tools\Microsoft.Identity.Client.dll"/>    
   </files>
 </package>
