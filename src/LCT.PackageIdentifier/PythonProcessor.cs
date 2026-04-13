@@ -36,6 +36,8 @@ namespace LCT.PackageIdentifier
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
         private const string PoetryProjectType = "POETRY";
+        private const string devGroupName = "dev";
+        private const string mainGroupName = "main";
 
         /// <summary>
         ///Parses PackageFile
@@ -184,8 +186,8 @@ namespace LCT.PackageIdentifier
                     Name = node["name"].ToString(),
                     Version = node["version"].ToString(),
                     PurlID = Dataconstant.PurlCheck()[PoetryProjectType] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
-                    // By Default Tommy.TomlLazy is coming instead of Null or empty
-                    Isdevdependent = (node["category"].ToString() != "main" && node["category"].ToString() != "Tommy.TomlLazy"),
+                    // Support both Poetry 1.x (category) and Poetry 2.x (groups)
+                    Isdevdependent = IsDevDependency(node),
                     FoundType = Dataconstant.Discovered,
                     SpdxComponentDetails = new SpdxComponentInfo()
                 };
@@ -201,6 +203,94 @@ namespace LCT.PackageIdentifier
             GetRefDetailsFromDependencyText(keyValuePair, dependencies, PythonPackages);
 
             return PythonPackages;
+        }
+
+        /// <summary>
+        /// Determines if a package is a development dependency based on Poetry version
+        /// Supports both Poetry 1.x (category field) and Poetry 2.x (groups field)
+        /// </summary>
+        /// <param name="node">TOML node containing package information</param>
+        /// <returns>True if package is a development dependency, false otherwise</returns>
+        private static bool IsDevDependency(TomlNode node)
+        {
+            // Poetry 2.x uses 'groups' field
+            if (node.HasKey("groups"))
+            {
+                var groupsNode = node["groups"];
+                if (groupsNode != null && !string.Equals(groupsNode.ToString(), "Tommy.TomlLazy", StringComparison.Ordinal))
+                {
+                    // Check if any group in the list is a development group
+                    return ContainsDevGroups(groupsNode);
+                }
+            }
+
+            // Poetry 1.x uses 'category' field (fallback for backward compatibility)
+            if (node.HasKey("category"))
+            {
+                string category = node["category"]?.ToString() ?? string.Empty;
+                return !string.Equals(category, "main", StringComparison.Ordinal) && 
+                       !string.Equals(category, "Tommy.TomlLazy", StringComparison.Ordinal);
+            }
+
+            // Default to production dependency if neither field is present or recognizable
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the groups contain development-related groups
+        /// </summary>
+        /// <param name="groupsNode">Groups node from Poetry 2.x (can be array or string)</param>
+        /// <returns>True if contains dev groups, false otherwise</returns>
+        private static bool ContainsDevGroups(TomlNode groupsNode)
+        {
+            try
+            {
+                // Handle groups as array (most common case)
+                if (groupsNode.IsArray)
+                {
+                    return ContainsDevGroupsInArray(groupsNode.AsArray);
+                }
+                // Handle groups as single string (fallback)
+                else
+                {
+                    return IsDevGroupString(groupsNode.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.WarnFormat("IsDevDependency(): Error parsing groups field: {0}", ex.Message);
+                // If we can't parse groups, assume it's a production dependency
+                return false;
+            }
+        }
+        private static bool ContainsDevGroupsInArray(Tommy.TomlArray array)
+        {
+            bool hasDev = false;
+            bool hasMain = false;
+
+            foreach (var groupItem in array)
+            {
+                string groupName = groupItem?.ToString()?.Trim();
+                if (string.IsNullOrEmpty(groupName))
+                    continue;
+
+                if (string.Equals(groupName, mainGroupName, StringComparison.OrdinalIgnoreCase))
+                    hasMain = true;
+
+                if (string.Equals(groupName, devGroupName, StringComparison.OrdinalIgnoreCase))
+                    hasDev = true;
+            }
+            return hasDev && !hasMain;
+        }
+
+        private static bool IsDevGroupString(string groupName)
+        {
+            groupName = groupName?.Trim();
+            if (!string.IsNullOrEmpty(groupName))
+            {
+                return string.Equals(groupName, devGroupName, StringComparison.OrdinalIgnoreCase);
+            }
+            return false;
         }
 
         /// <summary>

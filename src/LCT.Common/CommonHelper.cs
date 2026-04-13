@@ -542,7 +542,7 @@ namespace LCT.Common
         }
 
         /// <summary>
-        /// Masks sensitive arguments like tokens in the argument array.
+        /// Masks sensitive arguments like tokens and SBOM signing credentials in the argument array.
         /// </summary>
         /// <param name="args">The array of arguments to mask.</param>
         /// <returns>A new array with sensitive values masked.</returns>
@@ -557,6 +557,18 @@ namespace LCT.Common
             string[] maskedArgs = new string[args.Length];
             bool skipNext = false; // Flag to skip processing the next argument
 
+            // List of sensitive argument prefixes to mask
+            var sensitiveArgs = new[]
+            {
+                "--SW360:Token",
+                "--Jfrog:Token",
+                "--SbomSigning:ClientId",
+                "--SbomSigning:ClientSecret",
+                "--SbomSigning:TenantId",
+                "--SbomSigning:KeyVaultUri",
+                "--SbomSigning:CertificateName"
+            };
+
             for (int i = 0; i < args.Length; i++)
             {
                 if (skipNext)
@@ -564,8 +576,9 @@ namespace LCT.Common
                     skipNext = false;
                     continue;
                 }
-                if (args[i].Equals("--SW360:Token", StringComparison.OrdinalIgnoreCase) ||
-                    args[i].Equals("--Jfrog:Token", StringComparison.OrdinalIgnoreCase))
+
+                // Check if current argument is a sensitive parameter
+                if (sensitiveArgs.Any(sensitive => args[i].Equals(sensitive, StringComparison.OrdinalIgnoreCase)))
                 {
                     maskedArgs[i] = args[i];
                     if (i + 1 < args.Length)
