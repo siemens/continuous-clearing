@@ -58,6 +58,38 @@ files = [
     {file = "sphinx-7.2.0.tar.gz", hash = "sha256:0eae3456fbe7ab2ecf3859ccfa3f62b31e30234b5bdf80dc51c42dc43e95b833"},
 ]
 
+[[package]]
+name = "black"
+version = "23.3.0"
+description = "The uncompromising code formatter."
+groups = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "black-23.3.0.tar.gz", hash = "sha256:1234567890abcdef"},
+]
+
+[[package]]
+name = "blacktest"
+version = "23.3.0"
+description = "The uncompromising code formatter."
+groups = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "black-23.3.0.tar.gz", hash = "sha256:1234567890abcdef"},
+]
+
+[[package]]
+name = "blacktest1"
+version = "23.3.0"
+description = "The uncompromising code formatter."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "black-23.3.0.tar.gz", hash = "sha256:1234567890abcdef"},
+]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"

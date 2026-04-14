@@ -221,8 +221,8 @@ namespace LCT.Common
         {
             if (appSettings.SbomSigning == null)
             {
-                string errorMessage = "SbomSigning section is required via inline or in the appSettings.json file but was not found.";
-                ExceptionHandling.ArgumentException(errorMessage);
+                const string errorMessage = "SbomSigning section is required via inline or in the appSettings.json file but was not found.";
+                Logger.ErrorFormat(errorMessage);
                 environmentHelper.CallEnvironmentExit(-1);
                 return; // Unreachable but added for clarity
             }

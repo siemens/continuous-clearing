@@ -242,9 +242,7 @@ namespace LCT.PackageIdentifier
         /// <param name="groupsNode">Groups node from Poetry 2.x (can be array or string)</param>
         /// <returns>True if contains dev groups, false otherwise</returns>
         private static bool ContainsDevGroups(TomlNode groupsNode)
-        {
-            try
-            {
+        {            
                 // Handle groups as array (most common case)
                 if (groupsNode.IsArray)
                 {
@@ -254,15 +252,14 @@ namespace LCT.PackageIdentifier
                 else
                 {
                     return IsDevGroupString(groupsNode.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.WarnFormat("IsDevDependency(): Error parsing groups field: {0}", ex.Message);
-                // If we can't parse groups, assume it's a production dependency
-                return false;
-            }
+                }            
         }
+
+        /// <summary>
+        /// contains dev groups in array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         private static bool ContainsDevGroupsInArray(Tommy.TomlArray array)
         {
             bool hasDev = false;
@@ -283,6 +280,11 @@ namespace LCT.PackageIdentifier
             return hasDev && !hasMain;
         }
 
+        /// <summary>
+        /// Contains dev groups as string 
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         private static bool IsDevGroupString(string groupName)
         {
             groupName = groupName?.Trim();

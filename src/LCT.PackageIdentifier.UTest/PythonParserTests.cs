@@ -499,7 +499,7 @@ namespace LCT.PackageIdentifier.UTest
             Bom listofcomponents = pythonProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
 
             //Assert  Need to change this after python package clearence implementaion
-            Assert.True(listofcomponents.Components.Count == 0 || listofcomponents.Components.Count == 4);
+            Assert.True(listofcomponents.Components.Count == 0 || listofcomponents.Components.Count == 6);
         }
 
         [Test]
@@ -702,7 +702,7 @@ namespace LCT.PackageIdentifier.UTest
             List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
 
             //Assert
-            Assert.That(packages.Count, Is.EqualTo(5), "Should detect all 5 packages from Poetry 2.x lock file");
+            Assert.That(packages.Count, Is.EqualTo(8), "Should detect all 8 packages from Poetry 2.x lock file (including black)");
         }
 
         [Test]
@@ -717,11 +717,11 @@ namespace LCT.PackageIdentifier.UTest
             //Act
             List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
 
-            //Assert - Only pytest (groups=["dev"]) should be dev
+            //Assert - pytest and black (groups=["dev"] or "dev") should be dev
             int devCount = packages.FindAll(p => p.Isdevdependent).Count;
             int prodCount = packages.FindAll(p => !p.Isdevdependent).Count;
-            Assert.That(devCount, Is.EqualTo(1), "Only 1 package (pytest) should be classified as dev dependency");
-            Assert.That(prodCount, Is.EqualTo(4), "4 packages should be classified as production dependencies");
+            Assert.That(devCount, Is.EqualTo(2), "2 packages (pytest and black) should be classified as dev dependency");
+            Assert.That(prodCount, Is.EqualTo(6), "6 packages should be classified as production dependencies");
         }
 
         [Test]
@@ -737,14 +737,69 @@ namespace LCT.PackageIdentifier.UTest
             PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
 
             //Assert
-            Assert.That(dependencies.Count, Is.EqualTo(5), "Should have dependency entries for all 5 packages");
+            Assert.That(dependencies.Count, Is.EqualTo(8), "Should have dependency entries for all 6 packages");
             var requestsDep = dependencies.Find(d => d.Ref.Contains("requests"));
             Assert.That(requestsDep, Is.Not.Null, "requests dependency entry should exist");
             Assert.That(requestsDep.Dependencies.Count, Is.EqualTo(1), "requests should have 1 sub-dependency (urllib3)");
         }
+       
 
         [Test]
-        public void ExtractDetailsForPoetryLockfile_Poetry1xCategoryMain_MaintainsBackwardCompatibility()
+        public void ExtractDetailsForPoetryLockfile_Poetry2xGroupsAsString_IdentifiesCorrectly()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            List<Dependency> dependencies = new List<Dependency>();
+
+            //Act
+            List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
+
+            //Assert - black has groups = "dev" (string, not array)
+            var black = packages.Find(p => p.Name == "black");
+            Assert.That(black, Is.Not.Null, "black should be found in packages");
+            Assert.IsTrue(black.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
+        }
+
+        [Test]
+        public void ExtractDetailsForPoetryLockfile_Poetry2xGroupsAsString_IdentifiesCorrectlystring()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            List<Dependency> dependencies = new List<Dependency>();
+
+            //Act
+            List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
+
+            //Assert - black has groups = "dev" (string, not array)
+            var blacktest = packages.Find(p => p.Name == "blacktest");
+            Assert.That(blacktest, Is.Not.Null, "black should be found in packages");
+            Assert.IsFalse(blacktest.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
+        }
+
+        [Test]
+        public void ExtractDetailsForPoetryLockfile_Poetry2xGroupsAsString_IdentifiesCorrectlystringempty()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            List<Dependency> dependencies = new List<Dependency>();
+
+            //Act
+            List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
+
+            //Assert - black has groups = "dev" (string, not array)
+            var blacktest1 = packages.Find(p => p.Name == "blacktest1");
+            Assert.That(blacktest1, Is.Not.Null, "black should be found in packages");
+            Assert.IsFalse(blacktest1.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
+        }
+
+        [Test]
+        public void ExtractDetailsForPoetryLockfile_Poetry2xGroupsAsString_IdentifiesCorrectlycategorydev()
         {
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -755,15 +810,47 @@ namespace LCT.PackageIdentifier.UTest
             //Act
             List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
 
-            //Assert - All packages in PythonTestProject use category = "main" (Poetry 1.x format)
-            Assert.That(packages.Count, Is.EqualTo(4), "Should detect 4 packages from Poetry 1.x lock file");
-            foreach (var package in packages)
-            {
-                Assert.IsFalse(package.Isdevdependent,
-                    $"Package {package.Name} with category=\"main\" should NOT be marked as dev dependency");
-            }
-        }        
+            //Assert - black has groups = "dev" (string, not array)
+            var six1 = packages.Find(p => p.Name == "six1");
+            Assert.That(six1, Is.Not.Null, "six1 should be found in packages");
+            Assert.IsTrue(six1.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
+        }
 
+        [Test]
+        public void ExtractDetailsForPoetryLockfile_Poetry2xGroupsAsString_IdentifiesCorrectlycategorymainempty()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry.lock"));
+            List<Dependency> dependencies = new List<Dependency>();
+
+            //Act
+            List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
+
+            //Assert - black has groups = "dev" (string, not array)
+            var six2 = packages.Find(p => p.Name == "six2");
+            Assert.That(six2, Is.Not.Null, "six should be found in packages");
+            Assert.IsFalse(six2.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
+        }
+
+        [Test]
+        public void ExtractDetailsForPoetryLockfile_Poetry2xGroupsAsString_IdentifiesCorrectlycategorymain()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry.lock"));
+            List<Dependency> dependencies = new List<Dependency>();
+
+            //Act
+            List<PythonPackage> packages = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
+
+            //Assert - black has groups = "dev" (string, not array)
+            var six = packages.Find(p => p.Name == "six");
+            Assert.That(six, Is.Not.Null, "six should be found in packages");
+            Assert.IsFalse(six.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
+        }
     }
 }
 
