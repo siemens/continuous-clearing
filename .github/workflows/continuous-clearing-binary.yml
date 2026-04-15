@@ -45,7 +45,6 @@ on:
         description: |
           Version of the 'continuous-clearing' NuGet package to install.
           Leave empty to use the latest available release.
-          Example: '4.2.0'
         type: string
         default: ''
         required: false
@@ -56,7 +55,7 @@ on:
       enable_sw360_package_creator:
         description: |
           Set to true to run SW360 Package Creator after Package Identifier.
-          Requires CC_SW360_TOKEN secret to be available.
+          Requires Sw360 secret's to be available.
         type: boolean
         default: false
         required: false
@@ -64,7 +63,7 @@ on:
       enable_artifactory_uploader:
         description: |
           Set to true to run Artifactory Uploader after SW360 Package Creator.
-          Requires CC_JFROG_TOKEN secret to be available.
+          Requires JFROG secret's to be available.
           Has no effect when enable_sw360_package_creator is false.
         type: boolean
         default: false
@@ -113,8 +112,8 @@ jobs:
         with:
           # Central repository that holds appSettings_Docker.json and other
           # CCTool configuration files shared across all projects.
-          repository: sumanthkb44/.github
-          ref: main
+          repository: siemens/continuous-clearing
+          ref: feature/github_action_template
           path: cc-template
           # Fetch only the latest commit – history is not needed.
           fetch-depth: 1

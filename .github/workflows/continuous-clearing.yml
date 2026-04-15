@@ -95,8 +95,8 @@ jobs:
         with:
           # Central repository that holds appSettings_Docker.json and other
           # CCTool configuration files shared across all projects.
-          repository: sumanthkb44/.github
-          ref: main
+          repository: siemens/continuous-clearing
+          ref: feature/github_action_template
           path: cc-template
           # Fetch only the latest commit – history is not needed.
           fetch-depth: 1

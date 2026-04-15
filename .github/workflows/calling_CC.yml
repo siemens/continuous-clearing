@@ -31,20 +31,20 @@ on:
   pull_request:
     # Run on all target branches to catch compliance issues before merge.
 
-  workflow_dispatch:
-    inputs:
-      enable_sw360_package_creator:
-        description: 'Run SW360 Package Creator'
-        type: boolean
-        default: false
-      enable_artifactory_uploader:
-        description: 'Run Artifactory Uploader (dry-run by default)'
-        type: boolean
-        default: false
-      jfrog_dry_run:
-        description: 'Artifactory dry-run mode (false = live copy/move)'
-        type: boolean
-        default: true
+  # workflow_dispatch:
+  #   inputs:
+  #     enable_sw360_package_creator:
+  #       description: 'Run SW360 Package Creator'
+  #       type: boolean
+  #       default: false
+  #     enable_artifactory_uploader:
+  #       description: 'Run Artifactory Uploader (dry-run by default)'
+  #       type: boolean
+  #       default: false
+  #     jfrog_dry_run:
+  #       description: 'Artifactory dry-run mode (false = live copy/move)'
+  #       type: boolean
+  #       default: true
 
 concurrency:
   # Cancel any in-progress run on the same branch/PR when a newer commit arrives.
@@ -108,7 +108,7 @@ jobs:
 
     # Reference the shared reusable workflow from the central template repository.
     # Pin to a specific SHA or tag in production for supply-chain security.
-    uses: sumanthkb44/.github/.github/workflows/continuous-clearing.yml@main
+    uses: siemens/continuous-clearing/.github/workflows/continuous-clearing.yml@feature/github_action_template
 
     # Pass the secrets required by the clearing stages.
     # 'inherit' forwards all repository/environment secrets automatically.

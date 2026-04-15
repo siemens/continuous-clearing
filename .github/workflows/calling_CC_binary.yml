@@ -53,24 +53,24 @@ on:
   pull_request:
     # Runs on all target branches to catch compliance issues before merge.
 
-  workflow_dispatch:
-    inputs:
-      enable_sw360_package_creator:
-        description: 'Run SW360 Package Creator'
-        type: boolean
-        default: false
-      enable_artifactory_uploader:
-        description: 'Run Artifactory Uploader (dry-run by default)'
-        type: boolean
-        default: false
-      jfrog_dry_run:
-        description: 'Artifactory dry-run mode (false = live copy/move for releases)'
-        type: boolean
-        default: true
-      tool_version:
-        description: 'CCTool NuGet version to install (leave blank for latest)'
-        type: string
-        default: ''
+  # workflow_dispatch:
+  #   inputs:
+  #     enable_sw360_package_creator:
+  #       description: 'Run SW360 Package Creator'
+  #       type: boolean
+  #       default: false
+  #     enable_artifactory_uploader:
+  #       description: 'Run Artifactory Uploader (dry-run by default)'
+  #       type: boolean
+  #       default: false
+  #     jfrog_dry_run:
+  #       description: 'Artifactory dry-run mode (false = live copy/move for releases)'
+  #       type: boolean
+  #       default: true
+  #     tool_version:
+  #       description: 'CCTool NuGet version to install (leave blank for latest)'
+  #       type: string
+  #       default: ''
 
 concurrency:
   # Cancel any in-progress run on the same branch/PR when a newer commit arrives.
@@ -147,7 +147,7 @@ jobs:
     # Centralised reusable workflow – binary / NuGet variant.
     # Pin to a release tag (e.g. @v4.2.0) instead of @main in production
     # to guard against unintended upstream changes.
-    uses: sumanthkb44/.github/.github/workflows/continuous-clearing-binary.yml@main
+    uses: siemens/continuous-clearing/.github/workflows/continuous-clearing.yml@feature/github_action_template
 
     # Forwards all repository / environment secrets to the reusable workflow.
     # Ensure CC_SW360_TOKEN and CC_JFROG_TOKEN are set in this repository's
