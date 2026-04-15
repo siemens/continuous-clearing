@@ -1,0 +1,281 @@
+# =============================================================================
+# Reusable Workflow: Continuous Clearing (NuGet Binary)
+# =============================================================================
+# Purpose:
+#   Runs the Siemens Continuous Clearing Tool (CCTool) pipeline using the
+#   published NuGet package binaries instead of the Docker container image.
+#   All three stages mirror the Docker variant (continuous-clearing.yml) but
+#   execute via 'dotnet <dll>' directly on the GitHub-hosted runner.
+#
+# When to use this variant vs the Docker variant:
+#   - Use this workflow when Docker-in-Docker is unavailable or undesirable.
+#   - Use continuous-clearing.yml (Docker) when a fully isolated, reproducible
+#     container environment is required.
+#
+# Stages (in order):
+#   1. Package Identifier    – Always runs. Scans dependencies and generates SBOM.
+#   2. SW360 Package Creator – Optional (default: disabled). Creates/links components
+#                              in SW360 and triggers Fossology scans.
+#   3. Artifactory Uploader  – Optional (default: disabled). Copies cleared packages
+#                              to the configured JFrog Artifactory repositories.
+#
+# Usage:
+#   Call this workflow from your pipeline using 'uses:' and pass the inputs
+#   below. Secrets must be inherited from the caller via 'secrets: inherit'.
+#
+# Required caller artifact:
+#   The calling workflow must upload an artifact named 'cc-input' containing
+#   the project dependency files (e.g. project.assets.json for NuGet projects).
+#
+# Required secrets (must be set in the calling repo / environment):
+#   CC_SW360_TOKEN  – SW360 REST API authentication token
+#   CC_JFROG_TOKEN  – JFrog Artifactory authentication token
+#                     (only required when enable_artifactory_uploader: true)
+# =============================================================================
+
+name: Continuous Clearing (Binary)
+
+on:
+  workflow_call:
+    inputs:
+      # -----------------------------------------------------------------------
+      # Tool version
+      # -----------------------------------------------------------------------
+      tool_version:
+        description: |
+          Version of the 'continuous-clearing' NuGet package to install.
+          Leave empty to use the latest available release.
+          Example: '4.2.0'
+        type: string
+        default: ''
+        required: false
+
+      # -----------------------------------------------------------------------
+      # Tool stage toggles
+      # -----------------------------------------------------------------------
+      enable_sw360_package_creator:
+        description: |
+          Set to true to run SW360 Package Creator after Package Identifier.
+          Requires CC_SW360_TOKEN secret to be available.
+        type: boolean
+        default: false
+        required: false
+
+      enable_artifactory_uploader:
+        description: |
+          Set to true to run Artifactory Uploader after SW360 Package Creator.
+          Requires CC_JFROG_TOKEN secret to be available.
+          Has no effect when enable_sw360_package_creator is false.
+        type: boolean
+        default: false
+        required: false
+
+      # -----------------------------------------------------------------------
+      # Tool configuration
+      # -----------------------------------------------------------------------
+      jfrog_dry_run:
+        description: |
+          When true the Artifactory Uploader only validates paths/permissions
+          without copying or moving any files (safe default for CI).
+          Set to false for production/release runs.
+        type: boolean
+        default: true
+        required: false
+
+    secrets:
+      CC_SW360_TOKEN:
+        description: SW360 REST API authentication token.
+        required: false
+      CC_JFROG_TOKEN:
+        description: JFrog Artifactory authentication token.
+        required: false
+
+concurrency:
+  # Cancel in-flight clearing runs on the same ref to avoid duplicate work.
+  group: continuous-clearing-binary-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  continuous-clearing:
+    name: Continuous Clearing (Binary)
+    runs-on: ubuntu-latest
+
+    # Logical environment name – attach branch-protection rules or
+    # required reviewers here via GitHub Environments if needed.
+    # environment: clearing
+
+    steps:
+      # -----------------------------------------------------------------------
+      # Setup: fetch the appSettings bundled in the central template repository
+      # -----------------------------------------------------------------------
+      - name: Checkout CCTool configuration
+        uses: actions/checkout@v4
+        with:
+          # Central repository that holds appSettings_Docker.json and other
+          # CCTool configuration files shared across all projects.
+          repository: sumanthkb44/.github
+          ref: main
+          path: cc-template
+          # Fetch only the latest commit – history is not needed.
+          fetch-depth: 1
+
+      # -----------------------------------------------------------------------
+      # Setup: download dependency metadata produced by the caller's build job
+      # -----------------------------------------------------------------------
+      - name: Download CC input artifact
+        uses: actions/download-artifact@v4
+        with:
+          # Artifact name must match what the calling workflow uploaded.
+          name: cc-input
+          path: cc/Input
+
+      # -----------------------------------------------------------------------
+      # Setup: create directory layout used by CCTool
+      #
+      #   cc/Input     – dependency files uploaded by the caller
+      #   cc/Output    – generated SBOM and reports
+      #   cc/AppConfig – appSettings.json configuration
+      #   cc/Log       – CCTool log files
+      #   cc/Tools     – extracted NuGet package binaries
+      # -----------------------------------------------------------------------
+      - name: Prepare runtime directories
+        run: mkdir -p cc/Output cc/AppConfig cc/Log cc/Tools
+
+      - name: Stage appSettings configuration
+        run: |
+          cp cc-template/.github/workflows/appSettings_Docker.json \
+             cc/AppConfig/appSettings.json
+
+      # -----------------------------------------------------------------------
+      # Setup: install .NET 8 runtime required to execute the CCTool DLLs
+      # -----------------------------------------------------------------------
+      - name: Setup .NET 8 runtime
+        uses: actions/setup-dotnet@v4
+        with:
+          # .NET 8 is the LTS version targeted by Continuous Clearing Tool.
+          dotnet-version: '8.0.x'
+
+      # -----------------------------------------------------------------------
+      # Setup: download the CCTool NuGet package from GitHub Releases and
+      # extract the tool binaries into cc/Tools.
+      #
+      # The package id is 'continuous-clearing' (see CA.nuspec).
+      # If tool_version is provided it is used; otherwise the latest release
+      # asset is resolved via the GitHub CLI.
+      # -----------------------------------------------------------------------
+      - name: Resolve CCTool version
+        id: resolve_version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "${{ inputs.tool_version }}" ]; then
+            echo "version=${{ inputs.tool_version }}" >> "$GITHUB_OUTPUT"
+          else
+            # Fetch the tag of the latest published release.
+            latest=$(gh release view --repo siemens/continuous-clearing \
+                       --json tagName --jq '.tagName')
+            echo "version=${latest}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download CCTool NuGet package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "${{ steps.resolve_version.outputs.version }}" \
+            --repo siemens/continuous-clearing \
+            --pattern '*.nupkg' \
+            --dir cc/Tools \
+            --clobber
+
+      - name: Extract CCTool binaries from NuGet package
+        run: |
+          # NuGet packages are ZIP archives. Extract only the 'tools/' folder
+          # which contains the runnable DLLs as defined in CA.nuspec.
+          NUPKG=$(find cc/Tools -name '*.nupkg' | head -1)
+          echo "Extracting: ${NUPKG}"
+          unzip -q "${NUPKG}" 'tools/*' -d cc/Tools/extracted
+          # Make binaries directly accessible at cc/Tools root for cleaner paths.
+          mv cc/Tools/extracted/tools/* cc/Tools/
+          rm -rf cc/Tools/extracted "${NUPKG}"
+          echo "=== Extracted binaries ==="
+          ls -la cc/Tools/
+
+      # -----------------------------------------------------------------------
+      # Debug: surface input files to aid troubleshooting in CI logs
+      # -----------------------------------------------------------------------
+      - name: Verify input artifact contents
+        run: |
+          echo "=== cc/Input directory listing ==="
+          ls -la cc/Input
+          echo "=== Locating project.assets.json ==="
+          find cc/Input -name project.assets.json
+
+      # -----------------------------------------------------------------------
+      # Stage 1 – Package Identifier (always runs)
+      #
+      # Scans the input dependency files, resolves licenses, and produces a
+      # CycloneDX SBOM (BOM.cdx.json) in cc/Output.
+      # SBOM signing is disabled here; enable it by passing
+      # --SbomSigning:SBOMSignVerify true with Key Vault credentials.
+      # -----------------------------------------------------------------------
+      - name: Run Package Identifier
+        run: |
+          dotnet cc/Tools/PackageIdentifier.dll \
+            --settingsfilepath "${{ github.workspace }}/cc/AppConfig/appSettings.json" \
+            --Directory:InputFolder  "${{ github.workspace }}/cc/Input" \
+            --Directory:OutputFolder "${{ github.workspace }}/cc/Output" \
+            --SbomSigning:SBOMSignVerify false
+
+      # -----------------------------------------------------------------------
+      # Stage 2 – SW360 Package Creator (optional, default: disabled)
+      #
+      # Reads the SBOM from cc/Output, creates missing components/releases in
+      # SW360, links them to the configured project, and triggers Fossology
+      # source-code scans.
+      # -----------------------------------------------------------------------
+      - name: Run SW360 Package Creator
+        if: ${{ inputs.enable_sw360_package_creator }}
+        env:
+          CC_SW360_TOKEN: ${{ secrets.CC_SW360_TOKEN }}
+        run: |
+          dotnet cc/Tools/SW360PackageCreator.dll \
+            --settingsfilepath "${{ github.workspace }}/cc/AppConfig/appSettings.json" \
+            --Directory:OutputFolder "${{ github.workspace }}/cc/Output"
+
+      # -----------------------------------------------------------------------
+      # Stage 3 – Artifactory Uploader (optional, default: disabled)
+      #
+      # Copies cleared ("Report approved") packages from the remote repository
+      # to the configured third-party/dev/release repos in JFrog Artifactory.
+      # Runs in dry-run mode by default; set jfrog_dry_run: false for releases.
+      # -----------------------------------------------------------------------
+      - name: Run Artifactory Uploader
+        if: ${{ inputs.enable_artifactory_uploader }}
+        env:
+          CC_JFROG_TOKEN: ${{ secrets.CC_JFROG_TOKEN }}
+        run: |
+          dotnet cc/Tools/ArtifactoryUploader.dll \
+            --settingsfilepath "${{ github.workspace }}/cc/AppConfig/appSettings.json" \
+            --Directory:OutputFolder "${{ github.workspace }}/cc/Output" \
+            --Jfrog:DryRun ${{ inputs.jfrog_dry_run }}
+
+      # -----------------------------------------------------------------------
+      # Publish: upload SBOM and logs regardless of step outcomes so that
+      # results are always available for auditing and post-run analysis.
+      # -----------------------------------------------------------------------
+      - name: Upload SBOM artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          # Captures BOM.cdx.json and any other JSON reports written to Output.
+          path: cc/Output/**/*.json
+          if-no-files-found: warn
+
+      - name: Upload CCTool logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cc-logs
+          path: cc/Log/**
+          if-no-files-found: ignore

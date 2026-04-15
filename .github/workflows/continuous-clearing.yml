@@ -1,0 +1,223 @@
+# =============================================================================
+# Reusable Workflow: Continuous Clearing
+# =============================================================================
+# Purpose:
+#   Runs the Siemens Continuous Clearing Tool (CCTool) pipeline against
+#   pre-built dependency metadata uploaded by a calling workflow.
+#
+# Stages (in order):
+#   1. Package Identifier    – Always runs. Scans dependencies and generates SBOM.
+#   2. SW360 Package Creator – Optional (default: disabled). Creates/links components
+#                              in SW360 and triggers Fossology scans.
+#   3. Artifactory Uploader  – Optional (default: disabled). Copies cleared packages
+#                              to the configured JFrog Artifactory repositories.
+#
+# Usage:
+#   Call this workflow from your pipeline using 'uses:' and pass the inputs
+#   below. Secrets (SW360 token, JFrog token) must be inherited from the caller
+#   via 'secrets: inherit' or mapped explicitly.
+#
+# Required caller artifact:
+#   The calling workflow must upload an artifact named 'cc-input' containing
+#   the project dependency files (e.g. project.assets.json for NuGet).
+#
+# Required secrets (must be set in the calling repo / environment):
+#   CC_SW360_TOKEN  – SW360 REST API authentication token
+#   CC_JFROG_TOKEN  – JFrog Artifactory authentication token
+#                     (only required when enable_artifactory_uploader: true)
+# =============================================================================
+
+name: Continuous Clearing
+
+on:
+  workflow_call:
+    inputs:
+      # -----------------------------------------------------------------------
+      # Tool stage toggles
+      # -----------------------------------------------------------------------
+      enable_sw360_package_creator:
+        description: |
+          Set to true to run SW360 Package Creator after Package Identifier.
+          Requires CC_SW360_TOKEN secret to be available.
+        type: boolean
+        default: false
+        required: false
+
+      enable_artifactory_uploader:
+        description: |
+          Set to true to run Artifactory Uploader after SW360 Package Creator.
+          Requires CC_JFROG_TOKEN secret to be available.
+          Has no effect when enable_sw360_package_creator is false.
+        type: boolean
+        default: false
+        required: false
+
+      # -----------------------------------------------------------------------
+      # Tool configuration
+      # -----------------------------------------------------------------------
+      jfrog_dry_run:
+        description: |
+          When true the Artifactory Uploader only validates paths/permissions
+          without copying or moving any files (safe default for CI).
+          Set to false for production/release runs.
+        type: boolean
+        default: true
+        required: false
+
+    secrets:
+      CC_SW360_TOKEN:
+        description: SW360 REST API authentication token.
+        required: false
+      CC_JFROG_TOKEN:
+        description: JFrog Artifactory authentication token.
+        required: false
+
+concurrency:
+  # Cancel in-flight clearing runs on the same ref to avoid duplicate work.
+  group: continuous-clearing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  continuous-clearing:
+    name: Continuous Clearing
+    runs-on: ubuntu-latest
+
+    # Logical environment name – attach branch-protection rules or
+    # required reviewers here via GitHub Environments if needed.
+    # environment: clearing
+
+    steps:
+      # -----------------------------------------------------------------------
+      # Setup: fetch the appSettings bundled in the central template repository
+      # -----------------------------------------------------------------------
+      - name: Checkout CCTool configuration
+        uses: actions/checkout@v4
+        with:
+          # Central repository that holds appSettings_Docker.json and other
+          # CCTool configuration files shared across all projects.
+          repository: sumanthkb44/.github
+          ref: main
+          path: cc-template
+          # Fetch only the latest commit – history is not needed.
+          fetch-depth: 1
+
+      # -----------------------------------------------------------------------
+      # Setup: download dependency metadata produced by the caller's build job
+      # -----------------------------------------------------------------------
+      - name: Download CC input artifact
+        uses: actions/download-artifact@v4
+        with:
+          # Artifact name must match what the calling workflow uploaded.
+          name: cc-input
+          path: cc/Input
+
+      # -----------------------------------------------------------------------
+      # Setup: create directory layout expected by the Docker container
+      #
+      #   cc/Input     → /mnt/Input    (read-only dependency files)
+      #   cc/Output    → /mnt/Output   (generated SBOM and reports)
+      #   cc/AppConfig → /etc/CATool   (appSettings.json)
+      #   cc/Log       → /var/log      (CCTool log files)
+      # -----------------------------------------------------------------------
+      - name: Prepare runtime directories
+        run: |
+          mkdir -p cc/Output cc/AppConfig cc/Log
+
+      - name: Stage appSettings configuration
+        run: |
+          cp cc-template/.github/workflows/appSettings_Docker.json \
+             cc/AppConfig/appSettings_Docker.json
+
+      # -----------------------------------------------------------------------
+      # Debug: surface input files to aid troubleshooting in CI logs
+      # -----------------------------------------------------------------------
+      - name: Verify input artifact contents
+        run: |
+          echo "=== cc/Input directory listing ==="
+          ls -la cc/Input
+          echo "=== Locating project.assets.json ==="
+          find cc/Input -name project.assets.json
+
+      # -----------------------------------------------------------------------
+      # Stage 1 – Package Identifier (always runs)
+      #
+      # Scans the input dependency files, resolves licenses, and produces a
+      # CycloneDX SBOM (BOM.cdx.json) in cc/Output.
+      # SBOM signing is disabled here; enable it by passing
+      # --SbomSigning:SBOMSignVerify true with Key Vault credentials.
+      # -----------------------------------------------------------------------
+      - name: Run Package Identifier
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/cc/Input:/mnt/Input" \
+            -v "${{ github.workspace }}/cc/Output:/mnt/Output" \
+            -v "${{ github.workspace }}/cc/AppConfig:/etc/CATool" \
+            -v "${{ github.workspace }}/cc/Log:/var/log" \
+            ghcr.io/siemens/continuous-clearing:latest \
+            dotnet PackageIdentifier.dll \
+              --settingsfilepath /etc/CATool/appSettings_Docker.json \
+              --SbomSigning:SBOMSignVerify false
+
+      # -----------------------------------------------------------------------
+      # Stage 2 – SW360 Package Creator (optional, default: disabled)
+      #
+      # Reads the SBOM from cc/Output, creates missing components/releases in
+      # SW360, links them to the configured project, and triggers Fossology
+      # source-code scans.
+      # -----------------------------------------------------------------------
+      - name: Run SW360 Package Creator
+        if: ${{ inputs.enable_sw360_package_creator }}
+        env:
+          CC_SW360_TOKEN: ${{ secrets.CC_SW360_TOKEN }}
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/cc/Output:/mnt/Output" \
+            -v "${{ github.workspace }}/cc/AppConfig:/etc/CATool" \
+            -v "${{ github.workspace }}/cc/Log:/var/log" \
+            -e CC_SW360_TOKEN \
+            ghcr.io/siemens/continuous-clearing:latest \
+            dotnet SW360PackageCreator.dll \
+              --settingsfilepath /etc/CATool/appSettings_Docker.json
+
+      # -----------------------------------------------------------------------
+      # Stage 3 – Artifactory Uploader (optional, default: disabled)
+      #
+      # Copies cleared ("Report approved") packages from the remote repository
+      # to the configured third-party/dev/release repos in JFrog Artifactory.
+      # Runs in dry-run mode by default; set jfrog_dry_run: false for releases.
+      # -----------------------------------------------------------------------
+      - name: Run Artifactory Uploader
+        if: ${{ inputs.enable_artifactory_uploader }}
+        env:
+          CC_JFROG_TOKEN: ${{ secrets.CC_JFROG_TOKEN }}
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/cc/Output:/mnt/Output" \
+            -v "${{ github.workspace }}/cc/AppConfig:/etc/CATool" \
+            -v "${{ github.workspace }}/cc/Log:/var/log" \
+            -e CC_JFROG_TOKEN \
+            ghcr.io/siemens/continuous-clearing:latest \
+            dotnet ArtifactoryUploader.dll \
+              --settingsfilepath /etc/CATool/appSettings_Docker.json \
+              --Jfrog:DryRun ${{ inputs.jfrog_dry_run }}
+
+      # -----------------------------------------------------------------------
+      # Publish: upload SBOM and logs regardless of step outcomes so that
+      # results are always available for auditing and post-run analysis.
+      # -----------------------------------------------------------------------
+      - name: Upload SBOM artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          # Captures BOM.cdx.json and any other JSON reports written to Output.
+          path: cc/Output/**/*.json
+          if-no-files-found: warn
+
+      - name: Upload CCTool logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cc-logs
+          path: cc/Log/**
+          if-no-files-found: ignore

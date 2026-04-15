@@ -1,0 +1,130 @@
+# =============================================================================
+# Workflow: License Clearance
+# =============================================================================
+# Purpose:
+#   Orchestrates the full license compliance pipeline for this repository.
+#   Produces a CycloneDX SBOM and optionally creates SW360 entries and
+#   uploads cleared packages to JFrog Artifactory.
+#
+# Pipeline overview:
+#   build     → Restores .NET dependencies and uploads project metadata
+#   clearing  → Runs Siemens Continuous Clearing Tool via reusable workflow
+#
+# Triggers:
+#   - Push to main/master branch
+#   - Pull requests (all branches)  – runs Package Identifier only
+#   - Manual dispatch via GitHub UI – full pipeline available via inputs
+#
+# Required repository secrets:
+#   CC_SW360_TOKEN  – SW360 REST API authentication token
+#   CC_JFROG_TOKEN  – JFrog Artifactory authentication token
+# =============================================================================
+
+name: License Clearance
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+  pull_request:
+    # Run on all target branches to catch compliance issues before merge.
+
+  workflow_dispatch:
+    inputs:
+      enable_sw360_package_creator:
+        description: 'Run SW360 Package Creator'
+        type: boolean
+        default: false
+      enable_artifactory_uploader:
+        description: 'Run Artifactory Uploader (dry-run by default)'
+        type: boolean
+        default: false
+      jfrog_dry_run:
+        description: 'Artifactory dry-run mode (false = live copy/move)'
+        type: boolean
+        default: true
+
+concurrency:
+  # Cancel any in-progress run on the same branch/PR when a newer commit arrives.
+  group: license-clearance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Build & Restore
+  # ---------------------------------------------------------------------------
+  # Restores NuGet packages so that project.assets.json (full dependency graph)
+  # is present before the Continuous Clearing Tool runs.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build & Restore
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # .NET 8 is the current LTS release targeted by this project.
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Restores NuGet packages and writes obj/project.assets.json which
+      # contains the complete direct + transitive dependency graph.
+      - name: Restore NuGet dependencies
+        run: dotnet restore backend/backend.csproj
+
+      # Sanity-check: confirm project.assets.json exists before uploading.
+      - name: Verify dependency metadata
+        run: find backend -name project.assets.json
+
+      # Upload the project folder so the clearing job can consume it.
+      # The artifact name 'cc-input' is the contract with the reusable workflow.
+      - name: Upload CC input artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cc-input
+          path: backend
+          # Fail the step if the folder is empty (no assets generated).
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Continuous Clearing
+  # ---------------------------------------------------------------------------
+  # Delegates to the centralised reusable clearing workflow.
+  # Runs only after a successful build so dependency metadata is guaranteed.
+  #
+  # Stage defaults:
+  #   Package Identifier    → always enabled
+  #   SW360 Package Creator → disabled (set enable_sw360_package_creator: true)
+  #   Artifactory Uploader  → disabled (set enable_artifactory_uploader: true)
+  # ---------------------------------------------------------------------------
+  clearing:
+    name: Continuous Clearing
+    needs: build
+
+    # Reference the shared reusable workflow from the central template repository.
+    # Pin to a specific SHA or tag in production for supply-chain security.
+    uses: sumanthkb44/.github/.github/workflows/continuous-clearing.yml@main
+
+    # Pass the secrets required by the clearing stages.
+    # 'inherit' forwards all repository/environment secrets automatically.
+    secrets: inherit
+
+    with:
+      # ------------------------------------------------------------------
+      # Stage toggles
+      # On push/PR: only Package Identifier runs (SBOM generation only).
+      # On manual dispatch: honour the user-supplied values.
+      # ------------------------------------------------------------------
+      enable_sw360_package_creator: ${{ inputs.enable_sw360_package_creator || false }}
+      enable_artifactory_uploader:  ${{ inputs.enable_artifactory_uploader  || false }}
+
+      # ------------------------------------------------------------------
+      # Artifactory safety guard
+      # Dry-run is on by default; set to false only for production releases.
+      # ------------------------------------------------------------------
+      jfrog_dry_run: ${{ inputs.jfrog_dry_run || true }}
