@@ -14,17 +14,12 @@
 #
 # Usage:
 #   Call this workflow from your pipeline using 'uses:' and pass the inputs
-#   below. Secrets (SW360 token, JFrog token) must be inherited from the caller
-#   via 'secrets: inherit' or mapped explicitly.
+#   below.
 #
 # Required caller artifact:
 #   The calling workflow must upload an artifact named 'cc-input' containing
-#   the project dependency files (e.g. project.assets.json for NuGet).
+#   the project dependency files (e.g. project.assets.json for NuGet, package-lock.json for Node.js).
 #
-# Required secrets (must be set in the calling repo / environment):
-#   CC_SW360_TOKEN  – SW360 REST API authentication token
-#   CC_JFROG_TOKEN  – JFrog Artifactory authentication token
-#                     (only required when enable_artifactory_uploader: true)
 # =============================================================================
 
 name: Continuous Clearing
@@ -38,7 +33,6 @@ on:
       enable_sw360_package_creator:
         description: |
           Set to true to run SW360 Package Creator after Package Identifier.
-          Requires CC_SW360_TOKEN secret to be available.
         type: boolean
         default: false
         required: false
@@ -46,8 +40,6 @@ on:
       enable_artifactory_uploader:
         description: |
           Set to true to run Artifactory Uploader after SW360 Package Creator.
-          Requires CC_JFROG_TOKEN secret to be available.
-          Has no effect when enable_sw360_package_creator is false.
         type: boolean
         default: false
         required: false
@@ -57,9 +49,7 @@ on:
       # -----------------------------------------------------------------------
       jfrog_dry_run:
         description: |
-          When true the Artifactory Uploader only validates paths/permissions
-          without copying or moving any files (safe default for CI).
-          Set to false for production/release runs.
+          When true the Artifactory Uploader only validates
         type: boolean
         default: true
         required: false

@@ -25,12 +25,8 @@
 #
 # Required caller artifact:
 #   The calling workflow must upload an artifact named 'cc-input' containing
-#   the project dependency files (e.g. project.assets.json for NuGet projects).
+#   the project dependency files (e.g. project.assets.json for NuGet projects, package-lock.json for Node.js).
 #
-# Required secrets (must be set in the calling repo / environment):
-#   CC_SW360_TOKEN  – SW360 REST API authentication token
-#   CC_JFROG_TOKEN  – JFrog Artifactory authentication token
-#                     (only required when enable_artifactory_uploader: true)
 # =============================================================================
 
 name: Continuous Clearing (Binary)
@@ -63,8 +59,6 @@ on:
       enable_artifactory_uploader:
         description: |
           Set to true to run Artifactory Uploader after SW360 Package Creator.
-          Requires JFROG secret's to be available.
-          Has no effect when enable_sw360_package_creator is false.
         type: boolean
         default: false
         required: false
@@ -110,8 +104,6 @@ jobs:
       - name: Checkout CCTool configuration
         uses: actions/checkout@v4
         with:
-          # Central repository that holds appSettings_Docker.json and other
-          # CCTool configuration files shared across all projects.
           repository: siemens/continuous-clearing
           ref: feature/github_action_template
           path: cc-template
