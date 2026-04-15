@@ -134,7 +134,7 @@ jobs:
     # Centralised reusable workflow – binary / NuGet variant.
     # Pin to a release tag (e.g. @v4.2.0) instead of @main in production
     # to guard against unintended upstream changes.
-    uses: siemens/continuous-clearing/.github/workflows/continuous-clearing.yml@feature/github_action_template
+    uses: siemens/continuous-clearing/.github/workflows/continuous-clearing-binary.yml@feature/github_action_template
 
     # Forwards all repository / environment secrets to the reusable workflow.
     # Ensure CC_SW360_TOKEN and CC_JFROG_TOKEN are set in this repository's
