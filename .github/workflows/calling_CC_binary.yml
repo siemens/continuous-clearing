@@ -67,10 +67,6 @@ on:
   #       description: 'Artifactory dry-run mode (false = live copy/move for releases)'
   #       type: boolean
   #       default: true
-  #     tool_version:
-  #       description: 'CCTool NuGet version to install (leave blank for latest)'
-  #       type: string
-  #       default: ''
 
 concurrency:
   # Cancel any in-progress run on the same branch/PR when a newer commit arrives.
@@ -155,11 +151,6 @@ jobs:
     secrets: inherit
 
     with:
-      # Version of the CCTool NuGet package to install.
-      # Leave empty to always fetch the latest published release.
-      # Set an explicit version (e.g. '4.2.0') to pin for reproducibility.
-      tool_version: ${{ inputs.tool_version || '' }}
-
       # ------------------------------------------------------------------
       # Stage toggles
       # On push / PR:         only Package Identifier runs (SBOM only).
