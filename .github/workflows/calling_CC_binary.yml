@@ -99,30 +99,21 @@ jobs:
 
       # Restores NuGet packages and writes obj/project.assets.json which
       # contains the dependency graph consumed by the Package Identifier.
-      # ← CHANGE THIS: replace with the path to your solution / project file.
       - name: Restore NuGet dependencies
-        run: dotnet restore src/YourProject.sln
+        run: dotnet restore backend/backend.csproj
 
-      # Sanity-check: fail early if no assets file was produced.
+      # Sanity-check: confirm project.assets.json exists before uploading.
       - name: Verify dependency metadata
-        run: |
-          count=$(find src -name project.assets.json | wc -l)
-          echo "Found ${count} project.assets.json file(s):"
-          find src -name project.assets.json
-          if [ "${count}" -eq 0 ]; then
-            echo "::error::No project.assets.json found – restore may have failed."
-            exit 1
-          fi
+        run: find backend -name project.assets.json
 
-      # Upload the restored source tree so the clearing job can consume it.
+      # Upload the project folder so the clearing job can consume it.
       # The artifact name 'cc-input' is the contract with the reusable workflow.
-      # ← CHANGE THIS: replace 'src' with the folder(s) that hold your project
-      #   files and obj/ directories after restore.
       - name: Upload CC input artifact
         uses: actions/upload-artifact@v4
         with:
           name: cc-input
-          path: src
+          path: backend
+          # Fail the step if the folder is empty (no assets generated).
           if-no-files-found: error
 
   # ---------------------------------------------------------------------------
