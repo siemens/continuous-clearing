@@ -742,7 +742,7 @@ namespace LCT.PackageIdentifier.UTest
             Assert.That(requestsDep, Is.Not.Null, "requests dependency entry should exist");
             Assert.That(requestsDep.Dependencies.Count, Is.EqualTo(1), "requests should have 1 sub-dependency (urllib3)");
         }
-       
+
 
         [Test]
         public void ExtractDetailsForPoetryLockfile_Poetry2xGroupsAsString_IdentifiesCorrectly()

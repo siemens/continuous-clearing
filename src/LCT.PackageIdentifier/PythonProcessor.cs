@@ -228,7 +228,7 @@ namespace LCT.PackageIdentifier
             if (node.HasKey("category"))
             {
                 string category = node["category"]?.ToString() ?? string.Empty;
-                return !string.Equals(category, "main", StringComparison.Ordinal) && 
+                return !string.Equals(category, "main", StringComparison.Ordinal) &&
                        !string.Equals(category, "Tommy.TomlLazy", StringComparison.Ordinal);
             }
 
@@ -242,17 +242,17 @@ namespace LCT.PackageIdentifier
         /// <param name="groupsNode">Groups node from Poetry 2.x (can be array or string)</param>
         /// <returns>True if contains dev groups, false otherwise</returns>
         private static bool ContainsDevGroups(TomlNode groupsNode)
-        {            
-                // Handle groups as array (most common case)
-                if (groupsNode.IsArray)
-                {
-                    return ContainsDevGroupsInArray(groupsNode.AsArray);
-                }
-                // Handle groups as single string (fallback)
-                else
-                {
-                    return IsDevGroupString(groupsNode.ToString());
-                }            
+        {
+            // Handle groups as array (most common case)
+            if (groupsNode.IsArray)
+            {
+                return ContainsDevGroupsInArray(groupsNode.AsArray);
+            }
+            // Handle groups as single string (fallback)
+            else
+            {
+                return IsDevGroupString(groupsNode.ToString());
+            }
         }
 
         /// <summary>
@@ -639,7 +639,7 @@ namespace LCT.PackageIdentifier
                 jfrogPackageNameWhlExten, StringComparison.OrdinalIgnoreCase));
             jfrogPackageName = jfrogPackageNameWhlExten;
 
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults,component);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
 
             if (repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))
             {
@@ -651,7 +651,7 @@ namespace LCT.PackageIdentifier
                     var aqllist = aqlResultList.FindAll(x => x.Name.Contains(fullNameVersion, StringComparison.OrdinalIgnoreCase)
                     && (x.Name.EndsWith(ApiConstant.PythonExtension) || x.Name.EndsWith(FileConstant.TargzFileExtension)));
                     jfrogPackageName = fullNameVersion;
-                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist,component);
+                    repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqllist, component);
                 }
             }
 
