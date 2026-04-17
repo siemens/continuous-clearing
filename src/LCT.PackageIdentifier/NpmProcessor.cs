@@ -905,7 +905,7 @@ namespace LCT.PackageIdentifier
             Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {0}.", jfrogpackageName);
             var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults,component);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
 
             // Forming Jfrog repo Path
             if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))

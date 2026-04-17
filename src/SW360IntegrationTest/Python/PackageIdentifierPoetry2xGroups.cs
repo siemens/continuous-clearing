@@ -148,7 +148,7 @@ namespace SW360IntegrationTest.Python
             var coverageDevProperty = coverage.Properties?.FirstOrDefault(p => p.Name == Dataconstant.Cdx_IsDevelopment);
             Assert.That(coverageDevProperty, Is.Not.Null, "coverage should have IsDevelopment property");
             Assert.AreEqual("false", coverageDevProperty.Value, "coverage with groups=[\"main\", \"dev\"] should have IsDevelopment=false (main takes precedence)");
-        }               
-        
+        }
+
     }
 }
