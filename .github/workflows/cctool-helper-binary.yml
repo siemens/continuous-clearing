@@ -1,0 +1,157 @@
+# =============================================================================
+# Workflow: License Clearance (Binary / NuGet)
+# =============================================================================
+# Purpose:
+#   Orchestrates the full license compliance pipeline for this repository
+#   using the Siemens Continuous Clearing Tool installed from its NuGet
+#   package — no Docker daemon required on the runner.
+#
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  HOW TO USE THIS FILE IN YOUR REPOSITORY                               │
+# │                                                                         │
+# │  1. Copy this file into your repo at:                                   │
+# │       .github/workflows/license-clearance.yml                           │
+# │                                                                         │
+# │  2. Update the two placeholders marked with ← CHANGE THIS:             │
+# │       a. The 'dotnet restore' command – point it at your solution /     │
+# │          project file(s).                                               │
+# │       b. The artifact 'path' – include the folder(s) that contain      │
+# │          project.assets.json after restore.                             │
+# │                                                                         │
+# │  3. Add the following secrets to your repository                        │
+# │     (Settings → Secrets and variables → Actions):                       │
+# │       CC_SW360_TOKEN  – SW360 REST API token                            │
+# │       CC_JFROG_TOKEN  – JFrog Artifactory token (for uploader stage)   │
+# │                                                                         │
+# │  4. Commit and push. The workflow runs automatically on push / PR.      │
+# │     To trigger SW360 / Artifactory stages, use "Run workflow" in the   │
+# │     GitHub Actions UI and toggle the inputs.                            │
+# └─────────────────────────────────────────────────────────────────────────┘
+#
+# Pipeline overview:
+#   build    → Restores .NET dependencies, uploads project metadata artifact
+#   clearing → Downloads artifact, runs CCTool binary stages sequentially
+#
+# Triggers:
+#   - Push to main / master branch
+#   - Pull requests (all branches) – Package Identifier only (SBOM generation)
+#   - Manual dispatch via GitHub UI – full pipeline control via inputs
+#
+# Required repository secrets:
+#   CC_SW360_TOKEN  – SW360 REST API authentication token
+#   CC_JFROG_TOKEN  – JFrog Artifactory authentication token
+# =============================================================================
+
+name: License Clearance (Binary)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+  pull_request:
+    # Runs on all target branches to catch compliance issues before merge.
+
+  # workflow_dispatch:
+  #   inputs:
+  #     enable_sw360_package_creator:
+  #       description: 'Run SW360 Package Creator'
+  #       type: boolean
+  #       default: false
+  #     enable_artifactory_uploader:
+  #       description: 'Run Artifactory Uploader (dry-run by default)'
+  #       type: boolean
+  #       default: false
+  #     jfrog_dry_run:
+  #       description: 'Artifactory dry-run mode (false = live copy/move for releases)'
+  #       type: boolean
+  #       default: true
+
+concurrency:
+  # Cancel any in-progress run on the same branch/PR when a newer commit arrives.
+  group: license-clearance-binary-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Build & Restore
+  # ---------------------------------------------------------------------------
+  # Restores NuGet packages so that project.assets.json (the full direct +
+  # transitive dependency graph) is present before the CCTool runs.
+  #
+  # ✏️  Adapt the 'Restore NuGet dependencies' and 'Upload CC input artifact'
+  #     steps to match your repository's project structure.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build & Restore
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # .NET 8 is the current LTS version required by Continuous Clearing Tool.
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Restores NuGet packages and writes obj/project.assets.json which
+      # contains the dependency graph consumed by the Package Identifier.
+      - name: Restore NuGet dependencies
+        run: dotnet restore backend/backend.csproj
+
+      # Sanity-check: confirm project.assets.json exists before uploading.
+      - name: Verify dependency metadata
+        run: find backend -name project.assets.json
+
+      # Upload the project folder so the clearing job can consume it.
+      # The artifact name 'cc-input' is the contract with the reusable workflow.
+      - name: Upload CC input artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cc-input
+          path: backend
+          # Fail the step if the folder is empty (no assets generated).
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Continuous Clearing (Binary)
+  # ---------------------------------------------------------------------------
+  # Delegates to the centralised reusable workflow which installs the CCTool
+  # NuGet package and runs the configured stages against the cc-input artifact.
+  #
+  # Stage defaults (safe for everyday CI):
+  #   Package Identifier    → always enabled  (SBOM generation)
+  #   SW360 Package Creator → disabled        (enable via workflow_dispatch)
+  #   Artifactory Uploader  → disabled        (enable via workflow_dispatch)
+  # ---------------------------------------------------------------------------
+  clearing:
+    name: Continuous Clearing
+    needs: build
+
+    # Centralised reusable workflow – binary / NuGet variant.
+    # Pin to a release tag (e.g. @v4.2.0) instead of @main in production
+    # to guard against unintended upstream changes.
+    uses: siemens/continuous-clearing/.github/workflows/continuous-clearing-binary.yml@feature/github_action_template
+
+    # Forwards all repository / environment secrets to the reusable workflow.
+    # Ensure CC_SW360_TOKEN and CC_JFROG_TOKEN are set in this repository's
+    # secrets before enabling the corresponding stages below.
+    secrets: inherit
+
+    with:
+      # ------------------------------------------------------------------
+      # Stage toggles
+      # On push / PR:         only Package Identifier runs (SBOM only).
+      # On workflow_dispatch: honour the operator-supplied values.
+      # ------------------------------------------------------------------
+      enable_sw360_package_creator: ${{ inputs.enable_sw360_package_creator || false }}
+      enable_artifactory_uploader:  ${{ inputs.enable_artifactory_uploader  || false }}
+
+      # ------------------------------------------------------------------
+      # Artifactory safety guard
+      # Dry-run is on by default; set to false only for production releases.
+      # ------------------------------------------------------------------
+      jfrog_dry_run: ${{ inputs.jfrog_dry_run || true }}
