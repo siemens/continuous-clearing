@@ -219,6 +219,13 @@ namespace LCT.Common
         /// <param name="requiredParameters">The list of required parameters to add SBOM signing parameters to.</param>
         private static void AddSbomSigningRequiredParameters(CommonAppSettings appSettings, List<string> requiredParameters)
         {
+            if (appSettings.SbomSigning == null)
+            {
+                const string errorMessage = "The SbomSigning configuration section is required but was not found. Please define it either inline or in the appSettings.json file.";
+                Logger.ErrorFormat(errorMessage);
+                environmentHelper.CallEnvironmentExit(-1);
+                return; // Unreachable but added for clarity
+            }
             if (appSettings.SbomSigning.SBOMSignVerify)
             {
                 requiredParameters.Add("SbomSigning.KeyVaultURI");

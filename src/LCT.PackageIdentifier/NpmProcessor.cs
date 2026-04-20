@@ -280,7 +280,7 @@ namespace LCT.PackageIdentifier
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Manufacturer.BomRef = prop.Value[Dependencies]?.ToString();
+                components.Manufacturer.BomRef = BuildResolvedDependencies(prop.Value[Dependencies], depencyComponentList, prop.Name);
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
 
@@ -331,6 +331,54 @@ namespace LCT.PackageIdentifier
             }
             return packageName;
         }
+
+        /// <summary>
+        /// Builds a BomRef string with resolved dependency versions using the npm path-based resolution
+        /// algorithm: checks for a nested copy at "{parentPath}/node_modules/{depName}" first, then
+        /// falls back to the hoisted copy at "node_modules/{depName}".
+        /// Falls back to the version range when no resolved entry is found in either location.
+        /// </summary>
+        /// <param name="dependenciesToken">JToken of the package's dependencies (name → version range).</param>
+        /// <param name="allPackages">All package entries from the packages section for version resolution.</param>
+        /// <param name="parentPath">The node_modules path of the package that owns these dependencies (e.g. "node_modules/vinyl").</param>
+        /// <returns>Comma-separated "name:resolvedVersion" string, or null when there are no dependencies.</returns>
+        private static string BuildResolvedDependencies(JToken dependenciesToken, IEnumerable<JProperty> allPackages, string parentPath)
+        {
+            if (dependenciesToken == null) return null;
+
+            var packageList = allPackages.ToList();
+            var resolvedParts = new List<string>();
+
+            foreach (JProperty dep in dependenciesToken.OfType<JProperty>())
+            {
+                string nestedPath = $"{parentPath}/node_modules/{dep.Name}";
+                var matchedPkg = packageList.FirstOrDefault(p =>
+                    string.Equals(p.Name, nestedPath, StringComparison.OrdinalIgnoreCase));
+
+                if (matchedPkg == null)
+                {
+                    string hoistedPath = $"node_modules/{dep.Name}";
+                    matchedPkg = packageList.FirstOrDefault(p =>
+                        string.Equals(p.Name, hoistedPath, StringComparison.OrdinalIgnoreCase));
+                }
+
+                if (matchedPkg != null)
+                {
+                    var matchedProps = JObject.Parse(Convert.ToString(matchedPkg.Value));
+                    string resolvedVersion = Convert.ToString(matchedProps[Version]);
+                    if (!string.IsNullOrEmpty(resolvedVersion))
+                    {
+                        resolvedParts.Add($"{dep.Name}:{resolvedVersion}");
+                        continue;
+                    }
+                }
+
+                resolvedParts.Add($"{dep.Name}:{dep.Value}");
+            }
+
+            return resolvedParts.Count > 0 ? string.Join(",", resolvedParts) : null;
+        }
+
         /// <summary>
         /// Determines if a given component entry is a direct dependency.
         /// </summary>
@@ -857,7 +905,7 @@ namespace LCT.PackageIdentifier
             Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Searching for component in JFrog repository with name: {0}.", jfrogpackageName);
             var aqlResults = aqlResultList.FindAll(x => x.Properties.Any(p => p.Key == "npm.name" && p.Value == jfrogpackageName) && x.Properties.Any(p => p.Key == "npm.version" && p.Value == component.Version));
 
-            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults,component);
+            string repoName = CommonIdentiferHelper.GetRepodetailsFromPerticularOrder(aqlResults, component);
 
             // Forming Jfrog repo Path
             if (!repoName.Equals(NotFoundInRepo, StringComparison.OrdinalIgnoreCase))

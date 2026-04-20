@@ -301,6 +301,9 @@
 		<None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Maven.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="PackageIdentifierUTTestFiles\PythonTestProject\poetry2.lock">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>
