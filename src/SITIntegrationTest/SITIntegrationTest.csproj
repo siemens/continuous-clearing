@@ -1,0 +1,111 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+
+		<IsPackable>false</IsPackable>
+
+		<Configurations>Debug;Release</Configurations>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>..\..\out</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\..\out</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="nunit" Version="3.12.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="SITSyncTestFiles\Cargo\CCTComparisonBOMCargoInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITSyncTestFiles\Maven\CCTComparisonBOMMavenUpdated.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Cargo\CCTLocalBOMCargoSpdxSbom.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\CCTLocalBOMTemplateNugetInitial.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\DepMaven\CCTLocalBOMMavenInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\DepNpm\CCTLocalBOMNpmInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\DepNuget\CCTLocalBOMNugetInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\DepPython\CCTLocalBOMPythonInitial.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Maven\CCTLocalBOMMavenInitial.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Npm\CCTComparisonBOMNpmInitial.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Npm\CCTComparisonBOMNpmMultiplePackages.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Npm\CCTComparisonBOMNpmUpdated.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Npm\CCTLocalBOMNpmInitial.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Npm\CCTLocalBOMNpmMultiplePackages.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Npm\CCTLocalBOMNpmUpdated.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Debian\appSettingsDebianSW360IntegrationTest.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="NPM\appSettingsNpmSW360IntegrationTest.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="Nuget\appSettingsNugetSW360IntegrationTest.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="NPM\appSettingsNpmSW360IntegrationTest.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="Nuget\appSettingsNugetSW360IntegrationTest.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITSyncTestFiles\CCTComparisonBOMNugetTemplateInitial.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITSyncTestFiles\Python\CCTComparisonBOMPythonUpdated.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SITScanTestFiles\Python\CCTLocalBOMPythonInitial.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="SITSyncTestFiles\Alpine\" />
+		<Folder Include="SITScanTestFiles\Alpine\" />
+		<Folder Include="SITScanTestFiles\DepNpm\" />
+		<Folder Include="SITScanTestFiles\DepNuget\" />
+		<Folder Include="SITScanTestFiles\DepPython\" />
+	</ItemGroup>
+
+</Project>

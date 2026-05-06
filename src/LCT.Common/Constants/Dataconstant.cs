@@ -241,15 +241,15 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Identifier string.
         /// </summary>
-        public const string Identifier = "Identifier";
+        public const string Identifier = "SIT Scan";
         /// <summary>
         /// Creator string.
         /// </summary>
-        public const string Creator = "Creator";
+        public const string Creator = "SIT Sync";
         /// <summary>
         /// Uploader string.
         /// </summary>
-        public const string Uploader = "Uploader";
+        public const string Uploader = "SIT Upload";
         #endregion
 
         #region Properties

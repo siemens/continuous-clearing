@@ -1,0 +1,650 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+//---------------------------------------------------------------------------------------------------------------------
+
+// Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api LCT aql
+
+using CycloneDX.Models;
+using LCT.APICommunications;
+using LCT.APICommunications.Interfaces;
+using LCT.APICommunications.Model;
+using LCT.SITUpload.Model;
+using LCT.Common;
+using LCT.Common.Constants;
+using LCT.Common.Interface;
+using LCT.Common.Logging;
+using LCT.Common.Model;
+using LCT.Services.Interface;
+using log4net;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
+using File = System.IO.File;
+
+namespace LCT.SITUpload
+{
+    /// <summary>
+    /// PackageUploaderHelper class  - Reads,collect packages to upload
+    /// </summary>
+    public static class PackageUploadHelper
+    {
+        #region Fields
+
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static bool SetWarningCode;
+
+        #endregion
+
+        #region Properties
+
+        public static IJFrogService JFrogService { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the component list from the comparison BOM file.
+        /// </summary>
+        /// <param name="comparisonBomFilePath">The file path to the comparison BOM.</param>
+        /// <param name="environmentHelper">The environment helper for exit operations.</param>
+        /// <returns>A Bom object containing the components.</returns>
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper)
+        {
+            Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
+            Bom componentsToBoms = null;
+            try
+            {
+                if (File.Exists(comparisonBomFilePath))
+                {
+                    string json = File.ReadAllText(comparisonBomFilePath);
+                    componentsToBoms = CycloneDX.Json.Serializer.Deserialize(json);
+                    LogHandlingHelper.ListOfBomFileComponents(comparisonBomFilePath, componentsToBoms.Components ?? new List<Component>());
+                }
+                else
+                {
+                    Logger.ErrorFormat("File not found: {0}. Please provide a valid file path.", comparisonBomFilePath);
+                    environmentHelper.CallEnvironmentExit(-1);
+                }
+            }
+            catch (JsonReaderException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("GetComponentListFromComparisonBOM", $"Failed to deserialize the comparison BOM file at path: {comparisonBomFilePath}", ex, "JsonReaderException occurred while deserializing the comparison BOM.");
+                Logger.ErrorFormat("Exception occurred in reading the comparison BOM: {0}", ex.Message);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            Logger.Debug("GetComponentListFromComparisonBOM(): Completed the reading and identifying components from bom file.");
+            return componentsToBoms;
+        }
+
+        /// <summary>
+        /// Gets package information with operation details and response message.
+        /// </summary>
+        /// <param name="item">The component to get information for.</param>
+        /// <param name="operationType">The type of operation performed.</param>
+        /// <param name="responseMessage">The HTTP response message.</param>
+        /// <param name="dryRunSuffix">The suffix for dry run mode.</param>
+        /// <returns>A task containing the components to Artifactory information.</returns>
+        private static Task<ComponentsToArtifactory> GetPackageinfo(ComponentsToArtifactory item, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
+        {
+
+            ComponentsToArtifactory components = new ComponentsToArtifactory()
+            {
+                Name = item.Name,
+                Version = item.Version,
+                SrcRepoName = item.SrcRepoName,
+                DestRepoName = item.DestRepoName,
+                OperationType = operationType,
+                ResponseMessage = responseMessage,
+                DryRunSuffix = dryRunSuffix,
+                ComponentType = item.ComponentType,
+                Purl = item.Purl,
+                Token = item.Token,
+                CopyPackageApiUrl = item.CopyPackageApiUrl,
+                PackageName = item.PackageName,
+                PackageType = item.PackageType,
+
+            };
+            return Task.FromResult(components);
+
+        }
+
+        /// <summary>
+        /// Gets successful package information from a component.
+        /// </summary>
+        /// <param name="item">The component to get information for.</param>
+        /// <returns>A task containing the components to Artifactory information.</returns>
+        private static Task<ComponentsToArtifactory> GetSucessFulPackageinfo(ComponentsToArtifactory item)
+        {
+
+            ComponentsToArtifactory components = new ComponentsToArtifactory()
+            {
+                Name = item.Name,
+                Version = item.Version,
+                SrcRepoName = item.SrcRepoName,
+                DestRepoName = item.DestRepoName,
+                SrcRepoPathWithFullName = item.SrcRepoPathWithFullName,
+                Path = item.Path,
+                PackageType = item.PackageType,
+                Purl = item.Purl,
+
+            };
+            return Task.FromResult(components);
+
+        }
+
+
+        /// <summary>
+        /// Asynchronously processes packages not found in JFrog.
+        /// </summary>
+        /// <param name="item">The component to process.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public static async Task JfrogNotFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
+        {
+            ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
+            AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, notFound: true);
+        }
+
+        /// <summary>
+        /// Asynchronously processes packages found in JFrog.
+        /// </summary>
+        /// <param name="item">The component to process.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="operationType">The type of operation performed.</param>
+        /// <param name="responseMessage">The HTTP response message.</param>
+        /// <param name="dryRunSuffix">The suffix for dry run mode.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
+        {
+            ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
+            AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, notFound: false);
+        }
+
+        /// <summary>
+        /// Asynchronously processes successfully uploaded packages.
+        /// </summary>
+        /// <param name="item">The component to process.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private static async Task SucessfullPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
+        {
+            ComponentsToArtifactory components = await GetSucessFulPackageinfo(item);
+            AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, success: true);
+        }
+
+        /// <summary>
+        /// Adds a component to the appropriate display list based on its type and status.
+        /// </summary>
+        /// <param name="componentType">The type of the component.</param>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddComponentToDisplayList(string componentType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound = false, bool success = false)
+        {
+            if (string.IsNullOrWhiteSpace(componentType))
+                return;
+
+            switch (componentType.ToUpperInvariant())
+            {
+                case "NPM":
+                    AddToNpmList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "NUGET":
+                    AddToNugetList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "CHOCO":
+                    AddToChocoList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "MAVEN":
+                    AddToMavenList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "POETRY":
+                    AddToPoetryList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "CONAN":
+                    AddToConanList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "DEBIAN":
+                    AddToDebianList(component, displayPackagesInfo, notFound, success);
+                    break;
+                case "CARGO":
+                    AddToCargoList(component, displayPackagesInfo, notFound, success);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Adds a component to the NPM display list.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddToNpmList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesNpm.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesNpm.Add(component);
+        }
+
+        /// <summary>
+        /// Adds a component to the NuGet display list.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddToNugetList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesNuget.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesNuget.Add(component);
+        }
+
+        /// <summary>
+        /// Adds a component to the Maven display list.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddToMavenList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesMaven.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesMaven.Add(component);
+        }
+
+        /// <summary>
+        /// Adds a component to the Poetry display list.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddToPoetryList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesPython.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesPython.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesPython.Add(component);
+        }
+
+        /// <summary>
+        /// Adds a component to the Conan display list.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddToConanList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesConan.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesConan.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesConan.Add(component);
+        }
+
+        /// <summary>
+        /// Adds a component to the Debian display list.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddToDebianList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesDebian.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesDebian.Add(component);
+        }
+
+        /// <summary>
+        /// Adds a component to the Cargo display list.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <param name="notFound">Whether the package was not found.</param>
+        /// <param name="success">Whether the package was successfully processed.</param>
+        private static void AddToCargoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesCargo.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesCargo.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesCargo.Add(component);
+        }
+
+
+        /// <summary>
+        /// Asynchronously uploads the packages to Artifactory.
+        /// </summary>
+        /// <param name="componentsToUpload">The list of components to upload.</param>
+        /// <param name="timeout">The timeout value in seconds.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private static void AddToChocoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        {
+            if (notFound)
+                displayPackagesInfo.JfrogNotFoundPackagesChoco.Add(component);
+            else if (success)
+                displayPackagesInfo.SuccessfullPackagesChoco.Add(component);
+            else
+                displayPackagesInfo.JfrogFoundPackagesChoco.Add(component);
+        }
+        // Properly wrap UploadingThePackages as a method
+        public static async Task UploadingThePackages(List<ComponentsToArtifactory> componentsToUpload, int timeout, DisplayPackagesInfo displayPackagesInfo)
+        {
+            Logger.Debug("UploadingThePackages(): Starting the package upload process.");
+            foreach (var item in componentsToUpload)
+            {
+                await PackageUploadToArtifactory(PackageUploader.uploaderKpiData, item, timeout, displayPackagesInfo);
+            }
+
+            if (SetWarningCode)
+            {
+                EnvironmentHelper environmentHelper = new EnvironmentHelper();
+                environmentHelper.CallEnvironmentExit(2);
+                Logger.Debug("Setting ExitCode to 2");
+            }
+
+            Logger.Debug("UploadingThePackages(): Package upload process completed.");
+            Program.UploaderStopWatch?.Stop();
+        }
+
+        /// <summary>
+        /// Asynchronously uploads a package to Artifactory.
+        /// </summary>
+        /// <param name="uploaderKpiData">The uploader KPI data for tracking.</param>
+        /// <param name="item">The component to upload.</param>
+        /// <param name="timeout">The timeout value in seconds.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private static async Task PackageUploadToArtifactory(UploaderKpiData uploaderKpiData,
+                                                             ComponentsToArtifactory item,
+                                                             int timeout,
+                                                             DisplayPackagesInfo displayPackagesInfo)
+        {
+            var packageType = item.PackageType;
+            if (item.SrcRepoName != null
+                && !(item.SrcRepoName.Equals(item.DestRepoName, StringComparison.OrdinalIgnoreCase))
+                && !item.SrcRepoName.Contains("siparty-release"))
+            {
+                if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
+                {
+                    Logger.DebugFormat("PackageUploadToArtifactory():{0} and {1}  contains Source repository:{2} and Destination Repository:{3} ,So now started upload package process .", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
+                    await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
+                }
+                else
+                {
+                    uploaderKpiData.PackagesNotExistingInRemoteCache++;
+                    item.DestRepoName = null;
+                    await JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+                    Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is not found in any jfrog repository.", item.Name, item.Version);
+                }
+            }
+            else
+            {
+                IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
+                await SucessfullPackagesAsync(item, displayPackagesInfo);
+                Logger.DebugFormat("PackageUploadToArtifactory(): {0} and {1} is identified in source: {2} and destination: {3} repositories", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
+                item.DestRepoName = null;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously uploads a package when the source repository is found.
+        /// </summary>
+        /// <param name="packageType">The type of the package.</param>
+        /// <param name="uploaderKpiData">The uploader KPI data for tracking.</param>
+        /// <param name="item">The component to upload.</param>
+        /// <param name="timeout">The timeout value in seconds.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private static async Task SourceRepoFoundToUploadArtifactory(PackageType packageType, UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout, DisplayPackagesInfo displayPackagesInfo)
+        {
+            const string dryRunSuffix = null;
+            string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
+            ArtifactoryUploader.JFrogService = JFrogService;
+            ArtifactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
+            HttpResponseMessage responseMessage = await ArtifactoryUploader.UploadPackageToRepo(item, timeout, displayPackagesInfo);
+
+            if (responseMessage.StatusCode == HttpStatusCode.OK && !item.DryRun)
+            {
+                IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, true);
+            }
+            else if (responseMessage.ReasonPhrase == ApiConstant.PackageNotFound)
+            {
+                await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+                IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
+                item.DestRepoName = null;
+                SetWarningCode = true;
+            }
+            else if (responseMessage.ReasonPhrase == ApiConstant.ErrorInUpload)
+            {
+                await JfrogFoundPackagesAsync(item, displayPackagesInfo, operationType, responseMessage, dryRunSuffix);
+                IncrementCountersBasedOnPackageType(uploaderKpiData, packageType, false);
+                item.DestRepoName = null;
+                var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                Logger.DebugFormat("JFrog Response - {0}", responseContent);
+            }
+            else
+            {
+                // do nothing
+            }
+        }
+
+        /// <summary>
+        /// Gets the package name extension based on the component type.
+        /// </summary>
+        /// <param name="package">The component package.</param>
+        /// <returns>The file extension for the package type.</returns>
+        public static string GetPackageNameExtensionBasedOnComponentType(ComponentsToArtifactory package)
+        {
+            string packageNameEXtension = string.Empty;
+            if (package.ComponentType.Equals("NPM", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".tgz";
+            }
+            if (package.ComponentType.Equals("NUGET", StringComparison.OrdinalIgnoreCase) || package.ComponentType.Equals("CHOCO", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".nupkg";
+            }
+            if (package.ComponentType.Equals("MAVEN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".jar";
+            }
+            if (package.ComponentType.Equals("DEBIAN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".deb";
+            }
+            if (package.ComponentType.Equals("POETRY", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ".whl";
+            }
+            if (package.ComponentType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = "package.tgz";
+            }
+            if (package.ComponentType.Equals("CARGO", StringComparison.OrdinalIgnoreCase))
+            {
+                packageNameEXtension = ApiConstant.CargoExtension;
+            }
+
+            return packageNameEXtension;
+        }
+
+        /// <summary>
+        /// Gets the JFrog API communication instance for the specified component.
+        /// </summary>
+        /// <param name="component">The component to get the API instance for.</param>
+        /// <param name="timeout">The timeout value in seconds.</param>
+        /// <returns>An instance of IJFrogApiCommunication.</returns>
+        public static IJFrogApiCommunication GetJfrogApiCommInstance(ComponentsToArtifactory component, int timeout)
+        {
+
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
+            {
+                Token = component.Token,
+            };
+
+            // Initialize JFrog API communication based on Component Type
+            IJFrogApiCommunication jfrogApicommunication = component.ComponentType?.ToUpperInvariant() switch
+            {
+                "MAVEN" => new MavenJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
+                "POETRY" => new PythonJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout),
+                _ => new NpmJfrogApiCommunication(component.JfrogApi, component.SrcRepoName, repoCredentials, timeout)
+            };
+            return jfrogApicommunication;
+        }
+
+        /// <summary>
+        /// Writes the creator KPI data to the console.
+        /// </summary>
+        /// <param name="uploaderKpiData">The uploader KPI data to display.</param>
+        public static void WriteCreatorKpiDataToConsole(UploaderKpiData uploaderKpiData)
+        {
+            KpiNames uploaderKpiNames = IdentifyKpiNames(uploaderKpiData);
+            Dictionary<string, int> printList = new Dictionary<string, int>()
+            {
+                {uploaderKpiNames.ComponentsInBOM,uploaderKpiData.ComponentInComparisonBOM },
+                {uploaderKpiNames.PackagesInNotApprovedState,uploaderKpiData.ComponentNotApproved },
+                {uploaderKpiNames.PackagesInApprovedState,uploaderKpiData.PackagesToBeUploaded },
+                {uploaderKpiNames.PackagesCopiedToSipartyRepo,uploaderKpiData.PackagesUploadedToJfrog },
+
+                {uploaderKpiNames.PackagesNotCopiedToSipartyRepo,uploaderKpiData.PackagesNotUploadedToJfrog},
+
+                {uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesUploaded},
+
+                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},
+
+                {uploaderKpiNames.PackagesMovedToRepo,uploaderKpiData.InternalPackagesUploaded},
+
+                {uploaderKpiNames.PackagesNotMovedToRepo,uploaderKpiData.InternalPackagesNotUploadedToJfrog},
+
+                {uploaderKpiNames.PackagesNotExistingInRepository,uploaderKpiData.PackagesNotExistingInRemoteCache},
+
+                {uploaderKpiNames.PackagesNotActionedDueToError,uploaderKpiData.PackagesNotUploadedDueToError}
+            };
+
+            Dictionary<string, double> printTimingList = new Dictionary<string, double>()
+            {
+                { "SIT Upload",uploaderKpiData.TimeTakenByArtifactoryUploader }
+            };
+
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader, uploaderKpiNames);
+        }
+
+        /// <summary>
+        /// Identifies and maps KPI names from the uploader KPI data.
+        /// </summary>
+        /// <param name="uploaderKpiData">The uploader KPI data.</param>
+        /// <returns>A KpiNames object with mapped names.</returns>
+        private static KpiNames IdentifyKpiNames(UploaderKpiData uploaderKpiData)
+        {
+            KpiNames uploaderKpiNames = new KpiNames();
+            uploaderKpiNames.ComponentsInBOM = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentInComparisonBOM));
+            uploaderKpiNames.PackagesInNotApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentNotApproved));
+            uploaderKpiNames.PackagesInApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesToBeUploaded));
+            uploaderKpiNames.PackagesCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesUploadedToJfrog));
+            uploaderKpiNames.PackagesNotCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedToJfrog));
+            uploaderKpiNames.PackagesNotExistingInRepository = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotExistingInRemoteCache));
+            uploaderKpiNames.PackagesNotActionedDueToError = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedDueToError));
+            uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesUploaded));
+            uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog));
+            uploaderKpiNames.PackagesMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded));
+            uploaderKpiNames.PackagesNotMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog));
+
+            return uploaderKpiNames;
+        }
+
+        /// <summary>
+        /// Increments counters based on the package type and success status.
+        /// </summary>
+        /// <param name="uploaderKpiData">The uploader KPI data to update.</param>
+        /// <param name="packageType">The type of the package.</param>
+        /// <param name="isSuccess">Whether the operation was successful.</param>
+        private static void IncrementCountersBasedOnPackageType(UploaderKpiData uploaderKpiData, PackageType packageType, bool isSuccess)
+        {
+            // Define a dictionary to map package types to counters
+            Dictionary<PackageType, Action> successActions = new Dictionary<PackageType, Action>
+            {
+                { PackageType.Internal, () => uploaderKpiData.InternalPackagesUploaded++ },
+                { PackageType.Development, () => uploaderKpiData.DevPackagesUploaded++ },
+                { PackageType.ClearedThirdParty, () => uploaderKpiData.PackagesUploadedToJfrog++ },
+            };
+
+            Dictionary<PackageType, Action> failureActions = new Dictionary<PackageType, Action>
+            {
+                { PackageType.Internal, () => { uploaderKpiData.InternalPackagesNotUploadedToJfrog++; uploaderKpiData.PackagesNotUploadedDueToError++; } },
+                { PackageType.Development, () => { uploaderKpiData.DevPackagesNotUploadedToJfrog++; uploaderKpiData.PackagesNotUploadedDueToError++; } },
+                { PackageType.ClearedThirdParty, () => {uploaderKpiData.PackagesNotUploadedToJfrog++; uploaderKpiData.PackagesNotUploadedDueToError++; } },
+            };
+
+            if (isSuccess)
+            {
+                if (successActions.TryGetValue(packageType, out var action))
+                {
+                    action.Invoke();
+                }
+            }
+            else
+            {
+                if (failureActions.TryGetValue(packageType, out var action))
+                {
+                    action.Invoke();
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Updates the BOM with Artifactory repository URLs for uploaded components.
+        /// </summary>
+        /// <param name="bom">The BOM to update.</param>
+        /// <param name="componentsUploaded">The list of uploaded components.</param>
+        public static void UpdateBomArtifactoryRepoUrl(ref Bom bom, List<ComponentsToArtifactory> componentsUploaded)
+        {
+            foreach (var component in componentsUploaded)
+            {
+                var bomComponent = bom.Components.Find(x => x.Purl.Equals(component.Purl, StringComparison.OrdinalIgnoreCase));
+                if (bomComponent != null && component.DestRepoName != null && !component.DryRun)
+                {
+                    bomComponent.Properties ??= new List<Property>();
+                    var properties = bomComponent.Properties;
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_ArtifactoryRepoName, component.DestRepoName);
+                    CommonHelper.RemoveDuplicateAndAddProperty(ref properties, Dataconstant.Cdx_JfrogRepoPath, component.JfrogRepoPath);
+                    bomComponent.Properties = properties;
+                }
+            }
+        }
+
+        #endregion
+    }
+
+}

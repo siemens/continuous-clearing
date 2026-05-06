@@ -876,8 +876,8 @@ namespace LCT.Common.Logging
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Package Identifier execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input Parameters used in Package Identifier[/]\n\n");
+                .Append($"Start of SIT Scan execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [green]Input Parameters used in SIT Scan[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendDirectoryInfo(content, appSettings, maxPathLength);
@@ -919,8 +919,8 @@ namespace LCT.Common.Logging
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Package Creator execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input parameters used in Package Creator[/]\n\n");
+                .Append($"Start of SIT Sync execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [green]Input parameters used in SIT Sync[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendCreatorSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
@@ -942,8 +942,8 @@ namespace LCT.Common.Logging
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Uploader execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input Parameters used in Artifactory Uploader[/]\n\n");
+                .Append($"Start of SIT Upload execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [green]Input Parameters used in SIT Upload[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendUploaderSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
@@ -1039,7 +1039,7 @@ namespace LCT.Common.Logging
         {
             if (exeType == Dataconstant.Identifier)
             {
-                var logMessage = $"Input Parameters used in Package Identifier:\n\t" +
+                var logMessage = $"Input Parameters used in SIT Scan:\n\t" +
                 $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
@@ -1070,7 +1070,7 @@ namespace LCT.Common.Logging
             else if (exeType == Dataconstant.Creator)
             {
                 var creatorMessage =
-                    $"Input parameters used in Package Creator:\n\t" +
+                    $"Input parameters used in SIT Sync:\n\t" +
                     $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                     $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                     $"BoM FilePath\t\t --> {bomFilePath}\n\t" +
@@ -1090,7 +1090,7 @@ namespace LCT.Common.Logging
             }
             else if (exeType == Dataconstant.Uploader)
             {
-                Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
+                Logger.Logger.Log(null, Level.Info, $"Input Parameters used in SIT Upload:\n\t", null);
                 Logger.Logger.Log(null, Level.Notice, $"\tBoM FilePath:\t\t {bomFilePath}\n\t" +
                     $"CaTool Version\t\t {caToolInformation.CatoolVersion}\n\t" +
                     $"CaTool RunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +

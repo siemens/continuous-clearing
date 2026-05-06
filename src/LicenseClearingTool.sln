@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTest", "Integrat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtilities", "TestUtilities\TestUtilities.csproj", "{4C553D4B-3FD8-4C0F-A37F-ADD027EC071C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SW360IntegrationTest", "SW360IntegrationTest\SW360IntegrationTest.csproj", "{B494FA02-75F1-4E90-9279-2F604F8D5F9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SITIntegrationTest", "SITIntegrationTest\SITIntegrationTest.csproj", "{B494FA02-75F1-4E90-9279-2F604F8D5F9F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestUtilities", "UnitTestUtilities\UnitTestUtilities.csproj", "{5DA47437-F88D-4419-AD8E-603416A307C7}"
 EndProject
@@ -25,17 +25,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.Common.UTest", "LCT.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.Facade.UTest", "LCT.Facade.UTest\LCT.Facade.UTest.csproj", "{E5790FC0-6E71-43D4-8705-C17836893CA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.ArtifactoryUploader", "ArtifactoryUploader\LCT.ArtifactoryUploader.csproj", "{23D10886-3534-40D3-BD16-82664B29C266}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SITUpload", "LCT.SITUpload\LCT.SITUpload.csproj", "{23D10886-3534-40D3-BD16-82664B29C266}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.ArtifactoryUploader.UTest", "AritfactoryUploader.UTest\LCT.ArtifactoryUploader.UTest.csproj", "{7EF98B95-6F07-4ED2-990F-5C17FE55A87C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SITUpload.UTest", "LCT.SITUpload.UTest\LCT.SITUpload.UTest.csproj", "{7EF98B95-6F07-4ED2-990F-5C17FE55A87C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.PackageIdentifier", "LCT.PackageIdentifier\LCT.PackageIdentifier.csproj", "{5A3FB5A5-A982-4DC9-A30F-6AC8D2B32574}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SITScan", "LCT.SITScan\LCT.SITScan.csproj", "{5A3FB5A5-A982-4DC9-A30F-6AC8D2B32574}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.PackageIdentifier.UTest", "LCT.PackageIdentifier.UTest\LCT.PackageIdentifier.UTest.csproj", "{ACA55F0B-EECF-47B2-BB8C-0214C683B3E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SITScan.UTest", "LCT.SITScan.UTest\LCT.SITScan.UTest.csproj", "{ACA55F0B-EECF-47B2-BB8C-0214C683B3E1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SW360PackageCreator.UTest", "LCT.SW360PackageCreator.UTest\LCT.SW360PackageCreator.UTest.csproj", "{BD44EDF9-DE47-40B6-AA1F-9935455A0E91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SITSync.UTest", "LCT.SITSync.UTest\LCT.SITSync.UTest.csproj", "{BD44EDF9-DE47-40B6-AA1F-9935455A0E91}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SW360PackageCreator", "LCT.SW360PackageCreator\LCT.SW360PackageCreator.csproj", "{6F4427CB-2082-45FE-ACEA-AAFF23C79F8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SITSync", "LCT.SITSync\LCT.SITSync.csproj", "{6F4427CB-2082-45FE-ACEA-AAFF23C79F8D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.CycloneDxProcessor", "LCT.CycloneDxProcessor\LCT.CycloneDxProcessor.csproj", "{3E4FD695-E7C7-44FA-B6DB-E41F4C456E0E}"
 EndProject
