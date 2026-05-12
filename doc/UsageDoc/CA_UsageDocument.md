@@ -638,9 +638,9 @@ For more details on Azure DevOps templates, refer to the official [Microsoft Doc
 ```yaml
 resources:
 repositories:
-repository: Templates_Pipeline
+repository: SBoM
   type: git
-  name: YourProject/Templates_Pipeline
+  name: YourProject/SBoM
 ```
 
 :point_right: Note: If the Appsettingsfilepath parameter is not passed, the sample default app settings file is used by the template.
