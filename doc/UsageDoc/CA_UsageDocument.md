@@ -650,7 +650,7 @@ The sample default app settings file is located at templates\sample-default-app-
 ### Add a New Template Calling Step
 #### NuGet Template Example
 ```yaml
-- template: pipeline/build/pipeline-template-step-install-run-cctool-binary.yml@Templates_Pipeline
+- template: pipeline/build/pipeline-template-step-install-run-cctool-binary.yml@SBoM
 
   parameters:
     workingDirectory: $(Build.SourcesDirectory)/MyProject
@@ -667,7 +667,7 @@ The sample default app settings file is located at templates\sample-default-app-
 
 #### Docker Template Example
 ```yaml
-- template: pipeline/build/pipeline-template-step-install-run-cctool-docker.yml@Templates_Pipeline
+- template: pipeline/build/pipeline-template-step-install-run-cctool-docker.yml@SBoM
   parameters:
     workingDirectory: $(Build.SourcesDirectory)/MyProject
     sw360Token: '$(sw360ApiKey)'
