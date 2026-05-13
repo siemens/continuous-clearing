@@ -23,28 +23,28 @@
 name: License Clearance
 
 on:
-  push:
-    branches:
-      - main
-      - master
+  # push:
+  #   branches:
+  #     - main
+  #     - master
 
-  pull_request:
+  # pull_request:
     # Run on all target branches to catch compliance issues before merge.
 
-  # workflow_dispatch:
-  #   inputs:
-  #     enable_sw360_package_creator:
-  #       description: 'Run SW360 Package Creator'
-  #       type: boolean
-  #       default: false
-  #     enable_artifactory_uploader:
-  #       description: 'Run Artifactory Uploader (dry-run by default)'
-  #       type: boolean
-  #       default: false
-  #     jfrog_dry_run:
-  #       description: 'Artifactory dry-run mode (false = live copy/move)'
-  #       type: boolean
-  #       default: true
+  workflow_dispatch:
+    inputs:
+      enable_sw360_package_creator:
+        description: 'Run SW360 Package Creator'
+        type: boolean
+        default: false
+      enable_artifactory_uploader:
+        description: 'Run Artifactory Uploader (dry-run by default)'
+        type: boolean
+        default: false
+      jfrog_dry_run:
+        description: 'Artifactory dry-run mode (false = live copy/move)'
+        type: boolean
+        default: true
 
 concurrency:
   # Cancel any in-progress run on the same branch/PR when a newer commit arrives.

@@ -33,9 +33,8 @@
 #   clearing → Downloads artifact, runs CCTool binary stages sequentially
 #
 # Triggers:
-#   - Push to main / master branch
-#   - Pull requests (all branches) – Package Identifier only (SBOM generation)
-#   - Manual dispatch via GitHub UI – full pipeline control via inputs
+#   - Manual dispatch via GitHub UI only – full pipeline control via inputs
+#   (Push and pull_request triggers are disabled)
 #
 # Required repository secrets:
 #   CC_SW360_TOKEN  – SW360 REST API authentication token
@@ -45,28 +44,28 @@
 name: License Clearance (Binary)
 
 on:
-  push:
-    branches:
-      - main
-      - master
+  # push:
+  #   branches:
+  #     - main
+  #     - master
 
-  pull_request:
-    # Runs on all target branches to catch compliance issues before merge.
+  # pull_request:
+  #   # Runs on all target branches to catch compliance issues before merge.
 
-  # workflow_dispatch:
-  #   inputs:
-  #     enable_sw360_package_creator:
-  #       description: 'Run SW360 Package Creator'
-  #       type: boolean
-  #       default: false
-  #     enable_artifactory_uploader:
-  #       description: 'Run Artifactory Uploader (dry-run by default)'
-  #       type: boolean
-  #       default: false
-  #     jfrog_dry_run:
-  #       description: 'Artifactory dry-run mode (false = live copy/move for releases)'
-  #       type: boolean
-  #       default: true
+  workflow_dispatch:
+    inputs:
+      enable_sw360_package_creator:
+        description: 'Run SW360 Package Creator'
+        type: boolean
+        default: false
+      enable_artifactory_uploader:
+        description: 'Run Artifactory Uploader (dry-run by default)'
+        type: boolean
+        default: false
+      jfrog_dry_run:
+        description: 'Artifactory dry-run mode (false = live copy/move for releases)'
+        type: boolean
+        default: true
 
 concurrency:
   # Cancel any in-progress run on the same branch/PR when a newer commit arrives.
