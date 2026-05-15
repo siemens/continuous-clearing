@@ -1,0 +1,70 @@
+[[package]]
+name = "pytest"
+version = "7.4.0"
+description = "pytest: simple powerful testing with Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-7.4.0-py3-none-any.whl", hash = "sha256:abcdef123456"}
+]
+groups = ["dev"]
+
+[package.dependencies]
+
+[[package]]
+name = "requests"
+version = "2.31.0"
+description = "Python HTTP for Humans."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:1234567890ab"}
+]
+groups = ["main"]
+
+[package.dependencies]
+urllib3 = ">=1.21.1,<3"
+
+[[package]]
+name = "urllib3"
+version = "2.0.4"
+description = "HTTP library with thread-safe connection pooling, file post, and more."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "urllib3-2.0.4-py3-none-any.whl", hash = "sha256:fedcba098765"}
+]
+groups = ["main"]
+
+[package.dependencies]
+
+[[package]]
+name = "coverage"
+version = "7.3.0"
+description = "Code coverage measurement for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "coverage-7.3.0-py3-none-any.whl", hash = "sha256:aabbccdd1122"}
+]
+groups = ["main", "dev"]
+
+[package.dependencies]
+
+[[package]]
+name = "sphinx"
+version = "7.0.1"
+description = "Python documentation generator"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "sphinx-7.0.1-py3-none-any.whl", hash = "sha256:11223344aabb"}
+]
+groups = ["docs"]
+
+[package.dependencies]
+
+[metadata]
+lock-version = "2.0"
+python-versions = "^3.8"
+content-hash = "abc123def456ghi789"
