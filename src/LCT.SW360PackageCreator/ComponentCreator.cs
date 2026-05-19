@@ -92,7 +92,7 @@ namespace LCT.SW360PackageCreator
                 string currVersion = item.Version;
 
                 bool isInternalComponent = GetPackageType(item, ref componentsData);
-                SanitizePurlForProjectType(item, componentsData.ProjectType);
+                UpdatePurlForProjectType(item, componentsData.ProjectType);
                 if (componentsData.ProjectType.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
                 {
                     Logger.DebugFormat("{0}-{1} found as Choco component.", item.Name, item.Version);
@@ -202,14 +202,14 @@ namespace LCT.SW360PackageCreator
         /// - DEBIAN / ALPINE: if "?arch=source" is present the PURL is kept unchanged; otherwise everything from '?' onwards is removed.
         /// - All other types (NPM, NuGet, Maven, Poetry, Conan, Cargo, …): everything from '?' onwards is removed.       
         /// </summary>
-        private static void SanitizePurlForProjectType(Component item, string projectType)
+        private static void UpdatePurlForProjectType(Component item, string projectType)
         {
             if (string.IsNullOrEmpty(item?.Purl) || string.IsNullOrEmpty(projectType)) return;
 
             int queryIndex = item.Purl.IndexOf('?');
             if (queryIndex < 0) return;
 
-            bool isDebianOrAlpine = projectType.Equals("DEBIAN", StringComparison.OrdinalIgnoreCase)
+            bool isDebianOrAlpine = projectType.Equals(DebianProjectType, StringComparison.OrdinalIgnoreCase)
                                  || projectType.Equals("ALPINE", StringComparison.OrdinalIgnoreCase);
 
             if (isDebianOrAlpine && item.Purl.Contains(Dataconstant.PurlIDSuffix, StringComparison.OrdinalIgnoreCase))
