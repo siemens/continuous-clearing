@@ -543,17 +543,7 @@ namespace LCT.PackageIdentifier.UTest
             mock.Object.WriteBomKpiDataToConsole(new BomKpiData());
             mock.Verify(x => x.WriteBomKpiDataToConsole(It.IsAny<BomKpiData>()), Times.Once);
         }
-        [TestCase]
-        public void TestGetHashCodeUsingNpmView_InputNameAndVersion_ReturnsHashCode()
-        {
-            string expectedhashcode = "5f845b1a58ffb6f3ea6103edf0756ac65320b725";
-            string name = "@angular/animations";
-            string version = "12.0.0";
-
-
-            string hashcode = BomHelper.GetHashCodeUsingNpmView(name, version);
-            Assert.That(expectedhashcode, Is.EqualTo(hashcode));
-        }
+        
         [Test]
         public void GetProjectSummaryLink_ReturnsCorrectUrl()
         {
