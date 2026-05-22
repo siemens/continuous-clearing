@@ -44,7 +44,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.ProjectType, "Npm",
                 TestConstant.Appsettings,appsettingsFilePath,
                  TestConstant.Mode,""}),
-                "Test to run Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
         [Test, Order(2)]

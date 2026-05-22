@@ -49,24 +49,24 @@ namespace LCT.ArtifactoryUploader
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            string logFileNameWithTimestamp = $"{FileConstant.ArtifactoryUploaderLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            string logFileNameWithTimestamp = $"{FileConstant.SITUploadLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
-            Logger.Debug($"====================<<<<< Artifactory Uploader >>>>>====================");
+            Logger.Debug($"====================<<<<< SIT Upload >>>>>====================");
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
             Log4Net.AppendVerboseValue(appSettings);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
 
-            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Uploader);
+            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Upload);
             string bomFilePath = GetBomFilePath(appSettings);
             Logger.DebugFormat("Main(): Identified bom file with path: {0}", bomFilePath);
-            LoggerHelper.SpectreConsoleInitialMessage("Artifactory Uploader");
+            LoggerHelper.SpectreConsoleInitialMessage("SIT Upload");
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Uploader, bomFilePath: bomFilePath);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Upload, bomFilePath: bomFilePath);
             if (!appSettings.Jfrog.DryRun)
-                Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in release mode !!! \n", null);
+                Logger.Logger.Log(null, Level.Alert, $"SIT Upload is running in release mode !!! \n", null);
             else
-                Logger.Logger.Log(null, Level.Alert, $"Artifactory Uploader is running in dry-run mode, no packages will be moved \n", null);
+                Logger.Logger.Log(null, Level.Alert, $"SIT Upload is running in dry-run mode, no packages will be moved \n", null);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
@@ -94,9 +94,9 @@ namespace LCT.ArtifactoryUploader
             if (appSettings.Telemetry.Enable)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, PackageUploader.uploaderKpiData, TelemetryConstant.ArtifactoryUploaderKpiData);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, PackageUploader.uploaderKpiData, TelemetryConstant.UploadKpiData);
             }
-            Logger.Logger.Log(null, Level.Notice, $"End of Artifactory Uploader execution : {DateTime.Now}\n", null);
+            Logger.Logger.Log(null, Level.Notice, $"End of SIT Upload execution : {DateTime.Now}\n", null);
             // publish logs and BOM file to pipeline artifact
 
             PipelineArtifactUploader.UploadArtifacts();

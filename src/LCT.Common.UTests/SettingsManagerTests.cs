@@ -124,7 +124,7 @@ namespace LCT.Common.UTest
             appSettings.ProjectType = "NPM";
 
             // Act
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifier");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Scan");
 
             // Assert
             Assert.That(appSettings.ProjectType, Is.EqualTo("NPM"));
@@ -147,7 +147,7 @@ namespace LCT.Common.UTest
             appSettings.ProjectType = "NPM";
 
             // Act
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifier");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Scan");
 
             // Assert
             Assert.That(appSettings.SW360, Is.Not.Null);
@@ -174,7 +174,7 @@ namespace LCT.Common.UTest
             appSettings.ProjectType = "NPM";
 
             // Act
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifier");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Scan");
 
             // Assert
             Assert.That(appSettings.Jfrog, Is.Not.Null);
@@ -198,7 +198,7 @@ namespace LCT.Common.UTest
             appSettings.ProjectType = "ALPINE";
 
             // Act
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifier");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Scan");
 
             // Assert
             Assert.That(appSettings.ProjectType, Is.EqualTo("ALPINE").IgnoreCase);
@@ -227,7 +227,7 @@ namespace LCT.Common.UTest
             appSettings.ProjectType = "NPM";
 
             // Act
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Identifier");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Scan");
 
             // Assert
             Assert.That(appSettings.SbomSigning.SBOMSignVerify, Is.True);
@@ -250,7 +250,7 @@ namespace LCT.Common.UTest
             };
 
             // Act
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Creator");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Create");
 
             // Assert
             Assert.That(appSettings.SW360.ProjectID, Is.EqualTo("proj-001"));
@@ -272,7 +272,7 @@ namespace LCT.Common.UTest
             };
 
             // Act
-            _settingsManager.CheckRequiredArgsToRun(appSettings, "Uploader");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, "Upload");
 
             // Assert
             Assert.That(appSettings.Jfrog.URL, Is.EqualTo("https://jfrog.example.com"));

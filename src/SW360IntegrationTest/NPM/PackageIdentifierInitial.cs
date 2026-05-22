@@ -54,7 +54,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                  TestConstant.Mode,""}),
-                "Test to run Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
         [Test, Order(2)]

@@ -53,7 +53,7 @@ namespace SW360IntegrationTest.Choco
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""}),
-                "Test to run  Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
 

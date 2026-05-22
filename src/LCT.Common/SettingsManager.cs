@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using LCT.Common.Constants;
 using LCT.Common.Interface;
 using log4net;
 using Microsoft.Extensions.Configuration;
@@ -148,11 +149,11 @@ namespace LCT.Common
         /// Checks required arguments to run based on the current executable type.
         /// </summary>
         /// <param name="appSettings">The application settings.</param>
-        /// <param name="currentExe">The current executable type (Identifier, Creator, or other).</param>
+        /// <param name="currentExe">The current executable type (Scan, Create, or Upload).</param>
         public void CheckRequiredArgsToRun(CommonAppSettings appSettings, string currentExe)
         {
 
-            if (currentExe == "Identifier")
+            if (currentExe == Dataconstant.Scan)
             {
                 Logger.Debug("CheckRequiredArgsToRun():Validating mandatory parameters has started");
                 //Required parameters to run Package Identifier
@@ -184,7 +185,7 @@ namespace LCT.Common
                 }
                 CheckForMissingParameter(appSettings, identifierReqParameters);
             }
-            else if (currentExe == "Creator")
+            else if (currentExe == Dataconstant.Create)
             {
                 //Required parameters to run SW360Component Creator
                 List<string> creatorReqParameters = new List<string>()

@@ -681,7 +681,7 @@ namespace LCT.ArtifactoryUploader.UTest
         }
 
         [Test]
-        public void WriteCreatorKpiDataToConsole_ValidUploaderKpiData_LogsDataSuccessfully()
+        public void WriteUploadKpiDataToConsole_ValidUploaderKpiData_LogsDataSuccessfully()
         {
             // Arrange
             var uploaderKpiData = new UploaderKpiData
@@ -701,11 +701,11 @@ namespace LCT.ArtifactoryUploader.UTest
             };
 
             // Act & Assert - Should not throw any exceptions
-            Assert.DoesNotThrow(() => PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData));
+            Assert.DoesNotThrow(() => PackageUploadHelper.WriteUploadKpiDataToConsole(uploaderKpiData));
         }
 
         [Test]
-        public void WriteCreatorKpiDataToConsole_WithZeroValues_LogsDataSuccessfully()
+        public void WriteUploadKpiDataToConsole_WithZeroValues_LogsDataSuccessfully()
         {
             // Arrange
             var uploaderKpiData = new UploaderKpiData
@@ -725,7 +725,7 @@ namespace LCT.ArtifactoryUploader.UTest
             };
 
             // Act & Assert - Should not throw any exceptions
-            Assert.DoesNotThrow(() => PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData));
+            Assert.DoesNotThrow(() => PackageUploadHelper.WriteUploadKpiDataToConsole(uploaderKpiData));
         }
     }
 }

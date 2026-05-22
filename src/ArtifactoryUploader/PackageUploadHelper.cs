@@ -524,40 +524,40 @@ namespace LCT.ArtifactoryUploader
         }
 
         /// <summary>
-        /// Writes the creator KPI data to the console.
+        /// Writes the upload KPI data to the console.
         /// </summary>
         /// <param name="uploaderKpiData">The uploader KPI data to display.</param>
-        public static void WriteCreatorKpiDataToConsole(UploaderKpiData uploaderKpiData)
+        public static void WriteUploadKpiDataToConsole(UploaderKpiData uploaderKpiData)
         {
-            KpiNames uploaderKpiNames = IdentifyKpiNames(uploaderKpiData);
+            KpiNames uploadKpiNames = IdentifyKpiNames(uploaderKpiData);
             Dictionary<string, int> printList = new Dictionary<string, int>()
             {
-                {uploaderKpiNames.ComponentsInBOM,uploaderKpiData.ComponentInComparisonBOM },
-                {uploaderKpiNames.PackagesInNotApprovedState,uploaderKpiData.ComponentNotApproved },
-                {uploaderKpiNames.PackagesInApprovedState,uploaderKpiData.PackagesToBeUploaded },
-                {uploaderKpiNames.PackagesCopiedToSipartyRepo,uploaderKpiData.PackagesUploadedToJfrog },
+                {uploadKpiNames.ComponentsInBOM,uploaderKpiData.ComponentInComparisonBOM },
+                {uploadKpiNames.PackagesInNotApprovedState,uploaderKpiData.ComponentNotApproved },
+                {uploadKpiNames.PackagesInApprovedState,uploaderKpiData.PackagesToBeUploaded },
+                {uploadKpiNames.PackagesCopiedToSipartyRepo,uploaderKpiData.PackagesUploadedToJfrog },
 
-                {uploaderKpiNames.PackagesNotCopiedToSipartyRepo,uploaderKpiData.PackagesNotUploadedToJfrog},
+                {uploadKpiNames.PackagesNotCopiedToSipartyRepo,uploaderKpiData.PackagesNotUploadedToJfrog},
 
-                {uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesUploaded},
+                {uploadKpiNames.PackagesCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesUploaded},
 
-                {uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},
+                {uploadKpiNames.PackagesNotCopiedToSipartyDevDepRepo,uploaderKpiData.DevPackagesNotUploadedToJfrog},
 
-                {uploaderKpiNames.PackagesMovedToRepo,uploaderKpiData.InternalPackagesUploaded},
+                {uploadKpiNames.PackagesMovedToRepo,uploaderKpiData.InternalPackagesUploaded},
 
-                {uploaderKpiNames.PackagesNotMovedToRepo,uploaderKpiData.InternalPackagesNotUploadedToJfrog},
+                {uploadKpiNames.PackagesNotMovedToRepo,uploaderKpiData.InternalPackagesNotUploadedToJfrog},
 
-                {uploaderKpiNames.PackagesNotExistingInRepository,uploaderKpiData.PackagesNotExistingInRemoteCache},
+                {uploadKpiNames.PackagesNotExistingInRepository,uploaderKpiData.PackagesNotExistingInRemoteCache},
 
-                {uploaderKpiNames.PackagesNotActionedDueToError,uploaderKpiData.PackagesNotUploadedDueToError}
+                {uploadKpiNames.PackagesNotActionedDueToError,uploaderKpiData.PackagesNotUploadedDueToError}
             };
 
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
-                { "Artifactory Uploader",uploaderKpiData.TimeTakenByArtifactoryUploader }
+                { "SIT Upload",uploaderKpiData.TimeTakenByArtifactoryUploader }
             };
 
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Uploader, uploaderKpiNames);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, "", Dataconstant.Upload, uploadKpiNames);
         }
 
         /// <summary>
@@ -567,20 +567,20 @@ namespace LCT.ArtifactoryUploader
         /// <returns>A KpiNames object with mapped names.</returns>
         private static KpiNames IdentifyKpiNames(UploaderKpiData uploaderKpiData)
         {
-            KpiNames uploaderKpiNames = new KpiNames();
-            uploaderKpiNames.ComponentsInBOM = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentInComparisonBOM));
-            uploaderKpiNames.PackagesInNotApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentNotApproved));
-            uploaderKpiNames.PackagesInApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesToBeUploaded));
-            uploaderKpiNames.PackagesCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesUploadedToJfrog));
-            uploaderKpiNames.PackagesNotCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedToJfrog));
-            uploaderKpiNames.PackagesNotExistingInRepository = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotExistingInRemoteCache));
-            uploaderKpiNames.PackagesNotActionedDueToError = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedDueToError));
-            uploaderKpiNames.PackagesCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesUploaded));
-            uploaderKpiNames.PackagesNotCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog));
-            uploaderKpiNames.PackagesMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded));
-            uploaderKpiNames.PackagesNotMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog));
+            KpiNames uploadKpiNames = new KpiNames();
+            uploadKpiNames.ComponentsInBOM = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentInComparisonBOM));
+            uploadKpiNames.PackagesInNotApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.ComponentNotApproved));
+            uploadKpiNames.PackagesInApprovedState = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesToBeUploaded));
+            uploadKpiNames.PackagesCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesUploadedToJfrog));
+            uploadKpiNames.PackagesNotCopiedToSipartyRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedToJfrog));
+            uploadKpiNames.PackagesNotExistingInRepository = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotExistingInRemoteCache));
+            uploadKpiNames.PackagesNotActionedDueToError = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.PackagesNotUploadedDueToError));
+            uploadKpiNames.PackagesCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesUploaded));
+            uploadKpiNames.PackagesNotCopiedToSipartyDevDepRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.DevPackagesNotUploadedToJfrog));
+            uploadKpiNames.PackagesMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesUploaded));
+            uploadKpiNames.PackagesNotMovedToRepo = CommonHelper.Convert(uploaderKpiData, nameof(uploaderKpiData.InternalPackagesNotUploadedToJfrog));
 
-            return uploaderKpiNames;
+            return uploadKpiNames;
         }
 
         /// <summary>

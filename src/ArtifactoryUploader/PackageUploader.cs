@@ -86,7 +86,7 @@ namespace LCT.ArtifactoryUploader
             if (Program.UploaderStopWatch != null)
                 uploaderKpiData.TimeTakenByArtifactoryUploader =
                 (int)Program.UploaderStopWatch.Elapsed.TotalSeconds;
-            PackageUploadHelper.WriteCreatorKpiDataToConsole(uploaderKpiData);
+            PackageUploadHelper.WriteUploadKpiDataToConsole(uploaderKpiData);
 
             Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has completed");
 

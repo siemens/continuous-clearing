@@ -73,7 +73,7 @@ namespace SW360IntegrationTest.Debian
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.Mode,""}),
-                "Test to run component creator EXE execution");
+                "Test to run SIT Create EXE execution");
         }
         [Test, Order(2)]
         public void TestComparisionBOMUpdation()

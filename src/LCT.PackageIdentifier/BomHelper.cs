@@ -62,39 +62,39 @@ namespace LCT.PackageIdentifier
         /// <param name="bomKpiData">KPI data collected during BOM creation.</param>
         public void WriteBomKpiDataToConsole(BomKpiData bomKpiData)
         {
-            KpiNames identifierKpiNames = IdentifyKpiNames(bomKpiData);
+            KpiNames scanKpiNames = IdentifyKpiNames(bomKpiData);
             Dictionary<string, int> printList = new Dictionary<string, int>()
     {
-        {identifierKpiNames.ComponentsInInputFile, bomKpiData.ComponentsinPackageLockJsonFile },
-        {identifierKpiNames.DevelopmentComponents, bomKpiData.DevDependentComponents},
-        {identifierKpiNames.BundledComponents, bomKpiData.BundledComponents},
-        {identifierKpiNames.InvalidComponentsExcluded, bomKpiData.ComponentsExcluded},
-        {identifierKpiNames.DuplicateComponents, bomKpiData.DuplicateComponents}
+        {scanKpiNames.ComponentsInInputFile, bomKpiData.ComponentsinPackageLockJsonFile },
+        {scanKpiNames.DevelopmentComponents, bomKpiData.DevDependentComponents},
+        {scanKpiNames.BundledComponents, bomKpiData.BundledComponents},
+        {scanKpiNames.InvalidComponentsExcluded, bomKpiData.ComponentsExcluded},
+        {scanKpiNames.DuplicateComponents, bomKpiData.DuplicateComponents}
 
     };
             if (BomCreator.sw360 != null)
             {
-                printList.Add(identifierKpiNames.ManuallyExcludedSw360, bomKpiData.ComponentsExcludedSW360);
+                printList.Add(scanKpiNames.ManuallyExcludedSw360, bomKpiData.ComponentsExcludedSW360);
             }
             if (BomCreator.jfrog != null)
             {
-                printList.Add(identifierKpiNames.InternalComponents, bomKpiData.InternalComponents);
-                printList.Add(identifierKpiNames.PackagesPresentIn3rdPartyRepo, bomKpiData.ThirdPartyRepoComponents);
-                printList.Add(identifierKpiNames.PackagesPresentInDevDepRepo, bomKpiData.DevdependencyComponents);
-                printList.Add(identifierKpiNames.PackagesPresentInReleaseRepo, bomKpiData.ReleaseRepoComponents);
-                printList.Add(identifierKpiNames.PackagesNotPresentInOfficialRepo, bomKpiData.UnofficialComponents);
+                printList.Add(scanKpiNames.InternalComponents, bomKpiData.InternalComponents);
+                printList.Add(scanKpiNames.PackagesPresentIn3rdPartyRepo, bomKpiData.ThirdPartyRepoComponents);
+                printList.Add(scanKpiNames.PackagesPresentInDevDepRepo, bomKpiData.DevdependencyComponents);
+                printList.Add(scanKpiNames.PackagesPresentInReleaseRepo, bomKpiData.ReleaseRepoComponents);
+                printList.Add(scanKpiNames.PackagesNotPresentInOfficialRepo, bomKpiData.UnofficialComponents);
             }
-            printList.Add(identifierKpiNames.ComponentsAddedFromSBOMTemplate, bomKpiData.ComponentsinSBOMTemplateFile);
-            printList.Add(identifierKpiNames.ComponentsOverWrittenFromSBOMTemplate, bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
-            printList.Add(identifierKpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries, bomKpiData.UnsupportedComponentsFromSpdxFile);
-            printList.Add(identifierKpiNames.ComponentsInBOM, bomKpiData.ComponentsInComparisonBOM);
+            printList.Add(scanKpiNames.ComponentsAddedFromSBOMTemplate, bomKpiData.ComponentsinSBOMTemplateFile);
+            printList.Add(scanKpiNames.ComponentsOverWrittenFromSBOMTemplate, bomKpiData.ComponentsUpdatedFromSBOMTemplateFile);
+            printList.Add(scanKpiNames.ComponentsFromTheSPDXImportedAsBaselineEntries, bomKpiData.UnsupportedComponentsFromSpdxFile);
+            printList.Add(scanKpiNames.ComponentsInBOM, bomKpiData.ComponentsInComparisonBOM);
             Dictionary<string, double> printTimingList = new Dictionary<string, double>()
             {
-                { "PackageIdentifier",bomKpiData.TimeTakenByBomCreator }
+                { "SIT Scan",bomKpiData.TimeTakenByBomCreator }
             };
 
             CommonHelper.ProjectSummaryLink = bomKpiData.ProjectSummaryLink;
-            LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink, Dataconstant.Identifier, identifierKpiNames);
+            LoggerHelper.WriteToConsoleTable(printList, printTimingList, bomKpiData.ProjectSummaryLink, Dataconstant.Scan, scanKpiNames);
         }
 
         /// <summary>

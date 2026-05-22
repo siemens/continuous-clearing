@@ -40,7 +40,7 @@ namespace SW360IntegrationTest.Cargo
             // Test BOM Creator ran successfully or failed due to missing configuration (expected in dev environment)
             // Exit code 0 = Success, 1 = Configuration error, 2 = Warning, 255 = BOM file missing in CI, negative = Unhandled exception
             Assert.IsTrue(result == 0 || result == 2 || result == 1 || result == 255 || result < 0,
-                $"Test to run Artifactory Uploader EXE execution. Exit code: {result}");
+                $"Test to run SIT Upload EXE execution. Exit code: {result}");
         }
 
         [Test, Order(2)]

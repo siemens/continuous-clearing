@@ -70,7 +70,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.EnableFossologyTrigger,testParameters.FossologyTrigger,
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
-                TestConstant.FossologyURL,testParameters.FossUrl }), "Test to run Package Creator EXE execution");
+                TestConstant.FossologyURL,testParameters.FossUrl }), "Test to run SIT Create EXE execution");
         }
 
 

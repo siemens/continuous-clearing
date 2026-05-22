@@ -64,9 +64,9 @@ namespace LCT.SW360PackageCreator
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            string logFileNameWithTimestamp = $"{FileConstant.ComponentCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            string logFileNameWithTimestamp = $"{FileConstant.SITCreateLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
-            Logger.Debug($"====================<<<<< Package creator >>>>>====================");
+            Logger.Debug($"====================<<<<< SIT Create >>>>>====================");
             CommonAppSettings appSettings = settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
             Log4Net.AppendVerboseValue(appSettings);
 
@@ -76,20 +76,20 @@ namespace LCT.SW360PackageCreator
             string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder name: {FolderPath}", null);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Creator);
+            settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Create);
             int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
 
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            LoggerHelper.SpectreConsoleInitialMessage("Package creator");
+            LoggerHelper.SpectreConsoleInitialMessage("SIT Create");
 
             if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Alert, $"Package creator is running in TEST mode \n", null);
+                Logger.Logger.Log(null, Level.Alert, $"SIT Create is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Creator, bomFilePath: bomFilePath);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Create, bomFilePath: bomFilePath);
 
 
             if (appSettings.SbomSigning.SBOMSignVerify)
@@ -113,9 +113,9 @@ namespace LCT.SW360PackageCreator
             if (appSettings.Telemetry.Enable)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreatorKpiData);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreateKpiData);
             }
-            Logger.Logger.Log(null, Level.Notice, $"End of Package Creator execution: {DateTime.Now}\n", null);
+            Logger.Logger.Log(null, Level.Notice, $"End of SIT Create execution: {DateTime.Now}\n", null);
 
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();

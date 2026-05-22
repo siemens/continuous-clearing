@@ -167,7 +167,7 @@ namespace LCT.Common.UTest
             // Arrange
             bool verbose = false;
             string logPath = "test.log";
-            IAppender[] appenders = [new ConsoleAppender()];
+            IAppender[] appenders = new IAppender[] { new ConsoleAppender() };
 
             // Act
             Log4Net.ActivateFileAppender(verbose, logPath, appenders);

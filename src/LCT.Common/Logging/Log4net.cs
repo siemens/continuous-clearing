@@ -90,9 +90,9 @@ namespace LCT.Common
         {
             foreach (IAppender appender in appenders)
             {
-                if (verbose && appender is AppenderSkeleton appenderSkeleton)
+                if (appender is AppenderSkeleton appenderSkeleton)
                 {
-                    appenderSkeleton.Threshold = Level.All;
+                    appenderSkeleton.Threshold = verbose ? Level.All : Level.Debug;
                 }
 
                 if (!string.IsNullOrWhiteSpace(logPath) && appender is RollingFileAppender fileAppender)

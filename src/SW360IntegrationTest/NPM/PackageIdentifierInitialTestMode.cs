@@ -106,7 +106,7 @@ namespace SW360IntegrationTest.NPM
                 TestConstant.ProjectType, "NPM",
                 TestConstant.Mode,"test"
             }),
-                "Test to run  Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
 

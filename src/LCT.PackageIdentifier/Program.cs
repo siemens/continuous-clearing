@@ -122,24 +122,24 @@ namespace LCT.PackageIdentifier
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
-            string logFileNameWithTimestamp = $"{FileConstant.BomCreatorLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            string logFileNameWithTimestamp = $"{FileConstant.SITScanLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
-            Logger.Debug($"====================<<<<< Package Identifier >>>>>====================");
+            Logger.Debug($"====================<<<<< SIT Scan >>>>>====================");
             CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
             Log4Net.AppendVerboseValue(appSettings);
             appSettings.ProjectType = CommonHelper.CanonicalizeProjectType(appSettings.ProjectType);
             ProjectReleases projectReleases = new ProjectReleases();
             string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            _settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Identifier);
-            LoggerHelper.SpectreConsoleInitialMessage("Package Identifier");
+            _settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Scan);
+            LoggerHelper.SpectreConsoleInitialMessage("SIT Scan");
             if (appSettings.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
             {
                 Logger.Error($"\nPlease note that the Alpine feature is currently in preview state. This means it's available for testing and evaluation purposes. While functional, it may not yet include all planned features and could encounter occasional issues. Your feedback during this preview phase is appreciated as we work towards its official release. Thank you for exploring Alpine with us.");
             }
 
             if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Alert, $"Package Identifier is running in TEST mode \n", null);
+                Logger.Logger.Log(null, Level.Alert, $"SIT Scan is running in TEST mode \n", null);
 
             // Validate application settings
             if (appSettings.SW360 != null)
@@ -154,7 +154,7 @@ namespace LCT.PackageIdentifier
                 Exclude = DisplayInformation.DisplayExcludeFiles(appSettings),
                 ExcludeComponents = DisplayInformation.DisplayExcludeComponents(appSettings)
             };
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Scan);
 
             _bomCreator.JFrogService = GetJfrogService(appSettings);
             _bomCreator.BomHelper = new BomHelper();
@@ -168,9 +168,9 @@ namespace LCT.PackageIdentifier
             if (appSettings.Telemetry?.Enable == true)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.IdentifierKpiData);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.ScanKpiData);
             }
-            Logger.Logger.Log(null, Level.Notice, $"End of Package Identifier execution : {DateTime.Now}\n", null);
+            Logger.Logger.Log(null, Level.Notice, $"End of SIT Scan execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
         }

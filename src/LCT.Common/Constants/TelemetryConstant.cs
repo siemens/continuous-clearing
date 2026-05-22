@@ -16,29 +16,29 @@ namespace LCT.Common.Constants
         /// </summary>
         public const string ToolName = "CATool";
         /// <summary>
-        /// Telemetry key for package identifier execution.
+        /// Telemetry key for SIT Scan execution.
         /// </summary>
-        public const string PackageIdentifier = "PackageIdentifierExecution";
+        public const string SITScan = "SITScanExecution";
         /// <summary>
-        /// Telemetry key for package creator execution.
+        /// Telemetry key for SIT Create execution.
         /// </summary>
-        public const string PackageCreator = "PackageCreatorExecution";
+        public const string SITCreate = "SITCreateExecution";
         /// <summary>
-        /// Telemetry key for Artifactory uploader execution.
+        /// Telemetry key for SIT Upload execution.
         /// </summary>
-        public const string ArtifactoryUploader = "ArtifactoryUploaderExecution";
+        public const string SITUpload = "SITUploadExecution";
         /// <summary>
-        /// Telemetry key for identifier KPI data.
+        /// Telemetry key for SIT Scan KPI data.
         /// </summary>
-        public const string IdentifierKpiData = "IdentifierKpiDataTelemetry";
+        public const string ScanKpiData = "ScanKpiDataTelemetry";
         /// <summary>
-        /// Telemetry key for creator KPI data.
+        /// Telemetry key for SIT Create KPI data.
         /// </summary>
-        public const string CreatorKpiData = "CreatorKpiDataTelemetry";
+        public const string CreateKpiData = "CreateKpiDataTelemetry";
         /// <summary>
-        /// Telemetry key for Artifactory uploader KPI data.
+        /// Telemetry key for SIT Upload KPI data.
         /// </summary>
-        public const string ArtifactoryUploaderKpiData = "UploaderKpiDataTelemetry";
+        public const string UploadKpiData = "UploadKpiDataTelemetry";
         /// <summary>
         /// The type of telemetry (e.g., ApplicationInsights).
         /// </summary>
