@@ -1,4 +1,4 @@
-parameters:
+﻿parameters:
   # Sw360 and Fossology parameters
   - name: sw360Url
     type: string
@@ -55,11 +55,11 @@ parameters:
     type: string
     default: ''
 
-  - name: PackageCreatorEnabled
+  - name: SITScanEnabled
     type: boolean
     default: true
 
-  - name: ArtifactoryUploaderEnabled
+  - name: SITUploadEnabled
     type: boolean
     default: true
     
@@ -220,14 +220,14 @@ steps:
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
-      displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
+      displayName: 'Run SITScan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
         script: |
           # Print the working directory parameter
           Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-          Write-Host "##[section] Preparing arguments for PackageIdentifier..."
+          Write-Host "##[section] Preparing arguments for SITScan..."
           # Initialize arguments with mandatory fields
           $args = @(
             "--Directory:InputFolder", "${{ project.inputFolder }}",
@@ -318,25 +318,25 @@ steps:
           
           # Print the arguments for debugging
           if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            Write-Host "##[debug] Arguments for SITScan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
           }
 
           # Start executing the tool
-          Write-Host "##[section] Running PackageIdentifier tool..."
-          ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/PackageIdentifier.exe @args
+          Write-Host "##[section] Running SITScan tool..."
+          ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SITScan.exe @args
 
   - task: PowerShell@2
-    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
+    condition: eq('${{ parameters.SITScanEnabled }}', true)
     continueOnError: true
-    displayName: 'Run SW360PackageCreator'
+    displayName: 'Run SITCreate'
     inputs:
       targetType: 'inline'
       script: |
         # Print the working directory parameter
         Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-        Write-Host "##[section] Preparing arguments for SW360PackageCreator..."
+        Write-Host "##[section] Preparing arguments for SITCreate..."
 
         # Setup base arguments
         $args = @(
@@ -388,25 +388,25 @@ steps:
 
         # Print the arguments for debugging
         if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            Write-Host "##[debug] Arguments for SITScan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
         }
 
         # Start executing the tool
-        Write-Host "##[section] Running SW360PackageCreator..."
-        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SW360PackageCreator.exe @args
+        Write-Host "##[section] Running SITCreate..."
+        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SITCreate.exe @args
 
   - task: PowerShell@2
-    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
+    condition: eq('${{ parameters.SITUploadEnabled }}', true)
     continueOnError: true
-    displayName: 'Run ArtifactoryUploader'
+    displayName: 'Run SITUpload'
     inputs:
       targetType: 'inline'
       script: |
         # Print the working directory parameter
         Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-        Write-Host "##[section] Preparing arguments for ArtifactoryUploader..."
+        Write-Host "##[section] Preparing arguments for SITUpload..."
 
         # Setup base arguments
         $args = @(
@@ -459,10 +459,10 @@ steps:
 
         # Print the arguments for debugging
         if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            Write-Host "##[debug] Arguments for SITScan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
         }
 
         # Start executing the tool
-        Write-Host "##[section] Running ArtifactoryUploader..."
-        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/ArtifactoryUploader.exe @args
+        Write-Host "##[section] Running SITUpload..."
+        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SITUpload.exe @args

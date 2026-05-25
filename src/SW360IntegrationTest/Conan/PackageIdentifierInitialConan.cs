@@ -1,4 +1,4 @@
-﻿using CycloneDX.Models;
+using CycloneDX.Models;
 using NUnit.Framework;
 using System.IO;
 using TestUtilities;
@@ -47,7 +47,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""}),
-                "Test to run  Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
 

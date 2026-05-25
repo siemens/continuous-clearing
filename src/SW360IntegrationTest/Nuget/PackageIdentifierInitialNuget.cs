@@ -55,7 +55,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.JfrogNugetInternalRepo,"Nuget-test",
                 TestConstant.ProjectType,"Nuget",
                 TestConstant.Mode,""}),
-                "Test to run  Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
 

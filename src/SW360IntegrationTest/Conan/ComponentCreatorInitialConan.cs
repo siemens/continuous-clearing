@@ -1,4 +1,4 @@
-﻿using CycloneDX.Models;
+using CycloneDX.Models;
 using LCT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -65,7 +65,7 @@ namespace SW360IntegrationTest.Conan
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""
             }),
-                "Test to run Package Creator EXE execution");
+                "Test to run SIT Create EXE execution");
         }
 
         [Test, Order(2)]

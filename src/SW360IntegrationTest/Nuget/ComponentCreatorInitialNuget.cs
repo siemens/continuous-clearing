@@ -73,7 +73,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.TelemetryEnable, testParameters.TelemetryEnable,
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""}),
-                "Test to run Package Creator EXE execution");
+                "Test to run SIT Create EXE execution");
         }
 
         [Test, Order(2)]

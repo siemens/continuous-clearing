@@ -29,7 +29,7 @@ namespace TestUtilities
         public static int RunBOMCreatorExe(string[] args)
         {
             Process proc = new Process();
-            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "PackageIdentifier.exe" : "PackageIdentifier";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITScan.exe" : "SITScan";
             proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;
@@ -67,7 +67,7 @@ namespace TestUtilities
         public static int RunComponentCreatorExe(string[] args)
         {
             Process proc = new Process();
-            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SW360PackageCreator.exe" : "SW360PackageCreator";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITCreate.exe" : "SITCreate";
             proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;
@@ -101,7 +101,7 @@ namespace TestUtilities
         public static int RunArtifactoryUploaderExe(string[] args)
         {
             Process proc = new Process();
-            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ArtifactoryUploader.exe" : "ArtifactoryUploader";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITUpload.exe" : "SITUpload";
             proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;

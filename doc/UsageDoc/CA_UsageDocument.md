@@ -1,4 +1,4 @@
-# Continuous Clearing Tool
+﻿# Continuous Clearing Tool
 
 ## Contents
 - [Continuous Clearing Tool](#continuous-clearing-tool)
@@ -525,19 +525,19 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 ### Package Identifier
 
-* In order to run the PackageIdentifier.dll , execute the below command.
+* In order to run the SITScan.dll , execute the below command.
 
-  **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json`
+  **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITScan.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 * **With SBOM Signing enabled** (credentials from appSettings.json or command line parameters):
 
-  **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet PackageIdentifier.dll --settingsfilepath /etc/CATool/appSettings.json --SbomSigning:SBOMSignVerify true --SbomSigning:KeyVaultURI "https://your-keyvault.vault.azure.net/" --SbomSigning:CertificateName "your-certificate" --SbomSigning:ClientId "your-client-id" --SbomSigning:ClientSecret "your-client-secret" --SbomSigning:TenantId "your-tenant-id"`
+  **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITScan.dll --settingsfilepath /etc/CATool/appSettings.json --SbomSigning:SBOMSignVerify true --SbomSigning:KeyVaultURI "https://your-keyvault.vault.azure.net/" --SbomSigning:CertificateName "your-certificate" --SbomSigning:ClientId "your-client-id" --SbomSigning:ClientSecret "your-client-secret" --SbomSigning:TenantId "your-tenant-id"`
 
 ### SW360 Package Creator
 
-* In order to run the SW360PackageCreator.dll , execute the below command.
+* In order to run the SITCreate.dll , execute the below command.
 
-  **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SW360PackageCreator.dll --settingsfilepath /etc/CATool/appSettings.json`
+  **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITCreate.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 ### Artifactory Uploader
 
@@ -545,7 +545,7 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 * In order to run the Artifactory Uploader dll , execute the below command.
 
-  **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json`
+  **Example** : `docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITUpload.dll --settingsfilepath /etc/CATool/appSettings.json`
 
 </details>
 
@@ -559,19 +559,19 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 ### Package Identifier
 
-* In order to run the PackageIdentifier.exe, execute the below command.
+* In order to run the SITScan.exe, execute the below command.
 
-  **Example** : `PackageIdentifier.exe --settingsfilepath /<PathToConfig>/appSettings.json`
+  **Example** : `SITScan.exe --settingsfilepath /<PathToConfig>/appSettings.json`
 
 * **With SBOM Signing enabled** (credentials from appSettings.json or command line parameters):
 
-  **Example** : `PackageIdentifier.exe --settingsfilepath /<PathToConfig>/appSettings.json --SbomSigning:SBOMSignVerify true --SbomSigning:KeyVaultURI "https://your-keyvault.vault.azure.net/" --SbomSigning:CertificateName "your-certificate" --SbomSigning:ClientId "your-client-id" --SbomSigning:ClientSecret "your-client-secret" --SbomSigning:TenantId "your-tenant-id"`
+  **Example** : `SITScan.exe --settingsfilepath /<PathToConfig>/appSettings.json --SbomSigning:SBOMSignVerify true --SbomSigning:KeyVaultURI "https://your-keyvault.vault.azure.net/" --SbomSigning:CertificateName "your-certificate" --SbomSigning:ClientId "your-client-id" --SbomSigning:ClientSecret "your-client-secret" --SbomSigning:TenantId "your-tenant-id"`
 
 ### SW360 Package Creator
 
-* In order to run the SW360PackageCreator.exe, execute the below command.
+* In order to run the SITCreate.exe, execute the below command.
 
-  **Example** : `SW360PackageCreator.exe --settingsfilepath /<PathToConfig>/appSettings.json`
+  **Example** : `SITCreate.exe --settingsfilepath /<PathToConfig>/appSettings.json`
 
 ### Artifactory Uploader
 
@@ -579,7 +579,7 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 * In order to run the Artifactory Uploader exe, execute the below command.
 
-  **Example** : `ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json`
+  **Example** : `SITUpload.exe --settingsfilepath /<PathToConfig>/appSettings.json`
 
 </details>
 
@@ -591,11 +591,11 @@ When the JFrogDryRun is set to False, it indicates a shift towards deployment in
 * In order to execute the tool in release mode we need to pass an extra parameter to the existing
   argument list.
 
-  **Example** : docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet ArtifactoryUploader.dll --settingsfilepath /etc/CATool/appSettings.json --Jfrog:DryRun false
+  **Example** : docker run --rm -it -v /D/Projects/Output:/mnt/Output -v /D/Projects/DockerLog:/var/log -v /D/Projects/CAConfig:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITUpload.dll --settingsfilepath /etc/CATool/appSettings.json --Jfrog:DryRun false
 
   or
 
-  **Example** : ArtifactoryUploader.exe --settingsfilepath /<PathToConfig>/appSettings.json -Jfrog:DryRun false
+  **Example** : SITUpload.exe --settingsfilepath /<PathToConfig>/appSettings.json -Jfrog:DryRun false
 
 # How to handle multiple project types in same project
 
@@ -722,8 +722,9 @@ Both templates share common parameters with some implementation-specific differe
 | `sw360ProjectName` | string | '' | SW360 project name  |:white_check_mark:|
 | `projectDefinitions` | object | [] | List of project configurations to scan  |:white_check_mark:|
 | `outputFolder` | string | '' | Output directory for reports and artifacts  |:white_check_mark:|
-| `PackageCreatorEnabled` | boolean | true | Enable/disable SW360 package creation |:x:|
-| `ArtifactoryUploaderEnabled` | boolean | true | Enable/disable Artifactory uploads |:x:|
+| `SITScanEnabled` | boolean | true | Enable/disable Package Identification |:x:|
+| `SITCreateEnabled` | boolean | true | Enable/disable SW360 package creation |:x:|
+| `SITUploadEnabled` | boolean | true | Enable/disable Artifactory uploads |:x:|
 | `JfrogToken` | string | '' | JFrog Artifactory authentication token |:white_check_mark:|
 | `JfrogDryRun` | boolean | true | Run Artifactory uploads in dry-run mode |:x:|
 | `sw360Url` | string | '' | Optional SW360 instance URL |:x:|

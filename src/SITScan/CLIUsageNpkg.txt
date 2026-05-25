@@ -1,0 +1,18 @@
+Usage:
+   [flags]
+   [command]
+
+Examples for Nuget Package:
+   SITScan.exe --settingsfilepath /CAToolConfigPath/appSettings.json                              Creates Bom file by identifying packages in input
+
+Available Commands:
+   SITScan.exe    --settingsfilepath /CAToolConfigPath/appSettings.json                           Creates Bom file by identifying packages in input
+   SITCreate.exe  --settingsfilepath /CAToolConfigPath/appSettings.json                           Creates Components and Release in SW360
+   SITUpload.exe  --settingsfilepath /CAToolConfigPath/appSettings.json                           Uploads source package to JFrog Artifactory
+
+Flags:
+   --settingsfilepath           Path of application config file
+
+For more examples refer the Clearing Automation Usage Document.
+
+Note : For Docker run replace .exe with .dll

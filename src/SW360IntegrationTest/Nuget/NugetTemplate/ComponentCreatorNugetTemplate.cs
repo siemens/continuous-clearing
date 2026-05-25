@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -76,7 +76,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.Mode,""});
 
             Assert.IsTrue(value == 0 || value == 2,
-                "Test to run Package Creator EXE execution");
+                "Test to run SIT Create EXE execution");
         }
 
         [Test, Order(2)]

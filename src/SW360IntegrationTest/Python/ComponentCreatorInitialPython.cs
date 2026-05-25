@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -74,7 +74,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.Mode,""});
 
-            Assert.IsTrue(returnValue == 0 || returnValue == 2, "Test to run Package Creator EXE execution");
+            Assert.IsTrue(returnValue == 0 || returnValue == 2, "Test to run SIT Create EXE execution");
         }
 
         [Test, Order(2)]

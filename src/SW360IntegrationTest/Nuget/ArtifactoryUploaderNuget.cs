@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -36,7 +36,7 @@ namespace SW360IntegrationTest.Nuget
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.DryRun, false.ToString()
             }),
-                "Test to run Artifactory Uploader EXE execution");
+                "Test to run SIT Upload EXE execution");
         }
 
         [Test, Order(2)]

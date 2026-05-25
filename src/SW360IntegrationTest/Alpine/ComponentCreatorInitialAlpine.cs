@@ -74,7 +74,7 @@ namespace SW360IntegrationTest.Alpine
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.FossologyURL, testParameters.FossUrl,
                 TestConstant.Mode,""}),
-            "Test to run component creator EXE execution");
+            "Test to run SIT Create EXE execution");
         }
         [Test, Order(2)]
         public void TestComparisionBOMUpdation()

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -46,7 +46,7 @@ namespace SW360IntegrationTest.Alpine
                 TestConstant.Appsettings,appsettingsFilePath,
                 TestConstant.ProjectType,"ALPINE",
                 TestConstant.Mode,""}),
-                "Test to run Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
         [Test, Order(2)]

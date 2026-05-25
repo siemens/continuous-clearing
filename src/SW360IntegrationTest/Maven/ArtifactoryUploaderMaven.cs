@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Siemens AG">
 //   Copyright (C) Siemens AG 2023. All rights reserved. 
 // </copyright>
@@ -38,7 +38,7 @@ namespace SW360IntegrationTest.Maven
 
             // Test BOM Creator ran with exit code 0 or 2 (Warning)
             Assert.IsTrue(result == 0 || result == 2,
-                "Test to run Artifactory Uploader EXE execution");
+                "Test to run SIT Upload EXE execution");
         }
 
         [Test, Order(2)]

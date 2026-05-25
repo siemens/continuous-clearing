@@ -55,7 +55,7 @@ namespace SW360IntegrationTest.Maven
                 TestConstant.SBOMSignVerify, testParameters.SBOMSignVerify,
                 TestConstant.ProjectType,"Maven",
                 TestConstant.Mode,""}),
-                "Test to run  Package Identifier EXE execution");
+                "Test to run SIT Scan EXE execution");
         }
 
 

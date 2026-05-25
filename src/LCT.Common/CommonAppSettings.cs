@@ -175,8 +175,8 @@ namespace LCT.Common
             {
                 try
                 {
-                    if (!AppDomain.CurrentDomain.FriendlyName.Contains("SW360PackageCreator") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader"))
+                    if (!AppDomain.CurrentDomain.FriendlyName.Contains("SITCreate") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("SITUpload"))
                     {
                         var folderAction = new FolderAction();
                         folderAction.ValidateFolderPath(value, environmentHelper);

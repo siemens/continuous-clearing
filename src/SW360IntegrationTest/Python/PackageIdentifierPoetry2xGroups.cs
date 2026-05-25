@@ -56,7 +56,7 @@ namespace SW360IntegrationTest.Python
                 TestConstant.JfrogPoetryInternalRepo,"Pypi-test",
                 TestConstant.ProjectType,"Poetry",
                 TestConstant.Mode,""}),
-                "Test to run Package Identifier EXE execution for Poetry 2.x groups");
+                "Test to run SIT Scan EXE execution for Poetry 2.x groups");
         }
 
         [Test, Order(2)]
