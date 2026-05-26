@@ -199,26 +199,8 @@ namespace LCT.SW360PackageCreator
 
         /// <summary>
         /// Strips query-string parameters from a component's PURL, retaining only what is valid per type.
-        /// <para>
-        /// Rules:
-        /// <list type="bullet">
-        ///   <item>DEBIAN / ALPINE: if <c>?arch=source</c> is present the PURL is kept unchanged; otherwise everything from <c>?</c> onwards is removed.</item>
-        ///   <item>All other types: everything from <c>?</c> onwards is removed.</item>
-        ///   <item>If <paramref name="projectType"/> is null or empty the PURL is returned as-is.</item>
-        /// </list>
-        /// </para>
-        /// <para>Expected PURL formats written to SW360 per package type:</para>
-        /// <list type="table">
-        ///   <listheader><term>Type</term><description>Example PURL</description></listheader>
-        ///   <item><term>NPM</term>        <description><c>pkg:npm/%40babel/cli@7.16.8</c> (scoped: <c>pkg:npm/%40babel/cli@7.16.8</c>)</description></item>
-        ///   <item><term>NuGet</term>      <description><c>pkg:nuget/Newtonsoft.Json@13.0.1</c></description></item>
-        ///   <item><term>Maven</term>      <description><c>pkg:maven/org.springframework/spring-core@5.3.23</c></description></item>
-        ///   <item><term>PyPI (Poetry)</term><description><c>pkg:pypi/requests@2.28.1</c></description></item>
-        ///   <item><term>Conan</term>      <description><c>pkg:conan/zlib@1.2.11</c></description></item>
-        ///   <item><term>Cargo</term>      <description><c>pkg:cargo/serde@1.0.152</c></description></item>
-        ///   <item><term>DEBIAN</term>     <description><c>pkg:deb/debian/curl@7.74.0?arch=source</c> (arch qualifier retained)</description></item>
-        ///   <item><term>ALPINE</term>     <description><c>pkg:apk/alpine/busybox@1.35.0?arch=source</c> (arch qualifier retained)</description></item>
-        /// </list>
+        /// - DEBIAN / ALPINE: if "?arch=source" is present the PURL is kept unchanged; otherwise everything from '?' onwards is removed.
+        /// - All other types (NPM, NuGet, Maven, Poetry, Conan, Cargo, …): everything from '?' onwards is removed.       
         /// </summary>
         private static void UpdatePurlForProjectType(Component item, string projectType)
         {
