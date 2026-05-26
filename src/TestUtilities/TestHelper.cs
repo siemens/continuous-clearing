@@ -26,7 +26,7 @@ namespace TestUtilities
 
         public static bool BOMCreated { get; private set; }
 
-        public static int RunBOMCreatorExe(string[] args)
+        public static int RunSITScanExe(string[] args)
         {
             Process proc = new Process();
             string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITScan.exe" : "SITScan";
@@ -64,7 +64,7 @@ namespace TestUtilities
             return proc.ExitCode;
         }
 
-        public static int RunComponentCreatorExe(string[] args)
+        public static int RunSITCreateExe(string[] args)
         {
             Process proc = new Process();
             string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITCreate.exe" : "SITCreate";
@@ -98,7 +98,7 @@ namespace TestUtilities
             return proc.ExitCode;
         }
 
-        public static int RunArtifactoryUploaderExe(string[] args)
+        public static int RunSITUploadExe(string[] args)
         {
             Process proc = new Process();
             string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITUpload.exe" : "SITUpload";

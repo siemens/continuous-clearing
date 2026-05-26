@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -25,14 +25,14 @@ namespace SW360IntegrationTest.Nuget
         {
             testParameters = new TestParamNuget();
             OutFolder = TestHelper.OutFolder;
-            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "PackageCreatorTestFiles", "Nuget", "CCTComplienceCheckComparisonBOMNugetInitial.json"));
+            CCTComparisonBomTestFile = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "src", "SW360IntegrationTest", "SITCreateTestFiles", "Nuget", "CCTComplienceCheckComparisonBOMNugetInitial.json"));
 
             if (!TestHelper.BOMCreated)
             {
                 OutFolder = TestHelper.OutFolder;
                 string packagejsonPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "..", "TestFiles", "IntegrationTestFiles", "SystemTest1stIterationData", "ComplienceCheckNugetFolder"));
                 string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
-                TestHelper.RunBOMCreatorExe(new string[]{
+                TestHelper.RunSITScanExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
@@ -51,12 +51,12 @@ namespace SW360IntegrationTest.Nuget
         }
 
         [Test, Order(1)]
-        public void ComponentCreatorExe_ProvidedBOMFilePath_ReturnsSuccess()
+        public void SITCreateExe_ProvidedBOMFilePath_ReturnsSuccess()
         {
             string bomPath = Path.GetFullPath(Path.Combine(OutFolder, "..", "BOMs"));
             // Assert
             // Check exit is normal
-            Assert.AreEqual(2 | 0, TestHelper.RunComponentCreatorExe(new string[] {
+            Assert.AreEqual(2 | 0, TestHelper.RunSITCreateExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
                 TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,

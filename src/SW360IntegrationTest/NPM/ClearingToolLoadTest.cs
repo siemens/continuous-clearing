@@ -32,8 +32,8 @@ namespace SW360IntegrationTest.LoadTest
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            TestHelper.RunBOMCreatorExe(new string[] { packageJsonPath, bomPath });
-            TestHelper.RunComponentCreatorExe(new string[] { combomJsonPath });
+            TestHelper.RunSITScanExe(new string[] { packageJsonPath, bomPath });
+            TestHelper.RunSITCreateExe(new string[] { combomJsonPath });
 
             stopwatch.Stop();
             Console.WriteLine($"PerformanceTestFor130Components():Total time taken : {stopwatch.Elapsed.Minutes}");
@@ -54,8 +54,8 @@ namespace SW360IntegrationTest.LoadTest
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            TestHelper.RunBOMCreatorExe(new string[] { packageJsonPath, bomPath });
-            TestHelper.RunComponentCreatorExe(new string[] { combomJsonPath });
+            TestHelper.RunSITScanExe(new string[] { packageJsonPath, bomPath });
+            TestHelper.RunSITCreateExe(new string[] { combomJsonPath });
 
 
             stopwatch.Stop();
