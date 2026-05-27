@@ -250,6 +250,10 @@ namespace LCT.Common.Constants
         /// Uploader string.
         /// </summary>
         public const string Uploader = "Uploader";
+        /// <summary>
+        /// Purl ID suffix.
+        /// </summary>
+        public const string PurlIDSuffix = "?arch=source";
         #endregion
 
         #region Properties
