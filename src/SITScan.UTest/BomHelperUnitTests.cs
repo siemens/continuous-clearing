@@ -542,7 +542,8 @@ namespace SITScan.UTest
             var mock = new Mock<IBomHelper>();
             mock.Object.WriteBomKpiDataToConsole(new BomKpiData());
             mock.Verify(x => x.WriteBomKpiDataToConsole(It.IsAny<BomKpiData>()), Times.Once);
-        }       
+        }
+        
         [Test]
         public void GetProjectSummaryLink_ReturnsCorrectUrl()
         {

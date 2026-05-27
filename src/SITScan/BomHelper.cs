@@ -182,10 +182,8 @@ namespace SITScan
             {
                 Logger.WarnFormat("The signature of the SPDX file '{0}' is not valid. Please check the signature and certificate files. Currently processing the SPDX file without signature verification.", filename);
             }
-        }      
-
-
-
+        }
+        
         /// <summary>
         /// Builds a display name for a component including group if available.
         /// </summary>
@@ -322,7 +320,7 @@ namespace SITScan
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{purlBase}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{purlBase}{Dataconstant.ForwardSlash}{name}@{version}{Dataconstant.PurlIDSuffix}";
         }
 
         /// <summary>

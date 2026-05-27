@@ -92,6 +92,7 @@ namespace SITCreate
                 string currVersion = item.Version;
 
                 bool isInternalComponent = GetPackageType(item, ref componentsData);
+                UpdatePurlForProjectType(item, componentsData.ProjectType);
                 if (componentsData.ProjectType.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
                 {
                     Logger.DebugFormat("{0}-{1} found as Choco component.", item.Name, item.Version);
@@ -194,6 +195,27 @@ namespace SITCreate
             {
                 Logger.DebugFormat("UpdateToLocalBomFile():Local BoM not updated for {0}-{1}.\n", currName, currVersion);
             }
+        }
+
+        /// <summary>
+        /// Strips query-string parameters from a component's PURL, retaining only what is valid per type.
+        /// - DEBIAN / ALPINE: if "?arch=source" is present the PURL is kept unchanged; otherwise everything from '?' onwards is removed.
+        /// - All other types (NPM, NuGet, Maven, Poetry, Conan, Cargo, …): everything from '?' onwards is removed.       
+        /// </summary>
+        private static void UpdatePurlForProjectType(Component item, string projectType)
+        {
+            if (string.IsNullOrEmpty(item?.Purl) || string.IsNullOrEmpty(projectType)) return;
+
+            int queryIndex = item.Purl.IndexOf('?');
+            if (queryIndex < 0) return;
+
+            bool isDebianOrAlpine = projectType.Equals(DebianProjectType, StringComparison.OrdinalIgnoreCase)
+                                 || projectType.Equals("ALPINE", StringComparison.OrdinalIgnoreCase);
+
+            if (isDebianOrAlpine && item.Purl.Contains(Dataconstant.PurlIDSuffix, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            item.Purl = item.Purl[..queryIndex];
         }
 
         /// <summary>

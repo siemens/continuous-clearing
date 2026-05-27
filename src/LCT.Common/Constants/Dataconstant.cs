@@ -249,7 +249,12 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Upload string.
         /// </summary>
-        public const string Upload = "Upload";
+        public const string Uploader = "Upload";
+        /// <summary>
+        /// Purl ID suffix.
+        /// </summary>
+        public const string PurlIDSuffix = "?arch=source";        
+        
         #endregion
 
         #region Properties
