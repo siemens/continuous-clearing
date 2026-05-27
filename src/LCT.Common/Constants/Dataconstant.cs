@@ -249,7 +249,7 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Upload string.
         /// </summary>
-        public const string Uploader = "Upload";
+        public const string Upload = "Upload";
         /// <summary>
         /// Purl ID suffix.
         /// </summary>
