@@ -87,11 +87,11 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Log file name for component creator.
         /// </summary>
-        public const string SITCreateLog = "SITCreate.log";
+        public const string SITCreateLog = "SITCreate";
         /// <summary>
         /// Log file name for BOM creator.
         /// </summary>
-        public const string SITScanLog = "SITScan.log";
+        public const string SITScanLog = "SITScan";
         /// <summary>
         /// Log file name for Fossology uploader.
         /// </summary>
@@ -99,7 +99,7 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Log file name for Artifactory uploader.
         /// </summary>
-        public const string SITUploadLog = "SITUpload.log";
+        public const string SITUploadLog = "SITUpload";
         /// <summary>
         /// File extension for tar.xz files.
         /// </summary>
