@@ -183,49 +183,7 @@ namespace LCT.PackageIdentifier
                 Logger.WarnFormat("The signature of the SPDX file '{0}' is not valid. Please check the signature and certificate files. Currently processing the SPDX file without signature verification.", filename);
             }
         }
-
-        /// <summary>
-        /// Executes 'npm view' to retrieve the shasum for the specified package version.
-        /// </summary>
-        /// <param name="name">Package name.</param>
-        /// <param name="version">Package version.</param>
-        /// <returns>SHA sum string or empty string if unavailable.</returns>
-        public static string GetHashCodeUsingNpmView(string name, string version)
-        {
-            string hashCode;
-            Process p = new Process();
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.RedirectStandardInput = true;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                p.StartInfo.FileName = Path.Combine(@"/bin/bash");
-                p.StartInfo.Arguments = $"-c \" npm view {name}@{version} dist.shasum \"";
-                Logger.Debug("GetHashCodeUsingNpmView():Linux OS Found!!");
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                p.StartInfo.Arguments = $"/c npm view {name}@{version}  dist.shasum";
-                Logger.Debug("GetHashCodeUsingNpmView():Windows OS Found!!");
-            }
-            else
-            {
-                Logger.Debug("GetHashCodeUsingNpmView():OS Details not Found!!");
-            }
-
-            var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
-            Result result = processResult?.Result;
-
-            hashCode = result?.StdOut;
-            return hashCode?.Trim() ?? string.Empty;
-        }
-
-
-
+        
         /// <summary>
         /// Builds a display name for a component including group if available.
         /// </summary>
@@ -362,7 +320,7 @@ namespace LCT.PackageIdentifier
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{purlBase}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{purlBase}{Dataconstant.ForwardSlash}{name}@{version}{Dataconstant.PurlIDSuffix}";
         }
 
         /// <summary>
