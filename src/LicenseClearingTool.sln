@@ -25,17 +25,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.Common.UTest", "LCT.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.Facade.UTest", "LCT.Facade.UTest\LCT.Facade.UTest.csproj", "{E5790FC0-6E71-43D4-8705-C17836893CA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.ArtifactoryUploader", "ArtifactoryUploader\LCT.ArtifactoryUploader.csproj", "{23D10886-3534-40D3-BD16-82664B29C266}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SITUpload", "SITUpload\SITUpload.csproj", "{23D10886-3534-40D3-BD16-82664B29C266}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.ArtifactoryUploader.UTest", "AritfactoryUploader.UTest\LCT.ArtifactoryUploader.UTest.csproj", "{7EF98B95-6F07-4ED2-990F-5C17FE55A87C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SITUpload.UTest", "SITUpload.UTest\SITUpload.UTest.csproj", "{7EF98B95-6F07-4ED2-990F-5C17FE55A87C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.PackageIdentifier", "LCT.PackageIdentifier\LCT.PackageIdentifier.csproj", "{5A3FB5A5-A982-4DC9-A30F-6AC8D2B32574}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SITScan", "SITScan\SITScan.csproj", "{5A3FB5A5-A982-4DC9-A30F-6AC8D2B32574}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.PackageIdentifier.UTest", "LCT.PackageIdentifier.UTest\LCT.PackageIdentifier.UTest.csproj", "{ACA55F0B-EECF-47B2-BB8C-0214C683B3E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SITScan.UTest", "SITScan.UTest\SITScan.UTest.csproj", "{ACA55F0B-EECF-47B2-BB8C-0214C683B3E1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SW360PackageCreator.UTest", "LCT.SW360PackageCreator.UTest\LCT.SW360PackageCreator.UTest.csproj", "{BD44EDF9-DE47-40B6-AA1F-9935455A0E91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SITCreate.UTest", "SITCreate.UTest\SITCreate.UTest.csproj", "{BD44EDF9-DE47-40B6-AA1F-9935455A0E91}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.SW360PackageCreator", "LCT.SW360PackageCreator\LCT.SW360PackageCreator.csproj", "{6F4427CB-2082-45FE-ACEA-AAFF23C79F8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SITCreate", "SITCreate\SITCreate.csproj", "{6F4427CB-2082-45FE-ACEA-AAFF23C79F8D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCT.CycloneDxProcessor", "LCT.CycloneDxProcessor\LCT.CycloneDxProcessor.csproj", "{3E4FD695-E7C7-44FA-B6DB-E41F4C456E0E}"
 EndProject

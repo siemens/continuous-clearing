@@ -31,11 +31,11 @@ namespace LCT.Common.Constants
         /// <summary>
         /// KPI data file name for BOM.
         /// </summary>
-        public const string BomKpiDataFileName = "PackageIdentifierKpiData.json";
+        public const string BomKpiDataFileName = "SITScanKpiData.json";
         /// <summary>
         /// KPI data file name for creator.
         /// </summary>
-        public const string CreatorKpiDataFileName = "PacakageCreatorKpiData.json";
+        public const string CreatorKpiDataFileName = "SITCreateKpiData.json";
         /// <summary>
         /// KPI data file name for uploader.
         /// </summary>
@@ -59,11 +59,11 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Log file name prefix for BOM.
         /// </summary>
-        public const string BomLogFileNamePrefix = "PackageIdentifier_";
+        public const string BomLogFileNamePrefix = "SITScan_";
         /// <summary>
         /// Log file name prefix for creator.
         /// </summary>
-        public const string CreatorLogFileNamePrefix = "PackageCreator_";
+        public const string CreatorLogFileNamePrefix = "SITCreate_";
         /// <summary>
         /// Log file name prefix for uploader.
         /// </summary>
@@ -87,11 +87,11 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Log file name for component creator.
         /// </summary>
-        public const string ComponentCreatorLog = "PackageCreator.log";
+        public const string SITCreateLog = "SITCreate";
         /// <summary>
         /// Log file name for BOM creator.
         /// </summary>
-        public const string BomCreatorLog = "PackageIdentifier.log";
+        public const string SITScanLog = "SITScan";
         /// <summary>
         /// Log file name for Fossology uploader.
         /// </summary>
@@ -99,7 +99,7 @@ namespace LCT.Common.Constants
         /// <summary>
         /// Log file name for Artifactory uploader.
         /// </summary>
-        public const string ArtifactoryUploaderLog = "ArtifactoryUploader.log";
+        public const string SITUploadLog = "SITUpload";
         /// <summary>
         /// File extension for tar.xz files.
         /// </summary>

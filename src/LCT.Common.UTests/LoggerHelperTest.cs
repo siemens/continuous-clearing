@@ -238,7 +238,7 @@ namespace LCT.Common.UTest
         // --- Additional coverage for component-related methods ---
 
         [Test]
-        public void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi_CoversAllBranches()
+        public void WriteComponentsWithoutDownloadURLBySpectreToKpi_CoversAllBranches()
         {
             var componentInfo = new List<ComparisonBomData>
             {
@@ -249,10 +249,10 @@ namespace LCT.Common.UTest
                 new Components { Name = "CompB", Version = "2.0" }
             };
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(componentInfo, lstReleaseNotCreated, "http://sw360/", lstReleaseNotCreated)
+                LoggerHelper.WriteComponentsWithoutDownloadURLBySpectreToKpi(componentInfo, lstReleaseNotCreated, "http://sw360/", lstReleaseNotCreated)
             );
             Assert.DoesNotThrow(() =>
-                LoggerHelper.WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/", lstReleaseNotCreated)
+                LoggerHelper.WriteComponentsWithoutDownloadURLBySpectreToKpi(new List<ComparisonBomData>(), new List<Components>(), "http://sw360/", lstReleaseNotCreated)
             );
         }
 
@@ -352,10 +352,10 @@ namespace LCT.Common.UTest
             memoryAppender = new MemoryAppender();
             BasicConfigurator.Configure(memoryAppender);
             // Act
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier, OutFolder);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Scan, OutFolder);
 
             // Assert
-            string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
+            string expectedLogMessage = $"Input Parameters used in SIT Scan:\n\t" +
                 $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
@@ -411,10 +411,10 @@ namespace LCT.Common.UTest
             memoryAppender = new MemoryAppender();
             BasicConfigurator.Configure(memoryAppender);
             // Act
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier, OutFolder);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Scan, OutFolder);
 
             // Assert
-            string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
+            string expectedLogMessage = $"Input Parameters used in SIT Scan:\n\t" +
                 $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
@@ -465,10 +465,10 @@ namespace LCT.Common.UTest
             memoryAppender = new MemoryAppender();
             BasicConfigurator.Configure(memoryAppender);
             // Act
-            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Identifier, OutFolder);
+            LoggerHelper.LogInputParameters(caToolInformation, appSettings, listParameters, Dataconstant.Scan, OutFolder);
 
             // Assert
-            string expectedLogMessage = $"Input Parameters used in Package Identifier:\n\t" +
+            string expectedLogMessage = $"Input Parameters used in SIT Scan:\n\t" +
                 $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
@@ -511,16 +511,16 @@ namespace LCT.Common.UTest
             BasicConfigurator.Configure(memoryAppender);
 
             // Act
-            LoggerHelper.LogInputParameters(catool, appSettings, cli, Dataconstant.Creator, bomFilePath);
+            LoggerHelper.LogInputParameters(catool, appSettings, cli, Dataconstant.Create, bomFilePath);
 
             // Assert
             var events = memoryAppender.GetEvents();
             Assert.IsNotEmpty(events, "Expected log events for Creator execution.");
-            var notice = Array.FindLast(events, e => e.RenderedMessage.Contains("Input parameters used in Package Creator"));
+            var notice = Array.FindLast(events, e => e.RenderedMessage.Contains("Input parameters used in SIT Create"));
             Assert.IsNotNull(notice, "Creator notice log not found.");
 
             string expected =
-                $"Input parameters used in Package Creator:\n\t" +
+                $"Input parameters used in SIT Create:\n\t" +
                 $"CaTool Version\t\t --> {catool.CatoolVersion}\n\t" +
                 $"CaTool RunningPath\t --> {catool.CatoolRunningLocation}\n\t" +
                 $"BoM FilePath\t\t --> {bomFilePath}\n\t" +
@@ -554,14 +554,14 @@ namespace LCT.Common.UTest
             BasicConfigurator.Configure(memoryAppender);
 
             // Act
-            LoggerHelper.LogInputParameters(catool, appSettings, cli, Dataconstant.Uploader, bomFilePath);
+            LoggerHelper.LogInputParameters(catool, appSettings, cli, Dataconstant.Upload, bomFilePath);
 
             // Assert
             var events = memoryAppender.GetEvents();
             Assert.IsTrue(events.Length >= 2, "Expected at least two log events (Info header + Notice details) for Uploader.");
 
-            var infoHeader = Array.Find(events, e => e.RenderedMessage.Contains("Input Parameters used in Artifactory Uploader"));
-            Assert.IsNotNull(infoHeader, "Uploader info header log not found.");
+            var infoHeader = Array.Find(events, e => e.RenderedMessage.Contains("Input Parameters used in SIT Upload"));
+            Assert.IsNotNull(infoHeader, "SIT Upload info header log not found.");
 
             var detail = Array.Find(events, e => e.RenderedMessage.Contains("JFrogUrl:"));
             Assert.IsNotNull(detail, "Uploader detail notice log not found.");

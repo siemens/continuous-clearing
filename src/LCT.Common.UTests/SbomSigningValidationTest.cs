@@ -1477,7 +1477,6 @@ namespace LCT.Common.UTest
 
             // Arrange
             var mockHelper = new Mock<IEnvironmentHelper>();
-            string capturedMessage = null;
 
             mockHelper
                 .Setup(x => x.CallEnvironmentExit(It.IsAny<int>()))

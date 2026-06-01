@@ -180,7 +180,7 @@ namespace LCT.Common.Logging
         /// <param name="lstReleaseNotCreated">The list of releases not created.</param>
         /// <param name="sw360URL">The SW360 base URL.</param>
         /// <param name="duplicateComponentsByPurlId">The list of duplicate components by PURL ID.</param>
-        public static void WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> duplicateComponentsByPurlId)
+        public static void WriteComponentsWithoutDownloadURLBySpectreToKpi(List<ComparisonBomData> componentInfo, List<Components> lstReleaseNotCreated, string sw360URL, List<Components> duplicateComponentsByPurlId)
         {
             if (componentInfo.Count > 0 || lstReleaseNotCreated.Count > 0 || duplicateComponentsByPurlId.Count > 0)
             {
@@ -444,7 +444,7 @@ namespace LCT.Common.Logging
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                WriteComponentsWithoutDownloadURLByUseingSpectreToKpi(componentInfo, lstReleaseNotCreated, sw360URL, DuplicateComponentsByPurlId);
+                WriteComponentsWithoutDownloadURLBySpectreToKpi(componentInfo, lstReleaseNotCreated, sw360URL, DuplicateComponentsByPurlId);
                 return;
             }
 
@@ -782,9 +782,9 @@ namespace LCT.Common.Logging
         {
             return exeType switch
             {
-                Dataconstant.Identifier => GenerateIdentifierContent(caToolInformation, appSettings, listofPerameters),
-                Dataconstant.Creator => GenerateCreatorContent(caToolInformation, appSettings, bomFilePath),
-                Dataconstant.Uploader => GenerateUploaderContent(caToolInformation, appSettings, bomFilePath),
+                Dataconstant.Scan => GenerateScanContent(caToolInformation, appSettings, listofPerameters),
+                Dataconstant.Create => GenerateCreateContent(caToolInformation, appSettings, bomFilePath),
+                Dataconstant.Upload => GenerateUploadContent(caToolInformation, appSettings, bomFilePath),
                 _ => string.Empty
             };
         }
@@ -868,7 +868,7 @@ namespace LCT.Common.Logging
         /// <param name="appSettings">The application settings.</param>
         /// <param name="listofPerameters">The list of parameters for CLI.</param>
         /// <returns>The generated identifier content string.</returns>
-        private static string GenerateIdentifierContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
+        private static string GenerateScanContent(CatoolInfo caToolInformation, CommonAppSettings appSettings,
             ListofPerametersForCli listofPerameters)
         {
             int consoleWidth = GetAutoConsoleWidth();
@@ -876,8 +876,8 @@ namespace LCT.Common.Logging
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Package Identifier execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input Parameters used in Package Identifier[/]\n\n");
+                .Append($"Start of SIT Scan execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [green]Input Parameters used in SIT Scan[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
             AppendDirectoryInfo(content, appSettings, maxPathLength);
@@ -906,59 +906,59 @@ namespace LCT.Common.Logging
         }
 
         /// <summary>
-        /// Generates creator content for display.
+        /// Generates create content for display.
         /// </summary>
         /// <param name="caToolInformation">The CA tool information.</param>
         /// <param name="appSettings">The application settings.</param>
         /// <param name="bomFilePath">The BOM file path.</param>
-        /// <returns>The generated creator content string.</returns>
-        private static string GenerateCreatorContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
+        /// <returns>The generated create content string.</returns>
+        private static string GenerateCreateContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
             int consoleWidth = GetAutoConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Package Creator execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input parameters used in Package Creator[/]\n\n");
+                .Append($"Start of SIT Create execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [green]Input parameters used in SIT Create[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
-            AppendCreatorSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
+            AppendCreateSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
 
             return content.ToString();
         }
 
         /// <summary>
-        /// Generates uploader content for display.
+        /// Generates upload content for display.
         /// </summary>
         /// <param name="caToolInformation">The CA tool information.</param>
         /// <param name="appSettings">The application settings.</param>
         /// <param name="bomFilePath">The BOM file path.</param>
-        /// <returns>The generated uploader content string.</returns>
-        private static string GenerateUploaderContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
+        /// <returns>The generated upload content string.</returns>
+        private static string GenerateUploadContent(CatoolInfo caToolInformation, CommonAppSettings appSettings, string bomFilePath)
         {
             int consoleWidth = GetAutoConsoleWidth();
             int maxPathLength = Math.Max(60, consoleWidth - 20);
             var content = new StringBuilder();
 
             content
-                .Append($"Start of Uploader execution: [green]{DateTime.Now}[/]\n\n")
-                .Append($"[green]-[/] [green]Input Parameters used in Artifactory Uploader[/]\n\n");
+                .Append($"Start of SIT Upload execution: [green]{DateTime.Now}[/]\n\n")
+                .Append($"[green]-[/] [green]Input Parameters used in SIT Upload[/]\n\n");
 
             AppendBasicInfo(content, caToolInformation, maxPathLength);
-            AppendUploaderSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
+            AppendUploadSpecificInfo(content, appSettings, bomFilePath, maxPathLength);
 
             return content.ToString();
         }
 
         /// <summary>
-        /// Appends creator-specific information to the content builder.
+        /// Appends create-specific information to the content builder.
         /// </summary>
         /// <param name="content">The string builder.</param>
         /// <param name="appSettings">The application settings.</param>
         /// <param name="bomFilePath">The BOM file path.</param>
         /// <param name="maxPathLength">The maximum path length for wrapping.</param>
-        private static void AppendCreatorSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
+        private static void AppendCreateSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
     string bomFilePath, int maxPathLength)
         {
             content
@@ -988,13 +988,13 @@ namespace LCT.Common.Logging
 
 
         /// <summary>
-        /// Appends uploader-specific information to the content builder.
+        /// Appends upload-specific information to the content builder.
         /// </summary>
         /// <param name="content">The string builder.</param>
         /// <param name="appSettings">The application settings.</param>
         /// <param name="bomFilePath">The BOM file path.</param>
         /// <param name="maxPathLength">The maximum path length for wrapping.</param>
-        private static void AppendUploaderSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
+        private static void AppendUploadSpecificInfo(StringBuilder content, CommonAppSettings appSettings,
     string bomFilePath, int maxPathLength)
         {
             content
@@ -1037,9 +1037,9 @@ namespace LCT.Common.Logging
         /// <param name="bomFilePath">The BOM file path.</param>
         private static void LogInputParametersWithLog4net(CatoolInfo caToolInformation, CommonAppSettings appSettings, ListofPerametersForCli listofPerameters, string exeType, string bomFilePath)
         {
-            if (exeType == Dataconstant.Identifier)
+            if (exeType == Dataconstant.Scan)
             {
-                var logMessage = $"Input Parameters used in Package Identifier:\n\t" +
+                var logMessage = $"Input Parameters used in SIT Scan:\n\t" +
                 $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                 $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                 $"Package FilePath\t\t --> {appSettings.Directory.InputFolder}\n\t" +
@@ -1067,10 +1067,10 @@ namespace LCT.Common.Logging
 
                 Logger.Logger.Log(null, Level.Notice, logMessage, null);
             }
-            else if (exeType == Dataconstant.Creator)
+            else if (exeType == Dataconstant.Create)
             {
                 var creatorMessage =
-                    $"Input parameters used in Package Creator:\n\t" +
+                    $"Input parameters used in SIT Create:\n\t" +
                     $"CaTool Version\t\t --> {caToolInformation.CatoolVersion}\n\t" +
                     $"CaTool RunningPath\t --> {caToolInformation.CatoolRunningLocation}\n\t" +
                     $"BoM FilePath\t\t --> {bomFilePath}\n\t" +
@@ -1088,9 +1088,9 @@ namespace LCT.Common.Logging
                 creatorMessage += $"Log FolderPath\t\t --> {Log4Net.CatoolLogPath}\n\t";
                 Logger.Logger.Log(null, Level.Notice, creatorMessage, null);
             }
-            else if (exeType == Dataconstant.Uploader)
+            else if (exeType == Dataconstant.Upload)
             {
-                Logger.Logger.Log(null, Level.Info, $"Input Parameters used in Artifactory Uploader:\n\t", null);
+                Logger.Logger.Log(null, Level.Info, $"Input Parameters used in SIT Upload:\n\t", null);
                 Logger.Logger.Log(null, Level.Notice, $"\tBoM FilePath:\t\t {bomFilePath}\n\t" +
                     $"CaTool Version\t\t {caToolInformation.CatoolVersion}\n\t" +
                     $"CaTool RunningPath\t {caToolInformation.CatoolRunningLocation}\n\t" +

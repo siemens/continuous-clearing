@@ -239,21 +239,22 @@ namespace LCT.Common.Constants
         /// </summary>
         public const string SpdxImport = "SPDXImport";
         /// <summary>
-        /// Identifier string.
+        /// Scan string.
         /// </summary>
-        public const string Identifier = "Identifier";
+        public const string Scan = "Scan";
         /// <summary>
-        /// Creator string.
+        /// Create string.
         /// </summary>
-        public const string Creator = "Creator";
+        public const string Create = "Create";
         /// <summary>
-        /// Uploader string.
+        /// Upload string.
         /// </summary>
-        public const string Uploader = "Uploader";
+        public const string Upload = "Upload";
         /// <summary>
         /// Purl ID suffix.
         /// </summary>
-        public const string PurlIDSuffix = "?arch=source";
+        public const string PurlIDSuffix = "?arch=source";        
+        
         #endregion
 
         #region Properties

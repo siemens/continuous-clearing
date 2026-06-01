@@ -1,4 +1,4 @@
-## Continuous Clearing Tool
+﻿## Continuous Clearing Tool
 The Continuous Clearing Tool scans and collects the 3rd party OSS components used in a NPM/NuGet/Maven/Debian/Alpine & Python project and uploads it to SW360 and Fossology by accepting respective project ID for license clearing.
 
 ## Continuous Clearing SBOM Tool
@@ -26,7 +26,7 @@ BOM generated from the Continuous Clearing Tool will have all the dependencies i
 ![image.png](../usagedocimg/WF.png)
 
 ## Use Cases:
-1. Package identifier Should read all 1st and 3rd components of package type (npm,NuGet,Debian,Alpine,PyPi,Cargo & Maven)  
+1. SIT Scan Should read all 1st and 3rd components of package type (npm,NuGet,Debian,Alpine,PyPi,Cargo & Maven)  
    -   Read SBOM supplied from customer.
    - [ ]         SBOM needs to be in specified CycloneDX format.
    - [ ]     At least all the dependencies should be included in SBOM, further CA Tool needs 
@@ -47,10 +47,10 @@ BOM generated from the Continuous Clearing Tool will have all the dependencies i
          - [ ] 	   For Debian it's not there as of now.
       
 
-2. Package Creator should read SBOM produced from package identifier
+2. SIT Create should read SBOM produced from SIT Scan
     -    Read SBOM for all the components & it's properties
     - [ ]        All component properties FLAG should be read for different use cases.
-      - [ ]      DevDependent , Intenal/external & Excluded components logic will be moved from PackageIDentifier to PackageCreator.
+      - [ ]      DevDependent , Intenal/external & Excluded components logic will be moved from SITScan to SITCreate.
 
    
 3. After CATool final execution Standard SBOM should generate & send it for JFrog XRay & Siemens AG SBOM Service
