@@ -16,10 +16,10 @@ jobs:
           versionSpec: '5.12.0'
           
       - name: Restore Packages
-        run: dotnet restore src\LicenseClearingTool.sln
+        run: dotnet restore src\ContinuousClearingTool.sln
         
       - name: Build
-        run: dotnet build src\LicenseClearingTool.sln
+        run: dotnet build src\ContinuousClearingTool.sln
 
   commit-lint:
     runs-on: ubuntu-latest
