@@ -105,7 +105,7 @@ steps:
       # Ensure tools directory exists
       Write-Host "##[section] Creating tools directory: $toolsDir"
       New-Item -ItemType Directory -Path $toolsDir -Force | Out-Null
-      $extractPath = Join-Path $toolsDir "LicenseClearingTool"
+      $extractPath = Join-Path $toolsDir "ContinuousClearingTool"
 
       # Conditional block to check if branchName is provided
       if ([string]::IsNullOrWhiteSpace("${{ parameters.branchName_powerUser }}")) {
@@ -153,7 +153,7 @@ steps:
         git clone --branch "${{ parameters.branchName_powerUser }}" https://github.com/siemens/continuous-clearing.git ${{ parameters.workingDirectory }}/CA-Tool
 
         # Build the solution
-        $solutionPath = "${{ parameters.workingDirectory }}/CA-Tool/src/LicenseClearingTool.sln"
+        $solutionPath = "${{ parameters.workingDirectory }}/CA-Tool/src/ContinuousClearingTool.sln"
         Write-Host "##[section] Building the solution at $solutionPath"
         dotnet build $solutionPath --configuration Release
 
@@ -324,7 +324,7 @@ steps:
 
           # Start executing the tool
           Write-Host "##[section] Running SITScan tool..."
-          ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SITScan.exe @args
+          ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SITScan.exe @args
 
   - task: PowerShell@2
     condition: eq('${{ parameters.SITScanEnabled }}', true)
@@ -394,7 +394,7 @@ steps:
 
         # Start executing the tool
         Write-Host "##[section] Running SITCreate..."
-        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SITCreate.exe @args
+        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SITCreate.exe @args
 
   - task: PowerShell@2
     condition: eq('${{ parameters.SITUploadEnabled }}', true)
@@ -465,4 +465,4 @@ steps:
 
         # Start executing the tool
         Write-Host "##[section] Running SITUpload..."
-        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SITUpload.exe @args
+        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SITUpload.exe @args

@@ -91,7 +91,7 @@ steps:
     displayName: 'Build CA Tool'
     inputs:
       script: |
-        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
+        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/ContinuousClearingTool.sln --configuration Release
   
   - task: PowerShell@2
     displayName: 'Tool pre-requisite'
