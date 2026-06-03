@@ -1,0 +1,61 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+//---------------------------------------------------------------------------------------------------------------------
+
+using SIT.APICommunications.Interfaces;
+using SIT.Common;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace SIT.Upload
+{
+    public class ArtifactoryValidator
+    {
+        #region Fields
+
+        private readonly IJfrogAqlApiCommunication _JfrogAqlApiCommunication;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the ArtifactoryValidator class.
+        /// </summary>
+        /// <param name="jfrogAqlApiCommunication">The JFrog AQL API communication instance.</param>
+        public ArtifactoryValidator(IJfrogAqlApiCommunication jfrogAqlApiCommunication)
+        {
+            _JfrogAqlApiCommunication = jfrogAqlApiCommunication;
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Asynchronously validates Artifactory credentials by checking the connection.
+        /// </summary>
+        /// <returns>A task containing 0 if validation succeeds, -1 if validation fails.</returns>
+        public async Task<int> ValidateArtifactoryCredentials()
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            try
+            {
+                responseMessage = await _JfrogAqlApiCommunication.CheckConnection();
+                await LogHandlingHelper.HttpResponseHandling("JFrog Connection Validation", $"Methodname-ValidateArtifactoryCredentials()", responseMessage, "");
+                responseMessage.EnsureSuccessStatusCode();
+                return 0;
+            }
+            catch (HttpRequestException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("Get sw360 Project details for validating", $"MethodName-GetProjectById()", ex, "");
+                ExceptionHandling.HttpException(ex, responseMessage, "Artifactory");
+                return -1;
+            }
+        }
+
+        #endregion
+    }
+}

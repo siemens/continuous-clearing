@@ -16,7 +16,7 @@ namespace SIT.SBOMSigningVerification.Helpers
 {
     public class JsonFileHelper : IJsonFileHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType ?? typeof(JsonFileHelper));
 
         readonly AppSettings appSettings;
         private readonly ICertificateHelper certificateHelper;
