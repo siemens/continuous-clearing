@@ -3,7 +3,7 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-using LCT.APICommunications.Model;
+using SIT.APICommunications.Model;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 

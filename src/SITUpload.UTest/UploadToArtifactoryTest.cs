@@ -5,14 +5,14 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
+using SIT.APICommunications;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.AQL;
 using SITUpload.Model;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Model;
-using LCT.Services.Interface;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Model;
+using SIT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;

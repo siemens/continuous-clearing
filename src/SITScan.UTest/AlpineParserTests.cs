@@ -5,10 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace SITScan.UTest
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -82,7 +82,7 @@ namespace SITScan.UTest
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -111,7 +111,7 @@ namespace SITScan.UTest
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -140,7 +140,7 @@ namespace SITScan.UTest
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -170,7 +170,7 @@ namespace SITScan.UTest
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -199,7 +199,7 @@ namespace SITScan.UTest
                 ProjectType = "ALPINE",
                 Alpine = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }

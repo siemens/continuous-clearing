@@ -5,14 +5,14 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.APICommunications.Model.AQL;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using SITScan.Interface;
 using SITScan.Model;
-using LCT.Services.Interface;
+using SIT.Services.Interface;
 using Moq;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
@@ -417,7 +417,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config(),
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -481,7 +481,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Exclude = Excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = csprojfilepath
                 }
@@ -520,7 +520,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Exclude = Excludes },
                 SW360 = new SW360() { ExcludeComponents = new List<string>() },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = csprojfilepath
                 }
@@ -1011,7 +1011,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1047,7 +1047,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1085,7 +1085,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1152,7 +1152,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1201,7 +1201,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1268,7 +1268,7 @@ namespace SITScan.UTest
             {
                 Nuget = new Config() { Include = Includes, Exclude = excludes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -1351,7 +1351,7 @@ namespace SITScan.UTest
 
             // Use a valid temporary directory to avoid DirectoryNotFoundException
             string tempDir = Path.GetTempPath();
-            appSettings.Directory = new LCT.Common.Directory { InputFolder = tempDir };
+            appSettings.Directory = new SIT.Common.Directory { InputFolder = tempDir };
 
             var nugetProcessor = new NugetProcessor(_cycloneDXBomParser, _frameworkPackages.Object, _compositionBuilder.Object, mockSpdxBomParser.Object, _runtimeIdentifier.Object);
 

@@ -4,12 +4,12 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.Foss;
-using LCT.Common;
-using LCT.Common.Interface;
-using LCT.Facade.Interfaces;
-using LCT.Services.Interface;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.Foss;
+using SIT.Common;
+using SIT.Common.Interface;
+using SIT.Facade.Interfaces;
+using SIT.Services.Interface;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;

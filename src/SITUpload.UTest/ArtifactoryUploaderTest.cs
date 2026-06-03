@@ -4,16 +4,16 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
+using SIT.APICommunications;
+using SIT.APICommunications.Interfaces;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.AQL;
 using SITUpload.Model;
-using LCT.Common;
-using LCT.Facade;
-using LCT.Facade.Interfaces;
-using LCT.Services;
-using LCT.Services.Interface;
+using SIT.Common;
+using SIT.Facade;
+using SIT.Facade.Interfaces;
+using SIT.Services;
+using SIT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System;

@@ -5,8 +5,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.Common;
-using LCT.Common.Constants;
+using SIT.Common;
+using SIT.Common.Constants;
 using log4net;
 using System;
 using System.Collections.Generic;

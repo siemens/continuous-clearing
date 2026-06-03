@@ -4,16 +4,16 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Model;
-using LCT.Common;
-using LCT.Common.ComplianceValidator;
-using LCT.Common.Constants;
-using LCT.Common.Logging;
-using LCT.Common.Model;
-using LCT.Facade;
-using LCT.Facade.Interfaces;
-using LCT.Services;
-using LCT.Services.Interface;
+using SIT.APICommunications.Model;
+using SIT.Common;
+using SIT.Common.ComplianceValidator;
+using SIT.Common.Constants;
+using SIT.Common.Logging;
+using SIT.Common.Model;
+using SIT.Facade;
+using SIT.Facade.Interfaces;
+using SIT.Services;
+using SIT.Services.Interface;
 using SITCreate.Interfaces;
 using log4net;
 using log4net.Core;

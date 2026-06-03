@@ -4,7 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Interfaces;
+using SIT.APICommunications.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System.Net;

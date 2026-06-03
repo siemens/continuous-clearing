@@ -1,5 +1,5 @@
-using LCT.Common;
-using LCT.Common.Model;
+using SIT.Common;
+using SIT.Common.Model;
 using log4net.Appender;
 using log4net.Config;
 using NUnit.Framework;

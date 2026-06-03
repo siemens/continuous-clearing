@@ -6,7 +6,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
+using SIT.APICommunications.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;

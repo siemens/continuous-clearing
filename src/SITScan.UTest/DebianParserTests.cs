@@ -5,13 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.APICommunications.Model.AQL;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using SITScan.Interface;
-using LCT.Services.Interface;
+using SIT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -136,7 +136,7 @@ namespace SITScan.UTest
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -166,7 +166,7 @@ namespace SITScan.UTest
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -193,7 +193,7 @@ namespace SITScan.UTest
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -222,7 +222,7 @@ namespace SITScan.UTest
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -250,7 +250,7 @@ namespace SITScan.UTest
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath,
 
@@ -278,7 +278,7 @@ namespace SITScan.UTest
                 ProjectType = "DEBIAN",
                 Debian = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath,
 

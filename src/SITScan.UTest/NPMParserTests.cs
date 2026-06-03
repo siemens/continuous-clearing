@@ -5,10 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using SITScan.Model;
 using Moq;
 using NUnit.Framework;
@@ -37,7 +37,7 @@ namespace SITScan.UTest
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
                     OutputFolder = outFolder
@@ -70,7 +70,7 @@ namespace SITScan.UTest
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
                     OutputFolder = outFolder
@@ -105,7 +105,7 @@ namespace SITScan.UTest
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
                     OutputFolder = outFolder
@@ -141,7 +141,7 @@ namespace SITScan.UTest
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles")),
                     OutputFolder = outFolder
@@ -173,7 +173,7 @@ namespace SITScan.UTest
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath,
                     OutputFolder = outFolder,
@@ -205,7 +205,7 @@ namespace SITScan.UTest
                 ProjectType = "NPM",
                 Npm = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath,
                     OutputFolder = outFolder,

@@ -1,4 +1,4 @@
-﻿# Continuous Clearing Tool
+# Continuous Clearing Tool
 
 ## Contents
 - [Continuous Clearing Tool](#continuous-clearing-tool)
@@ -431,9 +431,9 @@ Arguments can be provided to the tool in two ways :
 
 #### **Method 1 - Only AppSettings**
 
-Copy content from the [sample app settings](https://github.com/siemens/continuous-clearing/blob/main/src/LCT.Common/appSettings.json) and create a new appSettings.json file in Continuous Clearing tool Config directory.
+Copy content from the [sample app settings](https://github.com/siemens/continuous-clearing/blob/main/src/SIT.Common/appSettings.json) and create a new appSettings.json file in Continuous Clearing tool Config directory.
 
-The appsettings can be passed to the tool via the command line paramater `--settingsfilepath`. The structure of the app settings can be fouond [here](https://github.com/siemens/continuous-clearing/blob/main/src/LCT.Common/appSettings.json).
+The appsettings can be passed to the tool via the command line paramater `--settingsfilepath`. The structure of the app settings can be fouond [here](https://github.com/siemens/continuous-clearing/blob/main/src/SIT.Common/appSettings.json).
 
 Description for the settings in appSettings.json file
 

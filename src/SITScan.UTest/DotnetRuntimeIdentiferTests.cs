@@ -4,7 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.Common;
+using SIT.Common;
 using SITScan.Model;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Locator;
@@ -40,7 +40,7 @@ namespace SITScan.UTest
             _testDir = Path.Combine(TestContext.CurrentContext.TestDirectory, "PackageIdentifierUTTestFiles");
             _appSettings = new CommonAppSettings
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = _testDir
                 }
@@ -74,7 +74,7 @@ namespace SITScan.UTest
 
             var appSettings = new CommonAppSettings
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = emptyDir
                 }
@@ -113,7 +113,7 @@ namespace SITScan.UTest
 
             var testAppSettings = new CommonAppSettings
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = invalidBuildDir
                 }
@@ -169,7 +169,7 @@ namespace SITScan.UTest
                 // Use a settings object that points to our modified directory
                 var testAppSettings = new CommonAppSettings
                 {
-                    Directory = new LCT.Common.Directory()
+                    Directory = new SIT.Common.Directory()
                     {
                         InputFolder = tempDir
                     }
@@ -272,7 +272,7 @@ namespace SITScan.UTest
 
             var appSettings = new CommonAppSettings
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = invalidBuildDir
                 }

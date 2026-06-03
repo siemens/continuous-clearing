@@ -4,20 +4,20 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-// Ignore Spelling: Fossology Expections Dx Sbom Bom Doesnt LCT
+// Ignore Spelling: Fossology Expections Dx Sbom Bom Doesnt SIT
 
 using CycloneDX.Models;
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.Foss;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
-using LCT.Facade.Interfaces;
-using LCT.Services;
-using LCT.Services.Interface;
-using LCT.Services.Model;
+using SIT.APICommunications;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.Foss;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
+using SIT.Facade.Interfaces;
+using SIT.Services;
+using SIT.Services.Interface;
+using SIT.Services.Model;
 using SITCreate.Interfaces;
 using SITCreate.Model;
 using Moq;
@@ -350,7 +350,7 @@ namespace SITCreate.UTest
                 {
                     SBOMSignVerify = false
                 },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = "outputFolder"
                 },
@@ -522,7 +522,7 @@ namespace SITCreate.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
 
@@ -551,7 +551,7 @@ namespace SITCreate.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
             };
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new AggregateException());
 
@@ -585,7 +585,7 @@ namespace SITCreate.UTest
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -636,7 +636,7 @@ namespace SITCreate.UTest
             CommonAppSettings CommonAppSettings = new()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -687,7 +687,7 @@ namespace SITCreate.UTest
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { IgnoreDevDependency = false, ProjectName = "Test" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -738,7 +738,7 @@ namespace SITCreate.UTest
             CommonAppSettings commonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { IgnoreDevDependency = false, ProjectName = "Test" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -782,7 +782,7 @@ namespace SITCreate.UTest
             {
 
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -1134,7 +1134,7 @@ namespace SITCreate.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { URL = "http://localhost:8081/" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
             };
 
             sw360CreatorServiceMock.Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(fossTriggerStatus);
@@ -1356,7 +1356,7 @@ namespace SITCreate.UTest
                     ProjectID = "projectId",
                     ProjectName = "projectName"
                 },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = "outputFolder"
                 },
@@ -1437,7 +1437,7 @@ namespace SITCreate.UTest
             CommonAppSettings appSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { ProjectName = "Test", IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = @"\Output"
                 }
@@ -1489,7 +1489,7 @@ namespace SITCreate.UTest
                     Fossology = new Fossology { URL = "https://fossology.example.com/" }
                 },
                 SbomSigning = new SbomSigningConfig { SBOMSignVerify = true },
-                Directory = new LCT.Common.Directory { OutputFolder = Path.GetTempPath() }
+                Directory = new SIT.Common.Directory { OutputFolder = Path.GetTempPath() }
             };
 
             var parsedBomData = new List<ComparisonBomData>
@@ -1558,7 +1558,7 @@ namespace SITCreate.UTest
                     Fossology = new Fossology { URL = "https://fossology.example.com/" }
                 },
                 SbomSigning = new SbomSigningConfig { SBOMSignVerify = false },
-                Directory = new LCT.Common.Directory { OutputFolder = Path.GetTempPath() }
+                Directory = new SIT.Common.Directory { OutputFolder = Path.GetTempPath() }
             };
 
             var parsedBomData = new List<ComparisonBomData>();
@@ -1640,7 +1640,7 @@ namespace SITCreate.UTest
             {
                 SW360 = new SW360 { ProjectName = "Test", ProjectID = "id", URL = "http://test.com", Fossology = new Fossology { URL = "http://foss.com/" } },
                 SbomSigning = new SbomSigningConfig { SBOMSignVerify = true },
-                Directory = new LCT.Common.Directory { OutputFolder = Path.GetTempPath() }
+                Directory = new SIT.Common.Directory { OutputFolder = Path.GetTempPath() }
             };
 
             await _componentCreator.CreateComponentInSw360(appSettingsEnabled, mockSw360CreatorService.Object,
@@ -1652,7 +1652,7 @@ namespace SITCreate.UTest
             {
                 SW360 = new SW360 { ProjectName = "Test", ProjectID = "id", URL = "http://test.com", Fossology = new Fossology { URL = "http://foss.com/" } },
                 SbomSigning = new SbomSigningConfig { SBOMSignVerify = false },
-                Directory = new LCT.Common.Directory { OutputFolder = Path.GetTempPath() }
+                Directory = new SIT.Common.Directory { OutputFolder = Path.GetTempPath() }
             };
 
             await _componentCreator.CreateComponentInSw360(appSettingsDisabled, mockSw360CreatorService.Object,

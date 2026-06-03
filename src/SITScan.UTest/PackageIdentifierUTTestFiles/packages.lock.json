@@ -1697,7 +1697,7 @@
           "System.Xml.XPath": "4.3.0"
         }
       },
-      "lct.apicommunications": {
+      "SIT.apicommunications": {
         "type": "Project",
         "dependencies": {
           "Microsoft.AspNet.WebApi.Client": "5.2.7",
@@ -1710,7 +1710,7 @@
           "log4net": "2.0.9"
         }
       },
-      "lct.common": {
+      "SIT.common": {
         "type": "Project",
         "dependencies": {
           "Microsoft.CodeCoverage": "16.7.1",
@@ -1724,11 +1724,11 @@
           "log4net": "2.0.9"
         }
       },
-      "lct.services": {
+      "SIT.services": {
         "type": "Project",
         "dependencies": {
-          "LCT.APICommunications": "1.0.0",
-          "LCT.Common": "1.0.0",
+          "SIT.APICommunications": "1.0.0",
+          "SIT.Common": "1.0.0",
           "Microsoft.CodeCoverage": "16.7.1",
           "Newtonsoft.Json": "12.0.3",
           "log4net": "2.0.9"

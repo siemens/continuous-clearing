@@ -5,10 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Model;
+using SIT.APICommunications.Model;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Model;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;

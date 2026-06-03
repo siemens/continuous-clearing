@@ -6,9 +6,9 @@
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Model;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Model;
 using SITCreate.Interfaces;
 using System;
 using System.Diagnostics;

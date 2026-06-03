@@ -5,9 +5,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
 using SITScan.Model;
 using log4net;
 using System.Collections.Generic;

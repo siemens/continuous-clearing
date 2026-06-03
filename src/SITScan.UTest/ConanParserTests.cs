@@ -5,13 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.APICommunications.Model.AQL;
+using SIT.Common;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using SITScan.Interface;
 using SITScan.Model;
-using LCT.Services.Interface;
+using SIT.Services.Interface;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -43,7 +43,7 @@ namespace SITScan.UTest
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -71,7 +71,7 @@ namespace SITScan.UTest
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -103,7 +103,7 @@ namespace SITScan.UTest
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -131,7 +131,7 @@ namespace SITScan.UTest
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -159,7 +159,7 @@ namespace SITScan.UTest
             {
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360(),
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = packagefilepath
                 }
@@ -426,7 +426,7 @@ namespace SITScan.UTest
                 ProjectType = "CONAN",
                 Conan = new Config() { Include = Includes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -456,7 +456,7 @@ namespace SITScan.UTest
 
             var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -499,7 +499,7 @@ namespace SITScan.UTest
 
             var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     OutputFolder = outputFolder
                 }

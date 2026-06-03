@@ -4,7 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications;
+using SIT.APICommunications;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;

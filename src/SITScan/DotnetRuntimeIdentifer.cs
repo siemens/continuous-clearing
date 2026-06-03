@@ -4,9 +4,9 @@
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Logging;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Logging;
 using SITScan.Interface;
 using SITScan.Model;
 using log4net;

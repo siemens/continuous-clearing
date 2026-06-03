@@ -4,12 +4,12 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
+using SIT.APICommunications;
+using SIT.APICommunications.Model;
 using SITUpload.Model;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;

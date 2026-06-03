@@ -25,9 +25,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\LCT.Common\LCT.Common.csproj" />
-		<ProjectReference Include="..\LCT.Services\LCT.Services.csproj" />
-		<ProjectReference Include="..\LCT.Telemetry\LCT.Telemetry.csproj" />
+		<ProjectReference Include="..\SIT.Common\SIT.Common.csproj" />
+		<ProjectReference Include="..\SIT.Services\SIT.Services.csproj" />
+		<ProjectReference Include="..\SIT.Telemetry\SIT.Telemetry.csproj" />
 	</ItemGroup>
 
 </Project>

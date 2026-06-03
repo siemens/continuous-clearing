@@ -3974,10 +3974,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:pypi/threadpoolctl@3.6.0",
-      "name": "threadpoolctl",
+      "bom-ref": "pkg:pypi/threadpooSITl@3.6.0",
+      "name": "threadpooSITl",
       "version": "3.6.0",
-      "purl": "pkg:pypi/threadpoolctl@3.6.0",
+      "purl": "pkg:pypi/threadpooSITl@3.6.0",
       "properties": [
         {
           "name": "internal:siemens:clearing:development",
@@ -5022,7 +5022,7 @@
         "pkg:pypi/joblib@1.5.2",
         "pkg:pypi/numpy@2.3.5",
         "pkg:pypi/scipy@1.16.3",
-        "pkg:pypi/threadpoolctl@3.6.0"
+        "pkg:pypi/threadpooSITl@3.6.0"
       ]
     },
     {
@@ -5067,7 +5067,7 @@
       ]
     },
     {
-      "ref": "pkg:pypi/threadpoolctl@3.6.0",
+      "ref": "pkg:pypi/threadpooSITl@3.6.0",
       "dependsOn": []
     },
     {

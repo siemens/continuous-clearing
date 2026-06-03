@@ -4,8 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 using CycloneDX.Models;
-using LCT.Common;
-using LCT.Common.Interface;
+using SIT.Common;
+using SIT.Common.Interface;
 using SITScan.Model;
 using Moq;
 using NUnit.Framework;
@@ -44,11 +44,11 @@ namespace SITScan.Tests
 
             _appSettings = new CommonAppSettings
             {
-                Directory = new LCT.Common.Directory
+                Directory = new SIT.Common.Directory
                 {
                     InputFolder = _testInputFolder
                 },
-                Choco = new LCT.Common.Model.Config
+                Choco = new SIT.Common.Model.Config
                 {
                     Include = new[] { "choco.config" }, // Adjust pattern as needed
                     Exclude = new string[0]

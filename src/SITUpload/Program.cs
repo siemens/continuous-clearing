@@ -6,17 +6,17 @@
 
 // Ignore Spelling: Uploader Artifactory
 
-using LCT.APICommunications;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications.Model;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Logging;
-using LCT.Common.Model;
-using LCT.Facade;
-using LCT.Facade.Interfaces;
-using LCT.Services;
-using LCT.Services.Interface;
+using SIT.APICommunications;
+using SIT.APICommunications.Interfaces;
+using SIT.APICommunications.Model;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Logging;
+using SIT.Common.Model;
+using SIT.Facade;
+using SIT.Facade.Interfaces;
+using SIT.Services;
+using SIT.Services.Interface;
 using log4net;
 using log4net.Core;
 using System;

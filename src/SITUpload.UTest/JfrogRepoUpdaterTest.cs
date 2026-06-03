@@ -5,9 +5,9 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
-using LCT.Services.Interface;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.AQL;
+using SIT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;

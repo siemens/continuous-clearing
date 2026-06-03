@@ -5,15 +5,15 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.AQL;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using SITScan.Interface;
 using SITScan.Model;
-using LCT.Services.Interface;
+using SIT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -745,7 +745,7 @@ namespace SITScan.UTest
 
             var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = tempDir
                 }
@@ -781,7 +781,7 @@ namespace SITScan.UTest
 
             var appSettings = new CommonAppSettings()
             {
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = tempDir
                 }

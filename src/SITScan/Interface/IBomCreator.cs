@@ -4,11 +4,11 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Model;
-using LCT.Common;
-using LCT.Common.Interface;
-using LCT.Common.Model;
-using LCT.Services.Interface;
+using SIT.APICommunications.Model;
+using SIT.Common;
+using SIT.Common.Interface;
+using SIT.Common.Model;
+using SIT.Services.Interface;
 using System.Threading.Tasks;
 
 namespace SITScan.Interface

@@ -5,15 +5,15 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.APICommunications;
+using SIT.APICommunications.Model.AQL;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using SITScan.Interface;
 using SITScan.Model;
-using LCT.Services.Interface;
+using SIT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
 using System;

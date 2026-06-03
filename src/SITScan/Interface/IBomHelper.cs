@@ -5,9 +5,9 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model.AQL;
+using SIT.APICommunications.Model.AQL;
 using SITScan.Model;
-using LCT.Services.Interface;
+using SIT.Services.Interface;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

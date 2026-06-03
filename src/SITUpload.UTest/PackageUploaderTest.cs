@@ -4,15 +4,15 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications.Model;
-using LCT.Common;
-using LCT.Common.Model;
-using LCT.Facade;
-using LCT.Facade.Interfaces;
-using LCT.Services;
-using LCT.Services.Interface;
+using SIT.APICommunications;
+using SIT.APICommunications.Interfaces;
+using SIT.APICommunications.Model;
+using SIT.Common;
+using SIT.Common.Model;
+using SIT.Facade;
+using SIT.Facade.Interfaces;
+using SIT.Services;
+using SIT.Services.Interface;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,7 +34,7 @@ namespace SITUpload.UTest
             string outFolder = Path.GetDirectoryName(exePath);
 
             CommonAppSettings commonAppSettings = new CommonAppSettings();
-            commonAppSettings.Directory = new LCT.Common.Directory()
+            commonAppSettings.Directory = new SIT.Common.Directory()
             {
                 OutputFolder = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles"))
             };

@@ -5,16 +5,16 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.Foss;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Logging;
-using LCT.Common.Model;
-using LCT.Services.Interface;
-using LCT.Services.Model;
+using SIT.APICommunications;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.Foss;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Logging;
+using SIT.Common.Model;
+using SIT.Services.Interface;
+using SIT.Services.Model;
 using SITCreate.Interfaces;
 using SITCreate.Model;
 using log4net;

@@ -4,13 +4,13 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications.Model;
-using LCT.APICommunications.Model.AQL;
+using SIT.APICommunications;
+using SIT.APICommunications.Interfaces;
+using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.AQL;
 using SITUpload.Model;
-using LCT.Common;
-using LCT.Services.Interface;
+using SIT.Common;
+using SIT.Services.Interface;
 using log4net;
 using System;
 using System.IO;

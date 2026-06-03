@@ -4,10 +4,10 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications.Model;
-using LCT.Common;
-using LCT.Common.Interface;
-using LCT.Services.Interface;
+using SIT.APICommunications.Model;
+using SIT.Common;
+using SIT.Common.Interface;
+using SIT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -39,7 +39,7 @@ namespace SITScan.UTest
             var CommonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }
@@ -67,7 +67,7 @@ namespace SITScan.UTest
             var CommonAppSettings = new CommonAppSettings()
             {
                 SW360 = new SW360() { ProjectName = "Test" },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
                 }

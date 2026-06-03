@@ -4,7 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.Common.Model;
+using SIT.Common.Model;
 using SITCreate.Interfaces;
 using SITCreate.Model;
 using NUnit.Framework;

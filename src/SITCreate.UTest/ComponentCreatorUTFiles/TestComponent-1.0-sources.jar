@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LCT.SW360PackageCreator.UTest.ComponentCreatorUTFiles
+namespace SIT.SW360PackageCreator.UTest.ComponentCreatorUTFiles
 {
     class TestComponent_1
     {

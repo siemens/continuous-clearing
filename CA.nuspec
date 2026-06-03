@@ -40,21 +40,21 @@
     <file src="out\net8.0\Json.More.dll" target="tools\Json.More.dll"/>
     <file src="out\net8.0\JsonPointer.Net.dll" target="tools\JsonPointer.Net.dll"/>
     <file src="out\net8.0\JsonSchema.Net.dll" target="tools\JsonSchema.Net.dll"/>
-    <file src="out\net8.0\LCT.APICommunications.deps.json" target="tools\LCT.APICommunications.deps.json"/>
-    <file src="out\net8.0\LCT.APICommunications.dll" target="tools\LCT.APICommunications.dll"/>
-    <file src="out\net8.0\LCT.APICommunications.pdb" target="tools\LCT.APICommunications.pdb"/>    
-    <file src="out\net8.0\LCT.Common.deps.json" target="tools\LCT.Common.deps.json"/>
-    <file src="out\net8.0\LCT.Common.dll" target="tools\LCT.Common.dll"/>
-    <file src="out\net8.0\LCT.Common.pdb" target="tools\LCT.Common.pdb"/>
-    <file src="out\net8.0\LCT.CycloneDxProcessor.dll" target="tools\LCT.CycloneDxProcessor.dll"/>
-    <file src="out\net8.0\LCT.CycloneDxProcessor.dll.config" target="tools\LCT.CycloneDxProcessor.dll.config"/>
-    <file src="out\net8.0\LCT.CycloneDxProcessor.pdb" target="tools\LCT.CycloneDxProcessor.pdb"/>
-    <file src="out\net8.0\LCT.Facade.deps.json" target="tools\LCT.Facade.deps.json"/>
-    <file src="out\net8.0\LCT.Facade.dll" target="tools\LCT.Facade.dll"/>
-    <file src="out\net8.0\LCT.Facade.pdb" target="tools\LCT.Facade.pdb"/>
-    <file src="out\net8.0\LCT.Services.deps.json" target="tools\LCT.Services.deps.json"/>
-    <file src="out\net8.0\LCT.Services.dll" target="tools\LCT.Services.dll"/>
-    <file src="out\net8.0\LCT.Services.pdb" target="tools\LCT.Services.pdb"/>
+    <file src="out\net8.0\SIT.APICommunications.deps.json" target="tools\SIT.APICommunications.deps.json"/>
+    <file src="out\net8.0\SIT.APICommunications.dll" target="tools\SIT.APICommunications.dll"/>
+    <file src="out\net8.0\SIT.APICommunications.pdb" target="tools\SIT.APICommunications.pdb"/>    
+    <file src="out\net8.0\SIT.Common.deps.json" target="tools\SIT.Common.deps.json"/>
+    <file src="out\net8.0\SIT.Common.dll" target="tools\SIT.Common.dll"/>
+    <file src="out\net8.0\SIT.Common.pdb" target="tools\SIT.Common.pdb"/>
+    <file src="out\net8.0\SIT.CycloneDxProcessor.dll" target="tools\SIT.CycloneDxProcessor.dll"/>
+    <file src="out\net8.0\SIT.CycloneDxProcessor.dll.config" target="tools\SIT.CycloneDxProcessor.dll.config"/>
+    <file src="out\net8.0\SIT.CycloneDxProcessor.pdb" target="tools\SIT.CycloneDxProcessor.pdb"/>
+    <file src="out\net8.0\SIT.Facade.deps.json" target="tools\SIT.Facade.deps.json"/>
+    <file src="out\net8.0\SIT.Facade.dll" target="tools\SIT.Facade.dll"/>
+    <file src="out\net8.0\SIT.Facade.pdb" target="tools\SIT.Facade.pdb"/>
+    <file src="out\net8.0\SIT.Services.deps.json" target="tools\SIT.Services.deps.json"/>
+    <file src="out\net8.0\SIT.Services.dll" target="tools\SIT.Services.dll"/>
+    <file src="out\net8.0\SIT.Services.pdb" target="tools\SIT.Services.pdb"/>
     <file src="out\net8.0\log4net.ansi.config" target="tools\log4net.ansi.config"/>
     <file src="out\net8.0\log4net.color.config" target="tools\log4net.color.config"/>
     <file src="out\net8.0\log4net.dll" target="tools\log4net.dll"/>
@@ -132,7 +132,7 @@
     <file src="out\net8.0\System.Text.Json.dll" target="tools\System.Text.Json.dll"/>
     <file src="out\net8.0\System.IO.Pipelines.dll" target="tools\System.IO.Pipelines.dll"/>
     <file src="out\net8.0\System.Text.Encodings.Web.dll" target="tools\System.Text.Encodings.Web.dll"/>
-    <file src="out\net8.0\LCT.Telemetry.dll" target="tools\LCT.Telemetry.dll"/>
+    <file src="out\net8.0\SIT.Telemetry.dll" target="tools\SIT.Telemetry.dll"/>
     <file src="out\net8.0\Tommy.dll" target="tools\Tommy.dll"/>
     <file src="out\net8.0\YamlDotNet.dll" target="tools\YamlDotNet.dll"/>
     <file src="out\net8.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\cs\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
@@ -250,7 +250,7 @@
 	  <file src="out\net8.0\Azure.Security.KeyVault.Certificates.dll" target="tools\Azure.Security.KeyVault.Certificates.dll"/>
 	  <file src="out\net8.0\Azure.Security.KeyVault.Keys.dll" target="tools\Azure.Security.KeyVault.Keys.dll"/>
 	  <file src="out\net8.0\Azure.Security.KeyVault.Secrets.dll" target="tools\Azure.Security.KeyVault.Secrets.dll"/>
-    <file src="out\net8.0\LCT.SBOMSigningVerification.dll" target="tools\LCT.SBOMSigningVerification.dll"/>
+    <file src="out\net8.0\SIT.SBOMSigningVerification.dll" target="tools\SIT.SBOMSigningVerification.dll"/>
     <file src="out\net8.0\System.ClientModel.dll" target="tools\System.ClientModel.dll"/>
     <file src="out\net8.0\Microsoft.Identity.Client.dll" target="tools\Microsoft.Identity.Client.dll"/>
     <file src="out\net8.0\Microsoft.Bcl.AsyncInterfaces.dll" target="tools\Microsoft.Bcl.AsyncInterfaces.dll"/>

@@ -4,19 +4,19 @@
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
 
-// Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api LCT aql
+// Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api SIT aql
 
 using CycloneDX.Models;
-using LCT.APICommunications;
-using LCT.APICommunications.Interfaces;
-using LCT.APICommunications.Model;
+using SIT.APICommunications;
+using SIT.APICommunications.Interfaces;
+using SIT.APICommunications.Model;
 using SITUpload.Model;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Logging;
-using LCT.Common.Model;
-using LCT.Services.Interface;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Logging;
+using SIT.Common.Model;
+using SIT.Services.Interface;
 using log4net;
 using Newtonsoft.Json;
 using System;

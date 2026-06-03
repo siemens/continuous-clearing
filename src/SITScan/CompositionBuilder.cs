@@ -5,7 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.Common.Constants;
+using SIT.Common.Constants;
 using SITScan.Interface;
 using SITScan.Model;
 using NuGet.Versioning;

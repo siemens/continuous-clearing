@@ -4,8 +4,8 @@
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
 
-using LCT.APICommunications.Interfaces;
-using LCT.Common;
+using SIT.APICommunications.Interfaces;
+using SIT.Common;
 using System.Net.Http;
 using System.Threading.Tasks;
 

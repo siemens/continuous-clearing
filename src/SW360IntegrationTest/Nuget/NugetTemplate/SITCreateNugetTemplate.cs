@@ -6,8 +6,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
-using LCT.Common.Constants;
+using SIT.APICommunications.Model;
+using SIT.Common.Constants;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;

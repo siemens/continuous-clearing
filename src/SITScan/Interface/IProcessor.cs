@@ -5,8 +5,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model;
-using LCT.Common;
+using SIT.APICommunications.Model;
+using SIT.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

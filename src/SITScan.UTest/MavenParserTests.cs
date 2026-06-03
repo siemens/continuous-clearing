@@ -5,14 +5,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
-using LCT.APICommunications.Model.AQL;
-using LCT.Common;
-using LCT.Common.Constants;
-using LCT.Common.Interface;
-using LCT.Common.Model;
+using SIT.APICommunications.Model.AQL;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using SITScan.Interface;
 using SITScan.Model;
-using LCT.Services.Interface;
+using SIT.Services.Interface;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -136,7 +136,7 @@ namespace SITScan.UTest
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath
                 }
@@ -418,7 +418,7 @@ namespace SITScan.UTest
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath
                 }
@@ -449,7 +449,7 @@ namespace SITScan.UTest
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath
                 }
@@ -482,7 +482,7 @@ namespace SITScan.UTest
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
 
@@ -515,7 +515,7 @@ namespace SITScan.UTest
                 ProjectType = "MAVEN",
                 Maven = new Config() { Include = Includes, Exclude = Excludes },
                 SW360 = new SW360() { IgnoreDevDependency = true },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
                 }
@@ -557,7 +557,7 @@ namespace SITScan.UTest
                     // Use the actual component from the test data: joda-time/joda-time:2.9.2
                     ExcludeComponents = new List<string> { "joda-time:2.9.2" }
                 },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
                 }
@@ -614,7 +614,7 @@ namespace SITScan.UTest
                     IgnoreDevDependency = true,
                     ExcludeComponents = null // Null excluded components
                 },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
                 }
@@ -657,7 +657,7 @@ namespace SITScan.UTest
                     IgnoreDevDependency = true,
                     ExcludeComponents = new List<string>() // Empty list
                 },
-                Directory = new LCT.Common.Directory()
+                Directory = new SIT.Common.Directory()
                 {
                     InputFolder = filepath,
                 }
