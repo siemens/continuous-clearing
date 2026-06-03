@@ -126,7 +126,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Includes = { "*_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
@@ -409,7 +409,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "MavenDevDependency", "WithDev"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "MavenDevDependency", "WithDev"));
             string[] Includes = { "*.cdx.json" };
             string[] Excludes = { "lol" };
             BomCreator.bomKpiData.DevDependentComponents = 0;
@@ -440,7 +440,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "MavenDevDependency", "WithOneInputFile"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "MavenDevDependency", "WithOneInputFile"));
             string[] Includes = { "*.cdx.json" };
             string[] Excludes = { "lol" };
             BomCreator.bomKpiData.DevDependentComponents = 0;
@@ -473,7 +473,7 @@ namespace SIT.Scan.UTest
             int expectednoofcomponents = 1;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Includes = { "CycloneDX_Maven.cdx.json", "SBOMTemplate_Maven.cdx.json", "SBOM_MavenCATemplate.cdx.json" };
             string[] Excludes = { "lol" };
 
@@ -506,7 +506,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Includes = { "CycloneDX_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
@@ -540,7 +540,7 @@ namespace SIT.Scan.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Includes = { "CycloneDX_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
@@ -598,7 +598,7 @@ namespace SIT.Scan.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Includes = { "CycloneDX_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 
@@ -641,7 +641,7 @@ namespace SIT.Scan.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Includes = { "CycloneDX_Maven.cdx.json" };
             string[] Excludes = { "lol" };
 

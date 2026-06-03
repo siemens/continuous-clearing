@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2025 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -331,8 +331,8 @@ namespace SIT.Common.UTest
 
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
-                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles")),
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -391,8 +391,8 @@ namespace SIT.Common.UTest
                 ProjectType = "NPM",
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
-                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles")),
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
 
             };
@@ -446,8 +446,8 @@ namespace SIT.Common.UTest
                 Jfrog = new Jfrog(),
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
-                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles")),
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
             caToolInformation = new CatoolInfo

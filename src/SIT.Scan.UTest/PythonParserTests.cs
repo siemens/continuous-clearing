@@ -55,7 +55,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -83,7 +83,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -111,7 +111,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true, ExcludeComponents = excludeComponents },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -138,7 +138,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -157,7 +157,7 @@ namespace SIT.Scan.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json", "SBOM_PythonCATemplate.cdx.json" };
-            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"));
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -166,7 +166,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles")),
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles")),
 
                 }
             };
@@ -185,7 +185,7 @@ namespace SIT.Scan.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             string[] Includes = { "CycloneDX_Python.cdx.json", "SBOMTemplate_Python.cdx.json" };
-            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"));
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -466,7 +466,7 @@ namespace SIT.Scan.UTest
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
             List<Dependency> dependencies = new List<Dependency>();
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "CycloneDX_Python.cdx.json"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "CycloneDX_Python.cdx.json"));
 
             //Act
             List<PythonPackage> listofcomponents = PythonProcessor.ExtractDetailsForPoetryLockfile(filePath, dependencies);
@@ -491,7 +491,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject"))
                 }
             };
 
@@ -623,7 +623,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -641,7 +641,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -659,7 +659,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -677,7 +677,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -695,7 +695,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -711,7 +711,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -730,7 +730,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -750,7 +750,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -768,7 +768,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -786,7 +786,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry2.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry2.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -804,7 +804,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -822,7 +822,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act
@@ -840,7 +840,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string OutFolder = Path.GetDirectoryName(exePath);
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "PythonTestProject", "poetry.lock"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "PythonTestProject", "poetry.lock"));
             List<Dependency> dependencies = new List<Dependency>();
 
             //Act

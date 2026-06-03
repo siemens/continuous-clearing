@@ -36,7 +36,7 @@ namespace SIT.Scan.Tests
             // Setup a valid test input folder
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            _testInputFolder = Path.Combine(outFolder, "PackageIdentifierUTTestFiles");
+            _testInputFolder = Path.Combine(outFolder, "SITScanUTTestFiles");
             if (!System.IO.Directory.Exists(_testInputFolder))
             {
                 System.IO.Directory.CreateDirectory(_testInputFolder);

@@ -483,7 +483,7 @@ namespace SIT.Create.UTest
         {
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string attachmentJson = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "SIT.Create.UTest", "ComponentCreatorUTFiles", "Attachment.json"));
+            string attachmentJson = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "SIT.Create.UTest", "SITCreateUTFiles", "Attachment.json"));
 
             string json = "";
             if (System.IO.File.Exists(attachmentJson))

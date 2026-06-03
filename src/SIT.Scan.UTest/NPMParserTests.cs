@@ -28,7 +28,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "TestDir"));
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
 
@@ -61,7 +61,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Includes = { "p*-lock16.json" };
             string[] Excludes = { "node_modules" };
 
@@ -95,7 +95,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string filepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "TestDir", "DupDir"));
+            string filepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "TestDir", "DupDir"));
             string[] Includes = { "p*-lock.json" };
             string[] Excludes = { "node_modules" };
             BomKpiData bomKpiData = new BomKpiData();
@@ -143,7 +143,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles")),
+                    InputFolder = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles")),
                     OutputFolder = outFolder
                 }
             };
@@ -166,7 +166,7 @@ namespace SIT.Scan.UTest
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json", "SBOMTemplate_Npm.cdx.json", "SBOM_NpmCATemplate.cdx.json" };
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -198,7 +198,7 @@ namespace SIT.Scan.UTest
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             NpmProcessor npmProcessor = new NpmProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "CycloneDX2_NPM.cdx.json" };
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {

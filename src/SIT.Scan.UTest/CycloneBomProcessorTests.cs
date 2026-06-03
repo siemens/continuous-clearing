@@ -160,7 +160,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "CycloneDX_Debian.cdx.json"));
+            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "CycloneDX_Debian.cdx.json"));
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();
@@ -177,7 +177,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "Cyclonedx1.json"));
+            string BomTestFile = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "Cyclonedx1.json"));
 
             //Act
             CycloneDXBomParser cycloneBomProcessor = new CycloneDXBomParser();

@@ -411,7 +411,7 @@ namespace SIT.Scan.UTest
             int expectednoofcomponents = 7;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "packages.config"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "packages.config"));
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -419,7 +419,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360(),
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -444,7 +444,7 @@ namespace SIT.Scan.UTest
             };
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string folderfilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             IEnvironmentHelper environmentHelper = new EnvironmentHelper();
             //Act
             List<string> allFoundConfigFiles = FolderScanner.FileScanner(folderfilepath, config, environmentHelper);
@@ -474,7 +474,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Excludes = null;
 
             CommonAppSettings commonAppSettings = new CommonAppSettings()
@@ -508,7 +508,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string csprojfilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
             string[] Excludes = null;
 
             Bom bom = new Bom();
@@ -1003,7 +1003,7 @@ namespace SIT.Scan.UTest
             int expectednoofcomponents = 2;
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
 
@@ -1038,7 +1038,7 @@ namespace SIT.Scan.UTest
             string IsDev = "true";
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
 
@@ -1077,7 +1077,7 @@ namespace SIT.Scan.UTest
             Mock<ICycloneDXBomParser> _mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "project.assets.json", "Nuget-SelfContained.csproj" };
 
@@ -1143,7 +1143,7 @@ namespace SIT.Scan.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "project.assets.json", "Nuget.csproj" };
             string[] excludes = { "NugetSelfContainedProject" };
@@ -1192,7 +1192,7 @@ namespace SIT.Scan.UTest
 
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };
@@ -1259,7 +1259,7 @@ namespace SIT.Scan.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "project.assets.json" };
             string[] excludes = { "NugetSelfContainedProject" };

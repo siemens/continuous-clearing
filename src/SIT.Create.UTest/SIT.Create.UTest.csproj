@@ -33,16 +33,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="ComponentCreatorUTFiles\adduser_3.118-debian10-combined.tar.bz2">
+		<None Update="SITCreateUTFiles\adduser_3.118-debian10-combined.tar.bz2">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="ComponentCreatorUTFiles\Attachment.json">
+		<None Update="SITCreateUTFiles\Attachment.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="ComponentCreatorUTFiles\patched-file_022.tar.gz">
+		<None Update="SITCreateUTFiles\patched-file_022.tar.gz">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="ComponentCreatorUTFiles\TestComponent-1.0-sources.jar">
+		<None Update="SITCreateUTFiles\TestComponent-1.0-sources.jar">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

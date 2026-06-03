@@ -37,7 +37,7 @@ namespace SIT.Scan.UTest
         public void Setup()
         {
             _identifier = new DotnetRuntimeIdentifer();
-            _testDir = Path.Combine(TestContext.CurrentContext.TestDirectory, "PackageIdentifierUTTestFiles");
+            _testDir = Path.Combine(TestContext.CurrentContext.TestDirectory, "SITScanUTTestFiles");
             _appSettings = new CommonAppSettings
             {
                 Directory = new SIT.Common.Directory()

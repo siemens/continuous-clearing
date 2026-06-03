@@ -20,9 +20,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="PackageIdentifierUTTestFiles\obj\**" />
-		<EmbeddedResource Remove="PackageIdentifierUTTestFiles\obj\**" />
-		<None Remove="PackageIdentifierUTTestFiles\obj\**" />
+		<Compile Remove="SITScanUTTestFiles\obj\**" />
+		<EmbeddedResource Remove="SITScanUTTestFiles\obj\**" />
+		<None Remove="SITScanUTTestFiles\obj\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,10 +30,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="PackageIdentifierUTTestFiles\Nuget.csproj">
+		<None Include="SITScanUTTestFiles\Nuget.csproj">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Include="PackageIdentifierUTTestFiles\NugetSelfContainedProject\Nuget-SelfContained.csproj">
+		<None Include="SITScanUTTestFiles\NugetSelfContainedProject\Nuget-SelfContained.csproj">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
@@ -61,175 +61,175 @@
 		<ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Update="PackageIdentifierUTTestFiles\AlpineSourceDetails_Cyclonedx.cdx.json">
+		<None Update="SITScanUTTestFiles\AlpineSourceDetails_Cyclonedx.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\choco.config">
+		<None Update="SITScanUTTestFiles\choco.config">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\conan.lock">
+		<None Update="SITScanUTTestFiles\conan.lock">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX2_Alpine.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX2_Alpine.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX2_Python.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX2_Python.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX_Alpine.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX_Alpine.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx_Debian.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx_Debian.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Debian.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx2_Debian.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX2_NPM.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX2_NPM.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX_NPM.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX_NPM.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX_Python.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\conan.dep.json">
+		<None Update="SITScanUTTestFiles\conan.dep.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
+		<None Update="SITScanUTTestFiles\Duplicate_Cyclonedx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\MavenDevDependency\bom-without.cdx.json">
+		<None Update="SITScanUTTestFiles\MavenDevDependency\bom-without.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\MavenDevDependency\bom.cdx.json">
+		<None Update="SITScanUTTestFiles\MavenDevDependency\bom.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithDev\bom-without.cdx.json">
+		<None Update="SITScanUTTestFiles\MavenDevDependency\WithDev\bom-without.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithDev\bom.cdx.json">
+		<None Update="SITScanUTTestFiles\MavenDevDependency\WithDev\bom.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\MavenDevDependency\WithOneInputFile\bom-without.cdx.json">
+		<None Update="SITScanUTTestFiles\MavenDevDependency\WithOneInputFile\bom-without.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\package-lock16.json">
+		<None Update="SITScanUTTestFiles\package-lock16.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\poetry.lock">
+		<None Update="SITScanUTTestFiles\poetry.lock">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\POM.xml">
+		<None Update="SITScanUTTestFiles\POM.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\project.assets.json">
+		<None Update="SITScanUTTestFiles\project.assets.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\PythonTestProject\example_package\__init__.py">
+		<None Update="SITScanUTTestFiles\PythonTestProject\example_package\__init__.py">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\PythonTestProject\poetry.lock">
+		<None Update="SITScanUTTestFiles\PythonTestProject\poetry.lock">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\PythonTestProject\pyproject.toml">
+		<None Update="SITScanUTTestFiles\PythonTestProject\pyproject.toml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\PythonTestProject\tests\__init__.py">
+		<None Update="SITScanUTTestFiles\PythonTestProject\tests\__init__.py">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMAlpineCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMAlpineCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMDebianCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMDebianCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Alpine.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_Alpine.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Debian.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_Debian.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Maven.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_Maven.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_MavenCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_MavenCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Npm.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_Npm.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_NpmCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_NpmCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Nuget.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_Nuget.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_NugetCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_NugetCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_Python.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_Python.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOMTemplate_PythonCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOMTemplate_PythonCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_AlpineCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOM_AlpineCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_ConanCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOM_ConanCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_DebianCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOM_DebianCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_MavenCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOM_MavenCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_NpmCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOM_NpmCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_NugetCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOM_NugetCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SBOMTemplates\SBOM_PythonCATemplate.cdx.json">
+		<None Update="SITScanUTTestFiles\SBOMTemplates\SBOM_PythonCATemplate.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.cdx.json">
+		<None Update="SITScanUTTestFiles\SourceDetails_Cyclonedx.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.json">
+		<None Update="SITScanUTTestFiles\SourceDetails_Cyclonedx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\DupDir\package-lock.json">
+		<None Update="SITScanUTTestFiles\TestDir\DupDir\package-lock.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\DupDir\package.json">
+		<None Update="SITScanUTTestFiles\TestDir\DupDir\package.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\packages.config">
+		<None Update="SITScanUTTestFiles\packages.config">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\packages.lock.json">
+		<None Update="SITScanUTTestFiles\packages.lock.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\package-lock.json">
+		<None Update="SITScanUTTestFiles\TestDir\package-lock.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\package.json">
+		<None Update="SITScanUTTestFiles\TestDir\package.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package-lock.json">
+		<None Update="SITScanUTTestFiles\TestDir\SubDir\package-lock.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package.json">
+		<None Update="SITScanUTTestFiles\TestDir\SubDir\package.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx_Maven.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx_Maven.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Maven.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx2_Maven.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
@@ -238,70 +238,70 @@
 		<ProjectReference Include="..\UnitTestUtilities\UnitTestUtilities.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX2_Python.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX2_Python.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx_Debian.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx_Debian.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Debian.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx2_Debian.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX2_NPM.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX2_NPM.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX_NPM.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX_NPM.cdx.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\CycloneDX_Python.cdx.json">
+		<None Update="SITScanUTTestFiles\CycloneDX_Python.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Duplicate_Cyclonedx.json">
+		<None Update="SITScanUTTestFiles\Duplicate_Cyclonedx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\package-lock16.json">
+		<None Update="SITScanUTTestFiles\package-lock16.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\POM.xml">
+		<None Update="SITScanUTTestFiles\POM.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\project.assets.json">
+		<None Update="SITScanUTTestFiles\project.assets.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\SourceDetails_Cyclonedx.json">
+		<None Update="SITScanUTTestFiles\SourceDetails_Cyclonedx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\DupDir\package-lock.json">
+		<None Update="SITScanUTTestFiles\TestDir\DupDir\package-lock.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\DupDir\package.json">
+		<None Update="SITScanUTTestFiles\TestDir\DupDir\package.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\packages.config">
+		<None Update="SITScanUTTestFiles\packages.config">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\packages.lock.json">
+		<None Update="SITScanUTTestFiles\packages.lock.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\package-lock.json">
+		<None Update="SITScanUTTestFiles\TestDir\package-lock.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\package.json">
+		<None Update="SITScanUTTestFiles\TestDir\package.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package-lock.json">
+		<None Update="SITScanUTTestFiles\TestDir\SubDir\package-lock.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\TestDir\SubDir\package.json">
+		<None Update="SITScanUTTestFiles\TestDir\SubDir\package.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx_Maven.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx_Maven.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\Cyclonedx2_Maven.cdx.json">
+		<None Update="SITScanUTTestFiles\Cyclonedx2_Maven.cdx.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierUTTestFiles\PythonTestProject\poetry2.lock">
+		<None Update="SITScanUTTestFiles\PythonTestProject\poetry2.lock">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

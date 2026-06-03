@@ -41,7 +41,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { ProjectName = "Test" },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
             //Act
@@ -69,7 +69,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { ProjectName = "Test" },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
             //Act && Assert

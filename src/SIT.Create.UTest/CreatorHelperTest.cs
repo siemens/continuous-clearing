@@ -775,7 +775,7 @@ namespace SIT.Create.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string localPathforDownload = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "SIT.Create.UTest", "ComponentCreatorUTFiles")) + Path.DirectorySeparatorChar;
+            string localPathforDownload = Path.GetFullPath(Path.Combine(outFolder, "..", "..", "src", "SIT.Create.UTest", "SITCreateUTFiles")) + Path.DirectorySeparatorChar;
 
             var component = new ComparisonBomData
             {

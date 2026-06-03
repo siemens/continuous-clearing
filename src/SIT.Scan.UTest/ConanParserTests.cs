@@ -35,7 +35,7 @@ namespace SIT.Scan.UTest
             int expectedNoOfcomponents = 11; // Based on Test_Bom.cdx.json showing 11 components
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "*.dep.json" }; // Use pattern matching for dep.json files
 
@@ -63,7 +63,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "*.dep.json" };
 
@@ -95,7 +95,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "*.dep.json" };
 
@@ -123,7 +123,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "*.dep.json" };
 
@@ -151,7 +151,7 @@ namespace SIT.Scan.UTest
             //Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
 
             string[] Includes = { "*.dep.json" };
 
@@ -419,7 +419,7 @@ namespace SIT.Scan.UTest
             Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
             ConanProcessor conanProcessor = new ConanProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
             string[] Includes = { "SBOM_ConanCATemplate.cdx.json" };
-            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"));
+            string packagefilepath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"));
 
             CommonAppSettings appSettings = new CommonAppSettings()
             {
@@ -428,7 +428,7 @@ namespace SIT.Scan.UTest
                 SW360 = new SW360() { IgnoreDevDependency = true },
                 Directory = new SIT.Common.Directory()
                 {
-                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -458,7 +458,7 @@ namespace SIT.Scan.UTest
             {
                 Directory = new SIT.Common.Directory()
                 {
-                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles"))
+                    OutputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
                 }
             };
 
@@ -466,7 +466,7 @@ namespace SIT.Scan.UTest
             ConanProcessor.CreateFileForMultipleVersions(componentsWithMultipleVersions, appSettings);
 
             // Assert
-            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+            string filePath = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles", "ContinuousClearing_Multipleversions.json"));
             Assert.IsTrue(File.Exists(filePath), "The file was not created.");
         }
 
@@ -476,8 +476,8 @@ namespace SIT.Scan.UTest
             // Arrange
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string outputFolder = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles"));
-            string filePath = Path.GetFullPath(Path.Combine(outFolder, "PackageIdentifierUTTestFiles", "ContinuousClearing_Multipleversions.json"));
+            string outputFolder = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles"));
+            string filePath = Path.GetFullPath(Path.Combine(outFolder, "SITScanUTTestFiles", "ContinuousClearing_Multipleversions.json"));
 
             // Create an initial file with some content
             var initialContent = new MultipleVersions

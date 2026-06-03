@@ -135,7 +135,7 @@ namespace SIT.Create.UTest
             Assert.That(string.IsNullOrEmpty(attachmentUrlList));
         }
 
-        //string attachmentJson = outFolder + @"..\..\..\src\SITCreate.UTest\ComponentCreatorUTFiles\Attachment.json";
+        //string attachmentJson = outFolder + @"..\..\..\src\SITCreate.UTest\SITCreateUTFiles\Attachment.json";
         // 
 
         public void GetPatchedFileFromDownloadedFolder_ProvidedPatchURLs_ReturnsEmptyDownloadPath()
@@ -147,7 +147,7 @@ namespace SIT.Create.UTest
             };
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string outFolder = Path.GetDirectoryName(exePath);
-            string downloadFolderPath = outFolder + @"..\..\..\src\SITCreate.UTest\ComponentCreatorUTFiles";
+            string downloadFolderPath = outFolder + @"..\..\..\src\SITCreate.UTest\SITCreateUTFiles";
             // \adduser_3.118-debian10-combined.tar.bz2";
 
             //Provided patch URLs for applying patch
