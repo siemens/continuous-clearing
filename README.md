@@ -51,27 +51,27 @@ you can run Continuous Clearing Tool as container or as a dotnet package,
  
  Execute them in the following order to achieve the complete License clearing process.
 
-1. **SIT Scan** - This executable takes Package file or a `cycloneDX BOM` as input and provides a SBOM file as output. For each of the component the dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the SBOM file.
+1. **SIT.Scan** - This executable takes Package file or a `cycloneDX BOM` as input and provides a SBOM file as output. For each of the component the dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the SBOM file.
 
  
 ```text
-docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITScan.dll --settingsfilepath /etc/CATool/appSetting.json
+docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Scan.dll --settingsfilepath /etc/CATool/appSetting.json
  ```
  * Input (i.e., /path/to/InputDirectory -> place to keep input files)
  * Output (i.e.,/path/to/OutputDirectory -> resulted files will be stored here) 
  * Log (i.e., /path/to/logDirectory -> logs will be stored here) 
  * Configuration (i.e., /path/to/ConfigDirectory -> place to keep the Config files i.e [**appSetting.json**](/src/SIT.Common/appSettings.json)) 
  
- 2. **SIT Create** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
+ 2. **SIT.Create** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
 
  `Note`: By default the SBOM contains both dev and non dev dependent components. Hence while creating the components in Sw360  make sure to set the *RemoveDevDependency* flag as `true` to skip creating the development dependent components.
  
  ```text
- docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITCreate.dll --settingsfilepath /etc/CATool/appSetting.json
+ docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Create.dll --settingsfilepath /etc/CATool/appSetting.json
 ```
- 3. **SIT Upload** - This executable takes `CycloneDX BOM` which is updated by the ` SITCreate.dll` as input and uploads the components that are already cleared (clearing state - "Report approved") to the SIPARTY release repo in Jfrog Artifactory.
+ 3. **SIT.Upload** - This executable takes `CycloneDX BOM` which is updated by the ` SIT.Create.dll` as input and uploads the components that are already cleared (clearing state - "Report approved") to the SIPARTY release repo in Jfrog Artifactory.
  ```text
-  docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SITUpload.dll --settingsfilepath /etc/CATool/appSetting.json
+  docker run --rm -it -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Upload.dll --settingsfilepath /etc/CATool/appSetting.json
   ```
 </details>
 
@@ -80,22 +80,22 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
  
  Extract the downloaded .nupkg package , execute the following commands inside the tools folder.
 
- 1. **SIT Scan** - This executable takes Package file as input and provides a CycloneDX BOM file as output. For each of the component the  dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the BOM file.
+ 1. **SIT.Scan** - This executable takes Package file as input and provides a CycloneDX BOM file as output. For each of the component the  dependency classification (development,internal) and the availability in jfrog artifactory is identified and added in the BOM file.
  
 ```text
-  SITScan.exe --settingsfilepath /<Config_Path>/appSetting.json
+  SIT.Scan.exe --settingsfilepath /<Config_Path>/appSetting.json
  ```
  
- 2. **SIT Create** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
+ 2. **SIT.Create** - This executable expects the `CycloneDX BOM` as the input, creates the missing components/releases in SW360 and links all the components to the respective project in SW360 portal and triggers the fossology upload.
 
   `Note`: By default the SBOM contains both dev and non dev dependent components. Hence while creating the components in Sw360  make sure to set the *RemoveDevDependency* flag as `true` to skip creating the development dependent components.
  
  ```text
-  SITCreate.exe --settingsfilepath /<Config_Path>/appSetting.json
+  SIT.Create.exe --settingsfilepath /<Config_Path>/appSetting.json
 ```
- 3. **SIT Upload** - This executable takes `CycloneDX BOM` which is updated by the ` SITCreate.dll` as input and uploads the components that are already cleared (clearing state - "Report approved") to the SIPARTY release repo in Jfrog Artifactory.
+ 3. **SIT.Upload** - This executable takes `CycloneDX BOM` which is updated by the ` SIT.Create.dll` as input and uploads the components that are already cleared (clearing state - "Report approved") to the SIPARTY release repo in Jfrog Artifactory.
  ```text
-   SITUpload.exe --settingsfilepath /<Config_Path>/appSetting.json
+   SIT.Upload.exe --settingsfilepath /<Config_Path>/appSetting.json
   ```
 
 </details>
@@ -103,7 +103,7 @@ docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDire
 
 Detailed insight on configuration and execution is provided in [Usage Doc](doc/UsageDoc/CA_UsageDocument.md).
  
- **_Note: SITUpload is not applicable for Debian/Alpine clearing._**
+ **_Note: SIT.Upload is not applicable for Debian/Alpine clearing._**
 
 # Development
 

@@ -26,11 +26,11 @@
     <file src="doc\UsageDoc\**\*.*" target="usagedocument"/>
     <file src="out\net8.0\App.config" target="tools\App.config"/>
     <file src="out\net8.0\appSettings.json" target="tools\appSettings.json"/>
-    <file src="out\net8.0\SITUpload.deps.json" target="tools\SITUpload.deps.json"/>
-    <file src="out\net8.0\SITUpload.dll" target="tools\SITUpload.dll"/>
-    <file src="out\net8.0\SITUpload.exe" target="tools\SITUpload.exe"/>
-    <file src="out\net8.0\SITUpload.pdb" target="tools\SITUpload.pdb"/>
-    <file src="out\net8.0\SITUpload.runtimeconfig.json" target="tools\SITUpload.runtimeconfig.json"/>
+    <file src="out\net8.0\SIT.Upload.deps.json" target="tools\SIT.Upload.deps.json"/>
+    <file src="out\net8.0\SIT.Upload.dll" target="tools\SIT.Upload.dll"/>
+    <file src="out\net8.0\SIT.Upload.exe" target="tools\SIT.Upload.exe"/>
+    <file src="out\net8.0\SIT.Upload.pdb" target="tools\SIT.Upload.pdb"/>
+    <file src="out\net8.0\SIT.Upload.runtimeconfig.json" target="tools\SIT.Upload.runtimeconfig.json"/>
     <file src="out\net8.0\CLIUsageNpkg.txt" target="tools\CLIUsageNpkg.txt"/>
     <file src="out\net8.0\CycloneDX.Core.dll" target="tools\CycloneDX.Core.dll"/>
     <file src="out\net8.0\CycloneDX.Utils.dll" target="tools\CycloneDX.Utils.dll"/>
@@ -103,20 +103,20 @@
     <file src="out\net8.0\NuGet.Protocol.dll" target="tools\NuGet.Protocol.dll"/>
     <file src="out\net8.0\NuGet.Resolver.dll" target="tools\NuGet.Resolver.dll"/>
     <file src="out\net8.0\NuGet.Versioning.dll" target="tools\NuGet.Versioning.dll"/>
-    <file src="out\net8.0\SITScan.deps.json" target="tools\SITScan.deps.json"/>
-    <file src="out\net8.0\SITScan.dll" target="tools\SITScan.dll"/>
-    <file src="out\net8.0\SITScan.dll.config" target="tools\SITScan.dll.config"/>
-    <file src="out\net8.0\SITScan.exe" target="tools\SITScan.exe"/>
-    <file src="out\net8.0\SITScan.pdb" target="tools\SITScan.pdb"/>
-    <file src="out\net8.0\SITScan.runtimeconfig.json" target="tools\SITScan.runtimeconfig.json"/>
+    <file src="out\net8.0\SIT.Scan.deps.json" target="tools\SIT.Scan.deps.json"/>
+    <file src="out\net8.0\SIT.Scan.dll" target="tools\SIT.Scan.dll"/>
+    <file src="out\net8.0\SIT.Scan.dll.config" target="tools\SIT.Scan.dll.config"/>
+    <file src="out\net8.0\SIT.Scan.exe" target="tools\SIT.Scan.exe"/>
+    <file src="out\net8.0\SIT.Scan.pdb" target="tools\SIT.Scan.pdb"/>
+    <file src="out\net8.0\SIT.Scan.runtimeconfig.json" target="tools\SIT.Scan.runtimeconfig.json"/>
     <file src="out\net8.0\PackageUrl.dll" target="tools\PackageUrl.dll"/>
     <file src="out\net8.0\protobuf-net.Core.dll" target="tools\protobuf-net.Core.dll"/>
     <file src="out\net8.0\protobuf-net.dll" target="tools\protobuf-net.dll"/>
-    <file src="out\net8.0\SITCreate.deps.json" target="tools\SITCreate.deps.json"/>
-    <file src="out\net8.0\SITCreate.dll" target="tools\SITCreate.dll"/>
-    <file src="out\net8.0\SITCreate.exe" target="tools\SITCreate.exe"/>
-    <file src="out\net8.0\SITCreate.pdb" target="tools\SITCreate.pdb"/>
-    <file src="out\net8.0\SITCreate.runtimeconfig.json" target="tools\SITCreate.runtimeconfig.json"/>
+    <file src="out\net8.0\SIT.Create.deps.json" target="tools\SIT.Create.deps.json"/>
+    <file src="out\net8.0\SIT.Create.dll" target="tools\SIT.Create.dll"/>
+    <file src="out\net8.0\SIT.Create.exe" target="tools\SIT.Create.exe"/>
+    <file src="out\net8.0\SIT.Create.pdb" target="tools\SIT.Create.pdb"/>
+    <file src="out\net8.0\SIT.Create.runtimeconfig.json" target="tools\SIT.Create.runtimeconfig.json"/>
     <file src="out\net8.0\System.CodeDom.dll" target="tools\System.CodeDom.dll"/>
     <file src="out\net8.0\System.Configuration.ConfigurationManager.dll" target="tools\System.Configuration.ConfigurationManager.dll"/>
     <file src="out\net8.0\System.Diagnostics.EventLog.dll" target="tools\System.Diagnostics.EventLog.dll"/>

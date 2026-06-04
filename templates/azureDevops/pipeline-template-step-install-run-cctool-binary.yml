@@ -58,6 +58,10 @@
   - name: SITScanEnabled
     type: boolean
     default: true
+  
+  - name: SITCreateEnabled
+    type: boolean
+    default: true
 
   - name: SITUploadEnabled
     type: boolean
@@ -220,14 +224,14 @@ steps:
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
-      displayName: 'Run SITScan for ${{ project.projectType }}'
+      displayName: 'Run SIT.Scan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
         script: |
           # Print the working directory parameter
           Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-          Write-Host "##[section] Preparing arguments for SITScan..."
+          Write-Host "##[section] Preparing arguments for SIT.Scan..."
           # Initialize arguments with mandatory fields
           $args = @(
             "--Directory:InputFolder", "${{ project.inputFolder }}",
@@ -318,25 +322,25 @@ steps:
           
           # Print the arguments for debugging
           if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for SITScan:"
+            Write-Host "##[debug] Arguments for SIT.Scan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
           }
 
           # Start executing the tool
-          Write-Host "##[section] Running SITScan tool..."
-          ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SITScan.exe @args
+          Write-Host "##[section] Running SIT.Scan tool..."
+          ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SIT.Scan.exe @args
 
   - task: PowerShell@2
-    condition: eq('${{ parameters.SITScanEnabled }}', true)
+    condition: eq('${{ parameters.SITCreateEnabled }}', true)
     continueOnError: true
-    displayName: 'Run SITCreate'
+    displayName: 'Run SIT.Create'
     inputs:
       targetType: 'inline'
       script: |
         # Print the working directory parameter
         Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-        Write-Host "##[section] Preparing arguments for SITCreate..."
+        Write-Host "##[section] Preparing arguments for SIT.Create..."
 
         # Setup base arguments
         $args = @(
@@ -388,25 +392,25 @@ steps:
 
         # Print the arguments for debugging
         if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for SITScan:"
+            Write-Host "##[debug] Arguments for SIT.Scan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
         }
 
         # Start executing the tool
-        Write-Host "##[section] Running SITCreate..."
-        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SITCreate.exe @args
+        Write-Host "##[section] Running SIT.Create..."
+        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SIT.Create.exe @args
 
   - task: PowerShell@2
     condition: eq('${{ parameters.SITUploadEnabled }}', true)
     continueOnError: true
-    displayName: 'Run SITUpload'
+    displayName: 'Run SIT.Upload'
     inputs:
       targetType: 'inline'
       script: |
         # Print the working directory parameter
         Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-        Write-Host "##[section] Preparing arguments for SITUpload..."
+        Write-Host "##[section] Preparing arguments for SIT.Upload..."
 
         # Setup base arguments
         $args = @(
@@ -459,10 +463,10 @@ steps:
 
         # Print the arguments for debugging
         if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for SITScan:"
+            Write-Host "##[debug] Arguments for SIT.Scan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
         }
 
         # Start executing the tool
-        Write-Host "##[section] Running SITUpload..."
-        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SITUpload.exe @args
+        Write-Host "##[section] Running SIT.Upload..."
+        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SIT.Upload.exe @args

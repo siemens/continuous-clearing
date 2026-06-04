@@ -29,7 +29,7 @@ namespace TestUtilities
         public static int RunSITScanExe(string[] args)
         {
             Process proc = new Process();
-            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITScan.exe" : "SITScan";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SIT.Scan.exe" : "SIT.Scan";
             proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;
@@ -67,7 +67,7 @@ namespace TestUtilities
         public static int RunSITCreateExe(string[] args)
         {
             Process proc = new Process();
-            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITCreate.exe" : "SITCreate";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SIT.Create.exe" : "SIT.Create";
             proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;
@@ -101,7 +101,7 @@ namespace TestUtilities
         public static int RunSITUploadExe(string[] args)
         {
             Process proc = new Process();
-            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SITUpload.exe" : "SITUpload";
+            string executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "SIT.Upload.exe" : "SIT.Upload";
             proc.StartInfo.FileName = Path.Combine(OutFolder, executableName);
             proc.StartInfo.Arguments = GetArguments(args);
             proc.StartInfo.UseShellExecute = false;

@@ -117,7 +117,7 @@ steps:
           inputFolder: ${{ project.inputFolder }}
 
     - task: PowerShell@2
-      displayName: 'Run SITScan for ${{ project.projectType }}'
+      displayName: 'Run SIT.Scan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
         script: |
@@ -169,12 +169,12 @@ steps:
             -v "${{ parameters.outputFolder }}/logs:/var/log" `
             -v "${settingsDir}:/etc/CATool" `
             -e BUILD_BUILDID=$env:BUILD_BUILDID `
-            ca-tool dotnet SITScan.dll @args
+            ca-tool dotnet SIT.Scan.dll @args
 
   - task: PowerShell@2
     continueOnError: true
     condition: eq('${{ parameters.SITScanEnabled }}', true)
-    displayName: 'Run SITCreate'
+    displayName: 'Run SIT.Create'
     inputs:
       targetType: 'inline'
       script: |
@@ -188,7 +188,7 @@ steps:
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
           -v "${settingsDir}:/etc/CATool" `
           -e BUILD_BUILDID=$env:BUILD_BUILDID `
-          ca-tool dotnet SITCreate.dll `
+          ca-tool dotnet SIT.Create.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
@@ -207,7 +207,7 @@ steps:
   - task: PowerShell@2
     continueOnError: true
     condition: eq('${{ parameters.SITUploadEnabled }}', true)
-    displayName: 'Run SITUpload'
+    displayName: 'Run SIT.Upload'
     inputs:
       targetType: 'inline'
       script: |
@@ -221,7 +221,7 @@ steps:
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
           -v "${settingsDir}:/etc/CATool" `
           -e BUILD_BUILDID=$env:BUILD_BUILDID `
-          ca-tool dotnet SITUpload.dll `
+          ca-tool dotnet SIT.Upload.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `

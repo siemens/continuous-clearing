@@ -3,20 +3,20 @@ Usage:
    [command]
 
 Examples for Nuget Package:
-   SITScan.exe --settingsfilepath /CAToolConfigPath/appSettings.json                    Creates Bom file by identifying packages in input
+   SIT.Scan.exe --settingsfilepath /CAToolConfigPath/appSettings.json                    Creates Bom file by identifying packages in input
 
 Available Commands:
-   SITScan.exe   --settingsfilepath /CAToolConfigPath/appSettings.json                  Creates Bom file by identifying packages in input
-   SITCreate.exe --settingsfilepath /CAToolConfigPath/appSettings.json                  Creates Components and Release in SW360
-   SITUpload.exe --settingsfilepath /CAToolConfigPath/appSettings.json                  Uploads source package to JFrog Artifactory
+   SIT.Scan.exe   --settingsfilepath /CAToolConfigPath/appSettings.json                  Creates Bom file by identifying packages in input
+   SIT.Create.exe --settingsfilepath /CAToolConfigPath/appSettings.json                  Creates Components and Release in SW360
+   SIT.Upload.exe --settingsfilepath /CAToolConfigPath/appSettings.json                  Uploads source package to JFrog Artifactory
 
 Examples for Docker Image:
-  dotnet SITScan.dll --settingsfilepath /etc/CATool/appSettings.json                    Creates Bom file by identifying packages in input
+  dotnet SIT.Scan.dll --settingsfilepath /etc/CATool/appSettings.json                    Creates Bom file by identifying packages in input
 
 Available Commands:
-  dotnet SITScan.dll   --settingsfilepath /etc/CATool/appSettings.json                  Creates Bom file by identifying packages in input
-  dotnet SITCreate.dll --settingsfilepath /etc/CATool/appSettings.json                  Creates Components and Release in SW360
-  dotnet SITUpload.dll --settingsfilepath /etc/CATool/appSettings.json                  Uploads source package to JFrog Artifactory
+  dotnet SIT.Scan.dll   --settingsfilepath /etc/CATool/appSettings.json                  Creates Bom file by identifying packages in input
+  dotnet SIT.Create.dll --settingsfilepath /etc/CATool/appSettings.json                  Creates Components and Release in SW360
+  dotnet SIT.Upload.dll --settingsfilepath /etc/CATool/appSettings.json                  Uploads source package to JFrog Artifactory
 
 Flags:
    --settingsfilepath           Path of application config file

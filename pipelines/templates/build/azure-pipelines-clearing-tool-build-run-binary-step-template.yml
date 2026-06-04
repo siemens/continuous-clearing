@@ -113,7 +113,7 @@ steps:
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
-      displayName: 'Run SITScan for ${{ project.projectType }}'
+      displayName: 'Run SIT.Scan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
         script: |
@@ -153,16 +153,16 @@ steps:
             $args += "true"
           }
 
-          dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SITScan.dll" @args
+          dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Scan.dll" @args
 
   - task: PowerShell@2
     condition: eq('${{ parameters.SITScanEnabled }}', true)
     continueOnError: true
-    displayName: 'Run SITCreate'
+    displayName: 'Run SIT.Create'
     inputs:
       targetType: 'inline'
       script: |
-        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SITCreate.dll `
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Create.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
@@ -182,11 +182,11 @@ steps:
   - task: PowerShell@2
     condition: eq('${{ parameters.SITUploadEnabled }}', true)
     continueOnError: true
-    displayName: 'Run SITUpload'
+    displayName: 'Run SIT.Upload'
     inputs:
       targetType: 'inline'
       script: |
-        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SITUpload.dll `
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Upload.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
