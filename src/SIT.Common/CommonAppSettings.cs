@@ -124,8 +124,8 @@ namespace SIT.Common
             }
             set
             {
-                if (!AppDomain.CurrentDomain.FriendlyName.Contains("PackageIdentifier") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("ArtifactoryUploader") &&
+                if (!AppDomain.CurrentDomain.FriendlyName.Contains("SIT.Scan") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("SIT.Upload") &&
                     !string.IsNullOrEmpty(value))
                 {
                     m_FOSSURL = value.TrimEnd(Dataconstant.ForwardSlash);
@@ -175,8 +175,8 @@ namespace SIT.Common
             {
                 try
                 {
-                    if (!AppDomain.CurrentDomain.FriendlyName.Contains("SITCreate") &&
-                    !AppDomain.CurrentDomain.FriendlyName.Contains("SITUpload"))
+                    if (!AppDomain.CurrentDomain.FriendlyName.Contains("SIT.Create") &&
+                    !AppDomain.CurrentDomain.FriendlyName.Contains("SIT.Upload"))
                     {
                         var folderAction = new FolderAction();
                         folderAction.ValidateFolderPath(value, environmentHelper);
