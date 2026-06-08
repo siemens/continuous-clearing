@@ -181,7 +181,7 @@ namespace SIT.Create
         /// <returns>data</returns>
         private async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
         {
-            ClassifyCargoUrls(component.SourceUrl, out string repositoryUrl, out string cratesDownloadUrl);
+            FormattingCargoUrls(component.SourceUrl, out string repositoryUrl, out string cratesDownloadUrl);
 
             string downloadPath = await TryDownloadFromRepository(component, localPathforDownload, repositoryUrl);
             if (!string.IsNullOrEmpty(downloadPath))
@@ -190,7 +190,7 @@ namespace SIT.Create
             return await TryDownloadFromCratesIo(component, localPathforDownload, repositoryUrl, cratesDownloadUrl);
         }
 
-        private static void ClassifyCargoUrls(string sourceUrl, out string repositoryUrl, out string cratesDownloadUrl)
+        private static void FormattingCargoUrls(string sourceUrl, out string repositoryUrl, out string cratesDownloadUrl)
         {
             repositoryUrl = string.Empty;
             cratesDownloadUrl = string.Empty;
@@ -199,11 +199,11 @@ namespace SIT.Create
 
             if (urls.Length == 1)
             {
-                string singleUrl = urls[0].Trim();
-                if (singleUrl.EndsWith(CratesDownloadSuffix, StringComparison.OrdinalIgnoreCase))
-                    cratesDownloadUrl = singleUrl;
+                string singleSourcecodeUrl = urls[0].Trim();
+                if (singleSourcecodeUrl.EndsWith(CratesDownloadSuffix, StringComparison.OrdinalIgnoreCase))
+                    cratesDownloadUrl = singleSourcecodeUrl;
                 else
-                    repositoryUrl = singleUrl;
+                    repositoryUrl = singleSourcecodeUrl;
             }
             else if (urls.Length > 1)
             {
