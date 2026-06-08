@@ -45,6 +45,8 @@ namespace SIT.Create
         private const string SOURCE = "SOURCE";
         private const string AlpinePackageType = "ALPINE";
         private const string DebianPackageType = "DEBIAN";
+        private const string NpmDownloaderKey = "NPM";
+        private const string CratesDownloadSuffix = "download";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
         /// <summary>
@@ -177,29 +179,79 @@ namespace SIT.Create
         /// <param name="component"></param>
         /// <param name="localPathforDownload"></param>
         /// <returns>data</returns>
-        private static async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
+        private async Task<string> DownloadCargoSource(ComparisonBomData component, string localPathforDownload)
         {
-            if (!string.IsNullOrEmpty(component.DownloadUrl))
+            ClassifyCargoUrls(component.SourceUrl, out string repositoryUrl, out string cratesDownloadUrl);
+
+            string downloadPath = await TryDownloadFromRepository(component, localPathforDownload, repositoryUrl);
+            if (!string.IsNullOrEmpty(downloadPath))
+                return downloadPath;
+
+            return await TryDownloadFromCratesIo(component, localPathforDownload, repositoryUrl, cratesDownloadUrl);
+        }
+
+        private static void ClassifyCargoUrls(string sourceUrl, out string repositoryUrl, out string cratesDownloadUrl)
+        {
+            repositoryUrl = string.Empty;
+            cratesDownloadUrl = string.Empty;
+
+            string[] urls = sourceUrl?.Split(';') ?? [];
+
+            if (urls.Length == 1)
             {
-                string fileName = $"{component.Name}-{component.Version}.crate";
-                string downloadFilePath = Path.Combine(localPathforDownload, fileName);
-
-                string directoryPath = Path.GetDirectoryName(downloadFilePath);
-                if (!string.IsNullOrEmpty(directoryPath))
-                    Directory.CreateDirectory(directoryPath);
-
-                Uri uri = new Uri(component.DownloadUrl);
-                await UrlHelper.DownloadFileAsync(uri, downloadFilePath);
-                if (downloadFilePath.EndsWith(FileConstant.CrateFileExtension))
-                {
-                    string tarfile = Path.ChangeExtension(downloadFilePath, FileConstant.TargzFileExtension);
-                    File.Copy(downloadFilePath, tarfile, true);
-                    downloadFilePath = tarfile;
-                }
-
-                return downloadFilePath;
+                string singleUrl = urls[0].Trim();
+                if (singleUrl.EndsWith(CratesDownloadSuffix, StringComparison.OrdinalIgnoreCase))
+                    cratesDownloadUrl = singleUrl;
+                else
+                    repositoryUrl = singleUrl;
             }
-            return "";
+            else if (urls.Length > 1)
+            {
+                repositoryUrl = urls[0].Trim();
+                cratesDownloadUrl = urls[1].Trim();
+            }
+        }
+
+        private async Task<string> TryDownloadFromRepository(ComparisonBomData component, string localPathforDownload, string repositoryUrl)
+        {
+            if (string.IsNullOrEmpty(repositoryUrl))
+                return string.Empty;
+
+            component.SourceUrl = repositoryUrl;
+            component.DownloadUrl = repositoryUrl;
+            return await _packageDownloderList[NpmDownloaderKey].DownloadPackage(component, localPathforDownload);
+        }
+
+        private static async Task<string> TryDownloadFromCratesIo(ComparisonBomData component, string localPathforDownload, string repositoryUrl, string cratesDownloadUrl)
+        {
+            if (string.IsNullOrEmpty(cratesDownloadUrl))
+                return string.Empty;
+
+            string downloadFilePath = Path.Combine(localPathforDownload, $"{component.Name}-{component.Version}.crate");
+
+            string directoryPath = Path.GetDirectoryName(downloadFilePath);
+            if (!string.IsNullOrEmpty(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+
+            string downloadedPath = await UrlHelper.DownloadFileAsync(new Uri(cratesDownloadUrl), downloadFilePath);
+            if (string.IsNullOrEmpty(downloadedPath))
+            {
+                Logger.DebugFormat("DownloadCargoSource(): Failed to download source from crates.io URL for {0}-{1}", component.Name, component.Version);
+                return string.Empty;
+            }
+
+            if (downloadFilePath.EndsWith(FileConstant.CrateFileExtension))
+            {
+                string tarfile = Path.ChangeExtension(downloadFilePath, FileConstant.TargzFileExtension);
+                File.Copy(downloadFilePath, tarfile, true);
+                downloadFilePath = tarfile;
+            }
+
+            string resolvedUrl = !string.IsNullOrEmpty(repositoryUrl) ? repositoryUrl : cratesDownloadUrl;
+            component.DownloadUrl = resolvedUrl;
+            component.SourceUrl = resolvedUrl;
+
+            return downloadFilePath;
         }
         /// <summary>
         /// Convert Zip To TarGz If Needed

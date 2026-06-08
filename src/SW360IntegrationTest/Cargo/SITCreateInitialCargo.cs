@@ -146,7 +146,7 @@ namespace SW360IntegrationTest.Cargo
                 new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
             string expectedname = "anstyle";
             string expectedversion = "1.0.11";
-            string expecteddownloadurl = "https://crates.io/api/v1/crates/anstyle/1.0.11/download";
+            string expecteddownloadurl = "https://github.com/rust-cli/anstyle.git/tree/v1.0.11";
             string expectedexternalid = "pkg:cargo/anstyle@1.0.11";
             //url formation for retrieving component details
             string url = TestConstant.Sw360ReleaseApi + TestConstant.componentNameUrl + "anstyle";

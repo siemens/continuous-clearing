@@ -529,16 +529,21 @@ namespace SIT.Create
                     var json = await response.Content.ReadAsStringAsync();
                     var jObj = JObject.Parse(json);
                     var versionToken = jObj["version"];
+                    var repository = versionToken?["repository"];
                     var dlPath = versionToken?["dl_path"];
 
-                    if (dlPath != null && dlPath.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(dlPath.ToString()))
+                    string repositoryValue = (repository != null && repository.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(repository.ToString()))
+                        ? repository.ToString()
+                        : string.Empty;
+
+                    string dlPathValue = (dlPath != null && dlPath.Type != JTokenType.Null && !string.IsNullOrWhiteSpace(dlPath.ToString()))
+                        ? $"{CommonAppSettings.SourceBaseUrlForCargo}{dlPath}"
+                        : string.Empty;
+
+                    repositoryUrl = string.Join(";", new[] { repositoryValue, dlPathValue }.Where(v => !string.IsNullOrEmpty(v)));
+
+                    if (string.IsNullOrEmpty(repositoryUrl))
                     {
-                        repositoryUrl = dlPath.ToString();
-                        repositoryUrl = $"{CommonAppSettings.SourceBaseUrlForCargo}{repositoryUrl}";
-                    }
-                    else
-                    {
-                        repositoryUrl = "";
                         Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                     }
                 }
