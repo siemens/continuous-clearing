@@ -61,13 +61,13 @@ jobs:
     displayName: 'Restore Dependencies'
     inputs:
       command: 'restore'
-      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+      projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
     inputs:
       command: 'build'
-      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+      projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
 
   - task: PowerShell@2
     displayName: 'Run Unit Tests with Coverage'
@@ -175,13 +175,13 @@ jobs:
       displayName: 'Restore Dependencies'
       inputs:
         command: 'restore'
-        projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+        projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
 
     - task: DotNetCoreCLI@2
       displayName: 'Build Solution'
       inputs:
         command: 'build'
-        projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+        projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
 
     - script: |
         SOLUTION_DIR="$(Build.SourcesDirectory)/src"
@@ -318,13 +318,13 @@ jobs:
     displayName: 'Restore Dependencies'
     inputs:
       command: 'restore'
-      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+      projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
     inputs:
       command: 'build'
-      projects: '$(Build.SourcesDirectory)/src/LicenseClearingTool.sln'
+      projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
 
   - task: SonarQubeAnalyze@7
     inputs:

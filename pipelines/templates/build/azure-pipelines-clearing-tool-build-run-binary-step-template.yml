@@ -1,4 +1,4 @@
-# --------------------------------------------------------------------------------------------------------------------
+﻿# --------------------------------------------------------------------------------------------------------------------
 # SPDX-FileCopyrightText: 2025 Siemens AG
 #
 #  SPDX-License-Identifier: MIT
@@ -49,11 +49,11 @@ parameters:
     default: ''
   
   # Template parameters
-  - name: PackageCreatorEnabled
+  - name: SITScanEnabled
     type: boolean
     default: true
 
-  - name: ArtifactoryUploaderEnabled
+  - name: SITUploadEnabled
     type: boolean
     default: true
     
@@ -91,7 +91,7 @@ steps:
     displayName: 'Build CA Tool'
     inputs:
       script: |
-        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
+        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/ContinuousClearingTool.sln --configuration Release
   
   - task: PowerShell@2
     displayName: 'Tool pre-requisite'
@@ -113,7 +113,7 @@ steps:
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
-      displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
+      displayName: 'Run SIT.Scan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
         script: |
@@ -153,16 +153,16 @@ steps:
             $args += "true"
           }
 
-          dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/PackageIdentifier.dll" @args
+          dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Scan.dll" @args
 
   - task: PowerShell@2
-    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
+    condition: eq('${{ parameters.SITScanEnabled }}', true)
     continueOnError: true
-    displayName: 'Run SW360PackageCreator'
+    displayName: 'Run SIT.Create'
     inputs:
       targetType: 'inline'
       script: |
-        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SW360PackageCreator.dll `
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Create.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
@@ -180,13 +180,13 @@ steps:
           --settingsfilepath "${{ parameters.appSettingsPath }}"
 
   - task: PowerShell@2
-    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
+    condition: eq('${{ parameters.SITUploadEnabled }}', true)
     continueOnError: true
-    displayName: 'Run ArtifactoryUploader'
+    displayName: 'Run SIT.Upload'
     inputs:
       targetType: 'inline'
       script: |
-        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/ArtifactoryUploader.dll `
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Upload.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `

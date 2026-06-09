@@ -29,49 +29,49 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="PackageCreatorTestFiles\Cargo\CCTComparisonBOMCargoInitial.json">
+		<None Update="SITCreateTestFiles\Cargo\CCTComparisonBOMCargoInitial.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageCreatorTestFiles\Maven\CCTComparisonBOMMavenUpdated.json">
+		<None Update="SITCreateTestFiles\Maven\CCTComparisonBOMMavenUpdated.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Cargo\CCTLocalBOMCargoSpdxSbom.json">
+		<None Update="SITScanTestFiles\Cargo\CCTLocalBOMCargoSpdxSbom.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\CCTLocalBOMTemplateNugetInitial.json">
+		<None Update="SITScanTestFiles\CCTLocalBOMTemplateNugetInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\DepMaven\CCTLocalBOMMavenInitial.json">
+		<None Update="SITScanTestFiles\DepMaven\CCTLocalBOMMavenInitial.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\DepNpm\CCTLocalBOMNpmInitial.json">
+		<None Update="SITScanTestFiles\DepNpm\CCTLocalBOMNpmInitial.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\DepNuget\CCTLocalBOMNugetInitial.json">
+		<None Update="SITScanTestFiles\DepNuget\CCTLocalBOMNugetInitial.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\DepPython\CCTLocalBOMPythonInitial.json">
+		<None Update="SITScanTestFiles\DepPython\CCTLocalBOMPythonInitial.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Maven\CCTLocalBOMMavenInitial.json">
+		<None Update="SITScanTestFiles\Maven\CCTLocalBOMMavenInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Npm\CCTComparisonBOMNpmInitial.json">
+		<None Update="SITScanTestFiles\Npm\CCTComparisonBOMNpmInitial.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Npm\CCTComparisonBOMNpmMultiplePackages.json">
+		<None Update="SITScanTestFiles\Npm\CCTComparisonBOMNpmMultiplePackages.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Npm\CCTComparisonBOMNpmUpdated.json">
+		<None Update="SITScanTestFiles\Npm\CCTComparisonBOMNpmUpdated.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Npm\CCTLocalBOMNpmInitial.json">
+		<None Update="SITScanTestFiles\Npm\CCTLocalBOMNpmInitial.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Npm\CCTLocalBOMNpmMultiplePackages.json">
+		<None Update="SITScanTestFiles\Npm\CCTLocalBOMNpmMultiplePackages.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Npm\CCTLocalBOMNpmUpdated.json">
+		<None Update="SITScanTestFiles\Npm\CCTLocalBOMNpmUpdated.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
 		<None Update="Debian\appSettingsDebianSW360IntegrationTest.json">
@@ -89,23 +89,23 @@
 		<None Update="Nuget\appSettingsNugetSW360IntegrationTest.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageCreatorTestFiles\CCTComparisonBOMNugetTemplateInitial.json">
+		<None Update="SITCreateTestFiles\CCTComparisonBOMNugetTemplateInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageCreatorTestFiles\Python\CCTComparisonBOMPythonUpdated.json">
+		<None Update="SITCreateTestFiles\Python\CCTComparisonBOMPythonUpdated.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="PackageIdentifierTestFiles\Python\CCTLocalBOMPythonInitial.json">
+		<None Update="SITScanTestFiles\Python\CCTLocalBOMPythonInitial.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="PackageCreatorTestFiles\Alpine\" />
-		<Folder Include="PackageIdentifierTestFiles\Alpine\" />
-		<Folder Include="PackageIdentifierTestFiles\DepNpm\" />
-		<Folder Include="PackageIdentifierTestFiles\DepNuget\" />
-		<Folder Include="PackageIdentifierTestFiles\DepPython\" />
+		<Folder Include="SITCreateTestFiles\Alpine\" />
+		<Folder Include="SITScanTestFiles\Alpine\" />
+		<Folder Include="SITScanTestFiles\DepNpm\" />
+		<Folder Include="SITScanTestFiles\DepNuget\" />
+		<Folder Include="SITScanTestFiles\DepPython\" />
 	</ItemGroup>
 
 </Project>

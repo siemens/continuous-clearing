@@ -1,4 +1,4 @@
-parameters:
+﻿parameters:
   # Sw360 and Fossology parameters
   - name: sw360Url
     type: string
@@ -55,11 +55,15 @@ parameters:
     type: string
     default: ''
 
-  - name: PackageCreatorEnabled
+  - name: SITScanEnabled
+    type: boolean
+    default: true
+  
+  - name: SITCreateEnabled
     type: boolean
     default: true
 
-  - name: ArtifactoryUploaderEnabled
+  - name: SITUploadEnabled
     type: boolean
     default: true
     
@@ -105,7 +109,7 @@ steps:
       # Ensure tools directory exists
       Write-Host "##[section] Creating tools directory: $toolsDir"
       New-Item -ItemType Directory -Path $toolsDir -Force | Out-Null
-      $extractPath = Join-Path $toolsDir "LicenseClearingTool"
+      $extractPath = Join-Path $toolsDir "ContinuousClearingTool"
 
       # Conditional block to check if branchName is provided
       if ([string]::IsNullOrWhiteSpace("${{ parameters.branchName_powerUser }}")) {
@@ -153,7 +157,7 @@ steps:
         git clone --branch "${{ parameters.branchName_powerUser }}" https://github.com/siemens/continuous-clearing.git ${{ parameters.workingDirectory }}/CA-Tool
 
         # Build the solution
-        $solutionPath = "${{ parameters.workingDirectory }}/CA-Tool/src/LicenseClearingTool.sln"
+        $solutionPath = "${{ parameters.workingDirectory }}/CA-Tool/src/ContinuousClearingTool.sln"
         Write-Host "##[section] Building the solution at $solutionPath"
         dotnet build $solutionPath --configuration Release
 
@@ -220,14 +224,14 @@ steps:
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
-      displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
+      displayName: 'Run SIT.Scan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
         script: |
           # Print the working directory parameter
           Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-          Write-Host "##[section] Preparing arguments for PackageIdentifier..."
+          Write-Host "##[section] Preparing arguments for SIT.Scan..."
           # Initialize arguments with mandatory fields
           $args = @(
             "--Directory:InputFolder", "${{ project.inputFolder }}",
@@ -318,25 +322,25 @@ steps:
           
           # Print the arguments for debugging
           if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            Write-Host "##[debug] Arguments for SIT.Scan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
           }
 
           # Start executing the tool
-          Write-Host "##[section] Running PackageIdentifier tool..."
-          ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/PackageIdentifier.exe @args
+          Write-Host "##[section] Running SIT.Scan tool..."
+          ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SIT.Scan.exe @args
 
   - task: PowerShell@2
-    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
+    condition: eq('${{ parameters.SITCreateEnabled }}', true)
     continueOnError: true
-    displayName: 'Run SW360PackageCreator'
+    displayName: 'Run SIT.Create'
     inputs:
       targetType: 'inline'
       script: |
         # Print the working directory parameter
         Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-        Write-Host "##[section] Preparing arguments for SW360PackageCreator..."
+        Write-Host "##[section] Preparing arguments for SIT.Create..."
 
         # Setup base arguments
         $args = @(
@@ -388,25 +392,25 @@ steps:
 
         # Print the arguments for debugging
         if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            Write-Host "##[debug] Arguments for SIT.Scan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
         }
 
         # Start executing the tool
-        Write-Host "##[section] Running SW360PackageCreator..."
-        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/SW360PackageCreator.exe @args
+        Write-Host "##[section] Running SIT.Create..."
+        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SIT.Create.exe @args
 
   - task: PowerShell@2
-    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
+    condition: eq('${{ parameters.SITUploadEnabled }}', true)
     continueOnError: true
-    displayName: 'Run ArtifactoryUploader'
+    displayName: 'Run SIT.Upload'
     inputs:
       targetType: 'inline'
       script: |
         # Print the working directory parameter
         Write-Host "##[section] Working Directory: ${{ parameters.workingDirectory }}"
 
-        Write-Host "##[section] Preparing arguments for ArtifactoryUploader..."
+        Write-Host "##[section] Preparing arguments for SIT.Upload..."
 
         # Setup base arguments
         $args = @(
@@ -459,10 +463,10 @@ steps:
 
         # Print the arguments for debugging
         if ($env:SYSTEM_DEBUG -eq 'true') {
-            Write-Host "##[debug] Arguments for PackageIdentifier:"
+            Write-Host "##[debug] Arguments for SIT.Scan:"
             $args | ForEach-Object { Write-Host "##[debug] $_" }
         }
 
         # Start executing the tool
-        Write-Host "##[section] Running ArtifactoryUploader..."
-        ${{ parameters.workingDirectory }}/tools/LicenseClearingTool/tools/ArtifactoryUploader.exe @args
+        Write-Host "##[section] Running SIT.Upload..."
+        ${{ parameters.workingDirectory }}/tools/ContinuousClearingTool/tools/SIT.Upload.exe @args
