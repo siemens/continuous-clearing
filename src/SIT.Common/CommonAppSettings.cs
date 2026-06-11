@@ -93,6 +93,8 @@ namespace SIT.Common
         public string ProjectID { get; set; }
         public string AuthTokenType { get; set; } = "Bearer";
         public string Token { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
         public Fossology Fossology { get; set; }
         public bool IgnoreDevDependency { get; set; } = true;
         public List<string> ExcludeComponents { get; set; }

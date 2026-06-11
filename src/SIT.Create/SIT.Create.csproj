@@ -33,6 +33,7 @@
 		<ProjectReference Include="..\SIT.Facade\SIT.Facade.csproj" />
 		<ProjectReference Include="..\SIT.Services\SIT.Services.csproj" />
 		<ProjectReference Include="..\SIT.Telemetry\SIT.Telemetry.csproj" />
+		<ProjectReference Include="..\SW360KeycloakService\SW360KeycloakService.csproj" />
 	</ItemGroup>
 
 	<ProjectExtensions>
