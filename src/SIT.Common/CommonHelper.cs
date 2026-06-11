@@ -1017,6 +1017,18 @@ namespace SIT.Common
             return true;
         }
 
+        public static void DisplayTokenExpiryWarning(CommonAppSettings appSettings)
+        {
+            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientId);
+            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientSecret);
+
+            if (!hasClientId && !hasClientSecret)
+            {
+                Logger.Warn("The old token authentication process was deprecated on September 5, 2026. Please switch to the new Keycloak authentication process using clientId and clientSecret instead of the old token.");
+            }
+            
+        }
+
         #endregion
 
 

@@ -86,7 +86,7 @@ namespace SW360KeycloakService
                     return _cachedAccessToken;
                 }
 
-                return await FetchAndCacheTokenAsync();
+                return await GenerateAccessTokenAsync();
             }
             finally
             {
@@ -98,18 +98,36 @@ namespace SW360KeycloakService
         /// Removes the cached token so the next call to <see cref="GetOrRefreshTokenAsync"/> forces a fresh fetch.
         /// Call this when a 401 Unauthorized response is received.
         /// </summary>
-        public void InvalidateToken()
+        public void ClearOldCacheToken()
         {
             _cachedAccessToken = null;
             _accessTokenExpiresAt = DateTimeOffset.MinValue;
-            Logger.Debug("KeycloakTokenCacheService: Cached token invalidated.");
+            Logger.Debug("KeycloakTokenCacheService: Cleared last keycloak token.");
         }
 
         #endregion
 
         #region Private Methods
 
-        private async Task<string> FetchAndCacheTokenAsync()
+        private bool HasStaticTokenFallback => !string.IsNullOrWhiteSpace(_settings?.KeyCloakToken);
+
+        /// <summary>
+        /// Returns the static fallback token when one is configured, logging a warning.
+        /// Otherwise logs the user-facing error, calls the exit action, and returns <c>null</c>.
+        /// </summary>
+        private string FallbackToOldTokenOrExit(string userFacingErrorMessage)
+        {
+            if (HasStaticTokenFallback)
+            {
+                Logger.Debug("KeycloakTokenCacheService: Keycloak authentication failed; falling back to static token.");                
+                return _settings.KeyCloakToken;
+            }
+            Logger.Error(userFacingErrorMessage);
+            _exitAction(-1);
+            return null;
+        }
+
+        private async Task<string> GenerateAccessTokenAsync()
         {
             if (string.IsNullOrWhiteSpace(_settings?.ClientId) ||
                 string.IsNullOrWhiteSpace(_settings?.ClientSecret) ||
@@ -138,25 +156,19 @@ namespace SW360KeycloakService
             catch (HttpRequestException ex)
             {
                 Logger.DebugFormat("KeycloakTokenCacheService: HTTP error fetching token from {0}. Error: {1}", tokenUrl, ex.Message);
-                Logger.ErrorFormat("Keycloak token request failed. Unable to connect to the Sw360 server.");
-                _exitAction(-1);
-                return null;
+                return FallbackToOldTokenOrExit("Keycloak token generation failed. Unable to connect to the Sw360 server.");
             }
             catch (TaskCanceledException ex)
             {
                 Logger.DebugFormat("KeycloakTokenCacheService: Token request timed out for {0}. Error: {1}", tokenUrl, ex.Message);
-                Logger.ErrorFormat("Keycloak token request timed out. The Sw360 server did not respond in time. Please check network connectivity or try again later.");
-                _exitAction(-1);
-                return null;
+                return FallbackToOldTokenOrExit("Keycloak token request timed out. The Sw360 server did not respond in time. Please check network connectivity or try again later.");
             }
 
             if (!response.IsSuccessStatusCode)
             {
                 string errorBody = await response.Content.ReadAsStringAsync();
-                Logger.DebugFormat("KeycloakTokenCacheService: Keycloak token request failed. Status: {0}, Body: {1}", response.StatusCode, errorBody);                
-                Logger.ErrorFormat("Keycloak Token generation failed. Please verify your ClientId and ClientSecret via inline or appSettings.json file and retry again. (Status: {0})", response.StatusCode);
-                _exitAction(-1);
-                return null;
+                Logger.DebugFormat("KeycloakTokenCacheService: Keycloak token request failed. Status: {0}, Body: {1}", response.StatusCode, errorBody);
+                return FallbackToOldTokenOrExit($"Keycloak Token generation failed. Please verify your ClientId and ClientSecret via inline or appSettings.json file and retry again. (Status: {response.StatusCode})");
             }
 
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -168,17 +180,13 @@ namespace SW360KeycloakService
             catch (JsonException ex)
             {
                 Logger.DebugFormat("KeycloakTokenCacheService: Failed to deserialize token response. Error: {0}", ex.Message);
-                Logger.ErrorFormat("Keycloak token response could not be parsed. An unexpected response was received from the Keycloak server.");
-                _exitAction(-1);
-                return null;
+                return FallbackToOldTokenOrExit("Keycloak token response could not be parsed. An unexpected response was received from the Keycloak server.");
             }
 
             if (string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
             {
                 Logger.Debug("KeycloakTokenCacheService: Received empty access token from Keycloak.");
-                Logger.Error("Keycloak returned an empty access token. Please verify your Keycloak realm and client configuration.");
-                _exitAction(-1);
-                return null;
+                return FallbackToOldTokenOrExit("Keycloak returned an empty access token.");
             }
 
             // Use ExpiresIn from the response minus a safety buffer to avoid edge-expiry 401s

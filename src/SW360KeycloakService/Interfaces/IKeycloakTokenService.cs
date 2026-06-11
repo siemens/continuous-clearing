@@ -24,6 +24,6 @@ namespace SW360KeycloakService.Interfaces
         /// Removes the cached token so the next call to <see cref="GetOrRefreshTokenAsync"/> forces a fresh fetch.
         /// Intended to be called when a 401 Unauthorized response is received.
         /// </summary>
-        void InvalidateToken();
+        void ClearOldCacheToken();
     }
 }

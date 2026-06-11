@@ -146,6 +146,7 @@ namespace SIT.Scan
             // Validate application settings
             if (appSettings.SW360 != null)
             {
+                CommonHelper.DisplayTokenExpiryWarning(appSettings);
                 await ValidateAppsettingsFile(appSettings, projectReleases);
             }
 

@@ -42,7 +42,7 @@ namespace SW360KeycloakService
 
             Logger.DebugFormat("TokenRefreshDelegatingHandler: 401 Unauthorized for {0} {1}. Refreshing token and retrying.", request.Method, request.RequestUri);
 
-            _tokenService.InvalidateToken();
+            _tokenService.ClearOldCacheToken();
             string newToken = await _tokenService.GetOrRefreshTokenAsync();
 
             if (string.IsNullOrWhiteSpace(newToken))

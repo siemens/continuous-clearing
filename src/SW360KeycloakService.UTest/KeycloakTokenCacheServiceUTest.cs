@@ -22,6 +22,18 @@ namespace SW360KeycloakService.UTest
         private const string ValidToken = "eyJhbGciOiJSUzI1NiJ9.test_token";
         private const string NewToken = "eyJhbGciOiJSUzI1NiJ9.new_token";
 
+        private const string StaticFallbackToken = "static-fallback-token";
+
+        private TokenServiceSettings BuildSettingsWithFallback(string clientId = "test-client", string secret = "test-secret", string url = "https://sw360.example.com") =>
+            new TokenServiceSettings
+            {
+                SW360BaseUrl = url,
+                ClientId = clientId,
+                ClientSecret = secret,
+                KeyCloakToken = StaticFallbackToken,
+                KeyCloakTokenType = "Bearer"
+            };
+
         private TokenServiceSettings BuildSettings(string clientId = "test-client", string secret = "test-secret", string url = "https://sw360.example.com")
         {
             return new TokenServiceSettings
@@ -128,7 +140,7 @@ namespace SW360KeycloakService.UTest
 
             // Act
             string first = await sut.GetOrRefreshTokenAsync();
-            sut.InvalidateToken();                                        // ← simulate 401 invalidation
+            sut.ClearOldCacheToken();                                        // ← simulate 401 invalidation
             string second = await sut.GetOrRefreshTokenAsync();
 
             // Assert
@@ -309,11 +321,87 @@ namespace SW360KeycloakService.UTest
             await sut.GetOrRefreshTokenAsync();   // prime the cache
 
             // Act
-            sut.InvalidateToken();
+            sut.ClearOldCacheToken();
             string token = await sut.GetOrRefreshTokenAsync();
 
             // Assert — second fetch returns new token
             Assert.That(token, Is.EqualTo(NewToken));
+        }
+
+        // ─── Scenario 11: All three provided — Keycloak fails (401) → fallback to static token ───
+
+        [Test]
+        public async Task GetOrRefreshTokenAsync_ShouldFallbackToStaticToken_WhenKeycloak401AndTokenPresent()
+        {
+            // Arrange — all three provided: ClientId + ClientSecret + static Token
+            var settings = BuildSettingsWithFallback();
+            var httpClient = BuildMockHttpClient(HttpStatusCode.Unauthorized,
+                "{\"error\":\"invalid_client\",\"error_description\":\"Invalid client credentials\"}");
+            int exitCode = 0;
+            var sut = new KeycloakTokenCacheService(settings, code => exitCode = code, httpClient);
+
+            // Act
+            string token = await sut.GetOrRefreshTokenAsync();
+
+            // Assert — no exit; static fallback token returned
+            Assert.That(exitCode, Is.EqualTo(0));
+            Assert.That(token, Is.EqualTo(StaticFallbackToken));
+        }
+
+        // ─── Scenario 12: All three provided — network error → fallback to static token ──────────
+
+        [Test]
+        public async Task GetOrRefreshTokenAsync_ShouldFallbackToStaticToken_WhenNetworkErrorAndTokenPresent()
+        {
+            // Arrange
+            var settings = BuildSettingsWithFallback();
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new HttpRequestException("Connection refused"));
+
+            var httpClient = new HttpClient(handlerMock.Object);
+            int exitCode = 0;
+            var sut = new KeycloakTokenCacheService(settings, code => exitCode = code, httpClient);
+
+            // Act
+            string token = await sut.GetOrRefreshTokenAsync();
+
+            // Assert — no exit; static fallback token returned
+            Assert.That(exitCode, Is.EqualTo(0));
+            Assert.That(token, Is.EqualTo(StaticFallbackToken));
+        }
+
+        // ─── Scenario 13: All three provided — timeout → fallback to static token ───────────────
+
+        [Test]
+        public async Task GetOrRefreshTokenAsync_ShouldFallbackToStaticToken_WhenTimeoutAndTokenPresent()
+        {
+            // Arrange
+            var settings = BuildSettingsWithFallback();
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new TaskCanceledException("Request timed out"));
+
+            var httpClient = new HttpClient(handlerMock.Object);
+            int exitCode = 0;
+            var sut = new KeycloakTokenCacheService(settings, code => exitCode = code, httpClient);
+
+            // Act
+            string token = await sut.GetOrRefreshTokenAsync();
+
+            // Assert — no exit; static fallback token returned
+            Assert.That(exitCode, Is.EqualTo(0));
+            Assert.That(token, Is.EqualTo(StaticFallbackToken));
         }
     }
 }

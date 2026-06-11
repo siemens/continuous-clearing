@@ -49,7 +49,7 @@ namespace SW360KeycloakService.UTest
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            tokenServiceMock.Verify(s => s.InvalidateToken(), Times.Never);
+            tokenServiceMock.Verify(s => s.ClearOldCacheToken(), Times.Never);
             tokenServiceMock.Verify(s => s.GetOrRefreshTokenAsync(), Times.Never);
         }
 
@@ -83,7 +83,7 @@ namespace SW360KeycloakService.UTest
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            tokenServiceMock.Verify(s => s.InvalidateToken(), Times.Once);
+            tokenServiceMock.Verify(s => s.ClearOldCacheToken(), Times.Once);
             tokenServiceMock.Verify(s => s.GetOrRefreshTokenAsync(), Times.Once);
         }
 
@@ -231,7 +231,7 @@ namespace SW360KeycloakService.UTest
                 Times.Exactly(2),                                        // exactly 2 attempts total
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>());
-            tokenServiceMock.Verify(s => s.InvalidateToken(), Times.Once);          // only one refresh
+            tokenServiceMock.Verify(s => s.ClearOldCacheToken(), Times.Once);          // only one refresh
         }
     }
 }
