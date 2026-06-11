@@ -30,7 +30,7 @@ namespace SW360KeycloakService.Constants
         internal const string ScopeKey = "scope";
 
         /// <summary>Keycloak scope value used during token request.</summary>
-        internal const string ScopeValue = "email profile";
+        internal const string ScopeValue = "openid email READ WRITE";
 
         /// <summary>Safety buffer in seconds subtracted from ExpiresIn when caching.</summary>
         internal const int ExpiryBufferSeconds = 60;
