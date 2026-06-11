@@ -561,6 +561,8 @@ namespace SIT.Common
             var sensitiveArgs = new[]
             {
                 "--SW360:Token",
+                "--SW360:ClientId",
+                "--SW360:ClientSecret",
                 "--Jfrog:Token",
                 "--SbomSigning:ClientId",
                 "--SbomSigning:ClientSecret",
@@ -973,6 +975,46 @@ namespace SIT.Common
                 component.Properties = properties;
             }
             bom.Components = bomComponentsList;
+        }
+
+        /// <summary>
+        /// Validates that Keycloak <paramref name="clientId"/> and <paramref name="clientSecret"/> are either
+        /// both provided or both absent. Logs an error and calls <paramref name="exitAction"/> when only one
+        /// of the two credentials is supplied.
+        /// </summary>
+        /// <param name="clientId">The Keycloak client identifier.</param>
+        /// <param name="clientSecret">The Keycloak client secret.</param>
+        /// <param name="logger">Logger used to write user-facing error messages.</param>
+        /// <param name="exitAction">Action invoked with exit code <c>-1</c> when validation fails.</param>
+        /// <returns>
+        /// <c>true</c> when both credentials are present and Keycloak should be used;
+        /// <c>false</c> when both are absent (plain-token mode) or when an error was reported.
+        /// </returns>
+        public static bool ValidateKeycloakCredentials(CommonAppSettings appSettings, Action<int> exitAction)
+        {
+            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientId);
+            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientSecret);
+
+            if (!hasClientId && !hasClientSecret)
+            {
+                return false;
+            }
+
+            if (hasClientId && !hasClientSecret)
+            {
+                Logger.Error("Token generation failed: ClientId is provided but ClientSecret is missing. Provide both ClientId and ClientSecret via inline or appsettings file.");
+                exitAction(-1);
+                return false;
+            }
+
+            if (!hasClientId && hasClientSecret)
+            {
+                Logger.Error("Token generation failed: ClientSecret is provided but ClientId is missing. Provide both ClientId and ClientSecret via inline or appsettings file.");
+                exitAction(-1);
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

@@ -246,8 +246,7 @@ namespace SIT.Scan
         private static async Task<KeycloakTokenCacheService> InitializeKeycloakTokenServiceAsync(
             CommonAppSettings appSettings, SW360ConnectionSettings sw360ConnectionSettings)
         {
-            if (string.IsNullOrWhiteSpace(appSettings.SW360.ClientId) ||
-                string.IsNullOrWhiteSpace(appSettings.SW360.ClientSecret))
+            if (!CommonHelper.ValidateKeycloakCredentials(appSettings, environmentHelper.CallEnvironmentExit))
             {
                 return null;
             }
