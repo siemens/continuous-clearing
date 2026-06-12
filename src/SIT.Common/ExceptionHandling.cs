@@ -46,7 +46,7 @@ namespace SIT.Common
         {
             if (400 <= Convert.ToInt32(response.StatusCode) && Convert.ToInt32(response.StatusCode) <= 499)
             {
-                Logger.Logger.Log(null, Level.Error, $"The exception may be caused by an incorrect projectid or missing token for {exceptionSource} , Please ensure that a valid token is provided and try again:{ex.Message}", null);
+                Logger.Logger.Log(null, Level.Error, $"This exception may be caused by an invalid projectId or a missing {exceptionSource} token. Please ensure a valid token is provided and retry. Response status code: (Status:{response.StatusCode}).", null);
 
             }
             else if ((500 <= Convert.ToInt32(ex.StatusCode) && Convert.ToInt32(ex.StatusCode) <= 599) || ex.StatusCode == null)

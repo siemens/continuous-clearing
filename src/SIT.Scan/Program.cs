@@ -255,8 +255,8 @@ namespace SIT.Scan
             var tokenSettings = new TokenServiceSettings
             {
                 SW360BaseUrl = appSettings.SW360.URL,
-                ClientId = appSettings.SW360.ClientId,
-                ClientSecret = appSettings.SW360.ClientSecret,
+                ClientId = appSettings.SW360.Keycloak?.ClientId,
+                ClientSecret = appSettings.SW360.Keycloak?.ClientSecret,
                 KeyCloakToken = appSettings.SW360.Token,
                 KeyCloakTokenType = appSettings.SW360.AuthTokenType
             };

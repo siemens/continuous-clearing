@@ -130,8 +130,7 @@ namespace SW360KeycloakService
         private async Task<string> GenerateAccessTokenAsync()
         {
             if (string.IsNullOrWhiteSpace(_settings?.ClientId) ||
-                string.IsNullOrWhiteSpace(_settings?.ClientSecret) ||
-                string.IsNullOrWhiteSpace(_settings?.SW360BaseUrl))
+                string.IsNullOrWhiteSpace(_settings?.ClientSecret))
             {
                 Logger.Debug("KeycloakTokenCacheService: ClientId, ClientSecret or SW360 URL not set. Falling back to existing token.");
                 return _settings?.KeyCloakToken;
@@ -156,7 +155,7 @@ namespace SW360KeycloakService
             catch (HttpRequestException ex)
             {
                 Logger.DebugFormat("KeycloakTokenCacheService: HTTP error fetching token from {0}. Error: {1}", tokenUrl, ex.Message);
-                return FallbackToOldTokenOrExit("Keycloak token generation failed. Unable to connect to the Sw360 server.");
+                return FallbackToOldTokenOrExit("Authentication failed. Unable to connect to the Sw360 server.");
             }
             catch (TaskCanceledException ex)
             {
@@ -168,7 +167,7 @@ namespace SW360KeycloakService
             {
                 string errorBody = await response.Content.ReadAsStringAsync();
                 Logger.DebugFormat("KeycloakTokenCacheService: Keycloak token request failed. Status: {0}, Body: {1}", response.StatusCode, errorBody);
-                return FallbackToOldTokenOrExit($"Keycloak Token generation failed. Please verify your ClientId and ClientSecret via inline or appSettings.json file and retry again. (Status: {response.StatusCode})");
+                return FallbackToOldTokenOrExit($"Authentication failed. Please ensure that both the ClientId and ClientSecret are provided, and then try again. (Status: {response.StatusCode})");
             }
 
             string responseBody = await response.Content.ReadAsStringAsync();

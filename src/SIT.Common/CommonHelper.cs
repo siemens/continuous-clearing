@@ -992,8 +992,19 @@ namespace SIT.Common
         /// </returns>
         public static bool ValidateKeycloakCredentials(CommonAppSettings appSettings, Action<int> exitAction)
         {
-            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientId);
-            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientSecret);
+            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientId);
+            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientSecret);
+            bool hasToken = !string.IsNullOrWhiteSpace(appSettings.SW360.Token);
+
+            const string clientId = "ClientId";
+            const string clientSecret = "ClientSecret";
+
+            if (!hasClientId && !hasClientSecret && !hasToken)
+            {
+                Logger.ErrorFormat("Authentication failed: Please provide {0},{1} and retry .", clientId, clientSecret);
+                exitAction(-1);
+                return false;
+            }
 
             if (!hasClientId && !hasClientSecret)
             {
@@ -1002,14 +1013,14 @@ namespace SIT.Common
 
             if (hasClientId && !hasClientSecret)
             {
-                Logger.Error("Token generation failed: ClientId is provided but ClientSecret is missing. Provide both ClientId and ClientSecret via inline or appsettings file.");
+                Logger.ErrorFormat("Authentication failed: Please provide {1} and retry.", clientId, clientSecret);
                 exitAction(-1);
                 return false;
             }
 
             if (!hasClientId && hasClientSecret)
             {
-                Logger.Error("Token generation failed: ClientSecret is provided but ClientId is missing. Provide both ClientId and ClientSecret via inline or appsettings file.");
+                Logger.ErrorFormat("Authentication failed: Please provide {1} and retry.", clientSecret, clientId);
                 exitAction(-1);
                 return false;
             }
@@ -1019,12 +1030,12 @@ namespace SIT.Common
 
         public static void DisplayTokenExpiryWarning(CommonAppSettings appSettings)
         {
-            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientId);
-            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.ClientSecret);
+            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientId);
+            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientSecret);
 
             if (!hasClientId && !hasClientSecret)
             {
-                Logger.Warn("The old token authentication process was deprecated on September 5, 2026. Please switch to the new Keycloak authentication process using clientId and clientSecret instead of the old token.");
+                Logger.Warn("Legacy token authentication will be deprecated on September 5, 2026. Please switch to the new Keycloak authentication using clientId and clientSecret");
             }
             
         }
