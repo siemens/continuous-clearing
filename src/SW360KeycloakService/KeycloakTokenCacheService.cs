@@ -22,7 +22,7 @@ namespace SW360KeycloakService
     /// Caches a Keycloak access token in memory and refreshes it automatically when it expires.
     /// Thread-safe via <see cref="SemaphoreSlim"/> double-check locking.
     /// </summary>
-    public class KeycloakTokenCacheService : IKeycloakTokenService
+    public class KeycloakTokenCacheService : IKeycloakTokenService, IDisposable
     {
         #region Fields
 
@@ -32,9 +32,11 @@ namespace SW360KeycloakService
         private readonly TokenServiceSettings _settings;
         private readonly HttpClient _httpClient;
         private readonly Action<int> _exitAction;
+        private readonly bool _ownsHttpClient;
 
         private string _cachedAccessToken;
         private DateTimeOffset _accessTokenExpiresAt = DateTimeOffset.MinValue;
+        private bool _disposed;
 
         #endregion
 
@@ -56,6 +58,7 @@ namespace SW360KeycloakService
         {
             _settings = settings;
             _exitAction = exitAction ?? (code => Environment.Exit(code));
+            _ownsHttpClient = httpClient == null;
             _httpClient = httpClient ?? new HttpClient();
         }
 
@@ -105,11 +108,36 @@ namespace SW360KeycloakService
             Logger.Debug("KeycloakTokenCacheService: Cleared last keycloak token.");
         }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases managed resources held by this instance.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> when called from <see cref="Dispose()"/>; <c>false</c> when called from a finalizer.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                _lock.Dispose();
+                if (_ownsHttpClient)
+                {
+                    _httpClient.Dispose();
+                }
+            }
+            _disposed = true;
+        }
+
         #endregion
 
         #region Private Methods
 
-        private bool HasStaticTokenFallback => !string.IsNullOrWhiteSpace(_settings?.KeyCloakToken);
+        private bool HasStaticTokenFallback => !string.IsNullOrWhiteSpace(_settings.KeyCloakToken);
 
         /// <summary>
         /// Returns the static fallback token when one is configured, logging a warning.
@@ -129,11 +157,11 @@ namespace SW360KeycloakService
 
         private async Task<string> GenerateAccessTokenAsync()
         {
-            if (string.IsNullOrWhiteSpace(_settings?.ClientId) ||
-                string.IsNullOrWhiteSpace(_settings?.ClientSecret))
+            if (string.IsNullOrWhiteSpace(_settings.ClientId) ||
+                string.IsNullOrWhiteSpace(_settings.ClientSecret))
             {
                 Logger.Debug("KeycloakTokenCacheService: ClientId, ClientSecret or SW360 URL not set. Falling back to existing token.");
-                return _settings?.KeyCloakToken;
+                return _settings.KeyCloakToken;
             }
 
             string tokenUrl = $"{_settings.SW360BaseUrl.TrimEnd('/')}{KeycloakConstants.TokenEndpoint}";

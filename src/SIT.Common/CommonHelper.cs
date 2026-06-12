@@ -1018,7 +1018,7 @@ namespace SIT.Common
                 return false;
             }
 
-            if (!hasClientId && hasClientSecret)
+            if (!hasClientId)
             {
                 Logger.ErrorFormat("Authentication failed: Please provide {1} and retry.", clientSecret, clientId);
                 exitAction(-1);
