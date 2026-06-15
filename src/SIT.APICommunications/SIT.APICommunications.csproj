@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SIT.Common\SIT.Common.csproj" />
+    <ProjectReference Include="..\SW360KeycloakService\SW360KeycloakService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

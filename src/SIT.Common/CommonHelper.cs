@@ -561,6 +561,8 @@ namespace SIT.Common
             var sensitiveArgs = new[]
             {
                 "--SW360:Token",
+                "--SW360:Keycloak:ClientId",
+                "--SW360:Keycloak:ClientSecret",
                 "--Jfrog:Token",
                 "--SbomSigning:ClientId",
                 "--SbomSigning:ClientSecret",
@@ -973,6 +975,69 @@ namespace SIT.Common
                 component.Properties = properties;
             }
             bom.Components = bomComponentsList;
+        }
+
+        /// <summary>
+        /// Validates that Keycloak <paramref name="clientId"/> and <paramref name="clientSecret"/> are either
+        /// both provided or both absent. Logs an error and calls <paramref name="exitAction"/> when only one
+        /// of the two credentials is supplied.
+        /// </summary>
+        /// <param name="clientId">The Keycloak client identifier.</param>
+        /// <param name="clientSecret">The Keycloak client secret.</param>
+        /// <param name="logger">Logger used to write user-facing error messages.</param>
+        /// <param name="exitAction">Action invoked with exit code <c>-1</c> when validation fails.</param>
+        /// <returns>
+        /// <c>true</c> when both credentials are present and Keycloak should be used;
+        /// <c>false</c> when both are absent (plain-token mode) or when an error was reported.
+        /// </returns>
+        public static bool ValidateKeycloakCredentials(CommonAppSettings appSettings, Action<int> exitAction)
+        {
+            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientId);
+            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientSecret);
+            bool hasToken = !string.IsNullOrWhiteSpace(appSettings.SW360.Token);
+
+            const string clientId = "ClientId";
+            const string clientSecret = "ClientSecret";
+
+            if (!hasClientId && !hasClientSecret && !hasToken)
+            {
+                Logger.ErrorFormat("Authentication failed: Please provide {0},{1} and retry .", clientId, clientSecret);
+                exitAction(-1);
+                return false;
+            }
+
+            if (!hasClientId && !hasClientSecret)
+            {
+                return false;
+            }
+
+            if (hasClientId && !hasClientSecret)
+            {
+                Logger.ErrorFormat("Authentication failed: Please provide {1} and retry.", clientId, clientSecret);
+                exitAction(-1);
+                return false;
+            }
+
+            if (!hasClientId)
+            {
+                Logger.ErrorFormat("Authentication failed: Please provide {1} and retry.", clientSecret, clientId);
+                exitAction(-1);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static void DisplayTokenExpiryWarning(CommonAppSettings appSettings)
+        {
+            bool hasClientId = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientId);
+            bool hasClientSecret = !string.IsNullOrWhiteSpace(appSettings.SW360.Keycloak?.ClientSecret);
+
+            if (!hasClientId && !hasClientSecret)
+            {
+                Logger.Warn("Legacy token authentication will be deprecated on September 5, 2026. Please switch to the new Keycloak authentication using clientId and clientSecret");
+            }
+            
         }
 
         #endregion

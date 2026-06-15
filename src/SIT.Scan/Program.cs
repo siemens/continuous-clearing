@@ -6,6 +6,9 @@
 
 // Ignore Spelling: Bom SIT
 
+using log4net;
+using log4net.Core;
+using Microsoft.Extensions.DependencyInjection;
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
@@ -19,9 +22,8 @@ using SIT.Facade.Interfaces;
 using SIT.Scan.Interface;
 using SIT.Services;
 using SIT.Services.Interface;
-using log4net;
-using log4net.Core;
-using Microsoft.Extensions.DependencyInjection;
+using SW360KeycloakService;
+using SW360KeycloakService.Model;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -144,6 +146,7 @@ namespace SIT.Scan
             // Validate application settings
             if (appSettings.SW360 != null)
             {
+                CommonHelper.DisplayTokenExpiryWarning(appSettings);
                 await ValidateAppsettingsFile(appSettings, projectReleases);
             }
 
@@ -227,12 +230,43 @@ namespace SIT.Scan
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
-            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
+            KeycloakTokenCacheService tokenService = await InitializeKeycloakTokenServiceAsync(appSettings, sw360ConnectionSettings);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings, tokenService));
             int isValid = await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
+        }
+
+        /// <summary>
+        /// Initializes the Keycloak token service if <c>ClientId</c> and <c>ClientSecret</c> are configured,
+        /// fetches a fresh token, and syncs the result back to <paramref name="appSettings"/> and
+        /// <paramref name="sw360ConnectionSettings"/>. Returns <c>null</c> when Keycloak credentials are absent.
+        /// </summary>
+        private static async Task<KeycloakTokenCacheService> InitializeKeycloakTokenServiceAsync(
+            CommonAppSettings appSettings, SW360ConnectionSettings sw360ConnectionSettings)
+        {
+            if (!CommonHelper.ValidateKeycloakCredentials(appSettings, environmentHelper.CallEnvironmentExit))
+            {
+                return null;
+            }
+
+            var tokenSettings = new TokenServiceSettings
+            {
+                SW360BaseUrl = appSettings.SW360.URL,
+                ClientId = appSettings.SW360.Keycloak?.ClientId,
+                ClientSecret = appSettings.SW360.Keycloak?.ClientSecret,
+                KeyCloakToken = appSettings.SW360.Token,
+                KeyCloakTokenType = appSettings.SW360.AuthTokenType
+            };
+            var tokenService = new KeycloakTokenCacheService(tokenSettings, environmentHelper.CallEnvironmentExit);
+            await tokenService.GetOrRefreshTokenAsync();
+            appSettings.SW360.Token = tokenSettings.KeyCloakToken;
+            appSettings.SW360.AuthTokenType = tokenSettings.KeyCloakTokenType;
+            sw360ConnectionSettings.Sw360Token = appSettings.SW360.Token;
+            sw360ConnectionSettings.SW360AuthTokenType = appSettings.SW360.AuthTokenType;
+            return tokenService;
         }
         #endregion
 
