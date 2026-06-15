@@ -22,6 +22,11 @@
   - [SPDX SBOM Signature Validator](#spdx-sbom-signature-validator)
     - [File Naming Convention](#file-naming-convention-1)
     - [Validation Process](#validation-process)
+  - [SW360 Keycloak Authentication](#sw360-keycloak-authentication)
+    - [Overview](#keycloak-overview)
+    - [Authentication Modes](#authentication-modes)
+    - [Configuration](#keycloak-configuration)
+    - [Token Lifecycle](#token-lifecycle)
   - [SBOM Signing and Verification](#sbom-signing-and-verification)
     - [Overview](#sbom-signing-overview)
     - [Configuration](#sbom-signing-configuration)
@@ -110,10 +115,28 @@ To ensure a smooth operation of the Continuous Clearing Tool, please follow thes
 1. **Project Entry in SW360**: 
    - Make sure your project is registered in SW360 for license clearance and is set to an **Active** state when running the Continuous Clearing Tool.
 2. **Access Requirements**:
-   - **SW360 REST API Authentication Token**:
-     - **SW360 Token**:
-       1. Users can generate a token from their functional account.
-       2. Required credentials include the client ID and client secret.
+   - **SW360 REST API Authentication**:
+
+     The tool supports two authentication modes for SW360. Choose one based on your setup:
+
+     | Mode | Required Fields | When to Use |
+     |------|----------------|-------------|
+     | **Keycloak** (recommended) | `SW360.Keycloak.ClientId` + `SW360.Keycloak.ClientSecret` | SW360 instances using Keycloak identity provider |
+     | **Legacy Token** (deprecated) | `SW360.Token` | Static bearer/token auth — deprecated, scheduled for removal **September 5, 2026** |
+
+     > ⚠️ **Deprecation Notice**: Legacy token authentication (`SW360.Token`) is deprecated as of this release and will be removed on **September 5, 2026**. Migrate to Keycloak authentication using `SW360.Keycloak.ClientId` and `SW360.Keycloak.ClientSecret`.
+
+     **Keycloak Authentication (Recommended)**:
+     - Obtain a **Client ID** and **Client Secret** from your SW360 Keycloak realm for your functional account.
+     - Set these under the `SW360.Keycloak` section in `appSettings.json` or pass them as `--SW360:Keycloak:ClientId` and `--SW360:Keycloak:ClientSecret` via command line.
+     - The tool automatically fetches and refreshes tokens; no manual token management is required.
+
+     **Legacy Token Authentication**:
+     - Generate a static token from your SW360 functional account.
+     - Set it as `SW360.Token` in `appSettings.json` or pass it as `--SW360:Token` via command line.
+
+     **Fallback Behavior**: If all three (`ClientId`, `ClientSecret`, and `Token`) are provided, the tool attempts Keycloak authentication first. If Keycloak authentication fails, it automatically falls back to the static token and logs a warning.
+
    - **Artifactory Token**:
      - Necessary for uploading cleared, internal, and development packages into JFrog Artifactory. Users must obtain their own JFrog Artifactory token.   
 
@@ -320,6 +343,38 @@ example.spdx.sbom.json.pem # Public certificate file
 2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
 3. Performs signature verification using the public certificate
 
+## SW360 Keycloak Authentication
+
+### Overview
+
+The Continuous Clearing Tool supports Keycloak-based OAuth 2.0 authentication for SW360, replacing the legacy static token approach. Keycloak authentication automatically manages token acquisition, caching, and refresh — no manual token rotation is required.
+
+> ⚠️ **Deprecation Notice**: Legacy static token authentication (`SW360.Token`) is deprecated and scheduled for removal on **September 5, 2026**. Migrate to Keycloak authentication before that date.
+
+### Authentication Modes
+
+| Mode | Configuration | Behavior |
+|------|--------------|----------|
+| **Keycloak** (recommended) | `SW360.Keycloak.ClientId` + `SW360.Keycloak.ClientSecret` | Fetches OAuth 2.0 tokens from Keycloak; auto-refreshes before expiry || 
+
+### Configuration
+
+**Via appSettings.json (Keycloak):**
+```json
+{
+  "SW360": {
+    "AuthTokenType": "Bearer",
+    "Keycloak": {
+      "ClientId": "your-sw360-client-id",
+      "ClientSecret": "your-sw360-client-secret"
+    }
+  }
+}
+```
+**Via command line (Keycloak — recommended for pipelines):**
+```
+--SW360:Keycloak:ClientId "your-client-id" --SW360:Keycloak:ClientSecret "your-client-secret"
+```
 ## SBOM Signing and Verification
 
 ### Overview
@@ -447,8 +502,10 @@ Description for the settings in appSettings.json file
 | 6    | SW360.URL                                 | URL of the SW360 server                                       | Yes             | [https://sw360.example.com](https://sw360.example.com)                   |
 | 7    | SW360.ProjectName                         | Name of the SW360 project                                     | Yes             | `MyProject`                                                                |
 | 8    | SW360.ProjectID                           | ID of the SW360 project                                       | Yes             | `57362e4179ce4e839f286ddf0b91d177`                                         |
-| 9    | SW360.AuthTokenType                       | Type of the SW360 token                                       | Yes             | `Bearer` or `Token`                                                          |
-| 10   | SW360.Token                               | Auth token for SW360                                          | Yes             | `xxxxxx`                                                                   |
+| 9    | SW360.AuthTokenType                       | Type of the SW360 token (used with legacy token auth)         | No†             | `Bearer` or `Token`                                                          |
+| 10   | SW360.Token                               | Static auth token for SW360 (legacy, deprecated Sep 5 2026)  | No†             | `xxxxxx`                                                                   |
+| 10a  | SW360.Keycloak.ClientId                   | Keycloak Client ID for SW360 authentication (recommended)     | Yes             | `my-sw360-client`                                                          |
+| 10b  | SW360.Keycloak.ClientSecret               | Keycloak Client Secret for SW360 authentication (recommended) | Yes             | `xxxxxx`                                                                   |
 | 11   | SW360.Fossology.URL                       | URL of Fossology server                                       | Yes             | [https://fossology.example.com](https://fossology.example.com)           |
 | 12   | SW360.Fossology.EnableTrigger             | Enable Fossology scan trigger                                 | No              | `True`                                                                     |
 | 13   | SW360.IgnoreDevDependency                 | Ignore development dependencies                               | No              | `True`                                                                     |
@@ -485,8 +542,13 @@ Description for the settings in appSettings.json file
 You can also pass the above mentioned arguments in the command line.
 Note: If the second approach is followed then make sure you provide all the settings mentioned in the appsettings.json in the command line
 
+For Keycloak authentication, use the following nested colon syntax:
+```
+--SW360:Keycloak:ClientId "your-client-id" --SW360:Keycloak:ClientSecret "your-client-secret"
+```
+
 #### **Method 3 (Recommended) - AppSettings + Cmd paramaters**
-- **Secrets Management**: Sensitive data such as the JFrog token, SW360 token, and SBOM signing credentials should be passed as secure variables via command line parameters. This practice ensures that confidential information remains protected.
+- **Secrets Management**: Sensitive data such as the JFrog token, SW360 Keycloak credentials (`--SW360:Keycloak:ClientId`, `--SW360:Keycloak:ClientSecret`), and SBOM signing credentials should be passed as secure variables via command line parameters. This practice ensures that confidential information remains protected.
 
 - **Project Configuration**:
   - Project-specific details such as the project type, SW360 project ID, project name, and directories can be conveniently passed as command line parameters. This allows for flexible and dynamic execution based on project requirements.
@@ -528,6 +590,10 @@ Continuous Clearing Tool can be executed as container or as binaries,
 * In order to run the SIT.Scan.dll , execute the below command.
 
   **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Scan.dll --settingsfilepath /etc/CATool/appSettings.json`
+
+* **With Keycloak authentication** (recommended — credentials passed as command line parameters):
+
+  **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Scan.dll --settingsfilepath /etc/CATool/appSettings.json --SW360:Keycloak:ClientId "your-client-id" --SW360:Keycloak:ClientSecret "your-client-secret"`
 
 * **With SBOM Signing enabled** (credentials from appSettings.json or command line parameters):
 
@@ -718,6 +784,8 @@ Both templates share common parameters with some implementation-specific differe
 | Parameter | Type | Default | Description |Mandatory|
 |-----------|------|---------|-------------|---------|
 | `sw360Token` | string | '' | SW360 authentication token |:white_check_mark:|
+| `sw360ClientId` | string | '' | SW360 authentication Client_id |:white_check_mark:|
+| `sw360ClientSecret` | string | '' | SW360 authentication Client_secret |:white_check_mark:|
 | `sw360ProjectId` | string | '' | Target SW360 project ID  |:white_check_mark:|
 | `sw360ProjectName` | string | '' | SW360 project name  |:white_check_mark:|
 | `projectDefinitions` | object | [] | List of project configurations to scan  |:white_check_mark:|

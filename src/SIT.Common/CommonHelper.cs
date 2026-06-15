@@ -561,8 +561,8 @@ namespace SIT.Common
             var sensitiveArgs = new[]
             {
                 "--SW360:Token",
-                "--SW360:ClientId",
-                "--SW360:ClientSecret",
+                "--SW360:Keycloak:ClientId",
+                "--SW360:Keycloak:ClientSecret",
                 "--Jfrog:Token",
                 "--SbomSigning:ClientId",
                 "--SbomSigning:ClientSecret",
