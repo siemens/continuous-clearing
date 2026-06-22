@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
+using log4net;
 using SIT.APICommunications;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
@@ -12,7 +13,6 @@ using SIT.Common.Interface;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Services.Interface;
-using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;

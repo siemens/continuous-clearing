@@ -4,8 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using SIT.APICommunications.Model.Foss;
 using Newtonsoft.Json;
+using SIT.APICommunications.Model.Foss;
 using System.Collections.Generic;
 
 namespace SIT.APICommunications.Model

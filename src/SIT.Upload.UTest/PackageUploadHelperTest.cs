@@ -7,14 +7,14 @@
 // Ignore Spelling: Aritfactory Uploader
 
 using CycloneDX.Models;
-using SIT.APICommunications;
-using SIT.APICommunications.Model;
-using SIT.Upload.Model;
-using SIT.Common.Constants;
-using SIT.Common.Interface;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Moq;
 using NUnit.Framework;
+using SIT.APICommunications;
+using SIT.APICommunications.Model;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Upload.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

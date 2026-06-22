@@ -5,16 +5,16 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using Moq;
+using NUnit.Framework;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.AQL;
-using SIT.Upload.Model;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Model;
 using SIT.Services.Interface;
-using Moq;
-using NUnit.Framework;
+using SIT.Upload.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;

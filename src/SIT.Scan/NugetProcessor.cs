@@ -5,6 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using log4net;
+using Newtonsoft.Json;
+using NuGet.ProjectModel;
+using NuGet.Versioning;
 using SIT.APICommunications;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
@@ -15,10 +19,6 @@ using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Scan.Model.NugetModel;
 using SIT.Services.Interface;
-using log4net;
-using Newtonsoft.Json;
-using NuGet.ProjectModel;
-using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;

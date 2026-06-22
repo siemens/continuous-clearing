@@ -5,10 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using NUnit.Framework;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
 using SIT.Common.Constants;
-using NUnit.Framework;
 using System.Collections.Generic;
 
 namespace SIT.Scan.UTest

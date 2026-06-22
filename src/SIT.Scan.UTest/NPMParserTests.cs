@@ -5,13 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using Moq;
+using NUnit.Framework;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Common.Model;
 using SIT.Scan.Model;
-using Moq;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 

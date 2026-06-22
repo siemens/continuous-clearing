@@ -5,8 +5,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using SIT.Common.Constants;
 using log4net;
+using SIT.Common.Constants;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

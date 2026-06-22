@@ -3,8 +3,8 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-using SIT.APICommunications.Model;
 using Newtonsoft.Json;
+using SIT.APICommunications.Model;
 using System.Collections.Generic;
 
 namespace SIT.Upload.Model

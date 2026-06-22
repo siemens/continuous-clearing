@@ -1,8 +1,8 @@
-using SIT.Common;
-using SIT.Common.Model;
 using log4net.Appender;
 using log4net.Config;
 using NUnit.Framework;
+using SIT.Common;
+using SIT.Common.Model;
 using System.Collections.Generic;
 using System.Linq;
 

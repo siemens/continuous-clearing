@@ -253,8 +253,8 @@ namespace SIT.Common.Constants
         /// <summary>
         /// Purl ID suffix.
         /// </summary>
-        public const string PurlIDSuffix = "?arch=source";        
-        
+        public const string PurlIDSuffix = "?arch=source";
+
         #endregion
 
         #region Properties

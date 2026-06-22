@@ -6,10 +6,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using SIT.APICommunications.Model;
-using SIT.Common.Constants;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using SIT.APICommunications.Model;
+using SIT.Common.Constants;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;

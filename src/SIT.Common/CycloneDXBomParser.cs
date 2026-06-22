@@ -6,9 +6,9 @@
 
 using CycloneDX.Json;
 using CycloneDX.Models;
-using SIT.Common.Constants;
 using log4net;
 using Newtonsoft.Json;
+using SIT.Common.Constants;
 using System;
 using System.Collections.Generic;
 using System.IO;

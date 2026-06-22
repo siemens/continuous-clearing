@@ -5,9 +5,9 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using SIT.Scan.Model;
 using NuGet.Versioning;
 using NUnit.Framework;
+using SIT.Scan.Model;
 using System.Collections.Generic;
 using System.Linq;
 

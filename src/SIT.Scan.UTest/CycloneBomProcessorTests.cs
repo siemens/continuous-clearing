@@ -5,11 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using NUnit.Framework;
 using SIT.APICommunications.Model;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Model;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using File = System.IO.File;

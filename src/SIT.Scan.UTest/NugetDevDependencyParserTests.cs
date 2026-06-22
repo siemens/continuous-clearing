@@ -4,9 +4,9 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using SIT.Scan.Model.NugetModel;
 using NuGet.ProjectModel;
 using NUnit.Framework;
+using SIT.Scan.Model.NugetModel;
 using System;
 using System.Collections.Generic;
 using System.IO;

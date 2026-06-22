@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using NUnit.Framework;
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
@@ -13,7 +14,6 @@ using SIT.Facade;
 using SIT.Facade.Interfaces;
 using SIT.Services;
 using SIT.Services.Interface;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;

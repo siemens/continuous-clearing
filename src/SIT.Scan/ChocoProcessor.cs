@@ -5,11 +5,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CycloneDX.Models;
+using log4net;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Scan.Model;
-using log4net;
 using System.Collections.Generic;
 using System.Reflection;
 using Dependency = CycloneDX.Models.Dependency;

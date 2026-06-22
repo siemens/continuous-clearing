@@ -6,6 +6,9 @@
 
 // Ignore Spelling: Bom SIT
 
+using log4net;
+using log4net.Core;
+using Microsoft.Extensions.DependencyInjection;
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
@@ -19,9 +22,6 @@ using SIT.Facade.Interfaces;
 using SIT.Scan.Interface;
 using SIT.Services;
 using SIT.Services.Interface;
-using log4net;
-using log4net.Core;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

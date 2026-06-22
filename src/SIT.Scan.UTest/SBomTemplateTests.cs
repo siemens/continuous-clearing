@@ -1,8 +1,8 @@
 using CycloneDX.Models;
-using SIT.Common;
-using SIT.Common.Constants;
 using Moq;
 using NUnit.Framework;
+using SIT.Common;
+using SIT.Common.Constants;
 using System.Collections.Generic;
 
 namespace SIT.Scan.UTest

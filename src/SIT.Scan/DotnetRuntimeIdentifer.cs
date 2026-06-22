@@ -4,15 +4,15 @@
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
+using log4net;
+using Microsoft.Build.Evaluation;
+using Microsoft.Build.Locator;
+using NuGet.ProjectModel;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Logging;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
-using log4net;
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Locator;
-using NuGet.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;

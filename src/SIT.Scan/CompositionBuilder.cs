@@ -5,10 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using NuGet.Versioning;
 using SIT.Common.Constants;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
-using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;

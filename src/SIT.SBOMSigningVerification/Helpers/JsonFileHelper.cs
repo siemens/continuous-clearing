@@ -5,9 +5,9 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 
+using log4net;
 using SIT.SBOMSigningVerification.Interface;
 using SIT.SBOMSigningVerification.Model;
-using log4net;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;

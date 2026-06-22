@@ -4,8 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 using CycloneDX.Models;
-using SIT.Common.Constants;
 using NUnit.Framework;
+using SIT.Common.Constants;
 using System.IO;
 using System.Linq;
 using TestUtilities;

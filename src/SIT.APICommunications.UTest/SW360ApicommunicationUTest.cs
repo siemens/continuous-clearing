@@ -4,9 +4,9 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using Newtonsoft.Json;
 using SIT.APICommunications.Model;
 using SIT.Common.Model;
-using Newtonsoft.Json;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;

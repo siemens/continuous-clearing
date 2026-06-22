@@ -7,6 +7,10 @@
 // Ignore Spelling: Fossology Expections Dx Sbom Bom Doesnt SIT
 
 using CycloneDX.Models;
+using Moq;
+using Moq.Protected;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.Foss;
@@ -14,16 +18,12 @@ using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Common.Model;
+using SIT.Create.Interfaces;
+using SIT.Create.Model;
 using SIT.Facade.Interfaces;
 using SIT.Services;
 using SIT.Services.Interface;
 using SIT.Services.Model;
-using SIT.Create.Interfaces;
-using SIT.Create.Model;
-using Moq;
-using Moq.Protected;
-using Newtonsoft.Json;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;

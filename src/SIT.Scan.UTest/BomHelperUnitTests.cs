@@ -5,6 +5,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using Moq;
+using NUnit.Framework;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
@@ -14,8 +16,6 @@ using SIT.Common.Model;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Services.Interface;
-using Moq;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -543,7 +543,7 @@ namespace SIT.Scan.UTest
             mock.Object.WriteBomKpiDataToConsole(new BomKpiData());
             mock.Verify(x => x.WriteBomKpiDataToConsole(It.IsAny<BomKpiData>()), Times.Once);
         }
-        
+
         [Test]
         public void GetProjectSummaryLink_ReturnsCorrectUrl()
         {
