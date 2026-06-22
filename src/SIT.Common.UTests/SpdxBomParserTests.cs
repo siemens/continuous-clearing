@@ -5,10 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 // Ignore Spelling: Spdx Bom SIT
 
-using SIT.Common.Interface;
-using SIT.Common.Model;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;

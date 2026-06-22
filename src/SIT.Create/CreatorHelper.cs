@@ -5,19 +5,19 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using log4net;
+using Newtonsoft.Json;
 using SIT.APICommunications.Model;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Logging;
 using SIT.Common.Model;
+using SIT.Create.Interfaces;
+using SIT.Create.Model;
 using SIT.Facade;
 using SIT.Facade.Interfaces;
 using SIT.Services;
 using SIT.Services.Interface;
-using SIT.Create.Interfaces;
-using SIT.Create.Model;
-using log4net;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

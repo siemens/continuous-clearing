@@ -4,12 +4,12 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using SIT.APICommunications.Interfaces;
-using SIT.APICommunications.Model;
-using SIT.Common.Model;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using SIT.APICommunications.Interfaces;
+using SIT.APICommunications.Model;
+using SIT.Common.Model;
 using System.Net;
 using System.Net.Http;
 using System.Text;

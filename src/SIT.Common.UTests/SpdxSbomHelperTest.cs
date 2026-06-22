@@ -5,8 +5,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using SIT.Common.Constants;
 using NUnit.Framework;
+using SIT.Common.Constants;
 using System;
 using System.Collections.Generic;
 using System.IO;

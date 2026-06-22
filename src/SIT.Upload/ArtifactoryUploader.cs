@@ -4,14 +4,14 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using log4net;
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.AQL;
-using SIT.Upload.Model;
 using SIT.Common;
 using SIT.Services.Interface;
-using log4net;
+using SIT.Upload.Model;
 using System;
 using System.IO;
 using System.Net;

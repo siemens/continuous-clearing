@@ -1,6 +1,6 @@
-﻿using SIT.APICommunications.Model;
+﻿using Moq;
+using SIT.APICommunications.Model;
 using SIT.Common.Model;
-using Moq;
 using System.Net;
 using File = System.IO.File;
 

@@ -5,13 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using log4net;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Services.Interface;
-using log4net;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

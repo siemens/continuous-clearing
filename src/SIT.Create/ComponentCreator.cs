@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using log4net;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.Foss;
@@ -13,11 +14,10 @@ using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Common.Logging;
 using SIT.Common.Model;
-using SIT.Services.Interface;
-using SIT.Services.Model;
 using SIT.Create.Interfaces;
 using SIT.Create.Model;
-using log4net;
+using SIT.Services.Interface;
+using SIT.Services.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;

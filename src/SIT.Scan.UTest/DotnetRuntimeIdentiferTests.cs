@@ -4,11 +4,11 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using SIT.Common;
-using SIT.Scan.Model;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Locator;
 using NUnit.Framework;
+using SIT.Common;
+using SIT.Scan.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;

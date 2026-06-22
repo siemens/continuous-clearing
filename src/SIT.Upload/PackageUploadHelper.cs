@@ -7,18 +7,18 @@
 // Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api SIT aql
 
 using CycloneDX.Models;
+using log4net;
+using Newtonsoft.Json;
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
-using SIT.Upload.Model;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Common.Logging;
 using SIT.Common.Model;
 using SIT.Services.Interface;
-using log4net;
-using Newtonsoft.Json;
+using SIT.Upload.Model;
 using System;
 using System.Collections.Generic;
 using System.Net;

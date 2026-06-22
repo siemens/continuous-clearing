@@ -5,12 +5,12 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 
-using SIT.APICommunications.Model;
-using SIT.Facade.Interfaces;
-using SIT.Services.Interface;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using SIT.APICommunications.Model;
+using SIT.Facade.Interfaces;
+using SIT.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;

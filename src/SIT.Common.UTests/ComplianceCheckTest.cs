@@ -4,9 +4,9 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using NUnit.Framework;
 using SIT.Common.ComplianceValidator;
 using SIT.Common.Model;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;

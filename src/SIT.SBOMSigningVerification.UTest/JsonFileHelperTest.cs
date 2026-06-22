@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
+using Moq;
 using SIT.SBOMSigningVerification.Helpers;
 using SIT.SBOMSigningVerification.Interface;
 using SIT.SBOMSigningVerification.Model;
-using Moq;
 using System;
 using System.IO;
 using System.Text;
