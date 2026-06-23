@@ -1,0 +1,343 @@
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using CycloneDX.Models;
+using log4net;
+using SIT.APICommunications.Model;
+using SIT.Common;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using SIT.Common.Logging;
+using SIT.Common.Model;
+using SIT.Scan.Interface;
+using SIT.Scan.Model;
+using SIT.Services.Interface;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
+using Dependency = CycloneDX.Models.Dependency;
+using Directory = System.IO.Directory;
+using Level = log4net.Core.Level;
+using Metadata = CycloneDX.Models.Metadata;
+
+
+namespace SIT.Scan
+
+{
+    /// <summary>
+    /// BomCreator model
+    /// </summary>
+    public class BomCreator : IBomCreator
+    {
+        #region Fields
+        private const string JFrogConnValidationContext = "JFrog Connection Validation";
+        private const string CheckJFrogConnectionMethod = "Methodname:CheckJFrogConnection()";
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public readonly static BomKpiData bomKpiData = new();
+        ComponentIdentification componentData;
+        private readonly ICycloneDXBomParser CycloneDXBomParser;
+        private readonly ISpdxBomParser SpdxBomParser;
+        private readonly IFrameworkPackages _frameworkPackages;
+        private readonly ICompositionBuilder _compositionBuilder;
+        private readonly IRuntimeIdentifier _runtimeIdentifier;
+
+        public static Jfrog jfrog { get; set; } = new Jfrog();
+        public static SW360 sw360 { get; set; } = new SW360();
+        #endregion
+
+        #region Properties
+        public IJFrogService JFrogService { get; set; }
+        public IBomHelper BomHelper { get; set; }
+        #endregion
+
+        #region Constructors
+        public BomCreator(ICycloneDXBomParser cycloneDXBomParser, IFrameworkPackages frameworkPackages, ICompositionBuilder compositionBuilder, ISpdxBomParser spdxBomParser, IRuntimeIdentifier runtimeIdentifier)
+        {
+            CycloneDXBomParser = cycloneDXBomParser;
+            _frameworkPackages = frameworkPackages;
+            _compositionBuilder = compositionBuilder;
+            SpdxBomParser = spdxBomParser;
+            _runtimeIdentifier = runtimeIdentifier;
+        }
+        #endregion
+
+
+        /// <summary>
+        /// Asynchronously generates a CycloneDX BOM from configured inputs and writes outputs (BOM, KPI files).
+        /// </summary>
+        /// <param name="appSettings">Application settings used for generation.</param>
+        /// <param name="bomHelper">BOM helper utilities.</param>
+        /// <param name="fileOperations">File operations helper used to write outputs.</param>
+        /// <param name="projectReleases">Project releases data used to enrich metadata.</param>
+        /// <param name="caToolInformation">CA tool information for telemetry/metadata.</param>
+        /// <returns>Asynchronously completes when generation finishes.</returns>
+        public async Task GenerateBom(CommonAppSettings appSettings,
+                                      IBomHelper bomHelper,
+                                      IFileOperations fileOperations,
+                                      ProjectReleases projectReleases,
+                                       CatoolInfo caToolInformation)
+        {
+            Logger.Debug("GenerateBom():SBOM generation process has started.");
+            Bom listOfComponentsToBom;
+            jfrog = appSettings.Jfrog;
+            sw360 = appSettings.SW360;
+            // Calls package parser
+            listOfComponentsToBom = await CallPackageParser(appSettings);
+            Logger.Logger.Log(null, Level.Notice, $"No of components added to BoM after removing bundled & excluded components " +
+                $"= {listOfComponentsToBom.Components.Count}", null);
+
+            bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
+            //Get project details for metadata properties
+
+            //Add composition information to the BOM , if empty then add empty composition
+            if (listOfComponentsToBom.Compositions == null || listOfComponentsToBom.Compositions.Count == 0)
+            {
+                listOfComponentsToBom.Compositions = [];
+            }
+
+            //sets metadata properties
+            listOfComponentsToBom = CycloneBomProcessor.SetMetadataInComparisonBOM(listOfComponentsToBom,
+                                                                                   appSettings,
+                                                                                   projectReleases,
+                                                                                   caToolInformation);
+
+            string defaultProjectName = CommonIdentiferHelper.GetDefaultProjectName(appSettings);
+            // Writes Comparison Bom
+            Logger.Logger.Log(null, Level.Notice, "Writing CycloneDX BoM to the output folder.", null);
+            WritecontentsToBOM(appSettings, bomKpiData, listOfComponentsToBom, defaultProjectName);
+            Logger.Logger.Log(null, Level.Notice, "CycloneDX BoM writing process has been completed.", null);
+
+            // Log warnings based on appSettings
+            DisplayInformation.LogBomGenerationWarnings(appSettings);
+
+            // Writes Kpi data 
+            Program.BomStopWatch?.Stop();
+            bomKpiData.TimeTakenByBomCreator = Program.BomStopWatch == null ? 0 :
+                (int)Program.BomStopWatch.Elapsed.TotalSeconds;
+            Logger.DebugFormat("GenerateBom(): Starting to write KPI data to the output folder - {0}", appSettings.Directory.OutputFolder);
+            fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
+                FileConstant.BomKpiDataFileName, defaultProjectName);
+            Logger.DebugFormat("GenerateBom(): Successfully wrote KPI data to the output folder - {0}.\n", appSettings.Directory.OutputFolder);
+            if (appSettings.SW360 != null)
+            {
+                // Writes Project Summary Url on CLI
+                string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360.ProjectID, appSettings.SW360.URL);
+                bomKpiData.ProjectSummaryLink = $"Link to the summary page of the configured project:{appSettings.SW360.ProjectName} => {projectURL}\n";
+            }
+
+            // Writes kpi info to console table
+            bomKpiData.InternalComponents = componentData.internalComponents != null ? componentData.internalComponents.Count : 0;
+            bomHelper.WriteBomKpiDataToConsole(bomKpiData);
+
+            if (appSettings.Jfrog != null)
+            {
+                LoggerHelper.WriteInternalComponentsTableInCli(componentData.internalComponents);
+            }
+
+            Logger.Debug($"GenerateBom():SBOM generation process has completed.\n");
+        }
+
+        /// <summary>
+        /// Writes contents to BOM by delegating to CycloneDX writer.
+        /// </summary>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="bomKpiData">KPI data structure to update.</param>
+        /// <param name="listOfComponentsToBom">BOM to write.</param>
+        /// <param name="defaultProjectName">Default project name used in file naming.</param>
+        private static void WritecontentsToBOM(CommonAppSettings appSettings, BomKpiData bomKpiData, Bom listOfComponentsToBom, string defaultProjectName)
+        {
+            WriteContentToCycloneDxBOM(appSettings, listOfComponentsToBom, ref bomKpiData, defaultProjectName);
+        }
+
+        /// <summary>
+        /// Writes a CycloneDX BOM file to the output folder, optionally merging with existing BOMs when configured.
+        /// </summary>
+        /// <param name="appSettings">Application settings.</param>
+        /// <param name="listOfComponentsToBom">BOM object containing components and metadata.</param>
+        /// <param name="bomKpiData">KPI data reference that can be modified.</param>
+        /// <param name="defaultProjectName">Default project name used for file naming.</param>
+        private static void WriteContentToCycloneDxBOM(CommonAppSettings appSettings, Bom listOfComponentsToBom, ref BomKpiData bomKpiData, string defaultProjectName)
+        {
+            FileOperations fileOperations = new FileOperations();
+            string bomFileName = $"{defaultProjectName}_{FileConstant.BomFileName}";
+            string outputFolderPath = appSettings.Directory.OutputFolder;
+            string[] files = Directory.GetFiles(outputFolderPath);
+
+            bool fileExists = files.Length > 0 && files.Any(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+            if (fileExists && appSettings.MultipleProjectType)
+            {
+                Logger.DebugFormat("WriteContentToCycloneDxBOM():Start process for appending components due multiple project type {0}.", appSettings.MultipleProjectType);
+                string existingFilePath = files.FirstOrDefault(file => Path.GetFileName(file).Equals(bomFileName, StringComparison.OrdinalIgnoreCase));
+                Logger.DebugFormat("WriteContentToCycloneDxBOM():Identified existing file for appending components.{0}", existingFilePath);
+                listOfComponentsToBom = fileOperations.CombineComponentsFromExistingBOM(listOfComponentsToBom, existingFilePath);
+                bomKpiData.ComponentsInComparisonBOM = listOfComponentsToBom.Components.Count;
+                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName, appSettings);
+                Logger.Debug($"WriteContentToCycloneDxBOM():Completed the appending components process.");
+            }
+            else
+            {
+                string formattedString = CommonHelper.AddSpecificValuesToBOMFormat(listOfComponentsToBom);
+                fileOperations.WriteContentToOutputBomFile(formattedString, outputFolderPath, FileConstant.BomFileName, defaultProjectName, appSettings);
+            }
+
+        }
+
+        /// <summary>
+        /// Asynchronously selects and invokes the appropriate package parser based on project type.
+        /// </summary>
+        /// <param name="appSettings">Application settings which include ProjectType.</param>
+        /// <returns>Asynchronously returns the generated BOM from the selected parser.</returns>
+        private async Task<Bom> CallPackageParser(CommonAppSettings appSettings)
+        {
+            IParser parser;
+
+            switch (appSettings.ProjectType.ToUpperInvariant())
+            {
+                case "NPM":
+                    parser = new NpmProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "NUGET":
+                    parser = new NugetProcessor(CycloneDXBomParser, _frameworkPackages, _compositionBuilder, SpdxBomParser, _runtimeIdentifier);
+                    return await ComponentIdentification(appSettings, parser);
+                case "MAVEN":
+                    parser = new MavenProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "DEBIAN":
+                    parser = new DebianProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "ALPINE":
+                    parser = new AlpineProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "POETRY":
+                    parser = new PythonProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "CONAN":
+                    parser = new ConanProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "CARGO":
+                    parser = new CargoProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                case "CHOCO":
+                    parser = new ChocoProcessor(CycloneDXBomParser, SpdxBomParser);
+                    return await ComponentIdentification(appSettings, parser);
+                default:
+                    LogHandlingHelper.BasicErrorHandling("Identified invalid projecttype", "CallPackageParser()", $"Invalid project type was provided: {appSettings.ProjectType}", "Provide Valid project type in configuration.");
+                    Logger.ErrorFormat("GenerateBom():Invalid ProjectType - {0}", appSettings.ProjectType);
+                    break;
+            }
+            return new Bom();
+        }
+
+        /// <summary>
+        /// Asynchronously runs component identification and enrichment using the provided parser.
+        /// </summary>
+        /// <param name="appSettings">Application settings used by the parser.</param>
+        /// <param name="parser">Parser that will parse package files and identify components.</param>
+        /// <returns>Asynchronously returns the composed BOM.</returns>
+        private async Task<Bom> ComponentIdentification(CommonAppSettings appSettings, IParser parser)
+        {
+            Logger.Debug("ComponentIdentification():Component identification process for BOM file has started.");
+            ComponentIdentification lstOfComponents;
+            List<Component> components;
+            Metadata metadata;
+            Bom bom = new Bom();
+            Bom unSupportedBomList = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            try
+            {
+                //Parsing the input file
+                bom = parser.ParsePackageFile(appSettings, ref unSupportedBomList);
+                metadata = bom.Metadata;
+                componentData = new ComponentIdentification()
+                {
+                    comparisonBOMData = bom.Components,
+                    internalComponents = new List<Component>()
+                };
+
+                if (appSettings.Jfrog != null)
+                {
+                    //Identification of internal components
+                    Logger.Logger.Log(null, Level.Notice, $"Identifying the internal components", null);
+                    lstOfComponents = await parser.IdentificationOfInternalComponents(componentData, appSettings, JFrogService, BomHelper);
+                    components = lstOfComponents.comparisonBOMData;
+                    //Setting the artifactory repo info
+                    components = await parser.GetJfrogRepoDetailsOfAComponent(components, appSettings, JFrogService, BomHelper);
+                    bom.Components = components;
+                }
+                else
+                {
+                    Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
+                    foreach (var component in bom.Components.Where(c => !c.Properties.Any(p => p.Name == Dataconstant.Cdx_ProjectType)))
+                    {
+                        component.Properties.Add(projectType);
+                    }
+                }
+                bom.Metadata = metadata;
+            }
+            catch (HttpRequestException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("An error occurred during component identification.", "ComponentIdentification()", ex);
+            }
+            bomKpiData.UnsupportedComponentsFromSpdxFile = unSupportedBomList.Components.Count;
+            bom.Components.AddRange(unSupportedBomList.Components);
+            bom.Dependencies.AddRange(unSupportedBomList.Dependencies);
+            Logger.Debug("ComponentIdentification():Component identification process for BOM file has completed.");
+            return bom;
+        }
+
+        /// <summary>
+        /// Asynchronously checks connectivity to JFrog using the configured JFrog service.
+        /// </summary>
+        /// <param name="appSettings">Application settings containing JFrog configuration.</param>
+        /// <returns>Asynchronously returns true when connection is successful or JFrog is not configured; otherwise false.</returns>
+        public async Task<bool> CheckJFrogConnection(CommonAppSettings appSettings)
+        {
+            Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has started");
+            if (appSettings.Jfrog != null)
+            {
+                var response = await JFrogService.CheckJFrogConnectivity();
+                if (response != null)
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await LogHandlingHelper.HttpResponseHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "");
+                        Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
+                        LoggerHelper.JfrogConnectionInfoDisplayForCli();
+                        return true;
+                    }
+                    else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "Check the JFrog server details or token validity.");
+                        Logger.Error("Check the JFrog token validity/permission..");
+                    }
+                    else if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "Check the JFrog server details .");
+                        Logger.Error("Check the provided JFrog server details..");
+                    }
+                    else
+                    {
+                        await LogHandlingHelper.HttpResponseErrorHandling(JFrogConnValidationContext, CheckJFrogConnectionMethod, response, "");
+                        Logger.Error("JFrog Connection was not successfull check the server status.");
+                    }
+                }
+                return false;
+            }
+            Logger.Debug("CheckJFrogConnection():Validating JFrog Connection has completed\n");
+            return true;
+
+        }
+
+
+        #region Events
+        #endregion
+    }
+}

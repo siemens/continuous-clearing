@@ -1,0 +1,186 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 Siemens AG
+//
+//  SPDX-License-Identifier: MIT
+// -------------------------------------------------------------------------------------------------------------------- 
+
+using log4net;
+using SIT.Common.Constants;
+using SIT.Common.Interface;
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Reflection;
+using System.Security;
+
+namespace SIT.Common
+{
+    /// <summary>
+    /// The FolderAction class
+    /// </summary>
+    public class FolderAction : IFolderAction
+    {
+        #region Fields
+
+        /// <summary>
+        /// The logger instance for logging messages and errors.
+        /// </summary>
+        static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Copies source directory content to target directory content
+        /// </summary>
+        /// <param name="sourceDirectory">The source directory path.</param>
+        /// <param name="targetDirectory">The target directory path.</param>
+        /// <returns>True if the copy operation succeeded; otherwise, false.</returns>
+        public bool CopyToTargetDirectory(string sourceDirectory, string targetDirectory)
+        {
+            Logger.Debug("CopyToTargetDirectory(): Start copying directory.");
+            bool isCopied;
+            try
+            {
+                var diSource = new DirectoryInfo(sourceDirectory);
+                var diTarget = new DirectoryInfo(targetDirectory);
+
+                CopyAll(diSource, diTarget);
+                isCopied = true;
+                Logger.DebugFormat("CopyToTargetDirectory(): Successfully copied from '{0}' to '{1}'.", sourceDirectory, targetDirectory);
+            }
+            catch (IOException ex)
+            {
+                isCopied = false;
+                Environment.ExitCode = -1;
+                LogHandlingHelper.ExceptionErrorHandling("Directory Copy Error", $"Failed to copy directory from '{sourceDirectory}' to '{targetDirectory}'.", ex, "An I/O error occurred during the copy operation. Ensure the source and target directories are accessible.");
+            }
+            catch (SecurityException ex)
+            {
+                isCopied = false;
+                Environment.ExitCode = -1;
+                LogHandlingHelper.ExceptionErrorHandling("Directory Copy Error", $"Failed to copy directory from '{sourceDirectory}' to '{targetDirectory}'.", ex, "A security exception occurred. Ensure the application has the required permissions to access the directories.");
+            }
+
+            Logger.Debug("FolderAction.CopyToTargetDirectory(): End copying directory.");
+
+            return isCopied;
+        }
+
+        /// <summary>
+        /// Validates the folder path to ensure it is not null and exists.
+        /// </summary>
+        /// <param name="folderPath">The folder path to validate.</param>
+        /// <param name="environmentHelper">The environment helper for exiting the application on validation failure.</param>
+        public void ValidateFolderPath(string folderPath, IEnvironmentHelper environmentHelper)
+        {
+            if (string.IsNullOrWhiteSpace(folderPath))
+            {
+                LogHandlingHelper.ExceptionErrorHandling("folder path validation in the appsettings file", "Method:ValidateFolderPath()", new ArgumentException($"Invalid value for folderPath - {folderPath}"), "The provided folder path is null, empty, or consists only of whitespace.");
+                Logger.Error($"The folder path provided in the appsettings file (Input folder path or Output folder path) is null, empty, or consists only of whitespace.");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+
+            if (!System.IO.Directory.Exists(folderPath))
+            {
+                LogHandlingHelper.ExceptionErrorHandling("folder path validation in the appsettings file", "Method:ValidateFolderPath()", new DirectoryNotFoundException($"Invalid folder path - {folderPath}"), $"Ensure the folder exists at the specified path: {folderPath}");
+                throw new DirectoryNotFoundException($"Invalid folder path -{folderPath}");
+            }
+        }
+
+        /// <summary>
+        /// Zip Files To Target Directory
+        /// </summary>
+        /// <param name="targetDirectory">The target directory to create a zip file from.</param>
+        /// <returns>True if the zip operation succeeded; otherwise, false.</returns>
+        public bool ZipFileToTargetDirectory(string targetDirectory)
+        {
+            Logger.Debug("FolderAction.ZipFileToTargetDirectory(): Start zipping directory.");
+
+            bool isZiped;
+            try
+            {
+                string startPath = targetDirectory;
+                string zipPath = targetDirectory + FileConstant.ZipFileExtension;
+
+                if (File.Exists(zipPath))
+                {
+                    File.Delete(zipPath);
+                }
+
+                ZipFile.CreateFromDirectory(startPath, zipPath);
+                isZiped = true;
+                Logger.DebugFormat("FolderAction.ZipFileToTargetDirectory(): Successfully zipped directory '{0}' to '{1}'.", startPath, zipPath);
+            }
+            catch (IOException ex)
+            {
+                isZiped = false;
+                LogHandlingHelper.ExceptionErrorHandling("Zipping Error", $"Failed to zip directory '{targetDirectory}'.", ex, "An I/O error occurred during the zipping process. Ensure the directory is accessible and not in use.");
+                Logger.Error("FolderAction.ZipFileToTargetDirectory():", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                isZiped = false;
+                LogHandlingHelper.ExceptionErrorHandling("Zipping Error", $"Failed to zip directory '{targetDirectory}'.", ex, "Unauthorized access occurred. Ensure the application has the required permissions to access the directory.");
+                Logger.Error("FolderAction.ZipFileToTargetDirectory():", ex);
+            }
+            catch (NotSupportedException ex)
+            {
+                isZiped = false;
+                LogHandlingHelper.ExceptionErrorHandling("Zipping Error", $"Failed to zip directory '{targetDirectory}'.", ex, "The operation is not supported. Ensure the directory path is valid and supported for zipping.");
+                Logger.Error("FolderAction.ZipFileToTargetDirectory():", ex);
+            }
+
+            Logger.Debug("FolderAction.ZipFileToTargetDirectory(): End zipping directory.");
+            return isZiped;
+        }
+
+        /// <summary>
+        /// Recursively copies all files and subdirectories from source to target directory.
+        /// </summary>
+        /// <param name="source">The source directory information.</param>
+        /// <param name="target">The target directory information.</param>
+        private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
+        {
+            Logger.DebugFormat("FolderAction.CopyAll(): Start copying from '{0}' to '{1}'.", source.FullName, target.FullName);
+
+            try
+            {
+                System.IO.Directory.CreateDirectory(target.FullName);
+
+                // Copy each file into the new directory.
+                foreach (FileInfo fi in source.GetFiles())
+                {
+                    fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                }
+
+                // Copy each subdirectory using recursion.
+                foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+                {
+                    DirectoryInfo nextTargetSubDir =
+                        target.CreateSubdirectory(diSourceSubDir.Name);
+                    CopyAll(diSourceSubDir, nextTargetSubDir);
+                }
+            }
+            catch (IOException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("Copy Error", $"Failed to copy from '{source.FullName}' to '{target.FullName}'.", ex, "An I/O error occurred during the copy operation. Ensure the source and target directories are accessible.");
+                Logger.Error("FolderAction.CopyAll():", ex);
+            }
+            catch (SecurityException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("Copy Error", $"Failed to copy from '{source.FullName}' to '{target.FullName}'.", ex, "A security exception occurred. Ensure the application has the required permissions to access the directories.");
+                Logger.Error("FolderAction.CopyAll():", ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("Copy Error", $"Failed to copy from '{source.FullName}' to '{target.FullName}'.", ex, "Unauthorized access occurred. Ensure the application has the required permissions to access the directories.");
+                Logger.Error("FolderAction.CopyAll():", ex);
+            }
+            Logger.DebugFormat("FolderAction.CopyAll(): Finished copying from '{0}' to '{1}'.", source.FullName, target.FullName);
+        }
+
+        #endregion
+    }
+}

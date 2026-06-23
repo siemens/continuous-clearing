@@ -8,28 +8,28 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Moq;
 
 
-namespace LCT.Telemetry.UTest
+namespace SIT.Telemetry.UTest
 {
     [TestFixture]
     public class TelemetryTests
     {
 
-        private Mock<LCT.Telemetry.ITelemetryProvider> _mockTelemetryProvider;
-        private LCT.Telemetry.Telemetry _telemetry;
+        private Mock<SIT.Telemetry.ITelemetryProvider> _mockTelemetryProvider;
+        private SIT.Telemetry.Telemetry _telemetry;
         private Dictionary<string, string> configuration;
         private TelemetryClient _mockTelemetryClient;
 
         [SetUp]
         public void SetUp()
         {
-            _mockTelemetryProvider = new Mock<LCT.Telemetry.ITelemetryProvider>();
+            _mockTelemetryProvider = new Mock<SIT.Telemetry.ITelemetryProvider>();
             var aiConfig = TelemetryConfiguration.CreateDefault();
             string telemetryType = "1";
             configuration = new Dictionary<string, string>
             {
                 { "ConnectionString", "1" }
             };
-            _telemetry = new LCT.Telemetry.Telemetry(telemetryType, configuration);
+            _telemetry = new SIT.Telemetry.Telemetry(telemetryType, configuration);
             aiConfig.ConnectionString = $"InstrumentationKey=1";
             _mockTelemetryClient = new TelemetryClient(aiConfig);
         }
@@ -88,7 +88,7 @@ namespace LCT.Telemetry.UTest
         [Test]
         public void Constructor_ShouldThrowException_ForInvalidTelemetryType()
         {
-            Assert.Throws<NotSupportedException>(() => new LCT.Telemetry.Telemetry("InvalidType", configuration));
+            Assert.Throws<NotSupportedException>(() => new SIT.Telemetry.Telemetry("InvalidType", configuration));
         }
         [Test]
         public void GetHashString_InputIsNull_ReturnsEmptyString()

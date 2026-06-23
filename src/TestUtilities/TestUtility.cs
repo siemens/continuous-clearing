@@ -5,9 +5,9 @@
 
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using LCT.APICommunications;
-using LCT.APICommunications.Model;
 using Newtonsoft.Json;
+using SIT.APICommunications;
+using SIT.APICommunications.Model;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;

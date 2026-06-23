@@ -1,4 +1,4 @@
-# --------------------------------------------------------------------------------------------------------------------
+﻿# --------------------------------------------------------------------------------------------------------------------
 # SPDX-FileCopyrightText: 2025 Siemens AG
 #
 #  SPDX-License-Identifier: MIT
@@ -42,10 +42,10 @@ parameters:
     default: ''
 
   # Template parameters
-  - name: PackageCreatorEnabled
+  - name: SITScanEnabled
     type: boolean
     default: true
-  - name: ArtifactoryUploaderEnabled
+  - name: SITUploadEnabled
     type: boolean
     default: true
   - name: appSettingsPath
@@ -82,7 +82,7 @@ steps:
     displayName: 'Build CA Tool'
     inputs:
       script: |
-        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/LicenseClearingTool.sln --configuration Release
+        dotnet build $(Build.SourcesDirectory)/continuous-clearing/src/ContinuousClearingTool.sln --configuration Release
 
   - task: PowerShell@2
     displayName: 'Build CA Tool Image'
@@ -117,7 +117,7 @@ steps:
           inputFolder: ${{ project.inputFolder }}
 
     - task: PowerShell@2
-      displayName: 'Run PackageIdentifier for ${{ project.projectType }}'
+      displayName: 'Run SIT.Scan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
         script: |
@@ -169,12 +169,12 @@ steps:
             -v "${{ parameters.outputFolder }}/logs:/var/log" `
             -v "${settingsDir}:/etc/CATool" `
             -e BUILD_BUILDID=$env:BUILD_BUILDID `
-            ca-tool dotnet PackageIdentifier.dll @args
+            ca-tool dotnet SIT.Scan.dll @args
 
   - task: PowerShell@2
     continueOnError: true
-    condition: eq('${{ parameters.PackageCreatorEnabled }}', true)
-    displayName: 'Run SW360PackageCreator'
+    condition: eq('${{ parameters.SITScanEnabled }}', true)
+    displayName: 'Run SIT.Create'
     inputs:
       targetType: 'inline'
       script: |
@@ -188,7 +188,7 @@ steps:
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
           -v "${settingsDir}:/etc/CATool" `
           -e BUILD_BUILDID=$env:BUILD_BUILDID `
-          ca-tool dotnet SW360PackageCreator.dll `
+          ca-tool dotnet SIT.Create.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
@@ -206,8 +206,8 @@ steps:
 
   - task: PowerShell@2
     continueOnError: true
-    condition: eq('${{ parameters.ArtifactoryUploaderEnabled }}', true)
-    displayName: 'Run ArtifactoryUploader'
+    condition: eq('${{ parameters.SITUploadEnabled }}', true)
+    displayName: 'Run SIT.Upload'
     inputs:
       targetType: 'inline'
       script: |
@@ -221,7 +221,7 @@ steps:
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
           -v "${settingsDir}:/etc/CATool" `
           -e BUILD_BUILDID=$env:BUILD_BUILDID `
-          ca-tool dotnet ArtifactoryUploader.dll `
+          ca-tool dotnet SIT.Upload.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
