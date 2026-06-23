@@ -1,7 +1,7 @@
 ﻿using CycloneDX.Models;
+using log4net;
 using SIT.Common.Constants;
 using SIT.Common.Model;
-using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;

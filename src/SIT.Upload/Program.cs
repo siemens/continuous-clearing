@@ -6,6 +6,8 @@
 
 // Ignore Spelling: Uploader Artifactory
 
+using log4net;
+using log4net.Core;
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
@@ -17,8 +19,6 @@ using SIT.Facade;
 using SIT.Facade.Interfaces;
 using SIT.Services;
 using SIT.Services.Interface;
-using log4net;
-using log4net.Core;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

@@ -5,13 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using SIT.Common.Constants;
-using SIT.Common.Logging;
-using SIT.Common.Model;
 using log4net.Appender;
 using log4net.Config;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using SIT.Common.Constants;
+using SIT.Common.Logging;
+using SIT.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;

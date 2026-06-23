@@ -5,11 +5,11 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using log4net;
+using Newtonsoft.Json;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.SBOMSigningVerification.Helpers;
-using log4net;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;

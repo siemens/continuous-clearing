@@ -4,10 +4,10 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using NUnit.Framework;
 using SIT.Common.Model;
 using SIT.Create.Interfaces;
 using SIT.Create.Model;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Reflection;

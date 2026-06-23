@@ -5,6 +5,9 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using Moq;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
 using SIT.Common.Interface;
@@ -12,9 +15,6 @@ using SIT.Common.Model;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Services.Interface;
-using Moq;
-using Newtonsoft.Json;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

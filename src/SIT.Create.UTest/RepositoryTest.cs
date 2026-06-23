@@ -4,9 +4,9 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using NUnit.Framework;
 using SIT.Common.Constants;
 using SIT.Create.Interfaces;
-using NUnit.Framework;
 
 namespace SIT.Create.UTest
 {

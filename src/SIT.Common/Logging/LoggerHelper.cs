@@ -5,10 +5,10 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using log4net;
 using SIT.Common.Constants;
 using SIT.Common.Model;
 using SIT.Common.Runtime;
-using log4net;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;

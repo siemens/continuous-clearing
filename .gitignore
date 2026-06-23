@@ -335,5 +335,5 @@ ASALocalRun/
 /Build/runtime/tempNuGet.config
 /src/out/netcoreapp3.1
 /src/.sonarlint
-/TestFiles/MavenTestFile/ArtifactoryUploaderTestData
-/TestFiles/IntegrationTestFiles/ArtifactoryUploaderTestData
+/TestFiles/MavenTestFile/SIT.UploadTestData
+/TestFiles/IntegrationTestFiles/SIT.UploadTestData

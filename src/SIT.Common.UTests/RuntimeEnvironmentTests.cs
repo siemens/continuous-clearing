@@ -4,8 +4,8 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using SIT.Common.Runtime;
 using NUnit.Framework;
+using SIT.Common.Runtime;
 using System;
 
 namespace SIT.Common.UTest

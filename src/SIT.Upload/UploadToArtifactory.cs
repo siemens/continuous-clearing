@@ -8,14 +8,14 @@
 
 using ArtifactoryUploader.Constants;
 using CycloneDX.Models;
+using log4net;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.AQL;
-using SIT.Upload.Model;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Services.Interface;
-using log4net;
+using SIT.Upload.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
