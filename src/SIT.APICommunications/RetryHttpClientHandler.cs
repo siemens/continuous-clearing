@@ -17,6 +17,8 @@ namespace SIT.APICommunications
 {
     /// <summary>
     /// A delegating handler that implements retry logic for HTTP requests using Polly policies.
+    /// Handles transient failures (5xx, 408, 406, 400) and network exceptions with configurable wait intervals.
+    /// Token refresh on 401 Unauthorized is handled upstream by <see cref="SW360KeycloakService.TokenRefreshDelegatingHandler"/>.
     /// </summary>
     public class RetryHttpClientHandler : DelegatingHandler
     {
@@ -46,7 +48,7 @@ namespace SIT.APICommunications
         /// </summary>
         public RetryHttpClientHandler()
         {
-            // Define the retry policy (retry on 5xx, 408, and transient errors)
+            // Define the retry policy (retry on 5xx, 408, 406, 400 and transient errors; exclude 401 and 403)
             _retryPolicy = Policy
                 .Handle<HttpRequestException>()
                 .Or<TaskCanceledException>()
@@ -93,6 +95,8 @@ namespace SIT.APICommunications
 
         /// <summary>
         /// Asynchronously sends an HTTP request with retry logic applied.
+        /// When a 401 Unauthorized response is received and a token service is configured,
+        /// the cached token is invalidated, a new token is fetched, and the request is retried once.
         /// </summary>
         /// <param name="request">The HTTP request message to send.</param>
         /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
@@ -101,7 +105,7 @@ namespace SIT.APICommunications
         {
             var context = new Context
             {
-                ["LogWarnings"] = request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) && bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) ? logWarnings : default,
+                ["LogWarnings"] = request.Headers.TryGetValues("LogWarnings", out var logWarningsValues) && bool.TryParse(logWarningsValues.FirstOrDefault(), out var logWarnings) && logWarnings,
                 ["HttpMethod"] = request.Method.ToString(),
                 ["RequestUri"] = request.RequestUri?.ToString(),
                 ["OperationInfo"] = request.Headers.TryGetValues("urlInfo", out var operationInfoValues) ? operationInfoValues.FirstOrDefault() : ""

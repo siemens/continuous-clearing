@@ -251,6 +251,9 @@
 	  <file src="out\net8.0\Azure.Security.KeyVault.Keys.dll" target="tools\Azure.Security.KeyVault.Keys.dll"/>
 	  <file src="out\net8.0\Azure.Security.KeyVault.Secrets.dll" target="tools\Azure.Security.KeyVault.Secrets.dll"/>
     <file src="out\net8.0\SIT.SBOMSigningVerification.dll" target="tools\SIT.SBOMSigningVerification.dll"/>
+    <file src="out\net8.0\SW360KeycloakService.dll" target="tools\SW360KeycloakService.dll"/>
+    <file src="out\net8.0\SW360KeycloakService.pdb" target="tools\SW360KeycloakService.pdb"/>
+    <file src="out\net8.0\SW360KeycloakService.deps.json" target="tools\SW360KeycloakService.deps.json"/>
     <file src="out\net8.0\System.ClientModel.dll" target="tools\System.ClientModel.dll"/>
     <file src="out\net8.0\Microsoft.Identity.Client.dll" target="tools\Microsoft.Identity.Client.dll"/>
     <file src="out\net8.0\Microsoft.Bcl.AsyncInterfaces.dll" target="tools\Microsoft.Bcl.AsyncInterfaces.dll"/>
