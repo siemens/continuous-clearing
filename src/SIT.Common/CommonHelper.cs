@@ -11,6 +11,8 @@ using log4net;
 using log4net.Core;
 using SIT.Common.Constants;
 using SIT.Common.Model;
+using SW360KeycloakService;
+using SW360KeycloakService.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +20,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using File = System.IO.File;
 
 namespace SIT.Common
@@ -71,6 +74,20 @@ namespace SIT.Common
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Gets the CA tool version and running location from the application's entry assembly.
+        /// </summary>
+        /// <returns>A <see cref="CatoolInfo"/> populated with the version (Major.Minor.Build) and the directory of the running executable.</returns>
+        public static CatoolInfo GetCatoolVersionFromProjectFile()
+        {
+            CatoolInfo catoolInfo = new CatoolInfo();
+            Assembly entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+            var versionFromProj = entryAssembly.GetName().Version;
+            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
+            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(entryAssembly.Location);
+            return catoolInfo;
         }
 
         /// <summary>
@@ -1026,6 +1043,40 @@ namespace SIT.Common
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Initializes the Keycloak token service if <c>ClientId</c> and <c>ClientSecret</c> are configured,
+        /// fetches a fresh token, and syncs the resulting token and token type back to
+        /// <paramref name="appSettings"/>. Returns <c>null</c> when Keycloak credentials are absent.
+        /// </summary>
+        /// <param name="appSettings">The application settings containing SW360 and Keycloak configuration.
+        /// Its <c>SW360.Token</c> and <c>SW360.AuthTokenType</c> fields are updated in place when a Keycloak
+        /// token is obtained.</param>
+        /// <param name="exitAction">Action invoked with exit code <c>-1</c> when validation or token retrieval fails.</param>
+        /// <returns>The initialized <see cref="KeycloakTokenCacheService"/>, or <c>null</c> when Keycloak credentials
+        /// are absent and the caller should fall back to plain-token authentication.</returns>
+        public static async Task<KeycloakTokenCacheService> InitializeKeycloakTokenServiceAsync(
+            CommonAppSettings appSettings, Action<int> exitAction)
+        {
+            if (!ValidateKeycloakCredentials(appSettings, exitAction))
+            {
+                return null;
+            }
+
+            var tokenSettings = new TokenServiceSettings
+            {
+                SW360BaseUrl = appSettings.SW360.URL,
+                ClientId = appSettings.SW360.Keycloak?.ClientId,
+                ClientSecret = appSettings.SW360.Keycloak?.ClientSecret,
+                KeyCloakToken = appSettings.SW360.Token,
+                KeyCloakTokenType = appSettings.SW360.AuthTokenType
+            };
+            var tokenService = new KeycloakTokenCacheService(tokenSettings, exitAction);
+            await tokenService.GetOrRefreshTokenAsync();
+            appSettings.SW360.Token = tokenSettings.KeyCloakToken;
+            appSettings.SW360.AuthTokenType = tokenSettings.KeyCloakTokenType;
+            return tokenService;
         }
 
         public static void DisplayTokenExpiryWarning(CommonAppSettings appSettings)

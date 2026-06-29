@@ -41,6 +41,7 @@
     <ProjectReference Include="..\SIT.CycloneDxProcessor\SIT.CycloneDxProcessor.csproj" />
     <ProjectReference Include="..\SIT.SBOMSigningVerification\SIT.SBOMSigningVerification.csproj" />
     <ProjectReference Include="..\SIT.Telemetry\SIT.Telemetry.csproj" />
+    <ProjectReference Include="..\SW360KeycloakService\SW360KeycloakService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -23,7 +23,6 @@ using SIT.Scan.Interface;
 using SIT.Services;
 using SIT.Services.Interface;
 using SW360KeycloakService;
-using SW360KeycloakService.Model;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -122,7 +121,7 @@ namespace SIT.Scan
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             // do not change the order of getting ca tool information
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            CatoolInfo caToolInformation = CommonHelper.GetCatoolVersionFromProjectFile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string logFileNameWithTimestamp = $"{FileConstant.SITScanLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
@@ -179,19 +178,6 @@ namespace SIT.Scan
         }
 
         /// <summary>
-        /// Retrieves the CA tool version and running location from the executing assembly.
-        /// </summary>
-        /// <returns>Information about the CA tool version and running location.</returns>
-        private static CatoolInfo GetCatoolVersionFromProjectfile()
-        {
-            CatoolInfo catoolInfo = new CatoolInfo();
-            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
-            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
-            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            return catoolInfo;
-        }
-
-        /// <summary>
         /// Creates an IJFrogService instance configured from the given application settings.
         /// </summary>
         /// <param name="appSettings">Application settings that contain JFrog configuration.</param>
@@ -222,6 +208,8 @@ namespace SIT.Scan
         /// <returns>Asynchronously completes after validation (may exit process on failure).</returns>
         private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
+            KeycloakTokenCacheService tokenService = await CommonHelper.InitializeKeycloakTokenServiceAsync(appSettings, environmentHelper.CallEnvironmentExit);
+
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
                 SW360URL = appSettings.SW360.URL,
@@ -230,43 +218,12 @@ namespace SIT.Scan
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
-            KeycloakTokenCacheService tokenService = await InitializeKeycloakTokenServiceAsync(appSettings, sw360ConnectionSettings);
             ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings, tokenService));
             int isValid = await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-        }
-
-        /// <summary>
-        /// Initializes the Keycloak token service if <c>ClientId</c> and <c>ClientSecret</c> are configured,
-        /// fetches a fresh token, and syncs the result back to <paramref name="appSettings"/> and
-        /// <paramref name="sw360ConnectionSettings"/>. Returns <c>null</c> when Keycloak credentials are absent.
-        /// </summary>
-        private static async Task<KeycloakTokenCacheService> InitializeKeycloakTokenServiceAsync(
-            CommonAppSettings appSettings, SW360ConnectionSettings sw360ConnectionSettings)
-        {
-            if (!CommonHelper.ValidateKeycloakCredentials(appSettings, environmentHelper.CallEnvironmentExit))
-            {
-                return null;
-            }
-
-            var tokenSettings = new TokenServiceSettings
-            {
-                SW360BaseUrl = appSettings.SW360.URL,
-                ClientId = appSettings.SW360.Keycloak?.ClientId,
-                ClientSecret = appSettings.SW360.Keycloak?.ClientSecret,
-                KeyCloakToken = appSettings.SW360.Token,
-                KeyCloakTokenType = appSettings.SW360.AuthTokenType
-            };
-            var tokenService = new KeycloakTokenCacheService(tokenSettings, environmentHelper.CallEnvironmentExit);
-            await tokenService.GetOrRefreshTokenAsync();
-            appSettings.SW360.Token = tokenSettings.KeyCloakToken;
-            appSettings.SW360.AuthTokenType = tokenSettings.KeyCloakTokenType;
-            sw360ConnectionSettings.Sw360Token = appSettings.SW360.Token;
-            sw360ConnectionSettings.SW360AuthTokenType = appSettings.SW360.AuthTokenType;
-            return tokenService;
         }
         #endregion
 

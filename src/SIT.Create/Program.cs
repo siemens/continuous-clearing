@@ -19,7 +19,6 @@ using SIT.Facade.Interfaces;
 using SIT.Services;
 using SIT.Services.Interface;
 using SW360KeycloakService;
-using SW360KeycloakService.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,7 +64,7 @@ namespace SIT.Create
 
             SettingsManager settingsManager = new SettingsManager();
             // do not change the order of getting ca tool information
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            CatoolInfo caToolInformation = CommonHelper.GetCatoolVersionFromProjectFile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string logFileNameWithTimestamp = $"{FileConstant.SITCreateLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
@@ -128,19 +127,6 @@ namespace SIT.Create
         }
 
         /// <summary>
-        /// gets the catool version from project file
-        /// </summary>
-        /// <returns>ca tool information</returns>
-        private static CatoolInfo GetCatoolVersionFromProjectfile()
-        {
-            CatoolInfo catoolInfo = new CatoolInfo();
-            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
-            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
-            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            return catoolInfo;
-        }
-
-        /// <summary>
         /// gets the sw360 project service object
         /// </summary>
         /// <param name="appSettings"></param>
@@ -148,6 +134,8 @@ namespace SIT.Create
         /// <returns>project service data</returns>
         private static async Task<(ISw360ProjectService, ISW360ApicommunicationFacade)> Getsw360ProjectServiceObject(CommonAppSettings appSettings)
         {
+            KeycloakTokenCacheService tokenService = await CommonHelper.InitializeKeycloakTokenServiceAsync(appSettings, environmentHelper.CallEnvironmentExit);
+
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
                 SW360URL = appSettings.SW360.URL,
@@ -157,39 +145,8 @@ namespace SIT.Create
                 Timeout = appSettings.TimeOut
             };
 
-            KeycloakTokenCacheService tokenService = await InitializeKeycloakTokenServiceAsync(appSettings, sw360ConnectionSettings);
             ISW360ApicommunicationFacade sW360ApicommunicationFacade = new SW360ApicommunicationFacade(sw360ConnectionSettings, tokenService);
             return (new Sw360ProjectService(sW360ApicommunicationFacade), sW360ApicommunicationFacade);
-        }
-
-        /// <summary>
-        /// Initializes the Keycloak token service if <c>ClientId</c> and <c>ClientSecret</c> are configured,
-        /// fetches a fresh token, and syncs the result back to <paramref name="appSettings"/> and
-        /// <paramref name="sw360ConnectionSettings"/>. Returns <c>null</c> when Keycloak credentials are absent.
-        /// </summary>
-        private static async Task<KeycloakTokenCacheService> InitializeKeycloakTokenServiceAsync(
-            CommonAppSettings appSettings, SW360ConnectionSettings sw360ConnectionSettings)
-        {
-            if (!CommonHelper.ValidateKeycloakCredentials(appSettings, environmentHelper.CallEnvironmentExit))
-            {
-                return null;
-            }
-
-            var tokenSettings = new TokenServiceSettings
-            {
-                SW360BaseUrl = appSettings.SW360.URL,
-                ClientId = appSettings.SW360.Keycloak?.ClientId,
-                ClientSecret = appSettings.SW360.Keycloak?.ClientSecret,
-                KeyCloakToken = appSettings.SW360.Token,
-                KeyCloakTokenType = appSettings.SW360.AuthTokenType
-            };
-            var tokenService = new KeycloakTokenCacheService(tokenSettings, environmentHelper.CallEnvironmentExit);
-            await tokenService.GetOrRefreshTokenAsync();
-            appSettings.SW360.Token = tokenSettings.KeyCloakToken;
-            appSettings.SW360.AuthTokenType = tokenSettings.KeyCloakTokenType;
-            sw360ConnectionSettings.Sw360Token = appSettings.SW360.Token;
-            sw360ConnectionSettings.SW360AuthTokenType = appSettings.SW360.AuthTokenType;
-            return tokenService;
         }
 
         /// <summary>
