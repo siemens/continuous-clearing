@@ -4,8 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using SIT.Common;
-using SIT.Scan.Model.NugetModel;
 using log4net;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
@@ -13,6 +11,8 @@ using Microsoft.Build.Locator;
 using Newtonsoft.Json.Linq;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
+using SIT.Common;
+using SIT.Scan.Model.NugetModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

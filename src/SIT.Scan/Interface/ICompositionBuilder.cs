@@ -5,8 +5,8 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
-using SIT.Scan.Model;
 using NuGet.Versioning;
+using SIT.Scan.Model;
 using System.Collections.Generic;
 
 namespace SIT.Scan.Interface

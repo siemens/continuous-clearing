@@ -4,15 +4,15 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using log4net;
+using Newtonsoft.Json;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
-using SIT.Upload.Model;
 using SIT.Common;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Common.Logging;
-using log4net;
-using Newtonsoft.Json;
+using SIT.Upload.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;

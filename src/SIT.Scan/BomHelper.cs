@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using CycloneDX.Models;
+using log4net;
 using SIT.APICommunications;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
@@ -15,15 +16,12 @@ using SIT.Common.Model;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Services.Interface;
-using log4net;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace SIT.Scan
@@ -183,7 +181,7 @@ namespace SIT.Scan
                 Logger.WarnFormat("The signature of the SPDX file '{0}' is not valid. Please check the signature and certificate files. Currently processing the SPDX file without signature verification.", filename);
             }
         }
-        
+
         /// <summary>
         /// Builds a display name for a component including group if available.
         /// </summary>

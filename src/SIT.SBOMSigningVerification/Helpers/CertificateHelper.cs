@@ -7,8 +7,8 @@
 
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys.Cryptography;
-using SIT.SBOMSigningVerification.Interface;
 using log4net;
+using SIT.SBOMSigningVerification.Interface;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;

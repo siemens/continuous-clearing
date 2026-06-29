@@ -4,10 +4,10 @@
 // SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
+using log4net;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
 using SIT.Common.Model;
-using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

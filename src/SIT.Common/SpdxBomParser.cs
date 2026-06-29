@@ -7,10 +7,10 @@
 // Ignore Spelling: SIT Spdx Bom
 
 using CycloneDX.Models;
-using SIT.Common.Interface;
-using SIT.Common.Model;
 using log4net;
 using Newtonsoft.Json;
+using SIT.Common.Interface;
+using SIT.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;

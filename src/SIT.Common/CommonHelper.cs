@@ -7,10 +7,10 @@
 // Ignore Spelling: Canonicalize
 
 using CycloneDX.Models;
-using SIT.Common.Constants;
-using SIT.Common.Model;
 using log4net;
 using log4net.Core;
+using SIT.Common.Constants;
+using SIT.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;

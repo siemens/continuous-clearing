@@ -7,9 +7,9 @@
 using CycloneDX.Models;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.AQL;
-using SIT.Upload.Model;
 using SIT.Common.Constants;
 using SIT.Services.Interface;
+using SIT.Upload.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
