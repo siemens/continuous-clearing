@@ -242,8 +242,16 @@ namespace SIT.Scan
         /// <param name="depencyComponentList">Enumerable of JProperty dependency entries.</param>
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
-            var property2 = depencyComponentList.ToList()[0];
+            List<JProperty> componentList = depencyComponentList?.ToList() ?? new List<JProperty>();
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += componentList.Count;
+
+            if (componentList.Count == 0)
+            {
+                Logger.DebugFormat("GetPackagesForBom(): 'packages' section is empty or contains no JProperty entries in {0}; nothing to process.", filepath);
+                return;
+            }
+
+            var property2 = componentList[0];
             var parsedContent = JObject.Parse(Convert.ToString(property2.Value));
             List<JToken> dep = parsedContent["dependencies"]?.ToList() ?? new List<JToken>();
             List<JToken> devDep = parsedContent["devDependencies"]?.ToList() ?? new List<JToken>();
@@ -251,7 +259,7 @@ namespace SIT.Scan
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
 
-            foreach (JProperty prop in depencyComponentList.Skip(1))
+            foreach (JProperty prop in componentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = FalseString };
                 if (string.IsNullOrEmpty(prop.Name))
@@ -280,7 +288,7 @@ namespace SIT.Scan
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Manufacturer.BomRef = BuildResolvedDependencies(prop.Value[Dependencies], depencyComponentList, prop.Name);
+                components.Manufacturer.BomRef = BuildResolvedDependencies(prop.Value[Dependencies], componentList, prop.Name);
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
 

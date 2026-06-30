@@ -88,6 +88,7 @@ namespace SIT.Scan
                 WriteDetailLog(info);
                 return info;
             }
+            Register();
             return ProcessAssetFiles(assetsFiles);
         }
 
@@ -429,18 +430,14 @@ namespace SIT.Scan
         /// Determines whether the specified file path matches any of the provided exclusion patterns.
         /// </summary>
         /// <param name="filePath">The file path to evaluate against the exclusion patterns. Cannot be <c>null</c>.</param>
-        /// <param name="excludePatterns">An array of string patterns to check for exclusion. If <paramref name="excludePatterns"/> is <c>null</c> or
-        /// empty, no exclusion is applied.</param>
-        /// <returns><see langword="true"/> if <paramref name="filePath"/> contains any of the <paramref name="excludePatterns"/>
-        /// (case-insensitive); otherwise, <see langword="false"/>.</returns>
+        /// <param name="excludePatterns">An array of glob patterns to check for exclusion (see
+        /// <see cref="GlobPatternMatcher"/> for supported syntax). If <paramref name="excludePatterns"/> is
+        /// <c>null</c> or empty, no exclusion is applied.</param>
+        /// <returns><see langword="true"/> if <paramref name="filePath"/> matches any of the
+        /// <paramref name="excludePatterns"/> globs; otherwise, <see langword="false"/>.</returns>
         private static bool IsExcluded(string filePath, string[] excludePatterns)
         {
-            if (excludePatterns == null || excludePatterns.Length == 0)
-            {
-                return false;
-            }
-
-            return excludePatterns.Any(pattern => filePath.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+            return GlobPatternMatcher.IsMatch(filePath, excludePatterns);
         }
         #endregion
 
