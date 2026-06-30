@@ -54,7 +54,7 @@ namespace SIT.Scan
             try
             {
                 byte[] certBytes = Convert.FromBase64String(base64Content);
-                var certificate = new X509Certificate2(certBytes);
+                var certificate = X509CertificateLoader.LoadCertificate(certBytes);
 
                 if (certificate.PublicKey == null)
                 {

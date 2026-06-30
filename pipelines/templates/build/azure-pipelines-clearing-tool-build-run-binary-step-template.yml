@@ -153,7 +153,7 @@ steps:
             $args += "true"
           }
 
-          dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Scan.dll" @args
+          dotnet "$(Build.SourcesDirectory)/continuous-clearing/out/net10.0/SIT.Scan.dll" @args
 
   - task: PowerShell@2
     condition: eq('${{ parameters.SITScanEnabled }}', true)
@@ -162,7 +162,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Create.dll `
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net10.0/SIT.Create.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
@@ -186,7 +186,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net8.0/SIT.Upload.dll `
+        dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net10.0/SIT.Upload.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `

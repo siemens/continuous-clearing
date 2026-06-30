@@ -26,7 +26,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: buildoutput
-          path: ${{ github.workspace }}/out/net8.0
+          path: ${{ github.workspace }}/out/net10.0
       
       - name: Upload Entire Output Directory
         uses: actions/upload-artifact@v4
@@ -45,7 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: buildoutput
-          path: ${{ github.workspace }}/out/net8.0
+          path: ${{ github.workspace }}/out/net10.0
 
       - name: Build Docker Image
         run: |
@@ -70,7 +70,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: buildoutput
-          path: ${{ github.workspace }}/out/net8.0
+          path: ${{ github.workspace }}/out/net10.0
 
       - name: Pack NuGet Package
         run: |

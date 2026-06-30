@@ -438,7 +438,7 @@ namespace SIT.Scan.UTest
             try
             {
                 // Try to extract from the existing certificate if possible
-                var cert = new X509Certificate2(_testCertificatePath);
+                var cert = X509CertificateLoader.LoadCertificateFromFile(_testCertificatePath);
                 if (cert.HasPrivateKey)
                 {
                     return cert.GetRSAPrivateKey().ExportRSAPrivateKey();
