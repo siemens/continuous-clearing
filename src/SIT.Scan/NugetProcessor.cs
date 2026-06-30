@@ -1354,11 +1354,7 @@ namespace SIT.Scan
         /// <param name="appSettings"></param>
         /// <returns></returns>
         private bool DetectDeploymentType(CommonAppSettings appSettings)
-        {
-            // NOTE: do NOT call _runtimeIdentifier.Register() here.
-            // IdentifyRuntime registers MSBuild *after* it has finished globbing,
-            // so MSBuildLocator's assembly resolver cannot hijack the
-            // Microsoft.Extensions.FileSystemGlobbing load used by GlobPatternMatcher.
+        {            
             runtimeInfo = new RuntimeInfo();
             runtimeInfo = _runtimeIdentifier.IdentifyRuntime(appSettings);
             return runtimeInfo.IsSelfContained;

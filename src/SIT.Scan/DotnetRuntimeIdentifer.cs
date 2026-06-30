@@ -81,20 +81,13 @@ namespace SIT.Scan
         {
             var info = new RuntimeInfo();
 
-            // Discover and filter asset files BEFORE registering MSBuild.
-            // MSBuildLocator.RegisterDefaults() installs an AssemblyLoadContext
-            // resolver that redirects assembly loads to the MSBuild directory.
-            // If MSBuild ships a different version of
-            // Microsoft.Extensions.FileSystemGlobbing than the one referenced here
-            // (8.0.0.0), GlobPatternMatcher will fail with a FileLoadException.
+            // Find and filter assets files
             var assetsFiles = FindAssetFiles(appSettings, info);
             if (!string.IsNullOrEmpty(info.ErrorMessage))
             {
                 WriteDetailLog(info);
                 return info;
             }
-
-            // Safe to register MSBuild now: globbing has already completed.
             Register();
             return ProcessAssetFiles(assetsFiles);
         }
