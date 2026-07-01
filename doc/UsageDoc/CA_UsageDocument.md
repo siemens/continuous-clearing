@@ -554,7 +554,7 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 ### Prerequisite
 
-1. .NET 8 runtime [https://dotnet.microsoft.com/download/dotnet-core/8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+1. .NET 10 runtime [https://dotnet.microsoft.com/download/dotnet-core/10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 2. Node.js and Git latest
 
 ### SIT.Scan
