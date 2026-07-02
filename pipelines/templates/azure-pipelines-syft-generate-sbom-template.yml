@@ -43,7 +43,7 @@ steps:
               ca-tool `
               /opt/DebianImageClearing/./syft packages `
               /tmp/InputImages/debian.tar `
-              -o cyclonedx-json@1.6 `
+              -o cyclonedx-json `
               --file "/tmp/OutputFiles/debian_sbom.cdx.json"
 
   - ${{ if eq(parameters.projectType, 'alpine') }}:
@@ -78,5 +78,5 @@ steps:
               ca-tool `
               /opt/DebianImageClearing/./syft packages `
               /tmp/InputImages/alpine.tar `
-              -o cyclonedx-json@1.6 `
+              -o cyclonedx-json `
               --file "/tmp/OutputFiles/alpine_sbom.cdx.json"
