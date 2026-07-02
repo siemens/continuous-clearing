@@ -89,7 +89,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        docker build -t ca-tool $(Build.SourcesDirectory)/continuous-clearing
+        docker build --no-cache -t ca-tool $(Build.SourcesDirectory)/continuous-clearing
 
   - task: PowerShell@2
     displayName: 'Tool pre-requisite'
