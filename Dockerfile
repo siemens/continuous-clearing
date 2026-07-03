@@ -18,7 +18,7 @@ RUN mkdir -p /opt/DebianImageClearing \
 
 # Install required packages and OpenJDK in a single RUN, then purge Python LAST.
 # - nodejs, npm, git, maven, curl, dpkg-dev, openjdk-17-jre-headless are runtime tooling
-# - syft v0.90.0 generates SBOMs for Debian image clearing
+# - syft v1.46.0 generates SBOMs for Debian image clearing
 # - Python 3.12 is removed AFTER all apt-get installs to avoid leaving apt in a
 #   half-broken state that would fail any subsequent `apt-get install`.
 RUN apt-get update && \
@@ -30,7 +30,7 @@ RUN apt-get update && \
         curl \
         dpkg-dev \
         openjdk-17-jre-headless && \
-    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v0.90.0 && \
+    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v1.46.0 && \
     dpkg -r --force-depends python3-minimal             || true && \
     dpkg -r --force-depends libpython3.12-minimal:amd64 || true && \
     dpkg -r --force-depends libpython3.12-stdlib:amd64  || true && \
