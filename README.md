@@ -111,7 +111,7 @@ These instructions will get the project up and running on your local machine for
 
 #### Prerequisite
 
-1. Download Visual Studio 2022.
+1. Download Visual Studio 2026.
 2. Download Docker latest version.
 3. Docker image of continuous Clearing tool to be loaded locally.
 
