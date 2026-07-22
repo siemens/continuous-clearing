@@ -127,6 +127,64 @@ namespace SIT.Upload.UTest
         }
 
         [Test]
+        public void SetExitCode_OnlyOptionalDevDepsNotInRepo_DoesNotExit()
+        {
+            // Arrange: 3 packages missing in repo but all 3 are npm optional devDeps
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 3,
+                PackagesNotUploadedDueToError = 0
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>
+                {
+                    new ComponentsToArtifactory { Name = "a", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "b", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "c", Version = "1.0.0", IsOptionalDevDependency = true }
+                }
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, displayPackagesInfo);
+
+            // Assert: no warn/debug logs, meaning early-return path was taken
+            var events = _memoryAppender.GetEvents();
+            Assert.That(FindEventByLevel(events, Level.Warn), Is.Null, "Should not warn when only optional devDeps are missing.");
+            Assert.That(FindEventByLevel(events, Level.Debug), Is.Null, "Should not set exit code when only optional devDeps are missing.");
+        }
+
+        [Test]
+        public void SetExitCode_MixedNotInRepo_ExcludesOptionalDevDepsFromCount()
+        {
+            // Arrange: 5 missing total, 2 are optional devDeps -> effective 3 for exit trigger
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 5,
+                PackagesNotUploadedDueToError = 0
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>
+                {
+                    new ComponentsToArtifactory { Name = "a", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "b", Version = "1.0.0", IsOptionalDevDependency = true }
+                }
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, displayPackagesInfo);
+
+            // Assert
+            var events = _memoryAppender.GetEvents();
+            var warnEvent = FindEventByLevel(events, Level.Warn);
+            Assert.NotNull(warnEvent);
+            StringAssert.Contains("3 packages not found in repository", warnEvent.RenderedMessage);
+        }
+
+        [Test]
         public void GetUploadPackageDetails_CoversAllScenarios()
         {
             // Arrange

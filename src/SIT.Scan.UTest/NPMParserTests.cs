@@ -221,5 +221,69 @@ namespace SIT.Scan.UTest
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
         }
+
+        [Test]
+        public void ParsePackageLockJson_PackagesWithDevAndOptionalFlags_AddsOptionalDevDependencyOnlyWhenBothTrue()
+        {
+            // Arrange - build a v3-format package-lock.json in memory covering all flag combinations.
+            string tempDir = Path.Combine(Path.GetTempPath(), "SITScanNpm_OptDev_" + System.Guid.NewGuid().ToString("N"));
+            System.IO.Directory.CreateDirectory(tempDir);
+            string lockPath = Path.Combine(tempDir, "package-lock.json");
+            string json = @"{
+              ""name"": ""optdev-fixture"",
+              ""version"": ""1.0.0"",
+              ""lockfileVersion"": 3,
+              ""requires"": true,
+              ""packages"": {
+                """": { ""name"": ""optdev-fixture"", ""version"": ""1.0.0"" },
+                ""node_modules/pkg-plain"":       { ""version"": ""1.0.0"" },
+                ""node_modules/pkg-dev"":         { ""version"": ""1.0.0"", ""dev"": true },
+                ""node_modules/pkg-optional"":    { ""version"": ""1.0.0"", ""optional"": true },
+                ""node_modules/pkg-devoptional"": { ""version"": ""1.0.0"", ""devOptional"": true },
+                ""node_modules/pkg-dev-and-opt"": { ""version"": ""1.0.0"", ""dev"": true, ""optional"": true }
+              }
+            }";
+            System.IO.File.WriteAllText(lockPath, json);
+
+            CommonAppSettings appSettings = new CommonAppSettings
+            {
+                ProjectType = "NPM",
+                SW360 = new SW360 { IgnoreDevDependency = false }
+            };
+
+            try
+            {
+                // Act
+                List<Component> components = NpmProcessor.ParsePackageLockJson(lockPath, appSettings);
+
+                // Assert - property present ONLY on pkg-dev-and-opt.
+                Assert.That(HasOptionalDevProperty(components, "pkg-dev-and-opt"), Is.True,
+                    "pkg-dev-and-opt has dev+optional; must have optional-dev-dependency=true");
+
+                Assert.That(HasOptionalDevProperty(components, "pkg-plain"), Is.False,
+                    "pkg-plain has no flags; must not have optional-dev-dependency");
+                Assert.That(HasOptionalDevProperty(components, "pkg-dev"), Is.False,
+                    "pkg-dev is dev-only; must not have optional-dev-dependency");
+                Assert.That(HasOptionalDevProperty(components, "pkg-optional"), Is.False,
+                    "pkg-optional is optional-only; must not have optional-dev-dependency");
+                Assert.That(HasOptionalDevProperty(components, "pkg-devoptional"), Is.False,
+                    "pkg-devoptional alone (without dev+optional) must not have optional-dev-dependency");
+            }
+            finally
+            {
+                try { System.IO.Directory.Delete(tempDir, true); } catch { /* best-effort cleanup */ }
+            }
+        }
+
+        private static bool HasOptionalDevProperty(List<Component> components, string name)
+        {
+            Component comp = components.Find(c => c.Name == name);
+            if (comp?.Properties == null)
+            {
+                return false;
+            }
+            return comp.Properties.Exists(p =>
+                p.Name == Dataconstant.Cdx_OptionalDevDependency && p.Value == "true");
+        }
     }
 }

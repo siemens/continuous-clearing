@@ -171,6 +171,10 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
         /// <summary>
+        /// CycloneDX optional dev dependency key.
+        /// </summary>
+        public const string Cdx_OptionalDevDependency = "internal:siemens:clearing:optional-devdependency";
+        /// <summary>
         /// CycloneDX identifier type key.
         /// </summary>
         public const string Cdx_IdentifierType = "internal:siemens:clearing:identifier-type";

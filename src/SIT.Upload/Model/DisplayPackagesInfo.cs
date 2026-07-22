@@ -27,6 +27,7 @@ namespace SIT.Upload.Model
         public List<ComponentsToArtifactory> UnknownPackagesCargo { get; set; }
         public List<ComponentsToArtifactory> UnknownPackagesChoco { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNpm { get; set; }
+        public List<ComponentsToArtifactory> JfrogNotFoundOptionalDevDepsNpm { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesNuget { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesConan { get; set; }
         public List<ComponentsToArtifactory> JfrogNotFoundPackagesPython { get; set; }
