@@ -201,7 +201,13 @@ namespace SIT.Upload
             LoggerHelper.SafeSpectreAction(() =>
             {
                 var content = new StringBuilder($"[green]{name}[/]\n\n");
-                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages, name, filepath, optionalDevDepPackages);
+                var lists = new PackageDisplayLists(
+                    unknownPackages,
+                    JfrogFoundPackages,
+                    JfrogNotFoundPackages,
+                    SucessfullPackages,
+                    optionalDevDepPackages);
+                AppendPackageContent(content, lists, name, filepath);
 
                 LoggerHelper.WriteStyledPanel(content.ToString().TrimEnd(), "", "blue", "yellow");
                 LoggerHelper.WriteLine();
@@ -209,28 +215,33 @@ namespace SIT.Upload
         }
 
         /// <summary>
+        /// Groups the per-package-type display lists to keep method signatures small.
+        /// </summary>
+        private sealed record PackageDisplayLists(
+            List<ComponentsToArtifactory> UnknownPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages,
+            List<ComponentsToArtifactory> OptionalDevDepPackages);
+
+        /// <summary>
         /// Appends package content to a StringBuilder for display.
         /// </summary>
         /// <param name="content">The StringBuilder to append content to.</param>
-        /// <param name="unknownPackages">List of unknown packages.</param>
-        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
-        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
-        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
+        /// <param name="lists">Grouped package lists to render.</param>
         /// <param name="name">The name of the package type.</param>
         /// <param name="filePath">The file path for storing package information.</param>
         private static void AppendPackageContent(
             StringBuilder content,
-            List<ComponentsToArtifactory> unknownPackages,
-            List<ComponentsToArtifactory> JfrogFoundPackages,
-            List<ComponentsToArtifactory> JfrogNotFoundPackages,
-            List<ComponentsToArtifactory> SucessfullPackages, string name, string filePath,
-            List<ComponentsToArtifactory> optionalDevDepPackages = null)
+            PackageDisplayLists lists,
+            string name,
+            string filePath)
         {
-            AppendUnknownPackages(content, unknownPackages, name, filePath);
-            AppendJfrogFoundPackages(content, JfrogFoundPackages);
-            AppendJfrogNotFoundPackages(content, JfrogNotFoundPackages);
-            AppendOptionalDevDependencyPackages(content, optionalDevDepPackages);
-            AppendSuccessfulPackages(content, SucessfullPackages);
+            AppendUnknownPackages(content, lists.UnknownPackages, name, filePath);
+            AppendJfrogFoundPackages(content, lists.JfrogFoundPackages);
+            AppendJfrogNotFoundPackages(content, lists.JfrogNotFoundPackages);
+            AppendOptionalDevDependencyPackages(content, lists.OptionalDevDepPackages);
+            AppendSuccessfulPackages(content, lists.SucessfullPackages);
         }
 
         /// <summary>
