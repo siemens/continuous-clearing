@@ -5,7 +5,7 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<AssemblyName>SIT.Upload</AssemblyName>
 		<RootNamespace>SIT.Upload</RootNamespace>
-		<Version>10.0.0</Version>
+		<Version>11.0.0</Version>
 		<NoWarn>$(NoWarn);NETSDK1206</NoWarn>
 	</PropertyGroup>
 

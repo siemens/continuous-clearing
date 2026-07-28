@@ -5,8 +5,7 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<AssemblyName>SIT.Scan</AssemblyName>
 		<RootNamespace>SIT.Scan</RootNamespace>
-		<Version>10.0.0</Version>
-		<!-- System.Text.Json is shipped in .NET 10 framework but CA.nuspec bundles tools\System.Text.Json.dll, so the explicit reference is intentionally kept. -->
+		<Version>11.0.0</Version>
 		<NoWarn>$(NoWarn);NU1510;NETSDK1206</NoWarn>
 	</PropertyGroup>
 
