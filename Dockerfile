@@ -10,7 +10,9 @@ ENV PATH="${PATH}:${DOTNET_ROOT}"
 # would otherwise reference files that only exist inside the container and not on the pipeline agent.
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 WORKDIR /app/out
-# Install Microsoft package repository
+# Install Microsoft package repository and the .NET 10 runtime.
+# wget/gnupg/apt-transport-https are only needed to register the MS repo,
+# so they are purged in the same layer to keep the final image small and reduce CVE surface.
 RUN apt-get update && \
    apt-get install -y --no-install-recommends \
        wget \
@@ -23,6 +25,7 @@ RUN apt-get update && \
    apt-get update && \
    apt-get install -y --no-install-recommends \
        dotnet-runtime-10.0 && \
+   apt-get purge -y --auto-remove wget gnupg apt-transport-https && \
    rm -rf /var/lib/apt/lists/*
 # Creating required directories
 RUN mkdir -p \
@@ -31,7 +34,8 @@ RUN mkdir -p \
    /mnt/Output \
    /etc/CATool \
    /app/out/PatchedFiles
-# Install required packages
+# Install required packages for CATool clearing flows
+# (Python is intentionally NOT installed — CATool doesn't need it, and it inflates the image + CVE surface.)
 RUN apt-get update && \
    apt-get install -y --no-install-recommends \
        nodejs \
@@ -40,8 +44,6 @@ RUN apt-get update && \
        maven \
        curl \
        dpkg-dev \
-       python3 \
-       python3-pip \
        openjdk-21-jre-headless && \
    rm -rf /var/lib/apt/lists/*
 # Install Syft
