@@ -34,21 +34,19 @@ RUN mkdir -p \
    /mnt/Output \
    /etc/CATool \
    /app/out/PatchedFiles
-# Install required packages for CATool clearing flows
-# (Python is intentionally NOT installed — CATool doesn't need it, and it inflates the image + CVE surface.)
+
+# `curl` is only needed to install Syft below, so it is purged in the same layer.
 RUN apt-get update && \
    apt-get install -y --no-install-recommends \
-       nodejs \
-       npm \
        git \
        maven \
        curl \
        dpkg-dev \
        openjdk-21-jre-headless && \
+   curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
+       sh -s -- -b /opt/DebianImageClearing v1.46.0 && \
+   apt-get purge -y --auto-remove curl && \
    rm -rf /var/lib/apt/lists/*
-# Install Syft
-RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
-   sh -s -- -b /opt/DebianImageClearing v1.46.0
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Copy the CATool build output (produced by `dotnet build -c Release`) into the image.
