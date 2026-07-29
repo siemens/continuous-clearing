@@ -5,6 +5,10 @@ FROM debian:13-slim
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DOTNET_ROOT=/usr/share/dotnet
 ENV PATH="${PATH}:${DOTNET_ROOT}"
+# Signal to the app (and match the official .NET images) that we're running inside a container.
+# PipelineArtifactUploader uses this to skip ##vso[artifact.upload ...] commands, whose paths
+# would otherwise reference files that only exist inside the container and not on the pipeline agent.
+ENV DOTNET_RUNNING_IN_CONTAINER=true
 WORKDIR /app/out
 # Install Microsoft package repository
 RUN apt-get update && \
