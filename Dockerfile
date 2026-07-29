@@ -22,7 +22,7 @@ RUN apt-get update && \
    rm packages-microsoft-prod.deb && \
    apt-get update && \
    apt-get install -y --no-install-recommends \
-       dotnet-sdk-10.0 && \
+       dotnet-runtime-10.0 && \
    rm -rf /var/lib/apt/lists/*
 # Creating required directories
 RUN mkdir -p \
