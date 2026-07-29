@@ -1,11 +1,18 @@
 # SPDX-FileCopyrightText: 2024 Siemens AG
 # SPDX-License-Identifier: MIT
 
-# .NET 10 SDK on Ubuntu 24.04 LTS 'noble'.
-# .NET 10 dropped Debian 12 (bookworm); no GA bookworm-slim or trixie-slim tag is
-# published (only :10.0-preview-trixie-slim exists). 'noble' is the APT-based LTS
-# variant supported through 2029 and ships openjdk-17-jre-headless in its main repo.
-FROM mcr.microsoft.com/dotnet/sdk:10.0-noble
+# CATool runtime image on Debian 13 ('trixie') slim.
+# Microsoft does not publish a GA Debian tag for .NET 10 SDK (only preview), so we
+# start from the official debian:trixie-slim image and install the .NET 10 SDK
+# using Microsoft's dotnet-install.sh script. This keeps the image on a pure
+# Debian base with a smaller footprint than the Ubuntu 'noble' variant.
+FROM debian:trixie-slim
+
+# .NET install location and PATH updates
+ENV DOTNET_ROOT=/usr/share/dotnet \
+    DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+    DOTNET_NOLOGO=1 \
+    PATH="/usr/share/dotnet:/root/.dotnet/tools:/root/.local/bin:/opt/DebianImageClearing:${PATH}"
 
 WORKDIR /app/out
 
@@ -16,32 +23,31 @@ RUN mkdir -p /opt/DebianImageClearing \
              /etc/CATool \
              /app/out/PatchedFiles
 
-# Install required packages and OpenJDK in a single RUN, then purge Python LAST.
-# - nodejs, npm, git, maven, curl, dpkg-dev, openjdk-17-jre-headless are runtime tooling
+# Install runtime tooling, .NET 10 SDK, and syft in a single layer to keep the image small.
+# - ca-certificates + curl are required for the .NET and syft installers
+# - nodejs, npm, git, maven, dpkg-dev are runtime tooling used by CATool
+# - openjdk-21-jre-headless is the JRE shipped in Debian 13 main (JDK 17 is not available)
 # - syft v1.46.0 generates SBOMs for Debian image clearing
-# - Python 3.12 is removed AFTER all apt-get installs to avoid leaving apt in a
-#   half-broken state that would fail any subsequent `apt-get install`.
+# - .NET 10 SDK is installed via Microsoft's dotnet-install.sh into /usr/share/dotnet
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
+        ca-certificates \
+        curl \
         nodejs \
         npm \
         git \
         maven \
-        curl \
         dpkg-dev \
-        openjdk-17-jre-headless && \
+        libicu-dev \
+        libssl-dev \
+        openjdk-21-jre-headless && \
+    curl -sSfL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && \
+    chmod +x /tmp/dotnet-install.sh && \
+    /tmp/dotnet-install.sh --channel 10.0 --install-dir /usr/share/dotnet && \
+    rm -f /tmp/dotnet-install.sh && \
     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v1.46.0 && \
-    dpkg -r --force-depends python3-minimal             || true && \
-    dpkg -r --force-depends libpython3.12-minimal:amd64 || true && \
-    dpkg -r --force-depends libpython3.12-stdlib:amd64  || true && \
-    dpkg -r --force-depends python3.12                  || true && \
-    dpkg -r --force-depends python3.12-minimal          || true && \
-    dpkg --purge libpython3.12-minimal:amd64            || true && \
-    dpkg --purge python3.12-minimal                     || true && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-ENV PATH="/root/.local/bin:/opt/DebianImageClearing:$PATH"
+    rm -rf /var/lib/apt/lists/* /tmp/*
 
 # Copy the CATool build output (produced by `dotnet build -c Release`) into the image.
 # Build output lands in `out/net10.0/` because csproj has <OutputPath>..\..\out</OutputPath>
