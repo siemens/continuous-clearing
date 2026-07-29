@@ -10,9 +10,9 @@ ENV PATH="${PATH}:${DOTNET_ROOT}"
 # would otherwise reference files that only exist inside the container and not on the pipeline agent.
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 WORKDIR /app/out
-# Install Microsoft package repository and the .NET 10 runtime.
-# wget/gnupg/apt-transport-https are only needed to register the MS repo,
-# so they are purged in the same layer to keep the final image small and reduce CVE surface.
+# Install Microsoft package repository and the .NET 10 SDK.
+# The SDK is required (not just runtime) because NuGet scanning invokes MSBuildLocator/MSBuild
+
 RUN apt-get update && \
    apt-get install -y --no-install-recommends \
        wget \
@@ -24,7 +24,7 @@ RUN apt-get update && \
    rm packages-microsoft-prod.deb && \
    apt-get update && \
    apt-get install -y --no-install-recommends \
-       dotnet-runtime-10.0 && \
+       dotnet-sdk-10.0 && \
    apt-get purge -y --auto-remove wget gnupg apt-transport-https && \
    rm -rf /var/lib/apt/lists/*
 # Creating required directories
