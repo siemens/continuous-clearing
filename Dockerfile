@@ -35,9 +35,11 @@ RUN mkdir -p \
    /etc/CATool \
    /app/out/PatchedFiles
 
-# `curl` is only needed to install Syft below, so it is purged in the same layer.
+# Install required packages for CATool clearing flows.# 
 RUN apt-get update && \
    apt-get install -y --no-install-recommends \
+       nodejs \
+       npm \
        git \
        maven \
        curl \
