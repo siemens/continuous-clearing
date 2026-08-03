@@ -56,14 +56,15 @@ namespace SIT.Common
         /// <param name="catoolVersion">The CA tool version.</param>
         /// <param name="kpiData">The KPI data to track.</param>
         /// <param name="telemetryFor">The telemetry event name.</param>
-        public void StartTelemetry<T>(string catoolVersion, T kpiData, string telemetryFor)
+        /// <param name="timeTaken">Total time taken by the tool to complete execution.</param>
+        public void StartTelemetry<T>(string catoolVersion, T kpiData, string telemetryFor, TimeSpan? timeTaken = null)
         {
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             LoggerHelper.WriteTelemetryMessage(TelemetryConstant.StartLogMessage);
             try
             {
                 InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, telemetryFor
-                                                    , appSettings_);
+                                                    , appSettings_, timeTaken);
                 TrackKpiDataTelemetry(telemetryFor, kpiData);
             }
             catch (Exception ex) when (ex is ArgumentNullException or IOException)
@@ -87,7 +88,7 @@ namespace SIT.Common
         /// <param name="eventName">The name of the event to track.</param>
         /// <param name="appSettings">The common application settings.</param>
         private void InitializeAndTrackEvent(string toolName, string toolVersion, string eventName,
-                                                    CommonAppSettings appSettings)
+                                                    CommonAppSettings appSettings, TimeSpan? timeTaken = null)
         {
             telemetry_.Initialize(toolName, toolVersion);
 
@@ -96,9 +97,11 @@ namespace SIT.Common
                 { "CA Tool Version", toolVersion },
                 { "SW360 Project Name", appSettings?.SW360?.ProjectName },
                 { "SW360 Project ID", appSettings?.SW360?.ProjectID },
+                { "SBOM File Name", Path.GetFileName(FileOperations.CatoolBomFilePath ?? string.Empty) },
                 { "Project Type", appSettings?.ProjectType },
                 { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
-                { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) }
+                { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
+                { "Time Taken For Completion", timeTaken.HasValue ? $"{timeTaken.Value.TotalSeconds:0.##} seconds" : string.Empty }
             });
         }
 
