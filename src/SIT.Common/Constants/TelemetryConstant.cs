@@ -30,15 +30,15 @@ namespace SIT.Common.Constants
         /// <summary>
         /// Telemetry key for SIT Scan KPI data.
         /// </summary>
-        public const string ScanKpiData = "ScanKpiDataTelemetry";
+        public const string ScanKpiData = "SITScanKpiDataTelemetry";
         /// <summary>
         /// Telemetry key for SIT Create KPI data.
         /// </summary>
-        public const string CreateKpiData = "CreateKpiDataTelemetry";
+        public const string CreateKpiData = "SITCreateKpiDataTelemetry";
         /// <summary>
         /// Telemetry key for SIT Upload KPI data.
         /// </summary>
-        public const string UploadKpiData = "UploadKpiDataTelemetry";
+        public const string UploadKpiData = "SITUploadKpiDataTelemetry";
         /// <summary>
         /// The type of telemetry (e.g., ApplicationInsights).
         /// </summary>
