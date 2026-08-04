@@ -396,7 +396,7 @@ namespace SIT.Upload
 
             foreach (var package in optionalDevDepPackages)
             {
-                Logger.WarnFormat("\u26A0 {0}-{1} is an optional devDependency and not found in jfrog", package.Name, package.Version);
+                Logger.WarnFormat("⚠ {0}-{1} is an optional devDependency and not found in jfrog", package.Name, package.Version);
             }
             Logger.Info("\n");
         }
