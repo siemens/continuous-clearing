@@ -55,17 +55,18 @@ namespace SIT.Common
         /// <typeparam name="T">The type of KPI data.</typeparam>
         /// <param name="catoolVersion">The CA tool version.</param>
         /// <param name="kpiData">The KPI data to track.</param>
-        /// <param name="telemetryFor">The telemetry event name.</param>
+        /// <param name="appDataEventName">The telemetry event name used for the application/context event.</param>
+        /// <param name="kpiEventName">The telemetry event name used for the KPI data event.</param>
         /// <param name="timeTaken">Total time taken by the tool to complete execution.</param>
-        public void StartTelemetry<T>(string catoolVersion, T kpiData, string telemetryFor, TimeSpan? timeTaken = null)
+        public void StartTelemetry<T>(string catoolVersion, T kpiData, string appDataEventName, string kpiEventName, TimeSpan? timeTaken = null)
         {
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             LoggerHelper.WriteTelemetryMessage(TelemetryConstant.StartLogMessage);
             try
             {
-                InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, telemetryFor
+                InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, appDataEventName
                                                     , appSettings_, timeTaken);
-                TrackKpiDataTelemetry(telemetryFor, kpiData);
+                TrackKpiDataTelemetry(kpiEventName, kpiData);
             }
             catch (Exception ex) when (ex is ArgumentNullException or IOException)
             {
