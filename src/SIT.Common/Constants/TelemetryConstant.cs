@@ -42,15 +42,15 @@ namespace SIT.Common.Constants
         /// <summary>
         /// Telemetry key for SIT Create application/context data.
         /// </summary>
-        public const string CreateAppData = "SitCreateAppData";
+        public const string CreateAppData = "SITCreateAppData";
         /// <summary>
         /// Telemetry key for SIT Scan application/context data.
         /// </summary>
-        public const string ScanAppData = "SitScanAppData";
+        public const string ScanAppData = "SITScanAppData";
         /// <summary>
         /// Telemetry key for SIT Upload application/context data.
         /// </summary>
-        public const string UploadAppData = "SitUploadAppData";
+        public const string UploadAppData = "SITUploadAppData";
         /// <summary>
         /// The type of telemetry (e.g., ApplicationInsights).
         /// </summary>
