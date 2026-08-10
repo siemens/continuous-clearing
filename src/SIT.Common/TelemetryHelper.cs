@@ -96,8 +96,8 @@ namespace SIT.Common
             telemetry_.TrackCustomEvent(eventName, new Dictionary<string, string>
             {
                 { "CA Tool Version", toolVersion },
-                { "Sw360 Project Name", appSettings?.SW360?.ProjectName },
-                { "Sw360 Project ID", appSettings?.SW360?.ProjectID },
+                { "SW360 Project Name", appSettings?.SW360?.ProjectName },
+                { "SW360 Project ID", appSettings?.SW360?.ProjectID },
                 { "SBOM File Name", Path.GetFileName(FileOperations.CatoolBomFilePath ?? string.Empty) },
                 { "Project Type", appSettings?.ProjectType },
                 { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
