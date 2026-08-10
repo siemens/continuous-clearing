@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -50,6 +50,7 @@ namespace SIT.Upload
             displayPackagesInfo.UnknownPackagesCargo = new List<ComponentsToArtifactory>();
             displayPackagesInfo.UnknownPackagesChoco = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesPython = new List<ComponentsToArtifactory>();
             displayPackagesInfo.JfrogNotFoundPackagesMaven = new List<ComponentsToArtifactory>();
@@ -126,7 +127,7 @@ namespace SIT.Upload
         {
             string localPathforartifactory = ArtifactoryUploader.GettPathForArtifactoryUpload();
 
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "npm", localPathforartifactory);
+            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "npm", localPathforartifactory, displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "NuGet", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven", localPathforartifactory);
             DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan", localPathforartifactory);
@@ -152,20 +153,21 @@ namespace SIT.Upload
     List<ComponentsToArtifactory> SucessfullPackages,
     List<ComponentsToArtifactory> JfrogFoundPackages,
     string name,
-    string filePath)
+    string filePath,
+    List<ComponentsToArtifactory> optionalDevDepPackages = null)
         {
-            if (!HasAnyPackages(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages))
+            if (!HasAnyPackages(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, optionalDevDepPackages))
             {
                 return;
             }
 
             if (LoggerFactory.UseSpectreConsole)
             {
-                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath);
+                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath, optionalDevDepPackages);
             }
             else
             {
-                DisplayWithLogger(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath);
+                DisplayWithLogger(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath, optionalDevDepPackages);
             }
         }
 
@@ -193,12 +195,19 @@ namespace SIT.Upload
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
             List<ComponentsToArtifactory> SucessfullPackages,
             List<ComponentsToArtifactory> JfrogFoundPackages,
-            string name, string filepath)
+            string name, string filepath,
+            List<ComponentsToArtifactory> optionalDevDepPackages = null)
         {
             LoggerHelper.SafeSpectreAction(() =>
             {
                 var content = new StringBuilder($"[green]{name}[/]\n\n");
-                AppendPackageContent(content, unknownPackages, JfrogFoundPackages, JfrogNotFoundPackages, SucessfullPackages, name, filepath);
+                var lists = new PackageDisplayLists(
+                    unknownPackages,
+                    JfrogFoundPackages,
+                    JfrogNotFoundPackages,
+                    SucessfullPackages,
+                    optionalDevDepPackages);
+                AppendPackageContent(content, lists, name, filepath);
 
                 LoggerHelper.WriteStyledPanel(content.ToString().TrimEnd(), "", "blue", "yellow");
                 LoggerHelper.WriteLine();
@@ -206,26 +215,33 @@ namespace SIT.Upload
         }
 
         /// <summary>
+        /// Groups the per-package-type display lists to keep method signatures small.
+        /// </summary>
+        private sealed record PackageDisplayLists(
+            List<ComponentsToArtifactory> UnknownPackages,
+            List<ComponentsToArtifactory> JfrogFoundPackages,
+            List<ComponentsToArtifactory> JfrogNotFoundPackages,
+            List<ComponentsToArtifactory> SucessfullPackages,
+            List<ComponentsToArtifactory> OptionalDevDepPackages);
+
+        /// <summary>
         /// Appends package content to a StringBuilder for display.
         /// </summary>
         /// <param name="content">The StringBuilder to append content to.</param>
-        /// <param name="unknownPackages">List of unknown packages.</param>
-        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
-        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
-        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
+        /// <param name="lists">Grouped package lists to render.</param>
         /// <param name="name">The name of the package type.</param>
         /// <param name="filePath">The file path for storing package information.</param>
         private static void AppendPackageContent(
             StringBuilder content,
-            List<ComponentsToArtifactory> unknownPackages,
-            List<ComponentsToArtifactory> JfrogFoundPackages,
-            List<ComponentsToArtifactory> JfrogNotFoundPackages,
-            List<ComponentsToArtifactory> SucessfullPackages, string name, string filePath)
+            PackageDisplayLists lists,
+            string name,
+            string filePath)
         {
-            AppendUnknownPackages(content, unknownPackages, name, filePath);
-            AppendJfrogFoundPackages(content, JfrogFoundPackages);
-            AppendJfrogNotFoundPackages(content, JfrogNotFoundPackages);
-            AppendSuccessfulPackages(content, SucessfullPackages);
+            AppendUnknownPackages(content, lists.UnknownPackages, name, filePath);
+            AppendJfrogFoundPackages(content, lists.JfrogFoundPackages);
+            AppendJfrogNotFoundPackages(content, lists.JfrogNotFoundPackages);
+            AppendOptionalDevDependencyPackages(content, lists.OptionalDevDepPackages);
+            AppendSuccessfulPackages(content, lists.SucessfullPackages);
         }
 
         /// <summary>
@@ -307,6 +323,24 @@ namespace SIT.Upload
         }
 
         /// <summary>
+        /// Appends npm optional devDependency packages (not found in JFrog) to the display content.
+        /// </summary>
+        /// <param name="content">The StringBuilder to append content to.</param>
+        /// <param name="packages">List of optional devDependency packages not found in JFrog.</param>
+        private static void AppendOptionalDevDependencyPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]is an optional devDependency and not found in jfrog[/]");
+                }
+                content.AppendLine();
+            }
+        }
+
+        /// <summary>
         /// Appends successful packages information to the content.
         /// </summary>
         /// <param name="content">The StringBuilder to append content to.</param>
@@ -338,13 +372,33 @@ namespace SIT.Upload
             List<ComponentsToArtifactory> SucessfullPackages,
             List<ComponentsToArtifactory> JfrogFoundPackages,
             string name,
-            string filePath)
+            string filePath,
+            List<ComponentsToArtifactory> optionalDevDepPackages = null)
         {
             Logger.InfoFormat("\n{0}:\n", name);
             DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
             DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
             DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
+            DisplayOptionalDevDepPackages(optionalDevDepPackages);
             DisplayErrorForSucessfullPackages(SucessfullPackages);
+        }
+
+        /// <summary>
+        /// Logs npm optional devDependency packages that were not found in JFrog.
+        /// </summary>
+        /// <param name="optionalDevDepPackages">List of optional devDependency packages not found in JFrog.</param>
+        private static void DisplayOptionalDevDepPackages(List<ComponentsToArtifactory> optionalDevDepPackages)
+        {
+            if (optionalDevDepPackages == null || optionalDevDepPackages.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var package in optionalDevDepPackages)
+            {
+                Logger.WarnFormat("⚠ {0}-{1} is an optional devDependency and not found in jfrog", package.Name, package.Version);
+            }
+            Logger.Info("\n");
         }
 
         /// <summary>
@@ -811,20 +865,22 @@ namespace SIT.Upload
         /// - Packages not actioned due to error
         /// If one or both counts are greater than zero, it logs the message and calls <see cref="EnvironmentHelper.CallEnvironmentExit(int)"/> with exit code 2.
         /// </remarks>
-        public static void SetExitCode(UploaderKpiData uploaderKpiData, EnvironmentHelper environmentHelper)
+        public static void SetExitCode(UploaderKpiData uploaderKpiData, EnvironmentHelper environmentHelper, DisplayPackagesInfo displayPackagesInfo = null)
         {
             var notInRepo = uploaderKpiData.PackagesNotExistingInRemoteCache;
             var notUploadedError = uploaderKpiData.PackagesNotUploadedDueToError;
+            var optionalDevDepCount = displayPackagesInfo?.JfrogNotFoundOptionalDevDepsNpm?.Count ?? 0;
+            var notInRepoForExit = Math.Max(0, notInRepo - optionalDevDepCount);
 
-            if (notInRepo <= 0 && notUploadedError <= 0)
+            if (notInRepoForExit <= 0 && notUploadedError <= 0)
             {
                 return;
             }
 
             var reasons = new List<string>(2);
-            if (notInRepo > 0)
+            if (notInRepoForExit > 0)
             {
-                reasons.Add($"{notInRepo} package{PluralSuffix(notInRepo)} not found in repository");
+                reasons.Add($"{notInRepoForExit} package{PluralSuffix(notInRepoForExit)} not found in repository");
             }
             if (notUploadedError > 0)
             {

@@ -2,7 +2,8 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
+		<NoWarn>$(NoWarn);NETSDK1206</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -17,7 +18,7 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
 		<PackageReference Include="Moq" Version="4.13.1" />
 		<PackageReference Include="NUnit" Version="3.12.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
 		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
 		<PackageReference Include="NUnit3TestAdapter" Version="3.16.1">
 			<PrivateAssets>all</PrivateAssets>

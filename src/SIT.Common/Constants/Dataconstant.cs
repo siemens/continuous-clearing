@@ -1,5 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -170,6 +170,10 @@ namespace SIT.Common.Constants
         /// CycloneDX is development key.
         /// </summary>
         public const string Cdx_IsDevelopment = "internal:siemens:clearing:development";
+        /// <summary>
+        /// CycloneDX optional dev dependency key.
+        /// </summary>
+        public const string Cdx_OptionalDevDependency = "internal:siemens:clearing:optional-devdependency";
         /// <summary>
         /// CycloneDX identifier type key.
         /// </summary>

@@ -1,5 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// --------------------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -130,6 +130,13 @@ namespace SIT.APICommunications.Model
         /// Gets or sets the HTTP response message.
         /// </summary>
         public HttpResponseMessage ResponseMessage { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this component is an optional devDependency (npm)
+        /// that was not found in JFrog. Such components are displayed in a dedicated section and
+        /// excluded from the exit-code-2 decision.
+        /// </summary>
+        public bool IsOptionalDevDependency { get; set; }
 
         #endregion Properties
     }

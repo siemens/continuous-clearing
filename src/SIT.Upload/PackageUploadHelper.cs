@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
@@ -133,6 +133,7 @@ namespace SIT.Upload
                 Path = item.Path,
                 PackageType = item.PackageType,
                 Purl = item.Purl,
+                IsOptionalDevDependency = item.IsOptionalDevDependency,
 
             };
             return Task.FromResult(components);
@@ -231,7 +232,12 @@ namespace SIT.Upload
         private static void AddToNpmList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
         {
             if (notFound)
-                displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
+            {
+                if (component.IsOptionalDevDependency)
+                    displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm.Add(component);
+                else
+                    displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
+            }
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesNpm.Add(component);
             else

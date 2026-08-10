@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -42,6 +42,7 @@ namespace SIT.Scan
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
         private const string DevOptional = "devOptional";
+        private const string Optional = "optional";
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
@@ -298,6 +299,7 @@ namespace SIT.Scan
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
                 components.Properties.Add(siemensDirect);
+                AddOptionalDevDependencyProperty(components, prop.Value);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
@@ -487,6 +489,7 @@ namespace SIT.Scan
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
                 components.Properties.Add(siemensDirect);
+                AddOptionalDevDependencyProperty(components, prop.Value);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
@@ -825,6 +828,46 @@ namespace SIT.Scan
             }
 
             return devValue != null;
+        }
+
+        /// <summary>
+        /// Determines whether a package-lock.json node represents an optional dependency
+        /// that is also part of the dev tree, i.e. the node has both "dev": true and
+        /// "optional": true set.
+        /// </summary>
+        /// <param name="node">JToken representing the package/dependency node.</param>
+        /// <returns>True when both dev and optional flags are true; otherwise false.</returns>
+        private static bool IsOptionalDevDependency(JToken node)
+        {
+            if (node == null)
+            {
+                return false;
+            }
+
+            return node[Dev]?.Value<bool?>() == true
+                && node[Optional]?.Value<bool?>() == true;
+        }
+
+        /// <summary>
+        /// Adds the CycloneDX optional-dev-dependency property (value "true") to the component
+        /// when the given package-lock.json node has both "dev": true and "optional": true.
+        /// When the condition is not met, no property is added.
+        /// </summary>
+        /// <param name="component">Component whose Properties list will be updated.</param>
+        /// <param name="node">JToken representing the package/dependency node.</param>
+        private static void AddOptionalDevDependencyProperty(Component component, JToken node)
+        {
+            if (!IsOptionalDevDependency(node))
+            {
+                return;
+            }
+
+            component.Properties ??= new List<Property>();
+            component.Properties.Add(new Property
+            {
+                Name = Dataconstant.Cdx_OptionalDevDependency,
+                Value = "true"
+            });
         }
 
         /// <summary>
