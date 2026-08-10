@@ -86,6 +86,8 @@ namespace SIT.Upload
                         JfrogApi = appSettings.Jfrog.URL
                     };
 
+                    components.IsOptionalDevDependency = IsNpmOptionalDevDependencyNotFoundInJfrog(item, components.ComponentType);
+
                     if (aqlResult != null)
                     {
                         components.SrcRepoPathWithFullName = aqlResult.Repo + Dataconstant.ForwardSlash + aqlResult.Path + Dataconstant.ForwardSlash + aqlResult.Name;
@@ -140,6 +142,36 @@ namespace SIT.Upload
 
             Logger.Debug(logBuilder.ToString());
         }
+        /// <summary>
+        /// Determines whether an npm component is an optional devDependency that was not
+        /// found in the JFrog repository. Such components are surfaced in a dedicated
+        /// display section and excluded from the exit-code-2 decision.
+        /// </summary>
+        /// <param name="item">The SBOM component.</param>
+        /// <param name="componentType">The resolved component type (e.g. NPM).</param>
+        /// <returns><c>true</c> if the component qualifies; otherwise <c>false</c>.</returns>
+        private static bool IsNpmOptionalDevDependencyNotFoundInJfrog(Component item, string componentType)
+        {
+            if (!string.Equals(componentType, NPM, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            if (item?.Properties == null)
+            {
+                return false;
+            }
+
+            var isOptionalDev = item.Properties
+                .Find(p => string.Equals(p.Name, Dataconstant.Cdx_OptionalDevDependency, StringComparison.OrdinalIgnoreCase))
+                ?.Value;
+            var jfrogRepoName = item.Properties
+                .Find(p => string.Equals(p.Name, Dataconstant.Cdx_ArtifactoryRepoName, StringComparison.OrdinalIgnoreCase))
+                ?.Value;
+
+            return string.Equals(isOptionalDev, "true", StringComparison.OrdinalIgnoreCase)
+                   && string.Equals(jfrogRepoName, Dataconstant.NotFoundInJFrog, StringComparison.OrdinalIgnoreCase);
+        }
+
         private static string GetComponentType(Component item)
         {
             var projectTypeProp = item.Properties
