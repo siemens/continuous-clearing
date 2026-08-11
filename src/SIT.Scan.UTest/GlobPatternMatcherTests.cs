@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -186,9 +186,9 @@ namespace SIT.Scan.UTest
         // "**/*Test/**" and expects directories like "TestFiles" or "ViewModel.tests" to be
         // excluded. Per the POSIX glob spec, "*Test" only matches segments that END with
         // "Test" - so those directories must be excluded with the broader "**/*Test*/**".
-        [TestCase(@"D:\CAInput\Eco\domains\sip5DataModel\backend\ViewModel.tests\packages.config")]
-        [TestCase(@"D:\CAInput\Newfolder\TestFiles\IntegrationTestFiles\Nuget\packages.config")]
-        [TestCase(@"D:\CAInput\Newfolder\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\packages.config")]
+        [TestCase(@"D:\Input\ProjectA\backend\ViewModel.tests\packages.config")]
+        [TestCase(@"D:\Input\SampleProject\TestFiles\IntegrationTestFiles\Nuget\packages.config")]
+        [TestCase(@"D:\Input\SampleProject\TestFiles\IntegrationTestFiles\SystemTestData\packages.config")]
         public void IsMatch_TrailingOnlyGlob_DoesNotMatchSegmentsThatOnlyContainTest(string filePath)
         {
             // "*Test" requires the segment to END with "Test" — none of these do, so the
@@ -196,9 +196,9 @@ namespace SIT.Scan.UTest
             Assert.IsFalse(GlobPatternMatcher.IsMatch(filePath, new[] { "**/*Test/**" }));
         }
 
-        [TestCase(@"D:\CAInput\Eco\domains\sip5DataModel\backend\ViewModel.tests\packages.config")]
-        [TestCase(@"D:\CAInput\Newfolder\TestFiles\IntegrationTestFiles\Nuget\packages.config")]
-        [TestCase(@"D:\CAInput\Newfolder\TestFiles\IntegrationTestFiles\SystemTest1stIterationData\packages.config")]
+        [TestCase(@"D:\Input\ProjectA\backend\ViewModel.tests\packages.config")]
+        [TestCase(@"D:\Input\SampleProject\TestFiles\IntegrationTestFiles\Nuget\packages.config")]
+        [TestCase(@"D:\Input\SampleProject\TestFiles\IntegrationTestFiles\SystemTestData\packages.config")]
         public void IsMatch_SurroundingWildcards_MatchSegmentsThatContainTest(string filePath)
         {
             // "*Test*" matches any segment CONTAINING "Test" (case-insensitive), which is the
@@ -206,9 +206,9 @@ namespace SIT.Scan.UTest
             Assert.IsTrue(GlobPatternMatcher.IsMatch(filePath, new[] { "**/*Test*/**" }));
         }
 
-        [TestCase(@"D:\CAInput\Nuget\signature\plugin_byteArr_signTemplate_int_stringArr_int\packages.config")]
-        [TestCase(@"D:\CAInput\Nuget\signature\plugin_byteArr_sign_byteArr_int\packages.config")]
-        [TestCase(@"D:\CAInput\Nuget\signature\ServiceControlInterface\packages.config")]
+        [TestCase(@"D:\Input\Nuget\signature\plugin_byteArr_signTemplate_int_stringArr_int\packages.config")]
+        [TestCase(@"D:\Input\Nuget\signature\plugin_byteArr_sign_byteArr_int\packages.config")]
+        [TestCase(@"D:\Input\Nuget\signature\ServiceControlInterface\packages.config")]
         public void IsMatch_SurroundingWildcards_DoNotMatchNonTestSegments(string filePath)
         {
             Assert.IsFalse(GlobPatternMatcher.IsMatch(filePath, new[] { "**/*Test*/**" }));

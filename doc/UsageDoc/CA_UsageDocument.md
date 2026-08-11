@@ -504,6 +504,50 @@ In order to exclude any components ,it can be configured in the  `appSettings.js
 
 In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
 
+#### Glob Pattern Support in `Include` and `Exclude`
+
+The `Include` and `Exclude` sections of each package type in `appSettings.json` support POSIX-style **glob patterns**, giving you fine-grained control over which files and folders the tool scans.
+
+**Supported wildcards**
+
+| Pattern | Meaning |
+|---------|---------|
+| `*`     | Matches any sequence of characters within a single path segment (does not cross `/`). |
+| `?`     | Matches exactly one character within a single segment. |
+| `**`    | Matches zero or more path segments (recurses into subdirectories). |
+| `[abc]` | Matches any one character listed in the brackets. |
+
+Matching is **case-insensitive** and works with both `/` and `\` path separators.
+
+**Include pattern examples**
+
+```jsonc
+"Nuget": {
+  "Include": [
+    "packages.config",        // bare name — matched recursively (same as "**/packages.config")
+    "**/p*.assets.json",      // project.assets.json, private.assets.json, etc.
+    "src/**/packages.lock.json" // only under the src folder tree
+  ]
+}
+```
+
+> A bare filename with no separator (e.g. `packages.config`) is automatically treated as recursive (`**/packages.config`) for backward compatibility.
+
+**Exclude pattern examples**
+
+```jsonc
+"Npm": {
+  "Exclude": [
+    "**/node_modules/**",     // exclude everything under any node_modules folder
+    "**/*Test*/**",           // exclude any folder whose name CONTAINS "Test" (e.g. TestFiles, ViewModel.tests)
+    "**/*Test/**",            // exclude only folders whose name ENDS with "Test"
+    "node_modules"            // bare name — legacy behavior, also excludes the directory contents
+  ]
+}
+```
+
+> **Tip:** To exclude any folder that *contains* a keyword (e.g. `TestFiles`, `IntegrationTestFiles`, `ViewModel.tests`), use `**/*Test*/**`. The pattern `**/*Test/**` only matches folders whose name **ends** with `Test`.
+
 ### **Continuous Clearing Tool Execution**
 
 Continuous Clearing Tool can be executed as container or as binaries,
