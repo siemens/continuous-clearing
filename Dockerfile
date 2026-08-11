@@ -1,47 +1,55 @@
 # SPDX-FileCopyrightText: 2024 Siemens AG
 # SPDX-License-Identifier: MIT
 
-# .NET 10 SDK on Ubuntu 24.04 LTS 'noble'.
-# .NET 10 dropped Debian 12 (bookworm); no GA bookworm-slim or trixie-slim tag is
-# published (only :10.0-preview-trixie-slim exists). 'noble' is the APT-based LTS
-# variant supported through 2029 and ships openjdk-17-jre-headless in its main repo.
-FROM mcr.microsoft.com/dotnet/sdk:10.0-noble
-
+FROM debian:13-slim
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DOTNET_ROOT=/usr/share/dotnet
+ENV PATH="${PATH}:${DOTNET_ROOT}"
+# Signal to the app (and match the official .NET images) that we're running inside a container.
+# PipelineArtifactUploader uses this to skip ##vso[artifact.upload ...] commands, whose paths
+# would otherwise reference files that only exist inside the container and not on the pipeline agent.
+ENV DOTNET_RUNNING_IN_CONTAINER=true
 WORKDIR /app/out
+# Install Microsoft package repository and the .NET 10 SDK.
+# The SDK is required (not just runtime) because NuGet scanning invokes MSBuildLocator/MSBuild
 
-# Creating required directories
-RUN mkdir -p /opt/DebianImageClearing \
-             /mnt/Input \
-             /mnt/Output \
-             /etc/CATool \
-             /app/out/PatchedFiles
-
-# Install required packages and OpenJDK in a single RUN, then purge Python LAST.
-# - nodejs, npm, git, maven, curl, dpkg-dev, openjdk-17-jre-headless are runtime tooling
-# - syft v1.46.0 generates SBOMs for Debian image clearing
-# - Python 3.12 is removed AFTER all apt-get installs to avoid leaving apt in a
-#   half-broken state that would fail any subsequent `apt-get install`.
 RUN apt-get update && \
-    apt-get -y install --no-install-recommends \
-        nodejs \
-        npm \
-        git \
-        maven \
-        curl \
-        dpkg-dev \
-        openjdk-17-jre-headless && \
-    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v1.46.0 && \
-    dpkg -r --force-depends python3-minimal             || true && \
-    dpkg -r --force-depends libpython3.12-minimal:amd64 || true && \
-    dpkg -r --force-depends libpython3.12-stdlib:amd64  || true && \
-    dpkg -r --force-depends python3.12                  || true && \
-    dpkg -r --force-depends python3.12-minimal          || true && \
-    dpkg --purge libpython3.12-minimal:amd64            || true && \
-    dpkg --purge python3.12-minimal                     || true && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+   apt-get install -y --no-install-recommends \
+       wget \
+       ca-certificates \
+       gnupg \
+       apt-transport-https && \
+   wget https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb && \
+   dpkg -i packages-microsoft-prod.deb && \
+   rm packages-microsoft-prod.deb && \
+   apt-get update && \
+   apt-get install -y --no-install-recommends \
+       dotnet-sdk-10.0 && \
+   apt-get purge -y --auto-remove wget gnupg apt-transport-https && \
+   rm -rf /var/lib/apt/lists/*
+# Creating required directories
+RUN mkdir -p \
+   /opt/DebianImageClearing \
+   /mnt/Input \
+   /mnt/Output \
+   /etc/CATool \
+   /app/out/PatchedFiles
 
-ENV PATH="/root/.local/bin:/opt/DebianImageClearing:$PATH"
+# Install required packages for CATool clearing flows.# 
+RUN apt-get update && \
+   apt-get install -y --no-install-recommends \
+       nodejs \
+       npm \
+       git \
+       maven \
+       curl \
+       dpkg-dev \
+       openjdk-21-jre-headless && \
+   curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
+       sh -s -- -b /opt/DebianImageClearing v1.46.0 && \
+   apt-get purge -y --auto-remove curl && \
+   rm -rf /var/lib/apt/lists/*
+ENV PATH="/root/.local/bin:${PATH}"
 
 # Copy the CATool build output (produced by `dotnet build -c Release`) into the image.
 # Build output lands in `out/net10.0/` because csproj has <OutputPath>..\..\out</OutputPath>
