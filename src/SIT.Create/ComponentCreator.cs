@@ -115,7 +115,7 @@ namespace SIT.Create
                     componentsData.Version = item.Version;
                     componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
                     componentsData.ReleaseExternalId = item.Purl;
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
+                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef, item.Purl, appSettings);
                     componentsData.SourceUrl = component.SourceUrl;
 
                     if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
@@ -283,10 +283,12 @@ namespace SIT.Create
         /// "DEBIAN"). The value is case-insensitive.</param>
         /// <param name="bomRef">The Bill of Materials (BOM) reference identifier for the component. This parameter is required for certain
         /// project types, such as "ALPINE".</param>
+        /// <param name="purl">The package url of the component. It is required for certain project types, such as "DEBIAN".</param>
+        /// <param name="appSettings">The application settings that hold the package source configuration, e.g. the APT archives of an image.</param>
         /// <returns>A <see cref="Components"/> object containing the source URL and related metadata for the specified
         /// component. If the project type is not recognized, the returned object may not contain source URL
         /// information.</returns>
-        private static async Task<Components> GetSourceUrl(string name, string version, string projectType, string bomRef)
+        private static async Task<Components> GetSourceUrl(string name, string version, string projectType, string bomRef, string purl, CommonAppSettings appSettings)
         {
             Components componentsData = new Components();
             switch (projectType.ToUpperInvariant())
@@ -298,7 +300,7 @@ namespace SIT.Create
                     componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForNugetPackage(name, version);
                     break;
                 case DebianProjectType:
-                    Components debComponentData = await UrlHelper.Instance.GetSourceUrlForDebianPackage(name, version);
+                    Components debComponentData = await UrlHelper.Instance.GetSourceUrlForDebianPackage(name, version, purl, appSettings?.Debian?.AptRepositories);
                     componentsData = debComponentData;
                     componentsData.ProjectType = projectType;
                     break;
