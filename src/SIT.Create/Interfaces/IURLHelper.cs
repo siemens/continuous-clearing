@@ -6,6 +6,7 @@
 
 
 using SIT.Common.Model;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SIT.Create.Interfaces
@@ -20,9 +21,13 @@ namespace SIT.Create.Interfaces
         /// </summary>
         /// <param name="componentName"></param>
         /// <param name="componenVersion"></param>
-        /// <param name="componentsData"></param>
+        /// <param name="purl">package url of the component, used to determine its distribution</param>
+        /// <param name="aptRepositories">APT archives the image installs its packages from</param>
         /// <returns>string</returns>
-        Task<Components> GetSourceUrlForDebianPackage(string componentName, string componenVersion);
+        Task<Components> GetSourceUrlForDebianPackage(string componentName,
+                                                      string componenVersion,
+                                                      string purl = null,
+                                                      IReadOnlyList<AptRepository> aptRepositories = null);
 
         /// <summary>
         /// Gets the Source Url For Nuget Package

@@ -40,6 +40,7 @@ namespace SIT.Create
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly HttpClient httpClient = new HttpClient();
+        private readonly IAptRepositoryService _aptRepositoryService;
         public static string GithubUrl { get; set; } = string.Empty;
         public static UrlHelper Instance { get; } = new UrlHelper();
         public CommonAppSettings CommonAppSettings { get; } = new CommonAppSettings();
@@ -49,6 +50,15 @@ namespace SIT.Create
         private const string SourcePackageType = "source";
 
         private bool _disposed;
+
+        public UrlHelper() : this(new AptRepositoryService())
+        {
+        }
+
+        public UrlHelper(IAptRepositoryService aptRepositoryService)
+        {
+            _aptRepositoryService = aptRepositoryService;
+        }
 
         /// <summary>
         /// Gets the SourceUrl For Alpine Package
@@ -410,16 +420,26 @@ namespace SIT.Create
         /// </summary>
         /// <param name="componentName"></param>
         /// <param name="componenVersion"></param>
+        /// <param name="purl">package url of the component, used to determine its distribution</param>
+        /// <param name="aptRepositories">APT archives the image installs its packages from</param>
         /// <returns>Components</returns>
-        public async Task<Components> GetSourceUrlForDebianPackage(string componentName, string componenVersion)
+        public async Task<Components> GetSourceUrlForDebianPackage(string componentName,
+                                                                   string componenVersion,
+                                                                   string purl = null,
+                                                                   IReadOnlyList<AptRepository> aptRepositories = null)
         {
             Components componentsData = new Components();
-            DebianPackage debianPackSourceDetails = await GetSourceUrl(componentName, componenVersion);
+            DebianPackage debianPackSourceDetails = await GetSourceUrlFromAptRepositories(componentName, componenVersion, purl, aptRepositories);
 
-            if (debianPackSourceDetails.IsRetryRequired)
+            if (debianPackSourceDetails == null)
             {
-                Logger.DebugFormat("Retry for.. {0}-{1}", componentName, componenVersion);
-                debianPackSourceDetails = await RetryToGetSourceURlDetailsAsync(componentName, componenVersion);
+                debianPackSourceDetails = await GetSourceUrl(componentName, componenVersion);
+
+                if (debianPackSourceDetails.IsRetryRequired)
+                {
+                    Logger.DebugFormat("Retry for.. {0}-{1}", componentName, componenVersion);
+                    debianPackSourceDetails = await RetryToGetSourceURlDetailsAsync(componentName, componenVersion);
+                }
             }
 
             componentsData.Name = debianPackSourceDetails.Name;
@@ -713,14 +733,90 @@ namespace SIT.Create
         }
 
         /// <summary>
+        /// Looks the source package up in the APT archives the image installs its packages from.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <param name="purl"></param>
+        /// <param name="aptRepositories"></param>
+        /// <returns>the debian package, or null when it is not provided by any of the archives</returns>
+        private async Task<DebianPackage> GetSourceUrlFromAptRepositories(string name,
+                                                                          string version,
+                                                                          string purl,
+                                                                          IReadOnlyList<AptRepository> aptRepositories)
+        {
+            if (aptRepositories == null || aptRepositories.Count == 0 || _aptRepositoryService == null)
+            {
+                return null;
+            }
+
+            AptSourceResolution resolution = await _aptRepositoryService.ResolveSourcePackageAsync(
+                aptRepositories, name, version, GetDistributionCandidates(purl));
+
+            if (resolution == null)
+            {
+                Logger.DebugFormat("GetSourceUrlFromAptRepositories(): {0}-{1} is not provided by any configured APT repository.", name, version);
+                return null;
+            }
+
+            DebianPackage sourceURLDetails = new DebianPackage { Name = resolution.Name, Version = resolution.Version };
+            return GetProperSourceURL(sourceURLDetails, resolution.FileUrls);
+        }
+
+        /// <summary>
+        /// Reads the distribution of a component from the qualifiers of its package url, e.g. "trixie" for
+        /// "pkg:deb/debian/busybox@1.37.0-6%2Bdhi1?os_distro=trixie&amp;os_name=debian&amp;os_version=13".
+        /// </summary>
+        /// <param name="purl"></param>
+        /// <returns>the distributions to search, most specific first</returns>
+        public static List<string> GetDistributionCandidates(string purl)
+        {
+            List<string> candidates = new List<string>();
+            int qualifierStart = purl?.IndexOf('?') ?? -1;
+
+            if (qualifierStart < 0)
+            {
+                return candidates;
+            }
+
+            foreach (string qualifier in purl.Substring(qualifierStart + 1).Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] keyValue = qualifier.Split('=', 2);
+                if (keyValue.Length != 2 || string.IsNullOrWhiteSpace(keyValue[1]))
+                {
+                    continue;
+                }
+
+                string key = keyValue[0].Trim();
+                string value = WebUtility.UrlDecode(keyValue[1]).Trim();
+
+                if (key.Equals("os_distro", StringComparison.OrdinalIgnoreCase))
+                {
+                    candidates.Insert(0, value);
+                }
+                else if (key.Equals("distro", StringComparison.OrdinalIgnoreCase))
+                {
+                    // syft reports the distribution as "<os name>-<os version>", e.g. "debian-13".
+                    candidates.Add(value);
+                    int separator = value.IndexOf('-');
+                    if (separator > 0)
+                    {
+                        candidates.Add(value.Substring(separator + 1));
+                    }
+                }
+            }
+
+            return candidates.Distinct(StringComparer.Ordinal).ToList();
+        }
+
+        /// <summary>
         /// Gets Source Url
         /// </summary>
         /// <param name="name"></param>
         /// <param name="version"></param>
         /// <returns>task</returns>
         private async Task<DebianPackage> GetSourceUrl(string name, string version)
-        {
-            DebianPackage sourceURLDetails = new DebianPackage { Name = name, Version = version };
+        {            DebianPackage sourceURLDetails = new DebianPackage { Name = name, Version = version };
             string packageType = SourcePackageType;
             sourceURLDetails = await GetArchiveResponse(sourceURLDetails, packageType);
 
@@ -1069,6 +1165,8 @@ namespace SIT.Create
                 await RetryHttpClientHandler.ExecuteWithRetryAsync(async () =>
                 {
                     using WebClient webClient = new();
+                    // Proxies and mirrors reject downloads that do not identify their client.
+                    webClient.Headers.Add(HttpRequestHeader.UserAgent, Dataconstant.UserAgent);
                     await webClient.DownloadFileTaskAsync(uri, downloadFilePath);
                 });
                 downloadedPath = downloadFilePath;
@@ -1116,6 +1214,8 @@ namespace SIT.Create
             {
                 httpClient.Dispose();
             }
+
+            (_aptRepositoryService as IDisposable)?.Dispose();
 
             _disposed = true;
         }
