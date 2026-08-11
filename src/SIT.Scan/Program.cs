@@ -170,7 +170,7 @@ namespace SIT.Scan
             if (appSettings.Telemetry?.Enable == true)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.ScanKpiData);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.ScanAppData, TelemetryConstant.ScanKpiData, BomStopWatch?.Elapsed);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of SIT Scan execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact

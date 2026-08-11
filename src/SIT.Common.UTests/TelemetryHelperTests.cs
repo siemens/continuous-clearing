@@ -38,12 +38,12 @@ namespace SIT.Common.UTest
             // Arrange
             string catoolVersion = "1.0.0";
             var kpiData = new { Metric1 = 100, Metric2 = 200 }; // Example KPI data
-            string telemetryFor = "TestEvent";
+            string appDataEvent = "TestEventAppData"; string kpiEvent = "TestEventKpiData";
             var consoleOutput = new System.IO.StringWriter();
             Console.SetOut(consoleOutput);
             // Act
             // This would normally start telemetry tracking in your system
-            telemetryHelper.StartTelemetry(catoolVersion, kpiData, telemetryFor);
+            telemetryHelper.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent);
 
             string output = consoleOutput.ToString();
             Assert.AreEqual(output, "");
@@ -55,10 +55,10 @@ namespace SIT.Common.UTest
             // Arrange
             string catoolVersion = null; // This will cause an ArgumentNullException
             var kpiData = new { Metric1 = 100, Metric2 = 200 };
-            string telemetryFor = "TestEvent";
+            string appDataEvent = "TestEventAppData"; string kpiEvent = "TestEventKpiData";
 
             // Act & Assert - The method should handle the exception and call TrackException internally
-            Assert.DoesNotThrow(() => telemetryHelper.StartTelemetry(catoolVersion, kpiData, telemetryFor));
+            Assert.DoesNotThrow(() => telemetryHelper.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent));
         }
 
         [Test]
@@ -77,10 +77,10 @@ namespace SIT.Common.UTest
             var telemetryHelperWithValidConfig = new TelemetryHelper(appSettingsWithValidConfig);
             string catoolVersion = "1.0.0";
             var kpiData = new { Metric1 = 100, Metric2 = 200 };
-            string telemetryFor = "TestEvent";
+            string appDataEvent = "TestEventAppData"; string kpiEvent = "TestEventKpiData";
 
             // Act & Assert - Should handle any exceptions gracefully
-            Assert.DoesNotThrow(() => telemetryHelperWithValidConfig.StartTelemetry(catoolVersion, kpiData, telemetryFor));
+            Assert.DoesNotThrow(() => telemetryHelperWithValidConfig.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent));
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace SIT.Common.UTest
             // Arrange
             string catoolVersion = "1.0.0";
             var kpiData = new { Metric1 = 100, Metric2 = 200 };
-            string telemetryFor = "TestEvent";
+            string appDataEvent = "TestEventAppData"; string kpiEvent = "TestEventKpiData";
             var appSettingsWithNullSW360 = new CommonAppSettings
             {
                 Telemetry = new Telemetry { ApplicationInsightsConnectionString = "R1WvRUkY0I6Z" },
@@ -99,7 +99,7 @@ namespace SIT.Common.UTest
             var telemetryHelperWithNullSW360 = new TelemetryHelper(appSettingsWithNullSW360);
 
             // Act & Assert - Should handle exception gracefully
-            Assert.DoesNotThrow(() => telemetryHelperWithNullSW360.StartTelemetry(catoolVersion, kpiData, telemetryFor));
+            Assert.DoesNotThrow(() => telemetryHelperWithNullSW360.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent));
         }
 
         [Test]
@@ -118,10 +118,10 @@ namespace SIT.Common.UTest
             // Arrange
             string catoolVersion = "1.0.0";
             var kpiData = new { Metric1 = 100, Metric2 = 200 };
-            string telemetryFor = "TestEvent";
+            string appDataEvent = "TestEventAppData"; string kpiEvent = "TestEventKpiData";
 
             // Act - Execute telemetry which should flush in finally block
-            telemetryHelper.StartTelemetry(catoolVersion, kpiData, telemetryFor);
+            telemetryHelper.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent);
 
             // Assert - Method completes successfully
             Assert.Pass("Telemetry flushed successfully");
@@ -139,10 +139,10 @@ namespace SIT.Common.UTest
             var telemetryHelperMinimal = new TelemetryHelper(appSettingsMinimal);
             string catoolVersion = "1.0.0";
             var kpiData = new { Metric1 = 100 };
-            string telemetryFor = "TestEvent";
+            string appDataEvent = "TestEventAppData"; string kpiEvent = "TestEventKpiData";
 
             // Act & Assert - Should handle and track exception with error time and stack trace
-            Assert.DoesNotThrow(() => telemetryHelperMinimal.StartTelemetry(catoolVersion, kpiData, telemetryFor));
+            Assert.DoesNotThrow(() => telemetryHelperMinimal.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent));
         }
 
         [Test]
@@ -164,11 +164,11 @@ namespace SIT.Common.UTest
             // Using null version to potentially trigger ArgumentNullException
             string catoolVersion = null;
             var kpiData = new { TestMetric = 100 };
-            string telemetryFor = "ExceptionTestEvent";
+            string appDataEvent = "ExceptionTestEventAppData"; string kpiEvent = "ExceptionTestEventKpiData";
 
             // Act & Assert - This should trigger the catch block and call TrackException internally
             // which will create a Dictionary with "Error Time" and "Stack Trace"
-            Assert.DoesNotThrow(() => telemetryHelperForException.StartTelemetry(catoolVersion, kpiData, telemetryFor));
+            Assert.DoesNotThrow(() => telemetryHelperForException.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent));
         }
 
         [Test]
@@ -188,10 +188,10 @@ namespace SIT.Common.UTest
             var telemetryHelperForIO = new TelemetryHelper(appSettingsForIOException);
             string catoolVersion = "1.0.0";
             var kpiData = new { FileMetric = 50 };
-            string telemetryFor = "IOExceptionEvent";
+            string appDataEvent = "IOExceptionEventAppData"; string kpiEvent = "IOExceptionEventKpiData";
 
             // Act & Assert - Should handle IOException and track it with error time and stack trace
-            Assert.DoesNotThrow(() => telemetryHelperForIO.StartTelemetry(catoolVersion, kpiData, telemetryFor));
+            Assert.DoesNotThrow(() => telemetryHelperForIO.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent));
         }
 
         [Test]
@@ -212,11 +212,11 @@ namespace SIT.Common.UTest
 
             string catoolVersion = "2.0.0";
             var kpiData = new { ErrorMetric = 999 };
-            string telemetryFor = "TrackExceptionTest";
+            string appDataEvent = "TrackExceptionTestAppData"; string kpiEvent = "TrackExceptionTestKpiData";
 
             // Act - This will internally call TrackException if an exception occurs
             // TrackException creates a Dictionary with "Error Time" (DateTime.UtcNow) and "Stack Trace" (ex.StackTrace)
-            Assert.DoesNotThrow(() => helperForTracking.StartTelemetry(catoolVersion, kpiData, telemetryFor));
+            Assert.DoesNotThrow(() => helperForTracking.StartTelemetry(catoolVersion, kpiData, appDataEvent, kpiEvent));
 
             // Assert - Verification that the method completes without throwing
             // The TrackException method would have been called with exceptionData containing:
