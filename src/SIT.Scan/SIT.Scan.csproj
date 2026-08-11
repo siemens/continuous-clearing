@@ -25,6 +25,7 @@
 		<PackageReference Include="Microsoft.Build.Locator" Version="1.5.5" />
 		<PackageReference Include="Microsoft.CodeCoverage" Version="17.1.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.0" />
 		<!--<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="NuGet.Packaging" Version="6.7.1" />-->
 		<PackageReference Include="NuGet.Resolver" Version="6.6.1" />

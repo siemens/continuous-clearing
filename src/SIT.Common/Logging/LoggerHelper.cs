@@ -1629,7 +1629,7 @@ namespace SIT.Common.Logging
             }
             else
             {
-                Logger.InfoFormat("    Input file FOUND :{0}", configFile);
+                Logger.InfoFormat("    Input file found :{0}", configFile);
             }
         }
 
@@ -1640,11 +1640,11 @@ namespace SIT.Common.Logging
         {
             if (LoggerFactory.UseSpectreConsole)
             {
-                WriteInfoWithMarkup($"[white]JFrog Connection was [/][green]successfull...[/]");
+                WriteInfoWithMarkup($"[white]JFrog Connection was [/][green]successful...[/]");
             }
             else
             {
-                Logger.Info("JFrog Connection was successfull!!");
+                Logger.Info("JFrog Connection was successful!!");
             }
         }
 
