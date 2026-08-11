@@ -575,9 +575,7 @@ The `Include` and `Exclude` sections of each package type in `appSettings.json` 
 | Pattern | Meaning |
 |---------|---------|
 | `*`     | Matches any sequence of characters within a single path segment (does not cross `/`). |
-| `?`     | Matches exactly one character within a single segment. |
 | `**`    | Matches zero or more path segments (recurses into subdirectories). |
-| `[abc]` | Matches any one character listed in the brackets. |
 
 Matching is **case-insensitive** and works with both `/` and `\` path separators.
 

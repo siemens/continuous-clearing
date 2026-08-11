@@ -46,7 +46,7 @@ namespace SW360KeycloakService.UTest
             };
         }
 
-        private HttpClient BuildMockHttpClient(HttpStatusCode statusCode, string responseBody, Mock<HttpMessageHandler> handlerMock = null)
+        private HttpClient BuildMockHttpClient(HttpStatusCode statusCode, string responseBody, Mock<HttpMessageHandler>? handlerMock = null)
         {
             handlerMock ??= new Mock<HttpMessageHandler>(MockBehavior.Strict);
             handlerMock

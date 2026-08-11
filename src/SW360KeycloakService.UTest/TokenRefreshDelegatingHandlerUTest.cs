@@ -96,7 +96,7 @@ namespace SW360KeycloakService.UTest
             var tokenServiceMock = new Mock<IKeycloakTokenService>();
             tokenServiceMock.Setup(s => s.GetOrRefreshTokenAsync()).ReturnsAsync(RefreshedToken);
 
-            AuthenticationHeaderValue capturedHeader = null;
+            AuthenticationHeaderValue? capturedHeader = null;
             var innerHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             int callCount = 0;
             innerHandlerMock
@@ -172,7 +172,7 @@ namespace SW360KeycloakService.UTest
         {
             // Arrange
             var tokenServiceMock = new Mock<IKeycloakTokenService>();
-            tokenServiceMock.Setup(s => s.GetOrRefreshTokenAsync()).ReturnsAsync((string)null);
+            tokenServiceMock.Setup(s => s.GetOrRefreshTokenAsync()).ReturnsAsync((string)null!);
 
             var innerHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             innerHandlerMock
