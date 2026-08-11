@@ -73,9 +73,12 @@ namespace SIT.Scan
                 return false;
             }
 
+            // Exclusion checks treat a bare literal token (e.g. "Test") as a
+            // substring match against any path segment, so users can write
+            // "Exclude": [ "Test" ] to skip any folder/file whose name contains "Test".
             List<string> normalizedPatterns = [.. patterns
                 .Where(p => !string.IsNullOrWhiteSpace(p))
-                .SelectMany(FormattingPattern)];
+                .SelectMany(p => FormattingPattern(p, treatBareAsContains: true))];
 
             if (normalizedPatterns.Count == 0)
             {
@@ -113,7 +116,7 @@ namespace SIT.Scan
             {
                 foreach (string pattern in excludePatterns)
                 {
-                    foreach (string normalized in FormattingPattern(pattern))
+                    foreach (string normalized in FormattingPattern(pattern, treatBareAsContains: true))
                     {
                         matcher.AddExclude(normalized);
                     }
@@ -134,6 +137,21 @@ namespace SIT.Scan
         /// </remarks>
         internal static IEnumerable<string> FormattingPattern(string pattern)
         {
+            return FormattingPattern(pattern, treatBareAsContains: false);
+        }
+
+        /// <summary>
+        /// Normalizes a pattern with optional substring semantics for bare literal tokens.
+        /// </summary>
+        /// <param name="pattern">The user-supplied pattern.</param>
+        /// <param name="treatBareAsContains">
+        /// When <c>true</c>, a pattern without a path separator and without any glob wildcards
+        /// (for example <c>"Test"</c>) is expanded so that it matches any path segment that
+        /// <em>contains</em> the token. This is used for exclusion patterns so that
+        /// <c>"Exclude": [ "Test" ]</c> also skips folders like <c>SIT.Scan.UTest</c>.
+        /// </param>
+        internal static IEnumerable<string> FormattingPattern(string pattern, bool treatBareAsContains)
+        {
             if (string.IsNullOrWhiteSpace(pattern))
             {
                 yield break;
@@ -148,11 +166,21 @@ namespace SIT.Scan
 
             if (!normalized.Contains('/'))
             {
+                bool hasWildcards = normalized.IndexOfAny(GlobWildcardCharacters) >= 0;
+
+                if (treatBareAsContains && !hasWildcards)
+                {
+                    // Match any file or directory segment whose name contains the token.
+                    yield return "**/*" + normalized + "*";
+                    yield return "**/*" + normalized + "*/**";
+                    yield break;
+                }
+
                 yield return "**/" + normalized;
 
                 // Preserve the historical "match anywhere, including contents" semantics
                 // when the user supplied a plain name such as "node_modules".
-                if (normalized.IndexOfAny(GlobWildcardCharacters) < 0)
+                if (!hasWildcards)
                 {
                     yield return "**/" + normalized + "/**";
                 }
