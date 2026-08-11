@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace SIT.Scan
 {
@@ -97,19 +96,24 @@ namespace SIT.Scan
         /// processes each found file, excluding any files as determined by the configuration.
         /// </summary>
         /// <param name="rootPath">The root directory in which to search for configuration files.</param>
-        /// <param name="includePattern">The search pattern to use when locating configuration files. This pattern supports standard file system
-        /// wildcards.</param>
+        /// <param name="includePattern">The glob pattern used to locate configuration files. Supports <c>*</c>, <c>?</c>, and
+        /// <c>**</c> wildcards (see <see cref="GlobPatternMatcher"/>).</param>
         /// <param name="config">The configuration settings used to determine which files should be excluded from processing.</param>
         /// <param name="fileOperations">An object that provides file system operations used during file processing.</param>
         /// <param name="allFoundConfigFiles">A list that is populated with the full paths of all configuration files found and not excluded.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="includePattern"/> is null.</exception>
         private static void ProcessIncludePattern(string rootPath, string includePattern, Config config, IFileOperations fileOperations, List<string> allFoundConfigFiles)
         {
+            ArgumentNullException.ThrowIfNull(includePattern);
+
             try
             {
-                string[] foundConfigFiles = System.IO.Directory.GetFiles(rootPath, includePattern, SearchOption.AllDirectories);
+                IReadOnlyList<string> foundConfigFiles = GlobPatternMatcher.GetMatchingFiles(
+                    rootPath,
+                    new[] { includePattern },
+                    excludePatterns: null);
 
-                if (foundConfigFiles != null && foundConfigFiles.Length > 0)
+                if (foundConfigFiles.Count > 0)
                 {
                     foreach (string configFile in foundConfigFiles)
                     {
@@ -117,11 +121,11 @@ namespace SIT.Scan
                     }
                 }
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentException ex)
             {
                 Logger.ErrorFormat("Error occurred while scanning files with pattern '{0}' in path '{1}': {2}", includePattern, rootPath, ex.Message);
                 LogHandlingHelper.BasicErrorHandling(FileScanningContext, FileScannerMethod, string.Format("Error occurred while scanning files with pattern '{0}' in path '{1}'.", includePattern, rootPath), "Check the input path and inclusion patterns.");
-                throw new ArgumentNullException(nameof(includePattern), $"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.\nInnerException: {ex.Message}");
+                throw new ArgumentException($"Error occurred while scanning files with pattern '{includePattern}' in path '{rootPath}'.\nInnerException: {ex.Message}", nameof(includePattern), ex);
             }
         }
 
@@ -168,24 +172,12 @@ namespace SIT.Scan
         /// Determines whether the specified file path matches any of the provided exclusion patterns.
         /// </summary>       
         /// <param name="filePath">The full path of the file to evaluate against the exclusion patterns.</param>
-        /// <param name="exclusionPatterns">An array of regular expression patterns used to identify files to exclude. If null or empty, no files are
-        /// excluded.</param>
+        /// <param name="exclusionPatterns">An array of glob patterns used to identify files to exclude (see
+        /// <see cref="GlobPatternMatcher"/> for supported syntax). If null or empty, no files are excluded.</param>
         /// <returns>true if the file path matches at least one exclusion pattern; otherwise, false.</returns>
         internal static bool IsExcluded(string filePath, string[] exclusionPatterns)
         {
-            if (exclusionPatterns == null || exclusionPatterns.Length == 0)
-                return false;
-
-            foreach (string exclusionPattern in exclusionPatterns)
-            {
-                Regex exRegex = new Regex(exclusionPattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-                if (exRegex.IsMatch(filePath))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return GlobPatternMatcher.IsMatch(filePath, exclusionPatterns);
         }
     }
 }
