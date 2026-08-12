@@ -122,9 +122,9 @@ To ensure a smooth operation of the Continuous Clearing Tool, please follow thes
      | Mode | Required Fields | When to Use |
      |------|----------------|-------------|
      | **Keycloak** (recommended) | `SW360.Keycloak.ClientId` + `SW360.Keycloak.ClientSecret` | SW360 instances using Keycloak identity provider |
-     | **Legacy Token** (deprecated) | `SW360.Token` | Static bearer/token auth — deprecated, scheduled for removal **September 5, 2026** |
+     | **Legacy Token** (deprecated) | `SW360.Token` | Static bearer/token auth — deprecated, scheduled for removal **October 3, 2026** |
 
-     > ⚠️ **Deprecation Notice**: Legacy token authentication (`SW360.Token`) is deprecated as of this release and will be removed on **September 5, 2026**. Migrate to Keycloak authentication using `SW360.Keycloak.ClientId` and `SW360.Keycloak.ClientSecret`.
+     > ⚠️ **Deprecation Notice**: Legacy token authentication (`SW360.Token`) is deprecated as of this release and will be removed on **October 3, 2026**. Migrate to Keycloak authentication using `SW360.Keycloak.ClientId` and `SW360.Keycloak.ClientSecret`.
 
      **Keycloak Authentication (Recommended)**:
      - Obtain a **Client ID** and **Client Secret** from your SW360 Keycloak realm for your functional account.
