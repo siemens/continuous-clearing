@@ -12,6 +12,7 @@ using SIT.Common.Interface;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Services.Interface;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -218,14 +219,55 @@ namespace SIT.Scan
                 BomCreator.bomKpiData.DuplicateComponents = initialCount - listofComponents.Count;
         }
 
+        /// <summary>
+        /// Reads the distribution of a package from the qualifiers of its package url, e.g. "distro=alpine-3.22" for
+        /// "pkg:apk/alpine/busybox@1.37.0-r20?distro=alpine-3.22" (syft) as well as for
+        /// "pkg:apk/alpine/busybox@1.37.0-r20?os_name=alpine&amp;os_version=3.22" (Docker Scout).
+        /// </summary>
+        /// <param name="alpinePackage">Parsed Alpine package information.</param>
+        /// <returns>The distribution qualifier, or an empty string if the package url states no distribution.</returns>
         private static string GetDistro(AlpinePackage alpinePackage)
         {
-            var distroIndex = alpinePackage.PurlID.LastIndexOf("distro");
-            if (distroIndex == -1)
+            int qualifierStart = alpinePackage.PurlID?.IndexOf('?') ?? -1;
+            if (qualifierStart == -1)
             {
                 return string.Empty;
             }
-            return alpinePackage.PurlID[distroIndex..];
+
+            string osName = string.Empty;
+            string osVersion = string.Empty;
+
+            foreach (string qualifier in alpinePackage.PurlID.Substring(qualifierStart + 1).Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] keyValue = qualifier.Split('=', 2);
+                if (keyValue.Length != 2 || string.IsNullOrWhiteSpace(keyValue[1]))
+                {
+                    continue;
+                }
+
+                string key = keyValue[0].Trim();
+                string value = keyValue[1].Trim();
+
+                if (key.Equals("distro", StringComparison.OrdinalIgnoreCase))
+                {
+                    return $"distro={value}";
+                }
+                if (key.Equals("os_name", StringComparison.OrdinalIgnoreCase))
+                {
+                    osName = value;
+                }
+                else if (key.Equals("os_version", StringComparison.OrdinalIgnoreCase))
+                {
+                    osVersion = value;
+                }
+            }
+
+            if (string.IsNullOrEmpty(osName) || string.IsNullOrEmpty(osVersion))
+            {
+                return string.Empty;
+            }
+
+            return $"distro={osName}-{osVersion}";
         }
 
         /// <summary>

@@ -47,6 +47,7 @@ namespace SIT.Create
 
         private const string SrcUrlFailWarnFormat = "Identification of SRC url failed for {0}, Exclude if it is an internal component or manually update the SRC url";
         private const string AportsDirectoryName = "aports";
+        private const string AportsDefaultBranch = "master";
         private const string SourcePackageType = "source";
 
         private bool _disposed;
@@ -103,18 +104,63 @@ namespace SIT.Create
         }
 
         /// <summary>
-        /// Gets Alpine Distro
+        /// Gets the aports branch of a component from the qualifiers of its bom reference, e.g. "3.22-stable" for
+        /// "pkg:apk/alpine/busybox@1.37.0-r20?distro=alpine-3.22".
         /// </summary>
         /// <param name="bomRef"></param>
-        /// <returns>distro</returns>
+        /// <returns>the aports branch to check out</returns>
         public static string GetAlpineDistro(string bomRef)
         {
+            string release = GetAlpineRelease(bomRef);
 
-            string[] getDistro = bomRef.Split("distro");
-            string[] getDestroVersion = getDistro[1].Split("-");
-            var output = getDestroVersion[1][..^2];
-            var distro = output + "-stable";
-            return distro;
+            if (string.IsNullOrEmpty(release))
+            {
+                Logger.WarnFormat("GetAlpineDistro(): The Alpine release of {0} is unknown, using the {1} branch of aports.", bomRef, AportsDefaultBranch);
+                return AportsDefaultBranch;
+            }
+
+            return $"{release}-stable";
+        }
+
+        /// <summary>
+        /// Reads the Alpine release from the distribution qualifiers of a package url, e.g. "3.22" for
+        /// "...?distro=alpine-3.22.1" (syft) as well as for "...?os_name=alpine&amp;os_version=3.22" (Docker Scout).
+        /// </summary>
+        /// <param name="purl"></param>
+        /// <returns>the release as "&lt;major&gt;.&lt;minor&gt;", or an empty string if no release is stated</returns>
+        private static string GetAlpineRelease(string purl)
+        {
+            int qualifierStart = purl?.IndexOf('?') ?? -1;
+
+            if (qualifierStart < 0)
+            {
+                return string.Empty;
+            }
+
+            foreach (string qualifier in purl.Substring(qualifierStart + 1).Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] keyValue = qualifier.Split('=', 2);
+                if (keyValue.Length != 2)
+                {
+                    continue;
+                }
+
+                string key = keyValue[0].Trim();
+                if (!key.Equals("distro", StringComparison.OrdinalIgnoreCase)
+                    && !key.Equals("os_distro", StringComparison.OrdinalIgnoreCase)
+                    && !key.Equals("os_version", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                Match release = AlpineReleaseRegex().Match(WebUtility.UrlDecode(keyValue[1]).Trim());
+                if (release.Success)
+                {
+                    return release.Value;
+                }
+            }
+
+            return string.Empty;
         }
 
         /// <summary>
@@ -1227,5 +1273,7 @@ namespace SIT.Create
         private static partial Regex AlpineComponentVersionRegex();
         [GeneratedRegex(@"\=")]
         private static partial Regex AlpinePackagelineRegex();
+        [GeneratedRegex(@"[0-9]+\.[0-9]+")]
+        private static partial Regex AlpineReleaseRegex();
     }
 }
