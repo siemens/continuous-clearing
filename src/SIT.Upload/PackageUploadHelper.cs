@@ -404,7 +404,27 @@ namespace SIT.Upload
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
                     Logger.DebugFormat("PackageUploadToArtifactory():{0} and {1}  contains Source repository:{2} and Destination Repository:{3} ,So now started upload package process .", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
-                    await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
+
+                    // If this is a development package and the version is a pre-release, skip copy/move
+                    if (item.PackageType == PackageType.Development && !SIT.Common.RegexHelper.IsReleaseVersion(item.Version))
+                    {
+                        Logger.DebugFormat("PackageUploadToArtifactory(): Skipping dev prerelease component {0} {1}", item.Name, item.Version);
+                        // increment KPI counters for dev packages not uploaded
+                        uploaderKpiData.DevPackagesNotUploadedToJfrog++;
+                        uploaderKpiData.PackagesNotUploadedToJfrog++;
+                        item.DestRepoName = null;
+
+                        // Mark as found but skipped so it appears in display lists with a clear reason
+                        var skippedResponse = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK)
+                        {
+                            ReasonPhrase = "SkippedPreReleaseDev"
+                        };
+                        await JfrogFoundPackagesAsync(item, displayPackagesInfo, "skipped", skippedResponse, null);
+                    }
+                    else
+                    {
+                        await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
+                    }
                 }
                 else
                 {
