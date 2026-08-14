@@ -480,6 +480,44 @@ Description for the settings in appSettings.json file
 | 32   | Npm.ReleaseRepo                 | NPM release repository name           | Yes             | `"npm-release"`                             |
 | 33   | Npm.DevDepRepo                  | NPM dev dependency repo name          | Yes             | `"npm-devdep"`                              |
 
+#### Debian source packages from custom APT repositories
+
+By default the source package of a Debian component is looked up on `snapshot.debian.org`. Images that install
+packages from other APT archives - vendor archives, hardened image archives or internal mirrors - are not covered
+by that archive, which results in `Source URL not found` for those components.
+
+Configure the APT archives the image installs from in `Debian.AptRepositories`. Every archive is read through its
+own index files (`dists/<suite>/Release`, `.../source/Sources`, `.../binary-<arch>/Packages`), so the exact pool
+location of the `.dsc`, the upstream tarball and the packaging patch is taken from the archive metadata instead of
+being guessed. The archives are searched in the configured order, and a file that one archive does not serve is
+looked up in the remaining ones - this is what happens when a vendor archive ships only the packaging delta and
+leaves the upstream tarball to the distribution.
+
+| S.No | Argument Name                          | Description                                                                    | Is it Mandatory | Example                                             |
+| ---- | -------------------------------------- | ------------------------------------------------------------------------------ | --------------- | --------------------------------------------------- |
+| 34   | Debian.AptRepositories[].Name          | Name of the archive, used for logging                                          | No              | `"debian"`                                         |
+| 35   | Debian.AptRepositories[].Uri           | Archive root, i.e. the URL that contains the `dists` and `pool` folders         | Yes             | `"https://deb.debian.org/debian"`                  |
+| 36   | Debian.AptRepositories[].Suites        | Suites to search. Defaults to the distribution of the scanned component        | No              | `["trixie", "trixie-updates"]`                    |
+| 37   | Debian.AptRepositories[].Components    | Components to search. Defaults to the components announced by the `Release` file | No              | `["main"]`                                         |
+| 38   | Debian.AptRepositories[].Architectures | Architectures to search. Defaults to the architectures announced by the `Release` file | No        | `["amd64"]`                                        |
+
+```json
+"Debian": {
+  "AptRepositories": [
+    {
+      "Name": "vendor",
+      "Uri": "https://vendor.example.com/deb/debian/main",
+      "Suites": [ "trixie" ]
+    },
+    {
+      "Name": "debian",
+      "Uri": "https://deb.debian.org/debian",
+      "Suites": [ "trixie", "trixie-updates" ]
+    }
+  ]
+}
+```
+
 
 #### **Method 2 - Only Cmd paramaters**
 You can also pass the above mentioned arguments in the command line.

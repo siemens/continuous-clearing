@@ -103,6 +103,10 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string SourceUrlNotFound = "Source URL not found";
         /// <summary>
+        /// Client identification sent with outgoing downloads.
+        /// </summary>
+        public const string UserAgent = "ContinuousClearing";
+        /// <summary>
         /// Error: Package URL not found.
         /// </summary>
         public const string PackageUrlNotFound = "Package URL not found";
