@@ -33,12 +33,7 @@ steps:
       command: 'login'
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
 
-  - script: |
-      echo "Testing docker pull for image: ${{ parameters.sw360DockerImage }}"
-      docker pull ${{ parameters.sw360DockerImage }}
-    displayName: "Test Docker pull sw360 image"
-    condition: succeeded()
-
+  
   - script: |
       echo "Testing docker pull for Debian image"
       docker pull debian:latest
