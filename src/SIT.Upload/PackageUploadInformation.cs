@@ -164,7 +164,7 @@ namespace SIT.Upload
             }
             else
             {
-                DisplayWithLogger(lists.UnknownPackages, lists.JfrogNotFoundPackages, lists.SucessfullPackages, lists.JfrogFoundPackages, name, filePath, lists.OptionalDevDepPackages, lists.SkippedPreReleasePackages);
+                DisplayWithLogger(lists, name, filePath);
             }
         }
 
@@ -368,22 +368,17 @@ namespace SIT.Upload
         /// <param name="name">The name of the package type.</param>
         /// <param name="filePath">The file path for storing package information.</param>
         private static void DisplayWithLogger(
-            List<ComponentsToArtifactory> unknownPackages,
-            List<ComponentsToArtifactory> JfrogNotFoundPackages,
-            List<ComponentsToArtifactory> SucessfullPackages,
-            List<ComponentsToArtifactory> JfrogFoundPackages,
+            PackageDisplayLists lists,
             string name,
-            string filePath,
-            List<ComponentsToArtifactory> optionalDevDepPackages = null,
-            List<ComponentsToArtifactory> skippedPreReleasePackages = null)
+            string filePath)
         {
             Logger.InfoFormat("\n{0}:\n", name);
-            DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
-            DisplayErrorForJfrogFoundPackages(JfrogFoundPackages);
-            DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
-            DisplayOptionalDevDepPackages(optionalDevDepPackages);
-            DisplayErrorForSucessfullPackages(SucessfullPackages);
-            DisplaySkippedPreReleasePackagesLogger(skippedPreReleasePackages);
+            DisplayErrorForUnknownPackages(lists.UnknownPackages, name, filePath);
+            DisplayErrorForJfrogFoundPackages(lists.JfrogFoundPackages);
+            DisplayErrorForJfrogPackages(lists.JfrogNotFoundPackages);
+            DisplayOptionalDevDepPackages(lists.OptionalDevDepPackages);
+            DisplayErrorForSucessfullPackages(lists.SucessfullPackages);
+            DisplaySkippedPreReleasePackagesLogger(lists.SkippedPreReleasePackages);
         }
 
         /// <summary>
