@@ -10,6 +10,8 @@ using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.Common;
 using SIT.Common.Model;
+using SW360KeycloakService;
+using SW360KeycloakService.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -44,7 +46,7 @@ namespace SIT.APICommunications
     /// <summary>
     /// Communicatest with SW360 API
     /// </summary>
-    public class SW360Apicommunication(SW360ConnectionSettings sw360ConnectionSettings) : ISw360ApiCommunication
+    public class SW360Apicommunication(SW360ConnectionSettings sw360ConnectionSettings, IKeycloakTokenService tokenService = null) : ISw360ApiCommunication
     {
         #region Fields
         private readonly string sw360AuthTokenType = sw360ConnectionSettings.SW360AuthTokenType;
@@ -547,24 +549,28 @@ namespace SIT.APICommunications
             await LogHandlingHelper.HttpRequestHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData()", httpClient, url);
             return await httpClient.GetAsync(url);
         }
-
         /// <summary>
         /// Creates and configures an HttpClient instance with authentication and timeout settings.
         /// </summary>
         /// <returns>A configured HttpClient instance for SW360 API communication.</returns>
         private HttpClient GetHttpClient()
         {
-            var handler = new RetryHttpClientHandler()
+            var retryHandler = new RetryHttpClientHandler
             {
                 InnerHandler = new HttpClientHandler()
             };
-            var httpClient = new HttpClient(handler);
+
+            HttpMessageHandler outerHandler = tokenService != null
+                ? new TokenRefreshDelegatingHandler(tokenService) { InnerHandler = retryHandler }
+                : retryHandler;
+
+            var httpClient = new HttpClient(outerHandler);
             TimeSpan timeOutInSec = TimeSpan.FromSeconds(timeOut);
             httpClient.Timeout = timeOutInSec;
             httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue(ApiConstant.ApplicationJson));
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(sw360AuthTokenType, sw360AuthToken);
+                    new AuthenticationHeaderValue(sw360AuthTokenType, sw360AuthToken);
             return httpClient;
         }
 

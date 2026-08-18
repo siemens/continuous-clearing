@@ -257,5 +257,8 @@
     <file src="out\net10.0\Microsoft.Identity.Client.Extensions.Msal.dll" target="tools\Microsoft.Identity.Client.Extensions.Msal.dll"/>
     <file src="out\net10.0\Microsoft.IdentityModel.Abstractions.dll" target="tools\Microsoft.IdentityModel.Abstractions.dll"/>
     <file src="out\net10.0\System.Memory.Data.dll" target="tools\System.Memory.Data.dll"/>
+   <file src="out\net10.0\SW360KeycloakService.dll" target="tools\SW360KeycloakService.dll"/>
+    <file src="out\net10.0\SW360KeycloakService.pdb" target="tools\SW360KeycloakService.pdb"/>
+    <file src="out\net10.0\SW360KeycloakService.deps.json" target="tools\SW360KeycloakService.deps.json"/>
   </files>
 </package>

@@ -167,7 +167,6 @@ namespace SIT.Common
                 if (appSettings.SW360 != null)
                 {
                     identifierReqParameters.Add($"SW360.ProjectID");
-                    identifierReqParameters.Add($"SW360.Token");
                     identifierReqParameters.Add($"SW360.URL");
                 }
                 if (appSettings.Jfrog != null)
@@ -191,7 +190,6 @@ namespace SIT.Common
                 List<string> creatorReqParameters = new List<string>()
             {
                 "SW360.ProjectID",
-                "Sw360.Token",
                 "SW360.URL",
                 "Directory.OutputFolder"
             };

@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using File = System.IO.File;
 
 namespace SIT.Common.UTest
@@ -310,6 +311,424 @@ namespace SIT.Common.UTest
             // Assert
             Assert.IsFalse(result);
         }
+
+        [Test]
+        public void GetCatoolVersionFromProjectFile_WhenCalled_ReturnsPopulatedCatoolInfo()
+        {
+            // Act
+            var result = CommonHelper.GetCatoolVersionFromProjectFile();
+
+            // Assert
+            Assert.IsNotNull(result, "CatoolInfo should not be null.");
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result.CatoolVersion), "CatoolVersion should be populated.");
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result.CatoolRunningLocation), "CatoolRunningLocation should be populated.");
+        }
+
+        [Test]
+        public void GetCatoolVersionFromProjectFile_WhenCalled_VersionHasMajorMinorBuildFormat()
+        {
+            // Act
+            var result = CommonHelper.GetCatoolVersionFromProjectFile();
+
+            // Assert
+            Assert.IsNotNull(result);
+            string[] parts = result.CatoolVersion.Split('.');
+            Assert.AreEqual(3, parts.Length, "Version should be in Major.Minor.Build format.");
+            foreach (string part in parts)
+            {
+                Assert.IsTrue(int.TryParse(part, out _), $"Version segment '{part}' should be numeric.");
+            }
+        }
+
+        [Test]
+        public void GetCatoolVersionFromProjectFile_WhenCalled_RunningLocationIsExistingDirectory()
+        {
+            // Act
+            var result = CommonHelper.GetCatoolVersionFromProjectFile();
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(System.IO.Directory.Exists(result.CatoolRunningLocation),
+                $"CatoolRunningLocation '{result.CatoolRunningLocation}' should be an existing directory.");
+        }
+
+        [Test]
+        public void GetCatoolVersionFromProjectFile_WhenCalledTwice_ReturnsConsistentValues()
+        {
+            // Act
+            var first = CommonHelper.GetCatoolVersionFromProjectFile();
+            var second = CommonHelper.GetCatoolVersionFromProjectFile();
+
+            // Assert
+            Assert.AreEqual(first.CatoolVersion, second.CatoolVersion);
+            Assert.AreEqual(first.CatoolRunningLocation, second.CatoolRunningLocation);
+        }
+
+        #region ValidateKeycloakCredentials
+
+        private static CommonAppSettings BuildAppSettingsWithSw360(string clientId, string clientSecret, string token)
+        {
+            return new CommonAppSettings
+            {
+                SW360 = new SW360
+                {
+                    URL = "https://sw360.example.com",
+                    AuthTokenType = "Bearer",
+                    Token = token,
+                    Keycloak = new Keycloak
+                    {
+                        ClientId = clientId,
+                        ClientSecret = clientSecret
+                    }
+                }
+            };
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenNoCredentialsAndNoToken_CallsExitAndReturnsFalse()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360(null, null, null);
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(-1, capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenOnlyTokenPresent_ReturnsFalseWithoutExit()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360(null, null, "legacy-token");
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsNull(capturedExitCode, "Exit action must not be invoked in plain-token mode.");
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenBothClientIdAndSecretPresent_ReturnsTrue()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360("client", "secret", null);
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsNull(capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenOnlyClientIdPresent_CallsExitAndReturnsFalse()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360("client", null, null);
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(-1, capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenOnlyClientSecretPresent_CallsExitAndReturnsFalse()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360(null, "secret", null);
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(-1, capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenAllCredentialsPresent_ReturnsTrue()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360("client", "secret", "legacy-token");
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsNull(capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenKeycloakSectionIsNullAndNoToken_CallsExitAndReturnsFalse()
+        {
+            // Arrange
+            var settings = new CommonAppSettings
+            {
+                SW360 = new SW360 { Token = null, Keycloak = null }
+            };
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(-1, capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenAllValuesAreWhitespace_CallsExitAndReturnsFalse()
+        {
+            // Arrange: IsNullOrWhiteSpace must treat whitespace identically to null/empty.
+            var settings = BuildAppSettingsWithSw360("   ", "\t", "  ");
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(-1, capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenOnlyWhitespaceClientIdAndRealSecret_CallsExitAndReturnsFalse()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360("   ", "secret", null);
+            int? capturedExitCode = null;
+
+            // Act
+            bool result = CommonHelper.ValidateKeycloakCredentials(settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(-1, capturedExitCode);
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenNoCredentials_LogsAuthenticationFailedMessage()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360(null, null, null);
+
+            // Act
+            CommonHelper.ValidateKeycloakCredentials(settings, _ => { });
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(
+                logEvents.Any(e => e.RenderedMessage.Contains("Authentication failed: Please provide")
+                                && e.RenderedMessage.Contains("ClientId")
+                                && e.RenderedMessage.Contains("ClientSecret")),
+                "Expected an authentication-failed message naming both ClientId and ClientSecret.");
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenBothCredentialsPresent_DoesNotLogError()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360("client", "secret", null);
+
+            // Act
+            CommonHelper.ValidateKeycloakCredentials(settings, _ => { });
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsFalse(
+                logEvents.Any(e => e.Level == log4net.Core.Level.Error),
+                "No error should be logged when both Keycloak credentials are present.");
+        }
+
+        [Test]
+        public void ValidateKeycloakCredentials_WhenExitActionIsInvoked_PassesNegativeOne()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360("client", null, null);
+            var capturedCodes = new List<int>();
+
+            // Act
+            CommonHelper.ValidateKeycloakCredentials(settings, code => capturedCodes.Add(code));
+
+            // Assert
+            Assert.AreEqual(1, capturedCodes.Count, "Exit action should be invoked exactly once.");
+            Assert.AreEqual(-1, capturedCodes[0]);
+        }
+
+        #endregion ValidateKeycloakCredentials
+
+        #region DisplayTokenExpiryWarning
+
+        [Test]
+        public void DisplayTokenExpiryWarning_WhenNoKeycloakCredentials_LogsDeprecationWarning()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360(null, null, "legacy-token");
+
+            // Act
+            CommonHelper.DisplayTokenExpiryWarning(settings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(
+                logEvents.Any(e => e.RenderedMessage.Contains("Legacy token authentication will be deprecated")),
+                "Expected deprecation warning when Keycloak credentials are missing.");
+        }
+
+        [Test]
+        public void DisplayTokenExpiryWarning_WhenBothKeycloakCredentialsPresent_DoesNotLogWarning()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360("client", "secret", null);
+
+            // Act
+            CommonHelper.DisplayTokenExpiryWarning(settings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsFalse(
+                logEvents.Any(e => e.RenderedMessage.Contains("Legacy token authentication will be deprecated")),
+                "Deprecation warning should not be logged when Keycloak credentials are configured.");
+        }
+
+        [Test]
+        public void DisplayTokenExpiryWarning_WhenOnlyClientIdPresent_DoesNotLogWarning()
+        {
+            // Arrange: any one credential is enough to suppress the warning.
+            var settings = BuildAppSettingsWithSw360("client", null, null);
+
+            // Act
+            CommonHelper.DisplayTokenExpiryWarning(settings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsFalse(
+                logEvents.Any(e => e.RenderedMessage.Contains("Legacy token authentication will be deprecated")),
+                "Warning should not be logged when at least one Keycloak credential is present.");
+        }
+
+        [Test]
+        public void DisplayTokenExpiryWarning_WhenKeycloakSectionIsNull_LogsDeprecationWarning()
+        {
+            // Arrange
+            var settings = new CommonAppSettings
+            {
+                SW360 = new SW360 { Token = "legacy-token", Keycloak = null }
+            };
+
+            // Act
+            CommonHelper.DisplayTokenExpiryWarning(settings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(
+                logEvents.Any(e => e.RenderedMessage.Contains("Legacy token authentication will be deprecated")),
+                "Expected deprecation warning when Keycloak section is null.");
+        }
+
+        [Test]
+        public void DisplayTokenExpiryWarning_WhenOnlyClientSecretPresent_DoesNotLogWarning()
+        {
+            // Arrange: mirror of the only-ClientId case — either credential alone suppresses the warning.
+            var settings = BuildAppSettingsWithSw360(null, "secret", null);
+
+            // Act
+            CommonHelper.DisplayTokenExpiryWarning(settings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsFalse(
+                logEvents.Any(e => e.RenderedMessage.Contains("Legacy token authentication will be deprecated")),
+                "Warning should not be logged when at least one Keycloak credential is present.");
+        }
+
+        [Test]
+        public void DisplayTokenExpiryWarning_WhenCredentialsAreWhitespace_LogsDeprecationWarning()
+        {
+            // Arrange: IsNullOrWhiteSpace must treat whitespace as missing.
+            var settings = BuildAppSettingsWithSw360("   ", "\t", "legacy-token");
+
+            // Act
+            CommonHelper.DisplayTokenExpiryWarning(settings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(
+                logEvents.Any(e => e.RenderedMessage.Contains("Legacy token authentication will be deprecated")),
+                "Expected deprecation warning when both credentials are whitespace-only.");
+        }
+
+        [Test]
+        public void DisplayTokenExpiryWarning_WhenNoKeycloakCredentials_LogsWarnLevel()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360(null, null, "legacy-token");
+
+            // Act
+            CommonHelper.DisplayTokenExpiryWarning(settings);
+
+            // Assert
+            var logEvents = memoryAppender.GetEvents();
+            Assert.IsTrue(
+                logEvents.Any(e => e.Level == log4net.Core.Level.Warn
+                                && e.RenderedMessage.Contains("Legacy token authentication will be deprecated")),
+                "Deprecation message must be emitted at WARN level.");
+        }
+
+        #endregion DisplayTokenExpiryWarning
+
+        #region InitializeKeycloakTokenServiceAsync
+
+        [Test]
+        public async Task InitializeKeycloakTokenServiceAsync_WhenCredentialsAndTokenAbsent_CallsExitAndReturnsNull()
+        {
+            // Arrange
+            var settings = BuildAppSettingsWithSw360(null, null, null);
+            int? capturedExitCode = null;
+
+            // Act
+            var result = await CommonHelper.InitializeKeycloakTokenServiceAsync(
+                settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsNull(result);
+            Assert.AreEqual(-1, capturedExitCode);
+        }
+
+        [Test]
+        public async Task InitializeKeycloakTokenServiceAsync_WhenOnlyLegacyTokenPresent_ReturnsNullWithoutExit()
+        {
+            // Arrange: plain-token mode — helper should short-circuit and return null without touching the network.
+            var settings = BuildAppSettingsWithSw360(null, null, "legacy-token");
+            int? capturedExitCode = null;
+
+            // Act
+            var result = await CommonHelper.InitializeKeycloakTokenServiceAsync(
+                settings, code => capturedExitCode = code);
+
+            // Assert
+            Assert.IsNull(result);
+            Assert.IsNull(capturedExitCode);
+            Assert.AreEqual("legacy-token", settings.SW360.Token, "Existing token must be preserved.");
+        }
+
+        #endregion InitializeKeycloakTokenServiceAsync
 
         [Test]
         public void RemoveExcludedComponents_WhenExcludedComponentMatches_ReturnsExcludedComponents()
