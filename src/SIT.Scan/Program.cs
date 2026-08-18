@@ -22,6 +22,7 @@ using SIT.Facade.Interfaces;
 using SIT.Scan.Interface;
 using SIT.Services;
 using SIT.Services.Interface;
+using SW360KeycloakService;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -120,7 +121,7 @@ namespace SIT.Scan
             if (!m_Verbose && CommonHelper.IsAzureDevOpsDebugEnabled())
                 m_Verbose = true;
             // do not change the order of getting ca tool information
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            CatoolInfo caToolInformation = CommonHelper.GetCatoolVersionFromProjectFile();
             Log4Net.CatoolCurrentDirectory = Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string logFileNameWithTimestamp = $"{FileConstant.SITScanLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
@@ -144,6 +145,7 @@ namespace SIT.Scan
             // Validate application settings
             if (appSettings.SW360 != null)
             {
+                CommonHelper.DisplayTokenExpiryWarning(appSettings);
                 await ValidateAppsettingsFile(appSettings, projectReleases);
             }
 
@@ -173,19 +175,6 @@ namespace SIT.Scan
             Logger.Logger.Log(null, Level.Notice, $"End of SIT Scan execution : {DateTime.Now}\n", null);
             // publish logs and bom file to pipeline artifact
             PipelineArtifactUploader.UploadArtifacts();
-        }
-
-        /// <summary>
-        /// Retrieves the CA tool version and running location from the executing assembly.
-        /// </summary>
-        /// <returns>Information about the CA tool version and running location.</returns>
-        private static CatoolInfo GetCatoolVersionFromProjectfile()
-        {
-            CatoolInfo catoolInfo = new CatoolInfo();
-            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
-            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
-            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            return catoolInfo;
         }
 
         /// <summary>
@@ -219,6 +208,8 @@ namespace SIT.Scan
         /// <returns>Asynchronously completes after validation (may exit process on failure).</returns>
         private static async Task ValidateAppsettingsFile(CommonAppSettings appSettings, ProjectReleases projectReleases)
         {
+            KeycloakTokenCacheService tokenService = await CommonHelper.InitializeKeycloakTokenServiceAsync(appSettings, environmentHelper.CallEnvironmentExit);
+
             SW360ConnectionSettings sw360ConnectionSettings = new SW360ConnectionSettings()
             {
                 SW360URL = appSettings.SW360.URL,
@@ -227,7 +218,7 @@ namespace SIT.Scan
                 IsTestMode = appSettings.IsTestMode,
                 Timeout = appSettings.TimeOut
             };
-            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings));
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(new SW360ApicommunicationFacade(sw360ConnectionSettings, tokenService));
             int isValid = await BomValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
             if (isValid == -1)
             {

@@ -9,6 +9,7 @@ using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.Common.Model;
 using SIT.Facade.Interfaces;
+using SW360KeycloakService.Interfaces;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -32,6 +33,17 @@ namespace SIT.Facade
         public SW360ApicommunicationFacade(SW360ConnectionSettings sw360ConnectionSettings)
         {
             m_sw360ApiCommunication = new SW360Apicommunication(sw360ConnectionSettings);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SW360ApicommunicationFacade"/> class
+        /// with an <see cref="IKeycloakTokenService"/> for automatic 401 token refresh.
+        /// </summary>
+        /// <param name="sw360ConnectionSettings">The SW360 connection settings.</param>
+        /// <param name="tokenService">The Keycloak token service used for 401 refresh.</param>
+        public SW360ApicommunicationFacade(SW360ConnectionSettings sw360ConnectionSettings, IKeycloakTokenService tokenService)
+        {
+            m_sw360ApiCommunication = new SW360Apicommunication(sw360ConnectionSettings, tokenService);
         }
 
         /// <summary>
