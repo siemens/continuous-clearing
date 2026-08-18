@@ -74,6 +74,14 @@ namespace SIT.Upload
             displayPackagesInfo.SuccessfullPackagesDebian = new List<ComponentsToArtifactory>();
             displayPackagesInfo.SuccessfullPackagesCargo = new List<ComponentsToArtifactory>();
             displayPackagesInfo.SuccessfullPackagesChoco = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesNpm = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesNuget = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesMaven = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesConan = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesPython = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesDebian = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesCargo = new List<ComponentsToArtifactory>();
+            displayPackagesInfo.SkippedPreReleasePackagesChoco = new List<ComponentsToArtifactory>();
 
 
             return displayPackagesInfo;
@@ -127,47 +135,36 @@ namespace SIT.Upload
         {
             string localPathforartifactory = ArtifactoryUploader.GettPathForArtifactoryUpload();
 
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, "npm", localPathforartifactory, displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, "NuGet", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, "Maven", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, "Conan", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, "Poetry", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, "Debian", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesCargo, displayPackagesInfo.JfrogNotFoundPackagesCargo, displayPackagesInfo.SuccessfullPackagesCargo, displayPackagesInfo.JfrogFoundPackagesCargo, "Cargo", localPathforartifactory);
-            DisplaySortedForeachComponents(displayPackagesInfo.UnknownPackagesChoco, displayPackagesInfo.JfrogNotFoundPackagesChoco, displayPackagesInfo.SuccessfullPackagesChoco, displayPackagesInfo.JfrogFoundPackagesChoco, "Choco", localPathforartifactory);
-
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesNpm, displayPackagesInfo.JfrogFoundPackagesNpm, displayPackagesInfo.JfrogNotFoundPackagesNpm, displayPackagesInfo.SuccessfullPackagesNpm, displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm, displayPackagesInfo.SkippedPreReleasePackagesNpm), "npm", localPathforartifactory);
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesNuget, displayPackagesInfo.JfrogFoundPackagesNuget, displayPackagesInfo.JfrogNotFoundPackagesNuget, displayPackagesInfo.SuccessfullPackagesNuget, null, displayPackagesInfo.SkippedPreReleasePackagesNuget), "NuGet", localPathforartifactory);
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesMaven, displayPackagesInfo.JfrogFoundPackagesMaven, displayPackagesInfo.JfrogNotFoundPackagesMaven, displayPackagesInfo.SuccessfullPackagesMaven, null, displayPackagesInfo.SkippedPreReleasePackagesMaven), "Maven", localPathforartifactory);
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesConan, displayPackagesInfo.JfrogFoundPackagesConan, displayPackagesInfo.JfrogNotFoundPackagesConan, displayPackagesInfo.SuccessfullPackagesConan, null, displayPackagesInfo.SkippedPreReleasePackagesConan), "Conan", localPathforartifactory);
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesPython, displayPackagesInfo.JfrogFoundPackagesPython, displayPackagesInfo.JfrogNotFoundPackagesPython, displayPackagesInfo.SuccessfullPackagesPython, null, displayPackagesInfo.SkippedPreReleasePackagesPython), "Poetry", localPathforartifactory);
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesDebian, displayPackagesInfo.JfrogFoundPackagesDebian, displayPackagesInfo.JfrogNotFoundPackagesDebian, displayPackagesInfo.SuccessfullPackagesDebian, null, displayPackagesInfo.SkippedPreReleasePackagesDebian), "Debian", localPathforartifactory);
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesCargo, displayPackagesInfo.JfrogFoundPackagesCargo, displayPackagesInfo.JfrogNotFoundPackagesCargo, displayPackagesInfo.SuccessfullPackagesCargo, null, displayPackagesInfo.SkippedPreReleasePackagesCargo), "Cargo", localPathforartifactory);
+            DisplaySortedForeachComponents(new PackageDisplayLists(displayPackagesInfo.UnknownPackagesChoco, displayPackagesInfo.JfrogFoundPackagesChoco, displayPackagesInfo.JfrogNotFoundPackagesChoco, displayPackagesInfo.SuccessfullPackagesChoco, null, displayPackagesInfo.SkippedPreReleasePackagesChoco), "Choco", localPathforartifactory);
         }
 
         /// <summary>
         /// Displays sorted components for each package type based on their status.
         /// </summary>
-        /// <param name="unknownPackages">List of unknown packages.</param>
-        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
-        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
-        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
+        /// <param name="lists">Grouped per-package-type display lists.</param>
         /// <param name="name">The name of the package type.</param>
         /// <param name="filePath">The file path for storing package information.</param>
-        private static void DisplaySortedForeachComponents(
-    List<ComponentsToArtifactory> unknownPackages,
-    List<ComponentsToArtifactory> JfrogNotFoundPackages,
-    List<ComponentsToArtifactory> SucessfullPackages,
-    List<ComponentsToArtifactory> JfrogFoundPackages,
-    string name,
-    string filePath,
-    List<ComponentsToArtifactory> optionalDevDepPackages = null)
+        private static void DisplaySortedForeachComponents(PackageDisplayLists lists, string name, string filePath)
         {
-            if (!HasAnyPackages(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, optionalDevDepPackages))
+            if (!HasAnyPackages(lists.UnknownPackages, lists.JfrogNotFoundPackages, lists.SucessfullPackages, lists.JfrogFoundPackages, lists.OptionalDevDepPackages, lists.SkippedPreReleasePackages))
             {
                 return;
             }
 
             if (LoggerFactory.UseSpectreConsole)
             {
-                DisplayWithSpectreConsole(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath, optionalDevDepPackages);
+                DisplayWithSpectreConsole(lists, name, filePath);
             }
             else
             {
-                DisplayWithLogger(unknownPackages, JfrogNotFoundPackages, SucessfullPackages, JfrogFoundPackages, name, filePath, optionalDevDepPackages);
+                DisplayWithLogger(lists.UnknownPackages, lists.JfrogNotFoundPackages, lists.SucessfullPackages, lists.JfrogFoundPackages, name, filePath, lists.OptionalDevDepPackages, lists.SkippedPreReleasePackages);
             }
         }
 
@@ -184,29 +181,14 @@ namespace SIT.Upload
         /// <summary>
         /// Displays package information using Spectre Console formatting.
         /// </summary>
-        /// <param name="unknownPackages">List of unknown packages.</param>
-        /// <param name="JfrogNotFoundPackages">List of packages not found in JFrog.</param>
-        /// <param name="SucessfullPackages">List of successfully processed packages.</param>
-        /// <param name="JfrogFoundPackages">List of packages found in JFrog.</param>
+        /// <param name="lists">Grouped per-package-type display lists.</param>
         /// <param name="name">The name of the package type.</param>
         /// <param name="filepath">The file path for storing package information.</param>
-        private static void DisplayWithSpectreConsole(
-            List<ComponentsToArtifactory> unknownPackages,
-            List<ComponentsToArtifactory> JfrogNotFoundPackages,
-            List<ComponentsToArtifactory> SucessfullPackages,
-            List<ComponentsToArtifactory> JfrogFoundPackages,
-            string name, string filepath,
-            List<ComponentsToArtifactory> optionalDevDepPackages = null)
+        private static void DisplayWithSpectreConsole(PackageDisplayLists lists, string name, string filepath)
         {
             LoggerHelper.SafeSpectreAction(() =>
             {
                 var content = new StringBuilder($"[green]{name}[/]\n\n");
-                var lists = new PackageDisplayLists(
-                    unknownPackages,
-                    JfrogFoundPackages,
-                    JfrogNotFoundPackages,
-                    SucessfullPackages,
-                    optionalDevDepPackages);
                 AppendPackageContent(content, lists, name, filepath);
 
                 LoggerHelper.WriteStyledPanel(content.ToString().TrimEnd(), "", "blue", "yellow");
@@ -222,7 +204,8 @@ namespace SIT.Upload
             List<ComponentsToArtifactory> JfrogFoundPackages,
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
             List<ComponentsToArtifactory> SucessfullPackages,
-            List<ComponentsToArtifactory> OptionalDevDepPackages);
+            List<ComponentsToArtifactory> OptionalDevDepPackages,
+            List<ComponentsToArtifactory> SkippedPreReleasePackages = null);
 
         /// <summary>
         /// Appends package content to a StringBuilder for display.
@@ -242,6 +225,24 @@ namespace SIT.Upload
             AppendJfrogNotFoundPackages(content, lists.JfrogNotFoundPackages);
             AppendOptionalDevDependencyPackages(content, lists.OptionalDevDepPackages);
             AppendSuccessfulPackages(content, lists.SucessfullPackages);
+            AppendSkippedPreReleasePackages(content, lists.SkippedPreReleasePackages);
+        }
+
+        /// <summary>
+        /// Appends skipped pre-release packages information to the content.
+        /// </summary>
+        /// <param name="content">The StringBuilder to append content to.</param>
+        /// <param name="packages">List of packages skipped because of a pre-release version.</param>
+        private static void AppendSkippedPreReleasePackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        {
+            if (packages?.Count > 0)
+            {
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"✓ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]Skipped Due to Pre-release Version[/]");
+                }
+            }
         }
 
         /// <summary>
@@ -373,7 +374,8 @@ namespace SIT.Upload
             List<ComponentsToArtifactory> JfrogFoundPackages,
             string name,
             string filePath,
-            List<ComponentsToArtifactory> optionalDevDepPackages = null)
+            List<ComponentsToArtifactory> optionalDevDepPackages = null,
+            List<ComponentsToArtifactory> skippedPreReleasePackages = null)
         {
             Logger.InfoFormat("\n{0}:\n", name);
             DisplayErrorForUnknownPackages(unknownPackages, name, filePath);
@@ -381,6 +383,25 @@ namespace SIT.Upload
             DisplayErrorForJfrogPackages(JfrogNotFoundPackages);
             DisplayOptionalDevDepPackages(optionalDevDepPackages);
             DisplayErrorForSucessfullPackages(SucessfullPackages);
+            DisplaySkippedPreReleasePackagesLogger(skippedPreReleasePackages);
+        }
+
+        /// <summary>
+        /// Logs packages skipped because they are a pre-release version.
+        /// </summary>
+        /// <param name="skippedPreReleasePackages">List of skipped pre-release packages.</param>
+        private static void DisplaySkippedPreReleasePackagesLogger(List<ComponentsToArtifactory> skippedPreReleasePackages)
+        {
+            if (skippedPreReleasePackages == null || skippedPreReleasePackages.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var package in skippedPreReleasePackages)
+            {
+                Logger.InfoFormat("✓ {0}-{1} Skipped Due to Pre-release Version", package.Name, package.Version);
+            }
+            Logger.Info("\n");
         }
 
         /// <summary>

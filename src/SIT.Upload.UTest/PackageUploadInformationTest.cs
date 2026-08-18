@@ -920,6 +920,7 @@ namespace SIT.Upload.UTest
                 jfrogFoundPackages,
                 "TestPackageType",
                 filepath,
+                null,
                 null
             });
 
@@ -951,6 +952,7 @@ namespace SIT.Upload.UTest
                 emptyList,
                 "EmptyPackageType",
                 filepath,
+                null,
                 null
             });
 
@@ -999,6 +1001,7 @@ namespace SIT.Upload.UTest
                 jfrogFoundPackages,
                 "npm",
                 filepath,
+                null,
                 null
             });
 
@@ -1034,6 +1037,7 @@ namespace SIT.Upload.UTest
                 emptyList,
                 "NuGet",
                 filepath,
+                null,
                 null
             });
 
@@ -1069,6 +1073,7 @@ namespace SIT.Upload.UTest
                 emptyList,
                 "Maven",
                 filepath,
+                null,
                 null
             });
 
@@ -1133,6 +1138,7 @@ namespace SIT.Upload.UTest
                 jfrogFoundPackages,
                 "Python",
                 filepath,
+                null,
                 null
             });
 
@@ -1148,10 +1154,6 @@ namespace SIT.Upload.UTest
             var warnEvent = FindEventByLevel(events, Level.Warn);
             Assert.IsNotNull(warnEvent, "Expected warning for not found packages");
         }
-
-        // ---------------------------------------------------------------------
-        // Coverage for new/changed code on bugfix/optinaldevdependenciesissue
-        // ---------------------------------------------------------------------
 
         [Test]
         public void GetComponentsToBePackages_InitializesJfrogNotFoundOptionalDevDepsNpm()
@@ -1295,7 +1297,8 @@ namespace SIT.Upload.UTest
                 emptyList,
                 "npm",
                 filepath,
-                optionalDevDep
+                optionalDevDep,
+                null
             });
 
             // Assert
@@ -1333,6 +1336,7 @@ namespace SIT.Upload.UTest
                 emptyList,
                 "npm",
                 filepath,
+                null,
                 null
             });
 
@@ -1345,7 +1349,8 @@ namespace SIT.Upload.UTest
                 emptyList,
                 "npm",
                 filepath,
-                new List<ComponentsToArtifactory>()
+                new List<ComponentsToArtifactory>(),
+                null
             });
 
             // Assert - no warn events emitted for optional devDep block
