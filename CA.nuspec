@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-	<version>10.0.0</version>
+	<version>11.0.0</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -210,11 +210,9 @@
     <file src="out\net10.0\runtimes\unix\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll" target="tools\runtimes\unix\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll"/>
     <file src="out\net10.0\runtimes\unix\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\unix\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll" target="tools\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\net8.0\Microsoft.Win32.SystemEvents.dll" target="tools\runtimes\win\lib\net8.0\Microsoft.Win32.SystemEvents.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\Microsoft.Win32.SystemEvents.dll" target="tools\runtimes\win\lib\net10.0\Microsoft.Win32.SystemEvents.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.dll" target="tools\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.Messages.dll" target="tools\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.Messages.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.EventLog.dll" target="tools\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.EventLog.dll"/>
     <file src="out\net10.0\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll" target="tools\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll"/>
     <file src="out\net10.0\runtimes\win\lib\netcoreapp2.0\System.Management.dll" target="tools\runtimes\win\lib\netcoreapp2.0\System.Management.dll"/>
     <file src="out\net10.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll" target="tools\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll"/>
