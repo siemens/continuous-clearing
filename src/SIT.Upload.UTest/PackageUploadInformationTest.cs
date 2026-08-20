@@ -41,6 +41,21 @@ namespace SIT.Upload.UTest
             _memoryAppender?.Close();
         }
 
+        private static object CreatePackageDisplayLists(
+            List<ComponentsToArtifactory> unknown,
+            List<ComponentsToArtifactory> jfrogFound,
+            List<ComponentsToArtifactory> jfrogNotFound,
+            List<ComponentsToArtifactory> successful,
+            List<ComponentsToArtifactory> optionalDevDep,
+            List<ComponentsToArtifactory> skippedPreRelease)
+        {
+            var type = typeof(PackageUploadInformation).GetNestedType(
+                "PackageDisplayLists",
+                System.Reflection.BindingFlags.NonPublic);
+            Assert.IsNotNull(type, "PackageDisplayLists nested type not found via reflection.");
+            return System.Activator.CreateInstance(type, unknown, jfrogFound, jfrogNotFound, successful, optionalDevDep, skippedPreRelease);
+        }
+
         [Test]
         public void SetExitCode_BothCountersNonZero_LogsCombinedWarning_ExitsWith2()
         {
@@ -914,13 +929,9 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                unknownPackages,
-                jfrogNotFoundPackages,
-                successfulPackages,
-                jfrogFoundPackages,
+                CreatePackageDisplayLists(unknownPackages, jfrogFoundPackages, jfrogNotFoundPackages, successfulPackages, null, null),
                 "TestPackageType",
-                filepath,
-                null
+                filepath
             });
 
             // Assert
@@ -945,13 +956,9 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                emptyList,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, null, null),
                 "EmptyPackageType",
-                filepath,
-                null
+                filepath
             });
 
             // Assert
@@ -993,13 +1000,9 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                emptyList,
-                jfrogFoundPackages,
+                CreatePackageDisplayLists(emptyList, jfrogFoundPackages, emptyList, emptyList, null, null),
                 "npm",
-                filepath,
-                null
+                filepath
             });
 
             // Assert
@@ -1028,13 +1031,9 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                jfrogNotFoundPackages,
-                emptyList,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, jfrogNotFoundPackages, emptyList, null, null),
                 "NuGet",
-                filepath,
-                null
+                filepath
             });
 
             // Assert
@@ -1063,13 +1062,9 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                successfulPackages,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, successfulPackages, null, null),
                 "Maven",
-                filepath,
-                null
+                filepath
             });
 
             // Assert
@@ -1127,13 +1122,9 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                unknownPackages,
-                jfrogNotFoundPackages,
-                successfulPackages,
-                jfrogFoundPackages,
+                CreatePackageDisplayLists(unknownPackages, jfrogFoundPackages, jfrogNotFoundPackages, successfulPackages, null, null),
                 "Python",
-                filepath,
-                null
+                filepath
             });
 
             // Assert
@@ -1148,10 +1139,6 @@ namespace SIT.Upload.UTest
             var warnEvent = FindEventByLevel(events, Level.Warn);
             Assert.IsNotNull(warnEvent, "Expected warning for not found packages");
         }
-
-        // ---------------------------------------------------------------------
-        // Coverage for new/changed code on bugfix/optinaldevdependenciesissue
-        // ---------------------------------------------------------------------
 
         [Test]
         public void GetComponentsToBePackages_InitializesJfrogNotFoundOptionalDevDepsNpm()
@@ -1289,13 +1276,9 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                emptyList,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, optionalDevDep, null),
                 "npm",
-                filepath,
-                optionalDevDep
+                filepath
             });
 
             // Assert
@@ -1327,25 +1310,17 @@ namespace SIT.Upload.UTest
             // Act - null optional list
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                emptyList,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, null, null),
                 "npm",
-                filepath,
-                null
+                filepath
             });
 
             // Act - empty optional list
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                emptyList,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, new List<ComponentsToArtifactory>(), null),
                 "npm",
-                filepath,
-                new List<ComponentsToArtifactory>()
+                filepath
             });
 
             // Assert - no warn events emitted for optional devDep block
@@ -1398,6 +1373,113 @@ namespace SIT.Upload.UTest
             var contentEmpty = new System.Text.StringBuilder();
             method.Invoke(null, new object[] { contentEmpty, new List<ComponentsToArtifactory>() });
             Assert.AreEqual(string.Empty, contentEmpty.ToString());
+        }
+
+        [Test]
+        public void AppendSkippedPreReleasePackages_WithPackages_AppendsColorizedLines()
+        {
+            // Arrange
+            var content = new System.Text.StringBuilder();
+            var packages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "spring-boot-web-server", Version = "4.1.0-SNAPSHOT" },
+                new ComponentsToArtifactory { Name = "another-pkg", Version = "2.0.0-beta" }
+            };
+
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "AppendSkippedPreReleasePackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "AppendSkippedPreReleasePackages method not found via reflection.");
+
+            // Act
+            method.Invoke(null, new object[] { content, packages });
+
+            // Assert
+            var text = content.ToString();
+            StringAssert.Contains("[white]spring-boot-web-server[/]", text);
+            StringAssert.Contains("[cyan]4.1.0-SNAPSHOT[/]", text);
+            StringAssert.Contains("[yellow]Skipped Due to Pre-release Version[/]", text);
+            StringAssert.Contains("[white]another-pkg[/]", text);
+            StringAssert.Contains("[cyan]2.0.0-beta[/]", text);
+            StringAssert.Contains("✓", text);
+        }
+
+        [Test]
+        public void AppendSkippedPreReleasePackages_WithNullOrEmpty_AppendsNothing()
+        {
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "AppendSkippedPreReleasePackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "AppendSkippedPreReleasePackages method not found via reflection.");
+
+            // null
+            var contentNull = new System.Text.StringBuilder();
+            method.Invoke(null, new object[] { contentNull, null });
+            Assert.AreEqual(string.Empty, contentNull.ToString());
+
+            // empty
+            var contentEmpty = new System.Text.StringBuilder();
+            method.Invoke(null, new object[] { contentEmpty, new List<ComponentsToArtifactory>() });
+            Assert.AreEqual(string.Empty, contentEmpty.ToString());
+        }
+
+        [Test]
+        public void DisplaySkippedPreReleasePackagesLogger_WithPackages_LogsInfoPerPackage()
+        {
+            // Arrange
+            var packages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "spring-boot-web-server", Version = "4.1.0-SNAPSHOT" },
+                new ComponentsToArtifactory { Name = "another-pkg", Version = "2.0.0-beta" }
+            };
+
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "DisplaySkippedPreReleasePackagesLogger",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "DisplaySkippedPreReleasePackagesLogger method not found via reflection.");
+
+            // Act
+            method.Invoke(null, new object[] { packages });
+
+            // Assert
+            var events = _memoryAppender.GetEvents();
+            var infoEvents = System.Array.FindAll(
+                events,
+                e => e.Level == Level.Info &&
+                     e.RenderedMessage.Contains("Skipped Due to Pre-release Version"));
+            Assert.GreaterOrEqual(infoEvents.Length, 2, "Expected one info log per skipped pre-release package.");
+
+            var first = FindEventContaining(events, "spring-boot-web-server");
+            Assert.IsNotNull(first);
+            StringAssert.Contains("4.1.0-SNAPSHOT", first.RenderedMessage);
+            StringAssert.Contains("Skipped Due to Pre-release Version", first.RenderedMessage);
+
+            var second = FindEventContaining(events, "another-pkg");
+            Assert.IsNotNull(second);
+            StringAssert.Contains("2.0.0-beta", second.RenderedMessage);
+        }
+
+        [Test]
+        public void DisplaySkippedPreReleasePackagesLogger_WithNullOrEmpty_DoesNotLog()
+        {
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "DisplaySkippedPreReleasePackagesLogger",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "DisplaySkippedPreReleasePackagesLogger method not found via reflection.");
+
+            // Act - null
+            method.Invoke(null, new object[] { null });
+
+            // Act - empty
+            method.Invoke(null, new object[] { new List<ComponentsToArtifactory>() });
+
+            // Assert - no info events mentioning the skip message
+            var events = _memoryAppender.GetEvents();
+            var infoEvents = System.Array.FindAll(
+                events,
+                e => e.Level == Level.Info &&
+                     e.RenderedMessage.Contains("Skipped Due to Pre-release Version"));
+            Assert.AreEqual(0, infoEvents.Length);
         }
 
         private static LoggingEvent FindEventContaining(LoggingEvent[] events, string text)

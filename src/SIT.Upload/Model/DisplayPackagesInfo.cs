@@ -51,6 +51,14 @@ namespace SIT.Upload.Model
         public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesCargo { get; set; }
         public List<ComponentsToArtifactory> SuccessfullPackagesChoco { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesNpm { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesNuget { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesConan { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesPython { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesDebian { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesMaven { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesCargo { get; set; }
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesChoco { get; set; }
 
         #endregion
     }

@@ -17,6 +17,7 @@
 - [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
     - [Overview](#overview)
     - [**Prerequisite for Continuous Clearing Tool execution**](#prerequisite-for-continuous-clearing-tool-execution)
+  - [CCT Package URL (PURL) Format by Package Manager](#cct-package-url-purl-format-by-package-manager)
   - [SPDX v2.3 Support](#spdx-v23-support)
     - [File Naming Convention](#file-naming-convention)
   - [SPDX SBOM Signature Validator](#spdx-sbom-signature-validator)
@@ -309,11 +310,27 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - SIT.Scan via the input directory parameter. The remaining process is same as other project types.
 
   * **Project Type :** **Choco (Chocolatey)**
-    
+
     * Input file repository should contain **choco.config** file.
-    
+
     * Manual license clearing in SW360 is required for Choco packages.
-  
+
+## CCT Package URL (PURL) Format by Package Manager
+
+The Continuous Clearing Tool identifies components using [Package URL (PURL)](https://github.com/package-url/purl-spec) strings. The expected PURL format and an example for each supported package manager are listed below.
+
+| Package Manager    | PURL Format                                                    | Example                                                             |
+| ------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| NPM                | `pkg:npm/package-name@version`                                 | `pkg:npm/%40angular/animations@12.3.1`                              |
+| Maven              | `pkg:maven/group-id/package-name@version`                      | `pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1`                 |
+| NuGet              | `pkg:nuget/package-name@version`                               | `pkg:nuget/EnterpriseLibrary.Common@6.0.1304`                       |
+| Debian             | `pkg:deb/distribution/package-name@version?arch=architecture`  | `pkg:deb/debian/base-files@13.8%2Bdeb13u6%2Bdhi0?arch=source`       |
+| Python (PyPI)      | `pkg:pypi/package-name@version`                                | `pkg:pypi/django@1.11.1`                                            |
+| Conan              | `pkg:conan/package-name@version`                               | `pkg:conan/libcurl@8.15.0`                                          |
+| Alpine             | `pkg:apk/distribution/package-name@version?arch=architecture`  | `pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source`                    |
+| Cargo (Rust)       | `pkg:cargo/package-name@version`                               | `pkg:cargo/addr2line@0.24.2`                                        |
+| Choco              | `pkg:nuget/package-name@version`                               | `pkg:nuget/7zip@23.01`                                              |
+
 ## SPDX v2.3 Support
 
 The SIT.Scan supports importing both supported and unsupported SPDX SBoMs and processes them correctly for inclusion in workflows.

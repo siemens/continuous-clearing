@@ -41,6 +41,123 @@ namespace SIT.Upload.UTest
             // Assert
             Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
         }
+
+        [Test]
+        public async Task UploadingThePackages_SkipsInternalPrerelease_Nuget_IncrementsKpiAndAddsToSkippedList()
+        {
+            // Arrange
+            var internalItem = new ComponentsToArtifactory
+            {
+                ComponentType = "NUGET",
+                Name = "test-nuget",
+                Version = "2.0.0-alpha",
+                Purl = "pkg:nuget/test-nuget@2.0.0-alpha",
+                SrcRepoName = "nuget-src-repo",
+                DestRepoName = "nuget-dest-repo",
+                PackageType = PackageType.Internal,
+                Token = "token"
+            };
+
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.SkippedPreReleasePackagesNuget = new List<ComponentsToArtifactory>();
+
+            // reset KPI counters
+            PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog = 0;
+            PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog = 0;
+
+            var components = new List<ComponentsToArtifactory> { internalItem };
+
+            // Act
+            await PackageUploadHelper.UploadingThePackages(components, 30, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog, "InternalPackagesNotUploadedToJfrog should be incremented for NuGet");
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog, "PackagesNotUploadedToJfrog should be incremented for NuGet");
+            Assert.IsNull(internalItem.DestRepoName, "DestRepoName should be null after skipping NuGet");
+            Assert.AreEqual(1, displayPackagesInfo.SkippedPreReleasePackagesNuget.Count, "Skipped internal NuGet package should be added to SkippedPreReleasePackagesNuget");
+            var added = displayPackagesInfo.SkippedPreReleasePackagesNuget[0];
+            Assert.AreEqual("skipped", added.OperationType);
+            Assert.IsNotNull(added.ResponseMessage);
+            Assert.AreEqual("SkippedPreRelease", added.ResponseMessage.ReasonPhrase);
+        }
+
+        [Test]
+        public async Task UploadingThePackages_SkipsInternalPrerelease_Maven_IncrementsKpiAndAddsToSkippedList()
+        {
+            // Arrange
+            var internalItem = new ComponentsToArtifactory
+            {
+                ComponentType = "MAVEN",
+                Name = "test-maven",
+                Version = "3.0.0-beta",
+                Purl = "pkg:maven/test-maven@3.0.0-beta",
+                SrcRepoName = "maven-src-repo",
+                DestRepoName = "maven-dest-repo",
+                PackageType = PackageType.Internal,
+                Token = "token"
+            };
+
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.SkippedPreReleasePackagesMaven = new List<ComponentsToArtifactory>();
+
+            // reset KPI counters
+            PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog = 0;
+            PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog = 0;
+
+            var components = new List<ComponentsToArtifactory> { internalItem };
+
+            // Act
+            await PackageUploadHelper.UploadingThePackages(components, 30, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog, "InternalPackagesNotUploadedToJfrog should be incremented for Maven");
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog, "PackagesNotUploadedToJfrog should be incremented for Maven");
+            Assert.IsNull(internalItem.DestRepoName, "DestRepoName should be null after skipping Maven");
+            Assert.AreEqual(1, displayPackagesInfo.SkippedPreReleasePackagesMaven.Count, "Skipped internal Maven package should be added to SkippedPreReleasePackagesMaven");
+            var added = displayPackagesInfo.SkippedPreReleasePackagesMaven[0];
+            Assert.AreEqual("skipped", added.OperationType);
+            Assert.IsNotNull(added.ResponseMessage);
+            Assert.AreEqual("SkippedPreRelease", added.ResponseMessage.ReasonPhrase);
+        }
+
+        [Test]
+        public async Task UploadingThePackages_SkipsInternalPrerelease_IncrementsKpiAndAddsToSkippedList()
+        {
+            // Arrange
+            var internalItem = new ComponentsToArtifactory
+            {
+                ComponentType = "NPM",
+                Name = "test-package",
+                Version = "1.0.0-alpha",
+                Purl = "pkg:npm/test-package@1.0.0-alpha",
+                SrcRepoName = "some-src-repo",
+                DestRepoName = "some-dest-repo",
+                PackageType = PackageType.Internal,
+                Token = "token"
+            };
+
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.SkippedPreReleasePackagesNpm = new List<ComponentsToArtifactory>();
+
+            // reset KPI counters
+            PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog = 0;
+            PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog = 0;
+
+            var components = new List<ComponentsToArtifactory> { internalItem };
+
+            // Act
+            await PackageUploadHelper.UploadingThePackages(components, 30, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog, "InternalPackagesNotUploadedToJfrog should be incremented");
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog, "PackagesNotUploadedToJfrog should be incremented");
+            Assert.IsNull(internalItem.DestRepoName, "DestRepoName should be null after skipping");
+            Assert.AreEqual(1, displayPackagesInfo.SkippedPreReleasePackagesNpm.Count, "Skipped internal package should be added to SkippedPreReleasePackagesNpm");
+            var added = displayPackagesInfo.SkippedPreReleasePackagesNpm[0];
+            Assert.AreEqual("skipped", added.OperationType);
+            Assert.IsNotNull(added.ResponseMessage);
+            Assert.AreEqual("SkippedPreRelease", added.ResponseMessage.ReasonPhrase);
+        }
         [Test]
         [TestCase("NPM", ".tgz")]
         [TestCase("NUGET", ".nupkg")]

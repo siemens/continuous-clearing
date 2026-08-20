@@ -761,7 +761,7 @@ namespace SIT.Common
         /// <returns>The complete SW360 release URL.</returns>
         public static string Sw360URL(string sw360Env, string releaseId)
         {
-            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/release/detailRelease/"}{releaseId}";
+            string sw360URL = $"{sw360Env}{"/components/releases/detail/"}{releaseId}";
             return sw360URL;
         }
 
@@ -773,7 +773,7 @@ namespace SIT.Common
         /// <returns>The complete SW360 component URL.</returns>
         public static string Sw360ComponentURL(string sw360Env, string componentId)
         {
-            string sw360URL = $"{sw360Env}{"/group/guest/components/-/component/detail/"}{componentId}";
+            string sw360URL = $"{sw360Env}{"/components/detail/"}{componentId}";
             return sw360URL;
         }
 

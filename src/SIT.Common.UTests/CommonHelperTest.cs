@@ -1547,7 +1547,7 @@ namespace SIT.Common.UTest
             var env = "https://stage.sw360.siemens.com/";
             var id = "R1";
             var result = CommonHelper.Sw360URL(env, id);
-            StringAssert.Contains("//group/guest/components", result);
+            StringAssert.Contains("//components/releases/detail/", result);
         }
 
         [Test]
@@ -1556,7 +1556,7 @@ namespace SIT.Common.UTest
             var env = "https://stage.sw360.siemens.com/";
             var id = "C1";
             var result = CommonHelper.Sw360ComponentURL(env, id);
-            StringAssert.Contains("//group/guest/components", result);
+            StringAssert.Contains("//components/detail/", result);
         }
         #region SetComponentPropertiesAndHashes Tests
 

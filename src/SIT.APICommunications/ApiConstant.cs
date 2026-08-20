@@ -44,7 +44,7 @@ namespace SIT.APICommunications
         /// <summary>
         /// The API suffix for SW360 project URL endpoints.
         /// </summary>
-        public const string Sw360ProjectUrlApiSuffix = "/group/guest/projects/-/project/detail/";
+        public const string Sw360ProjectUrlApiSuffix = "/projects/detail/";
 
         /// <summary>
         /// The API suffix for SW360 release URL endpoints.
