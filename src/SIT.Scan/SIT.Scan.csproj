@@ -33,7 +33,7 @@
 		<!--<PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.10.0" />-->
 		<PackageReference Include="System.Text.Json" Version="10.0.0" />
 		<PackageReference Include="Microsoft.ComponentDetection.Detectors" Version="5.2.15" />
-		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
+		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" ExcludeAssets="runtime" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
 	</ItemGroup>
 
