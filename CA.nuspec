@@ -210,7 +210,6 @@
     <file src="out\net10.0\runtimes\unix\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll" target="tools\runtimes\unix\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll"/>
     <file src="out\net10.0\runtimes\unix\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\unix\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll" target="tools\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\net8.0\Microsoft.Win32.SystemEvents.dll" target="tools\runtimes\win\lib\net8.0\Microsoft.Win32.SystemEvents.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\Microsoft.Win32.SystemEvents.dll" target="tools\runtimes\win\lib\net10.0\Microsoft.Win32.SystemEvents.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.dll" target="tools\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.Messages.dll" target="tools\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.Messages.dll"/>
