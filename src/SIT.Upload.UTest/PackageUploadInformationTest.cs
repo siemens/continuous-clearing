@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -39,6 +39,21 @@ namespace SIT.Upload.UTest
         public void TearDown()
         {
             _memoryAppender?.Close();
+        }
+
+        private static object CreatePackageDisplayLists(
+            List<ComponentsToArtifactory> unknown,
+            List<ComponentsToArtifactory> jfrogFound,
+            List<ComponentsToArtifactory> jfrogNotFound,
+            List<ComponentsToArtifactory> successful,
+            List<ComponentsToArtifactory> optionalDevDep,
+            List<ComponentsToArtifactory> skippedPreRelease)
+        {
+            var type = typeof(PackageUploadInformation).GetNestedType(
+                "PackageDisplayLists",
+                System.Reflection.BindingFlags.NonPublic);
+            Assert.IsNotNull(type, "PackageDisplayLists nested type not found via reflection.");
+            return System.Activator.CreateInstance(type, unknown, jfrogFound, jfrogNotFound, successful, optionalDevDep, skippedPreRelease);
         }
 
         [Test]
@@ -124,6 +139,64 @@ namespace SIT.Upload.UTest
             StringAssert.Contains("Artifactory uploader exited with warning, due to 7 packages not actioned due to error.", warnEvent.RenderedMessage);
             StringAssert.Contains("For more detailed packages information, check the above tables.", warnEvent.RenderedMessage);
             StringAssert.Contains("Setting ExitCode to 2", debugEvent.RenderedMessage);
+        }
+
+        [Test]
+        public void SetExitCode_OnlyOptionalDevDepsNotInRepo_DoesNotExit()
+        {
+            // Arrange: 3 packages missing in repo but all 3 are npm optional devDeps
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 3,
+                PackagesNotUploadedDueToError = 0
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>
+                {
+                    new ComponentsToArtifactory { Name = "a", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "b", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "c", Version = "1.0.0", IsOptionalDevDependency = true }
+                }
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, displayPackagesInfo);
+
+            // Assert: no warn/debug logs, meaning early-return path was taken
+            var events = _memoryAppender.GetEvents();
+            Assert.That(FindEventByLevel(events, Level.Warn), Is.Null, "Should not warn when only optional devDeps are missing.");
+            Assert.That(FindEventByLevel(events, Level.Debug), Is.Null, "Should not set exit code when only optional devDeps are missing.");
+        }
+
+        [Test]
+        public void SetExitCode_MixedNotInRepo_ExcludesOptionalDevDepsFromCount()
+        {
+            // Arrange: 5 missing total, 2 are optional devDeps -> effective 3 for exit trigger
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 5,
+                PackagesNotUploadedDueToError = 0
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>
+                {
+                    new ComponentsToArtifactory { Name = "a", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "b", Version = "1.0.0", IsOptionalDevDependency = true }
+                }
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, displayPackagesInfo);
+
+            // Assert
+            var events = _memoryAppender.GetEvents();
+            var warnEvent = FindEventByLevel(events, Level.Warn);
+            Assert.NotNull(warnEvent);
+            StringAssert.Contains("3 packages not found in repository", warnEvent.RenderedMessage);
         }
 
         [Test]
@@ -856,10 +929,7 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                unknownPackages,
-                jfrogNotFoundPackages,
-                successfulPackages,
-                jfrogFoundPackages,
+                CreatePackageDisplayLists(unknownPackages, jfrogFoundPackages, jfrogNotFoundPackages, successfulPackages, null, null),
                 "TestPackageType",
                 filepath
             });
@@ -886,10 +956,7 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                emptyList,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, null, null),
                 "EmptyPackageType",
                 filepath
             });
@@ -933,10 +1000,7 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                emptyList,
-                jfrogFoundPackages,
+                CreatePackageDisplayLists(emptyList, jfrogFoundPackages, emptyList, emptyList, null, null),
                 "npm",
                 filepath
             });
@@ -967,10 +1031,7 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                jfrogNotFoundPackages,
-                emptyList,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, jfrogNotFoundPackages, emptyList, null, null),
                 "NuGet",
                 filepath
             });
@@ -1001,10 +1062,7 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                emptyList,
-                emptyList,
-                successfulPackages,
-                emptyList,
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, successfulPackages, null, null),
                 "Maven",
                 filepath
             });
@@ -1064,10 +1122,7 @@ namespace SIT.Upload.UTest
             // Act
             method.Invoke(null, new object[]
             {
-                unknownPackages,
-                jfrogNotFoundPackages,
-                successfulPackages,
-                jfrogFoundPackages,
+                CreatePackageDisplayLists(unknownPackages, jfrogFoundPackages, jfrogNotFoundPackages, successfulPackages, null, null),
                 "Python",
                 filepath
             });
@@ -1083,6 +1138,348 @@ namespace SIT.Upload.UTest
             // Verify warning event for not found packages
             var warnEvent = FindEventByLevel(events, Level.Warn);
             Assert.IsNotNull(warnEvent, "Expected warning for not found packages");
+        }
+
+        [Test]
+        public void GetComponentsToBePackages_InitializesJfrogNotFoundOptionalDevDepsNpm()
+        {
+            // Act
+            var info = PackageUploadInformation.GetComponentsToBePackages();
+
+            // Assert
+            Assert.IsNotNull(info.JfrogNotFoundOptionalDevDepsNpm,
+                "JfrogNotFoundOptionalDevDepsNpm list must be initialized.");
+            Assert.AreEqual(0, info.JfrogNotFoundOptionalDevDepsNpm.Count);
+        }
+
+        [Test]
+        public void SetExitCode_NullDisplayPackagesInfo_UsesRawNotInRepoCount()
+        {
+            // Arrange: 2 not-in-repo, no display info -> should still exit with 2 packages message
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 2,
+                PackagesNotUploadedDueToError = 0
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, null);
+
+            // Assert
+            var events = _memoryAppender.GetEvents();
+            var warnEvent = FindEventByLevel(events, Level.Warn);
+            Assert.NotNull(warnEvent);
+            StringAssert.Contains("2 packages not found in repository", warnEvent.RenderedMessage);
+        }
+
+        [Test]
+        public void SetExitCode_OptionalDevDepsExceedNotInRepo_ClampsToZeroAndDoesNotExit()
+        {
+            // Arrange: optionalDev count > raw count; clamp to 0
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 1,
+                PackagesNotUploadedDueToError = 0
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>
+                {
+                    new ComponentsToArtifactory { Name = "a", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "b", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "c", Version = "1.0.0", IsOptionalDevDependency = true }
+                }
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, displayPackagesInfo);
+
+            // Assert: no logs indicating exit
+            var events = _memoryAppender.GetEvents();
+            Assert.IsNull(FindEventByLevel(events, Level.Warn));
+            Assert.IsNull(FindEventByLevel(events, Level.Debug));
+        }
+
+        [Test]
+        public void SetExitCode_MixedNotInRepoPlusErrors_LogsCombinedMessage()
+        {
+            // Arrange: 4 missing (2 optional-dev) + 3 errors -> "2 packages not found in repository" + errors
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 4,
+                PackagesNotUploadedDueToError = 3
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>
+                {
+                    new ComponentsToArtifactory { Name = "a", Version = "1.0.0", IsOptionalDevDependency = true },
+                    new ComponentsToArtifactory { Name = "b", Version = "1.0.0", IsOptionalDevDependency = true }
+                }
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, displayPackagesInfo);
+
+            // Assert
+            var events = _memoryAppender.GetEvents();
+            var warnEvent = FindEventByLevel(events, Level.Warn);
+            Assert.NotNull(warnEvent);
+            StringAssert.Contains("2 packages not found in repository", warnEvent.RenderedMessage);
+            StringAssert.Contains("3 packages not actioned due to error", warnEvent.RenderedMessage);
+        }
+
+        [Test]
+        public void SetExitCode_NullOptionalDevDepsList_TreatsAsZero()
+        {
+            // Arrange
+            var kpi = new UploaderKpiData
+            {
+                PackagesNotExistingInRemoteCache = 2,
+                PackagesNotUploadedDueToError = 0
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundOptionalDevDepsNpm = null
+            };
+            EnvironmentHelper environmentHelper = new();
+
+            // Act
+            PackageUploadInformation.SetExitCode(kpi, environmentHelper, displayPackagesInfo);
+
+            // Assert
+            var warnEvent = FindEventByLevel(_memoryAppender.GetEvents(), Level.Warn);
+            Assert.NotNull(warnEvent);
+            StringAssert.Contains("2 packages not found in repository", warnEvent.RenderedMessage);
+        }
+
+        [Test]
+        public void DisplayOptionalDevDepPackages_WithPackages_LogsWarnPerPackage()
+        {
+            // Arrange
+            var optionalDevDep = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "@esbuild/aix-ppc64", Version = "0.28.0", IsOptionalDevDependency = true },
+                new ComponentsToArtifactory { Name = "@esbuild/win32-ia32", Version = "0.27.7", IsOptionalDevDependency = true }
+            };
+            var emptyList = new List<ComponentsToArtifactory>();
+            var filepath = Path.GetTempPath();
+
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "DisplayWithLogger",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "DisplayWithLogger method not found via reflection.");
+
+            // Act
+            method.Invoke(null, new object[]
+            {
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, optionalDevDep, null),
+                "npm",
+                filepath
+            });
+
+            // Assert
+            var events = _memoryAppender.GetEvents();
+            var warnEvents = System.Array.FindAll(events, e => e.Level == Level.Warn);
+            Assert.GreaterOrEqual(warnEvents.Length, 2, "Expected one warn per optional devDependency package.");
+
+            var first = FindEventContaining(events, "@esbuild/aix-ppc64");
+            Assert.IsNotNull(first);
+            StringAssert.Contains("0.28.0", first.RenderedMessage);
+            StringAssert.Contains("is an optional devDependency and not found in jfrog", first.RenderedMessage);
+
+            var second = FindEventContaining(events, "@esbuild/win32-ia32");
+            Assert.IsNotNull(second);
+            StringAssert.Contains("0.27.7", second.RenderedMessage);
+        }
+
+        [Test]
+        public void DisplayOptionalDevDepPackages_WithNullOrEmpty_DoesNotLog()
+        {
+            // Arrange
+            var emptyList = new List<ComponentsToArtifactory>();
+            var filepath = Path.GetTempPath();
+
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "DisplayWithLogger",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act - null optional list
+            method.Invoke(null, new object[]
+            {
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, null, null),
+                "npm",
+                filepath
+            });
+
+            // Act - empty optional list
+            method.Invoke(null, new object[]
+            {
+                CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, new List<ComponentsToArtifactory>(), null),
+                "npm",
+                filepath
+            });
+
+            // Assert - no warn events emitted for optional devDep block
+            var events = _memoryAppender.GetEvents();
+            var warnEvents = System.Array.FindAll(
+                events,
+                e => e.Level == Level.Warn &&
+                     e.RenderedMessage.Contains("is an optional devDependency and not found in jfrog"));
+            Assert.AreEqual(0, warnEvents.Length);
+        }
+
+        [Test]
+        public void AppendOptionalDevDependencyPackages_WithPackages_AppendsColorizedLines()
+        {
+            // Arrange
+            var content = new System.Text.StringBuilder();
+            var packages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "@esbuild/aix-ppc64", Version = "0.28.0" }
+            };
+
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "AppendOptionalDevDependencyPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "AppendOptionalDevDependencyPackages method not found via reflection.");
+
+            // Act
+            method.Invoke(null, new object[] { content, packages });
+
+            // Assert
+            var text = content.ToString();
+            StringAssert.Contains("[white]@esbuild/aix-ppc64[/]", text);
+            StringAssert.Contains("[cyan]0.28.0[/]", text);
+            StringAssert.Contains("[yellow]is an optional devDependency and not found in jfrog[/]", text);
+        }
+
+        [Test]
+        public void AppendOptionalDevDependencyPackages_WithNullOrEmpty_AppendsNothing()
+        {
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "AppendOptionalDevDependencyPackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // null
+            var contentNull = new System.Text.StringBuilder();
+            method.Invoke(null, new object[] { contentNull, null });
+            Assert.AreEqual(string.Empty, contentNull.ToString());
+
+            // empty
+            var contentEmpty = new System.Text.StringBuilder();
+            method.Invoke(null, new object[] { contentEmpty, new List<ComponentsToArtifactory>() });
+            Assert.AreEqual(string.Empty, contentEmpty.ToString());
+        }
+
+        [Test]
+        public void AppendSkippedPreReleasePackages_WithPackages_AppendsColorizedLines()
+        {
+            // Arrange
+            var content = new System.Text.StringBuilder();
+            var packages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "spring-boot-web-server", Version = "4.1.0-SNAPSHOT" },
+                new ComponentsToArtifactory { Name = "another-pkg", Version = "2.0.0-beta" }
+            };
+
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "AppendSkippedPreReleasePackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "AppendSkippedPreReleasePackages method not found via reflection.");
+
+            // Act
+            method.Invoke(null, new object[] { content, packages });
+
+            // Assert
+            var text = content.ToString();
+            StringAssert.Contains("[white]spring-boot-web-server[/]", text);
+            StringAssert.Contains("[cyan]4.1.0-SNAPSHOT[/]", text);
+            StringAssert.Contains("[yellow]Skipped Due to Pre-release Version[/]", text);
+            StringAssert.Contains("[white]another-pkg[/]", text);
+            StringAssert.Contains("[cyan]2.0.0-beta[/]", text);
+            StringAssert.Contains("✓", text);
+        }
+
+        [Test]
+        public void AppendSkippedPreReleasePackages_WithNullOrEmpty_AppendsNothing()
+        {
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "AppendSkippedPreReleasePackages",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "AppendSkippedPreReleasePackages method not found via reflection.");
+
+            // null
+            var contentNull = new System.Text.StringBuilder();
+            method.Invoke(null, new object[] { contentNull, null });
+            Assert.AreEqual(string.Empty, contentNull.ToString());
+
+            // empty
+            var contentEmpty = new System.Text.StringBuilder();
+            method.Invoke(null, new object[] { contentEmpty, new List<ComponentsToArtifactory>() });
+            Assert.AreEqual(string.Empty, contentEmpty.ToString());
+        }
+
+        [Test]
+        public void DisplaySkippedPreReleasePackagesLogger_WithPackages_LogsInfoPerPackage()
+        {
+            // Arrange
+            var packages = new List<ComponentsToArtifactory>
+            {
+                new ComponentsToArtifactory { Name = "spring-boot-web-server", Version = "4.1.0-SNAPSHOT" },
+                new ComponentsToArtifactory { Name = "another-pkg", Version = "2.0.0-beta" }
+            };
+
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "DisplaySkippedPreReleasePackagesLogger",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "DisplaySkippedPreReleasePackagesLogger method not found via reflection.");
+
+            // Act
+            method.Invoke(null, new object[] { packages });
+
+            // Assert
+            var events = _memoryAppender.GetEvents();
+            var infoEvents = System.Array.FindAll(
+                events,
+                e => e.Level == Level.Info &&
+                     e.RenderedMessage.Contains("Skipped Due to Pre-release Version"));
+            Assert.GreaterOrEqual(infoEvents.Length, 2, "Expected one info log per skipped pre-release package.");
+
+            var first = FindEventContaining(events, "spring-boot-web-server");
+            Assert.IsNotNull(first);
+            StringAssert.Contains("4.1.0-SNAPSHOT", first.RenderedMessage);
+            StringAssert.Contains("Skipped Due to Pre-release Version", first.RenderedMessage);
+
+            var second = FindEventContaining(events, "another-pkg");
+            Assert.IsNotNull(second);
+            StringAssert.Contains("2.0.0-beta", second.RenderedMessage);
+        }
+
+        [Test]
+        public void DisplaySkippedPreReleasePackagesLogger_WithNullOrEmpty_DoesNotLog()
+        {
+            var method = typeof(PackageUploadInformation).GetMethod(
+                "DisplaySkippedPreReleasePackagesLogger",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "DisplaySkippedPreReleasePackagesLogger method not found via reflection.");
+
+            // Act - null
+            method.Invoke(null, new object[] { null });
+
+            // Act - empty
+            method.Invoke(null, new object[] { new List<ComponentsToArtifactory>() });
+
+            // Assert - no info events mentioning the skip message
+            var events = _memoryAppender.GetEvents();
+            var infoEvents = System.Array.FindAll(
+                events,
+                e => e.Level == Level.Info &&
+                     e.RenderedMessage.Contains("Skipped Due to Pre-release Version"));
+            Assert.AreEqual(0, infoEvents.Length);
         }
 
         private static LoggingEvent FindEventContaining(LoggingEvent[] events, string text)

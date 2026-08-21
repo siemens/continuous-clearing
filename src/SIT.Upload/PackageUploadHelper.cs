@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
@@ -133,6 +133,7 @@ namespace SIT.Upload
                 Path = item.Path,
                 PackageType = item.PackageType,
                 Purl = item.Purl,
+                IsOptionalDevDependency = item.IsOptionalDevDependency,
 
             };
             return Task.FromResult(components);
@@ -168,6 +169,19 @@ namespace SIT.Upload
         }
 
         /// <summary>
+        /// Adds a component that was skipped because it is a pre-release version to the dedicated
+        /// per-component-type skipped display list.
+        /// </summary>
+        /// <param name="item">The component that was skipped.</param>
+        /// <param name="displayPackagesInfo">The display information for packages.</param>
+        public static async Task SkippedPreReleasePackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo)
+        {
+            var responseMessage = new HttpResponseMessage(HttpStatusCode.OK) { ReasonPhrase = "SkippedPreRelease" };
+            ComponentsToArtifactory component = await GetPackageinfo(item, "skipped", responseMessage, null);
+            AddComponentToDisplayList(item.ComponentType, component, displayPackagesInfo, skipped: true);
+        }
+
+        /// <summary>
         /// Asynchronously processes successfully uploaded packages.
         /// </summary>
         /// <param name="item">The component to process.</param>
@@ -187,7 +201,7 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddComponentToDisplayList(string componentType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound = false, bool success = false)
+        private static void AddComponentToDisplayList(string componentType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound = false, bool success = false, bool skipped = false)
         {
             if (string.IsNullOrWhiteSpace(componentType))
                 return;
@@ -195,28 +209,28 @@ namespace SIT.Upload
             switch (componentType.ToUpperInvariant())
             {
                 case "NPM":
-                    AddToNpmList(component, displayPackagesInfo, notFound, success);
+                    AddToNpmList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
                 case "NUGET":
-                    AddToNugetList(component, displayPackagesInfo, notFound, success);
+                    AddToNugetList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
                 case "CHOCO":
-                    AddToChocoList(component, displayPackagesInfo, notFound, success);
+                    AddToChocoList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
                 case "MAVEN":
-                    AddToMavenList(component, displayPackagesInfo, notFound, success);
+                    AddToMavenList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
                 case "POETRY":
-                    AddToPoetryList(component, displayPackagesInfo, notFound, success);
+                    AddToPoetryList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
                 case "CONAN":
-                    AddToConanList(component, displayPackagesInfo, notFound, success);
+                    AddToConanList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
                 case "DEBIAN":
-                    AddToDebianList(component, displayPackagesInfo, notFound, success);
+                    AddToDebianList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
                 case "CARGO":
-                    AddToCargoList(component, displayPackagesInfo, notFound, success);
+                    AddToCargoList(component, displayPackagesInfo, notFound, success, skipped);
                     break;
             }
         }
@@ -228,10 +242,17 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddToNpmList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToNpmList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
-                displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesNpm ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
+            {
+                if (component.IsOptionalDevDependency)
+                    displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm.Add(component);
+                else
+                    displayPackagesInfo.JfrogNotFoundPackagesNpm.Add(component);
+            }
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesNpm.Add(component);
             else
@@ -245,9 +266,11 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddToNugetList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToNugetList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesNuget ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
                 displayPackagesInfo.JfrogNotFoundPackagesNuget.Add(component);
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesNuget.Add(component);
@@ -262,9 +285,11 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddToMavenList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToMavenList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesMaven ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
                 displayPackagesInfo.JfrogNotFoundPackagesMaven.Add(component);
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesMaven.Add(component);
@@ -279,9 +304,11 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddToPoetryList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToPoetryList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesPython ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
                 displayPackagesInfo.JfrogNotFoundPackagesPython.Add(component);
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesPython.Add(component);
@@ -296,9 +323,11 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddToConanList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToConanList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesConan ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
                 displayPackagesInfo.JfrogNotFoundPackagesConan.Add(component);
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesConan.Add(component);
@@ -313,9 +342,11 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddToDebianList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToDebianList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesDebian ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
                 displayPackagesInfo.JfrogNotFoundPackagesDebian.Add(component);
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesDebian.Add(component);
@@ -330,9 +361,11 @@ namespace SIT.Upload
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <param name="notFound">Whether the package was not found.</param>
         /// <param name="success">Whether the package was successfully processed.</param>
-        private static void AddToCargoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToCargoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesCargo ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
                 displayPackagesInfo.JfrogNotFoundPackagesCargo.Add(component);
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesCargo.Add(component);
@@ -348,9 +381,11 @@ namespace SIT.Upload
         /// <param name="timeout">The timeout value in seconds.</param>
         /// <param name="displayPackagesInfo">The display information for packages.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private static void AddToChocoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success)
+        private static void AddToChocoList(ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo, bool notFound, bool success, bool skipped = false)
         {
-            if (notFound)
+            if (skipped)
+                (displayPackagesInfo.SkippedPreReleasePackagesChoco ??= new List<ComponentsToArtifactory>()).Add(component);
+            else if (notFound)
                 displayPackagesInfo.JfrogNotFoundPackagesChoco.Add(component);
             else if (success)
                 displayPackagesInfo.SuccessfullPackagesChoco.Add(component);
@@ -398,7 +433,23 @@ namespace SIT.Upload
                 if (!(item.SrcRepoName.Contains("Not Found in JFrog")))
                 {
                     Logger.DebugFormat("PackageUploadToArtifactory():{0} and {1}  contains Source repository:{2} and Destination Repository:{3} ,So now started upload package process .", item.Name, item.Version, item.SrcRepoName, item.DestRepoName);
-                    await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
+
+                    // If this is an internal package and the version is a pre-release, skip copy/move
+                    if (item.PackageType == PackageType.Internal && !SIT.Common.RegexHelper.IsReleaseVersion(item.Version))
+                    {
+                        Logger.DebugFormat("PackageUploadToArtifactory(): Skipping internal prerelease component {0} {1}", item.Name, item.Version);
+                        // increment KPI counters for internal packages not uploaded
+                        uploaderKpiData.InternalPackagesNotUploadedToJfrog++;
+                        uploaderKpiData.PackagesNotUploadedToJfrog++;
+                        item.DestRepoName = null;
+
+                        // Add to skipped pre-release list so it appears in a dedicated display section
+                        await SkippedPreReleasePackagesAsync(item, displayPackagesInfo);
+                    }
+                    else
+                    {
+                        await SourceRepoFoundToUploadArtifactory(packageType, uploaderKpiData, item, timeout, displayPackagesInfo);
+                    }
                 }
                 else
                 {

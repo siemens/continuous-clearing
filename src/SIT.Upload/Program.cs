@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -47,7 +47,7 @@ namespace SIT.Upload
 
             SettingsManager settingsManager = new SettingsManager();
             // do not change the order of getting ca tool information
-            CatoolInfo caToolInformation = GetCatoolVersionFromProjectfile();
+            CatoolInfo caToolInformation = CommonHelper.GetCatoolVersionFromProjectFile();
             Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
             string logFileNameWithTimestamp = $"{FileConstant.SITUploadLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
@@ -94,22 +94,13 @@ namespace SIT.Upload
             if (appSettings.Telemetry.Enable)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, PackageUploader.uploaderKpiData, TelemetryConstant.UploadKpiData);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, PackageUploader.uploaderKpiData, TelemetryConstant.UploadAppData, TelemetryConstant.UploadKpiData, UploaderStopWatch?.Elapsed);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of SIT Upload execution : {DateTime.Now}\n", null);
             // publish logs and BOM file to pipeline artifact
 
             PipelineArtifactUploader.UploadArtifacts();
 
-        }
-
-        private static CatoolInfo GetCatoolVersionFromProjectfile()
-        {
-            CatoolInfo catoolInfo = new CatoolInfo();
-            var versionFromProj = Assembly.GetExecutingAssembly().GetName().Version;
-            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
-            catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            return catoolInfo;
         }
 
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)

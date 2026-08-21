@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -40,6 +40,123 @@ namespace SIT.Upload.UTest
             Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
             // Assert
             Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
+        }
+
+        [Test]
+        public async Task UploadingThePackages_SkipsInternalPrerelease_Nuget_IncrementsKpiAndAddsToSkippedList()
+        {
+            // Arrange
+            var internalItem = new ComponentsToArtifactory
+            {
+                ComponentType = "NUGET",
+                Name = "test-nuget",
+                Version = "2.0.0-alpha",
+                Purl = "pkg:nuget/test-nuget@2.0.0-alpha",
+                SrcRepoName = "nuget-src-repo",
+                DestRepoName = "nuget-dest-repo",
+                PackageType = PackageType.Internal,
+                Token = "token"
+            };
+
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.SkippedPreReleasePackagesNuget = new List<ComponentsToArtifactory>();
+
+            // reset KPI counters
+            PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog = 0;
+            PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog = 0;
+
+            var components = new List<ComponentsToArtifactory> { internalItem };
+
+            // Act
+            await PackageUploadHelper.UploadingThePackages(components, 30, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog, "InternalPackagesNotUploadedToJfrog should be incremented for NuGet");
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog, "PackagesNotUploadedToJfrog should be incremented for NuGet");
+            Assert.IsNull(internalItem.DestRepoName, "DestRepoName should be null after skipping NuGet");
+            Assert.AreEqual(1, displayPackagesInfo.SkippedPreReleasePackagesNuget.Count, "Skipped internal NuGet package should be added to SkippedPreReleasePackagesNuget");
+            var added = displayPackagesInfo.SkippedPreReleasePackagesNuget[0];
+            Assert.AreEqual("skipped", added.OperationType);
+            Assert.IsNotNull(added.ResponseMessage);
+            Assert.AreEqual("SkippedPreRelease", added.ResponseMessage.ReasonPhrase);
+        }
+
+        [Test]
+        public async Task UploadingThePackages_SkipsInternalPrerelease_Maven_IncrementsKpiAndAddsToSkippedList()
+        {
+            // Arrange
+            var internalItem = new ComponentsToArtifactory
+            {
+                ComponentType = "MAVEN",
+                Name = "test-maven",
+                Version = "3.0.0-beta",
+                Purl = "pkg:maven/test-maven@3.0.0-beta",
+                SrcRepoName = "maven-src-repo",
+                DestRepoName = "maven-dest-repo",
+                PackageType = PackageType.Internal,
+                Token = "token"
+            };
+
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.SkippedPreReleasePackagesMaven = new List<ComponentsToArtifactory>();
+
+            // reset KPI counters
+            PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog = 0;
+            PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog = 0;
+
+            var components = new List<ComponentsToArtifactory> { internalItem };
+
+            // Act
+            await PackageUploadHelper.UploadingThePackages(components, 30, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog, "InternalPackagesNotUploadedToJfrog should be incremented for Maven");
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog, "PackagesNotUploadedToJfrog should be incremented for Maven");
+            Assert.IsNull(internalItem.DestRepoName, "DestRepoName should be null after skipping Maven");
+            Assert.AreEqual(1, displayPackagesInfo.SkippedPreReleasePackagesMaven.Count, "Skipped internal Maven package should be added to SkippedPreReleasePackagesMaven");
+            var added = displayPackagesInfo.SkippedPreReleasePackagesMaven[0];
+            Assert.AreEqual("skipped", added.OperationType);
+            Assert.IsNotNull(added.ResponseMessage);
+            Assert.AreEqual("SkippedPreRelease", added.ResponseMessage.ReasonPhrase);
+        }
+
+        [Test]
+        public async Task UploadingThePackages_SkipsInternalPrerelease_IncrementsKpiAndAddsToSkippedList()
+        {
+            // Arrange
+            var internalItem = new ComponentsToArtifactory
+            {
+                ComponentType = "NPM",
+                Name = "test-package",
+                Version = "1.0.0-alpha",
+                Purl = "pkg:npm/test-package@1.0.0-alpha",
+                SrcRepoName = "some-src-repo",
+                DestRepoName = "some-dest-repo",
+                PackageType = PackageType.Internal,
+                Token = "token"
+            };
+
+            var displayPackagesInfo = new DisplayPackagesInfo();
+            displayPackagesInfo.SkippedPreReleasePackagesNpm = new List<ComponentsToArtifactory>();
+
+            // reset KPI counters
+            PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog = 0;
+            PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog = 0;
+
+            var components = new List<ComponentsToArtifactory> { internalItem };
+
+            // Act
+            await PackageUploadHelper.UploadingThePackages(components, 30, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.InternalPackagesNotUploadedToJfrog, "InternalPackagesNotUploadedToJfrog should be incremented");
+            Assert.AreEqual(1, PackageUploader.uploaderKpiData.PackagesNotUploadedToJfrog, "PackagesNotUploadedToJfrog should be incremented");
+            Assert.IsNull(internalItem.DestRepoName, "DestRepoName should be null after skipping");
+            Assert.AreEqual(1, displayPackagesInfo.SkippedPreReleasePackagesNpm.Count, "Skipped internal package should be added to SkippedPreReleasePackagesNpm");
+            var added = displayPackagesInfo.SkippedPreReleasePackagesNpm[0];
+            Assert.AreEqual("skipped", added.OperationType);
+            Assert.IsNotNull(added.ResponseMessage);
+            Assert.AreEqual("SkippedPreRelease", added.ResponseMessage.ReasonPhrase);
         }
         [Test]
         [TestCase("NPM", ".tgz")]
@@ -726,6 +843,183 @@ namespace SIT.Upload.UTest
 
             // Act & Assert - Should not throw any exceptions
             Assert.DoesNotThrow(() => PackageUploadHelper.WriteUploadKpiDataToConsole(uploaderKpiData));
+        }
+
+        // ---------------------------------------------------------------------
+        // Coverage for optional devDependency npm routing (branch changes)
+        // ---------------------------------------------------------------------
+
+        [Test]
+        public async Task JfrogNotFoundPackagesAsync_NpmOptionalDevDependency_RoutesToOptionalDevDepsList()
+        {
+            // Arrange
+            var item = new ComponentsToArtifactory
+            {
+                ComponentType = "NPM",
+                Name = "@esbuild/aix-ppc64",
+                Version = "0.28.0",
+                IsOptionalDevDependency = true
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>()
+            };
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count,
+                "Optional devDependency npm items must not appear in the regular not-found npm list.");
+            Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm.Count);
+            Assert.IsTrue(displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm[0].IsOptionalDevDependency,
+                "IsOptionalDevDependency flag must be preserved.");
+            Assert.AreEqual("@esbuild/aix-ppc64", displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm[0].Name);
+        }
+
+        [Test]
+        public async Task JfrogNotFoundPackagesAsync_NpmNonOptionalDevDependency_RoutesToRegularNotFoundList()
+        {
+            // Arrange
+            var item = new ComponentsToArtifactory
+            {
+                ComponentType = "NPM",
+                Name = "left-pad",
+                Version = "1.3.0",
+                IsOptionalDevDependency = false
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundPackagesNpm = new List<ComponentsToArtifactory>(),
+                JfrogNotFoundOptionalDevDepsNpm = new List<ComponentsToArtifactory>()
+            };
+
+            // Act
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+
+            // Assert
+            Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNpm.Count);
+            Assert.AreEqual(0, displayPackagesInfo.JfrogNotFoundOptionalDevDepsNpm.Count);
+        }
+
+        [Test]
+        public void IsNpmOptionalDevDependencyNotFoundInJfrog_NpmWithBothProperties_ReturnsTrue()
+        {
+            var component = new CycloneDX.Models.Component
+            {
+                Properties = new List<CycloneDX.Models.Property>
+                {
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_OptionalDevDependency, Value = "true" },
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = Dataconstant.NotFoundInJFrog }
+                }
+            };
+
+            var method = typeof(UploadToArtifactory).GetMethod(
+                "IsNpmOptionalDevDependencyNotFoundInJfrog",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method);
+
+            var result = (bool)method.Invoke(null, new object[] { component, "NPM" });
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void IsNpmOptionalDevDependencyNotFoundInJfrog_NonNpmType_ReturnsFalse()
+        {
+            var component = new CycloneDX.Models.Component
+            {
+                Properties = new List<CycloneDX.Models.Property>
+                {
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_OptionalDevDependency, Value = "true" },
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = Dataconstant.NotFoundInJFrog }
+                }
+            };
+
+            var method = typeof(UploadToArtifactory).GetMethod(
+                "IsNpmOptionalDevDependencyNotFoundInJfrog",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (bool)method.Invoke(null, new object[] { component, "NUGET" });
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsNpmOptionalDevDependencyNotFoundInJfrog_NullProperties_ReturnsFalse()
+        {
+            var component = new CycloneDX.Models.Component { Properties = null };
+
+            var method = typeof(UploadToArtifactory).GetMethod(
+                "IsNpmOptionalDevDependencyNotFoundInJfrog",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (bool)method.Invoke(null, new object[] { component, "NPM" });
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsNpmOptionalDevDependencyNotFoundInJfrog_OptionalFalse_ReturnsFalse()
+        {
+            var component = new CycloneDX.Models.Component
+            {
+                Properties = new List<CycloneDX.Models.Property>
+                {
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_OptionalDevDependency, Value = "false" },
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = Dataconstant.NotFoundInJFrog }
+                }
+            };
+
+            var method = typeof(UploadToArtifactory).GetMethod(
+                "IsNpmOptionalDevDependencyNotFoundInJfrog",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (bool)method.Invoke(null, new object[] { component, "NPM" });
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsNpmOptionalDevDependencyNotFoundInJfrog_JfrogRepoFound_ReturnsFalse()
+        {
+            var component = new CycloneDX.Models.Component
+            {
+                Properties = new List<CycloneDX.Models.Property>
+                {
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_OptionalDevDependency, Value = "true" },
+                    new CycloneDX.Models.Property { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = "npm-remote-cache" }
+                }
+            };
+
+            var method = typeof(UploadToArtifactory).GetMethod(
+                "IsNpmOptionalDevDependencyNotFoundInJfrog",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (bool)method.Invoke(null, new object[] { component, "NPM" });
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public async Task GetSucessFulPackageinfo_PreservesIsOptionalDevDependencyFlag_ViaJfrogNotFoundPackagesAsync()
+        {
+            // GetSucessFulPackageinfo is private; validate its IsOptionalDevDependency copy
+            // through the public JfrogNotFoundPackagesAsync entry point (NUGET path avoids
+            // the npm optional-dev routing so the flag lands in the regular not-found list).
+            var item = new ComponentsToArtifactory
+            {
+                ComponentType = "NUGET",
+                Name = "some-pkg",
+                Version = "1.2.3",
+                IsOptionalDevDependency = true
+            };
+            var displayPackagesInfo = new DisplayPackagesInfo
+            {
+                JfrogNotFoundPackagesNuget = new List<ComponentsToArtifactory>()
+            };
+
+            await PackageUploadHelper.JfrogNotFoundPackagesAsync(item, displayPackagesInfo);
+
+            Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
+            Assert.IsTrue(displayPackagesInfo.JfrogNotFoundPackagesNuget[0].IsOptionalDevDependency,
+                "IsOptionalDevDependency must be copied by GetSucessFulPackageinfo.");
         }
     }
 }

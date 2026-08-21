@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ namespace SIT.Upload
             Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has completed");
 
             // set the error code
-            PackageUploadInformation.SetExitCode(uploaderKpiData, environmentHelper);
+            PackageUploadInformation.SetExitCode(uploaderKpiData, environmentHelper, displayPackagesInfo);
 
         }
 

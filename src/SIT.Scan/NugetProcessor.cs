@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -1355,9 +1355,7 @@ namespace SIT.Scan
         /// <returns></returns>
         private bool DetectDeploymentType(CommonAppSettings appSettings)
         {
-            //Regsister the runtime identifier
             _runtimeIdentifier.Register();
-
             runtimeInfo = new RuntimeInfo();
             runtimeInfo = _runtimeIdentifier.IdentifyRuntime(appSettings);
             return runtimeInfo.IsSelfContained;

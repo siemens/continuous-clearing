@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// SPDX-FileCopyrightText: 2025 Siemens AG
+// SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
@@ -42,6 +42,7 @@ namespace SIT.Scan
         private const string Dependencies = "dependencies";
         private const string Dev = "dev";
         private const string DevOptional = "devOptional";
+        private const string Optional = "optional";
         private const string Version = "version";
         private const string NotFoundInRepo = "Not Found in JFrogRepo";
         private const string Requires = "requires";
@@ -242,8 +243,16 @@ namespace SIT.Scan
         /// <param name="depencyComponentList">Enumerable of JProperty dependency entries.</param>
         private static void GetPackagesForBom(string filepath, ref List<BundledComponents> bundledComponents, ref List<Component> lstComponentForBOM, ref int noOfDevDependent, IEnumerable<JProperty> depencyComponentList)
         {
-            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += depencyComponentList.Count();
-            var property2 = depencyComponentList.ToList()[0];
+            List<JProperty> componentList = depencyComponentList?.ToList() ?? new List<JProperty>();
+            BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += componentList.Count;
+
+            if (componentList.Count == 0)
+            {
+                Logger.DebugFormat("GetPackagesForBom(): 'packages' section is empty or contains no JProperty entries in {0}; nothing to process.", filepath);
+                return;
+            }
+
+            var property2 = componentList[0];
             var parsedContent = JObject.Parse(Convert.ToString(property2.Value));
             List<JToken> dep = parsedContent["dependencies"]?.ToList() ?? new List<JToken>();
             List<JToken> devDep = parsedContent["devDependencies"]?.ToList() ?? new List<JToken>();
@@ -251,7 +260,7 @@ namespace SIT.Scan
             directDependencies.AddRange(dep);
             directDependencies.AddRange(devDep);
 
-            foreach (JProperty prop in depencyComponentList.Skip(1))
+            foreach (JProperty prop in componentList.Skip(1))
             {
                 Property isdev = new() { Name = Dataconstant.Cdx_IsDevelopment, Value = FalseString };
                 if (string.IsNullOrEmpty(prop.Name))
@@ -280,7 +289,7 @@ namespace SIT.Scan
                 components.Type = Component.Classification.Library;
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
-                components.Manufacturer.BomRef = BuildResolvedDependencies(prop.Value[Dependencies], depencyComponentList, prop.Name);
+                components.Manufacturer.BomRef = BuildResolvedDependencies(prop.Value[Dependencies], componentList, prop.Name);
                 components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
                 components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
 
@@ -290,6 +299,7 @@ namespace SIT.Scan
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
                 components.Properties.Add(siemensDirect);
+                AddOptionalDevDependencyProperty(components, prop.Value);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
@@ -479,6 +489,7 @@ namespace SIT.Scan
                 components.Properties = new List<Property>();
                 components.Properties.Add(isdev);
                 components.Properties.Add(siemensDirect);
+                AddOptionalDevDependencyProperty(components, prop.Value);
                 lstComponentForBOM.Add(components);
                 lstComponentForBOM = RemoveBundledComponentFromList(bundledComponents, lstComponentForBOM);
             }
@@ -817,6 +828,46 @@ namespace SIT.Scan
             }
 
             return devValue != null;
+        }
+
+        /// <summary>
+        /// Determines whether a package-lock.json node represents an optional dependency
+        /// that is also part of the dev tree, i.e. the node has both "dev": true and
+        /// "optional": true set.
+        /// </summary>
+        /// <param name="node">JToken representing the package/dependency node.</param>
+        /// <returns>True when both dev and optional flags are true; otherwise false.</returns>
+        private static bool IsOptionalDevDependency(JToken node)
+        {
+            if (node == null)
+            {
+                return false;
+            }
+
+            return node[Dev]?.Value<bool?>() == true
+                && node[Optional]?.Value<bool?>() == true;
+        }
+
+        /// <summary>
+        /// Adds the CycloneDX optional-dev-dependency property (value "true") to the component
+        /// when the given package-lock.json node has both "dev": true and "optional": true.
+        /// When the condition is not met, no property is added.
+        /// </summary>
+        /// <param name="component">Component whose Properties list will be updated.</param>
+        /// <param name="node">JToken representing the package/dependency node.</param>
+        private static void AddOptionalDevDependencyProperty(Component component, JToken node)
+        {
+            if (!IsOptionalDevDependency(node))
+            {
+                return;
+            }
+
+            component.Properties ??= new List<Property>();
+            component.Properties.Add(new Property
+            {
+                Name = Dataconstant.Cdx_OptionalDevDependency,
+                Value = "true"
+            });
         }
 
         /// <summary>

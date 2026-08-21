@@ -1,43 +1,57 @@
 # SPDX-FileCopyrightText: 2024 Siemens AG
 # SPDX-License-Identifier: MIT
- 
-# Get parent image as latest debian patch of bullseye
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim
+
+FROM debian:13-slim
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DOTNET_ROOT=/usr/share/dotnet
+ENV PATH="${PATH}:${DOTNET_ROOT}"
+# Signal to the app (and match the official .NET images) that we're running inside a container.
+# PipelineArtifactUploader uses this to skip ##vso[artifact.upload ...] commands, whose paths
+# would otherwise reference files that only exist inside the container and not on the pipeline agent.
+ENV DOTNET_RUNNING_IN_CONTAINER=true
 WORKDIR /app/out
- 
+# Install Microsoft package repository and the .NET 10 SDK.
+# The SDK is required (not just runtime) because NuGet scanning invokes MSBuildLocator/MSBuild
+
+RUN apt-get update && \
+   apt-get install -y --no-install-recommends \
+       wget \
+       ca-certificates \
+       gnupg \
+       apt-transport-https && \
+   wget https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb && \
+   dpkg -i packages-microsoft-prod.deb && \
+   rm packages-microsoft-prod.deb && \
+   apt-get update && \
+   apt-get install -y --no-install-recommends \
+       dotnet-sdk-10.0 && \
+   apt-get purge -y --auto-remove wget gnupg apt-transport-https && \
+   rm -rf /var/lib/apt/lists/*
 # Creating required directories
-RUN mkdir /opt/DebianImageClearing && \
-    mkdir /mnt/Input && \
-    mkdir /mnt/Output && \
-    mkdir /etc/CATool && \
-    mkdir /app/out/PatchedFiles
- 
-# Installing required packages
-# Installing syft:v0.90.0
-# Installing specific version of openjdk
+RUN mkdir -p \
+   /opt/DebianImageClearing \
+   /mnt/Input \
+   /mnt/Output \
+   /etc/CATool \
+   /app/out/PatchedFiles
+
+# Install required packages for CATool clearing flows.# 
 RUN apt-get update && \
-    apt-get -y install --no-install-recommends nodejs npm && \
-    apt-get -y install --no-install-recommends git && \
-    apt-get -y install --no-install-recommends maven && \
-    apt-get -y install --no-install-recommends curl && \
-    apt-get -y install --no-install-recommends dpkg-dev && \
-    dpkg -r --force-depends python3-minimal && \    
-    dpkg -r --force-depends libpython3.11-minimal:amd64 && \
-    dpkg -r --force-depends libpython3.11-stdlib:amd64 && \     
-    dpkg -r --force-depends python3.11 && \
-    dpkg -r --force-depends python3.11-minimal && \
-    dpkg --purge libpython3.11-minimal:amd64 && \
-    dpkg --purge python3.11-minimal && \
-    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /opt/DebianImageClearing v0.90.0
- 
-RUN apt-get update && \
-    curl -L -o openjdk-17-jre-headless_17.0.9+9-1~deb12u1_amd64.deb https://snapshot.debian.org/archive/debian-security/20231105T195436Z/pool/updates/main/o/openjdk-17/openjdk-17-jre-headless_17.0.9+9-1~deb12u1_amd64.deb && \
-    dpkg -i openjdk-17-jre-headless_17.0.9+9-1~deb12u1_amd64.deb && \    
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf archive.tar.gz
- 
-ENV PATH="/root/.local/bin:$PATH"
- 
-# Copying files from host to current working directory
-COPY /out/net8.0 /app/out
-#COPY /buildoutput/ /app/out
+   apt-get install -y --no-install-recommends \
+       nodejs \
+       npm \
+       git \
+       maven \
+       curl \
+       dpkg-dev \
+       openjdk-21-jre-headless && \
+   curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
+       sh -s -- -b /opt/DebianImageClearing v1.46.0 && \
+   apt-get purge -y --auto-remove curl && \
+   rm -rf /var/lib/apt/lists/*
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Copy the CATool build output (produced by `dotnet build -c Release`) into the image.
+# Build output lands in `out/net10.0/` because csproj has <OutputPath>..\..\out</OutputPath>
+# and AppendTargetFrameworkToOutputPath defaults to true.
+COPY /out/net10.0 /app/out

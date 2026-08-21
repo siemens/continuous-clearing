@@ -17,11 +17,17 @@
 - [Continuous Clearing Tool Execution](#continuous-clearing-tool-execution)
     - [Overview](#overview)
     - [**Prerequisite for Continuous Clearing Tool execution**](#prerequisite-for-continuous-clearing-tool-execution)
+  - [CCT Package URL (PURL) Format by Package Manager](#cct-package-url-purl-format-by-package-manager)
   - [SPDX v2.3 Support](#spdx-v23-support)
     - [File Naming Convention](#file-naming-convention)
   - [SPDX SBOM Signature Validator](#spdx-sbom-signature-validator)
     - [File Naming Convention](#file-naming-convention-1)
     - [Validation Process](#validation-process)
+  - [SW360 Keycloak Authentication](#sw360-keycloak-authentication)
+    - [Overview](#keycloak-overview)
+    - [Authentication Modes](#authentication-modes)
+    - [Configuration](#keycloak-configuration)
+    - [Token Lifecycle](#token-lifecycle)
   - [SBOM Signing and Verification](#sbom-signing-and-verification)
     - [Overview](#sbom-signing-overview)
     - [Configuration](#sbom-signing-configuration)
@@ -110,10 +116,28 @@ To ensure a smooth operation of the Continuous Clearing Tool, please follow thes
 1. **Project Entry in SW360**: 
    - Make sure your project is registered in SW360 for license clearance and is set to an **Active** state when running the Continuous Clearing Tool.
 2. **Access Requirements**:
-   - **SW360 REST API Authentication Token**:
-     - **SW360 Token**:
-       1. Users can generate a token from their functional account.
-       2. Required credentials include the client ID and client secret.
+   - **SW360 REST API Authentication**:
+
+     The tool supports two authentication modes for SW360. Choose one based on your setup:
+
+     | Mode | Required Fields | When to Use |
+     |------|----------------|-------------|
+     | **Keycloak** (recommended) | `SW360.Keycloak.ClientId` + `SW360.Keycloak.ClientSecret` | SW360 instances using Keycloak identity provider |
+     | **Legacy Token** (deprecated) | `SW360.Token` | Static bearer/token auth — deprecated, scheduled for removal **October 3, 2026** |
+
+     > ⚠️ **Deprecation Notice**: Legacy token authentication (`SW360.Token`) is deprecated as of this release and will be removed on **October 3, 2026**. Migrate to Keycloak authentication using `SW360.Keycloak.ClientId` and `SW360.Keycloak.ClientSecret`.
+
+     **Keycloak Authentication (Recommended)**:
+     - Obtain a **Client ID** and **Client Secret** from your SW360 Keycloak realm for your functional account.
+     - Set these under the `SW360.Keycloak` section in `appSettings.json` or pass them as `--SW360:Keycloak:ClientId` and `--SW360:Keycloak:ClientSecret` via command line.
+     - The tool automatically fetches and refreshes tokens; no manual token management is required.
+
+     **Legacy Token Authentication**:
+     - Generate a static token from your SW360 functional account.
+     - Set it as `SW360.Token` in `appSettings.json` or pass it as `--SW360:Token` via command line.
+
+     **Fallback Behavior**: If all three (`ClientId`, `ClientSecret`, and `Token`) are provided, the tool attempts Keycloak authentication first. If Keycloak authentication fails, it automatically falls back to the static token and logs a warning.
+
    - **Artifactory Token**:
      - Necessary for uploading cleared, internal, and development packages into JFrog Artifactory. Users must obtain their own JFrog Artifactory token.   
 
@@ -286,11 +310,27 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
       Resulted output.sbom.cdx.json file will be having the list of installed packages  and the same file will be used as  an input to Continuous clearing tool - SIT.Scan via the input directory parameter. The remaining process is same as other project types.
 
   * **Project Type :** **Choco (Chocolatey)**
-    
+
     * Input file repository should contain **choco.config** file.
-    
+
     * Manual license clearing in SW360 is required for Choco packages.
-  
+
+## CCT Package URL (PURL) Format by Package Manager
+
+The Continuous Clearing Tool identifies components using [Package URL (PURL)](https://github.com/package-url/purl-spec) strings. The expected PURL format and an example for each supported package manager are listed below.
+
+| Package Manager    | PURL Format                                                    | Example                                                             |
+| ------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| NPM                | `pkg:npm/package-name@version`                                 | `pkg:npm/%40angular/animations@12.3.1`                              |
+| Maven              | `pkg:maven/group-id/package-name@version`                      | `pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1`                 |
+| NuGet              | `pkg:nuget/package-name@version`                               | `pkg:nuget/EnterpriseLibrary.Common@6.0.1304`                       |
+| Debian             | `pkg:deb/distribution/package-name@version?arch=architecture`  | `pkg:deb/debian/base-files@13.8%2Bdeb13u6%2Bdhi0?arch=source`       |
+| Python (PyPI)      | `pkg:pypi/package-name@version`                                | `pkg:pypi/django@1.11.1`                                            |
+| Conan              | `pkg:conan/package-name@version`                               | `pkg:conan/libcurl@8.15.0`                                          |
+| Alpine             | `pkg:apk/distribution/package-name@version?arch=architecture`  | `pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source`                    |
+| Cargo (Rust)       | `pkg:cargo/package-name@version`                               | `pkg:cargo/addr2line@0.24.2`                                        |
+| Choco              | `pkg:nuget/package-name@version`                               | `pkg:nuget/7zip@23.01`                                              |
+
 ## SPDX v2.3 Support
 
 The SIT.Scan supports importing both supported and unsupported SPDX SBoMs and processes them correctly for inclusion in workflows.
@@ -320,6 +360,38 @@ example.spdx.sbom.json.pem # Public certificate file
 2. For each SBOM file, it locates corresponding `.sig` and `.pem` files
 3. Performs signature verification using the public certificate
 
+## SW360 Keycloak Authentication
+
+### Overview
+
+The Continuous Clearing Tool supports Keycloak-based OAuth 2.0 authentication for SW360, replacing the legacy static token approach. Keycloak authentication automatically manages token acquisition, caching, and refresh — no manual token rotation is required.
+
+> ⚠️ **Deprecation Notice**: Legacy static token authentication (`SW360.Token`) is deprecated and scheduled for removal on **September 5, 2026**. Migrate to Keycloak authentication before that date.
+
+### Authentication Modes
+
+| Mode | Configuration | Behavior |
+|------|--------------|----------|
+| **Keycloak** (recommended) | `SW360.Keycloak.ClientId` + `SW360.Keycloak.ClientSecret` | Fetches OAuth 2.0 tokens from Keycloak; auto-refreshes before expiry || 
+
+### Configuration
+
+**Via appSettings.json (Keycloak):**
+```json
+{
+  "SW360": {
+    "AuthTokenType": "Bearer",
+    "Keycloak": {
+      "ClientId": "your-sw360-client-id",
+      "ClientSecret": "your-sw360-client-secret"
+    }
+  }
+}
+```
+**Via command line (Keycloak — recommended for pipelines):**
+```
+--SW360:Keycloak:ClientId "your-client-id" --SW360:Keycloak:ClientSecret "your-client-secret"
+```
 ## SBOM Signing and Verification
 
 ### Overview
@@ -447,8 +519,10 @@ Description for the settings in appSettings.json file
 | 6    | SW360.URL                                 | URL of the SW360 server                                       | Yes             | [https://sw360.example.com](https://sw360.example.com)                   |
 | 7    | SW360.ProjectName                         | Name of the SW360 project                                     | Yes             | `MyProject`                                                                |
 | 8    | SW360.ProjectID                           | ID of the SW360 project                                       | Yes             | `57362e4179ce4e839f286ddf0b91d177`                                         |
-| 9    | SW360.AuthTokenType                       | Type of the SW360 token                                       | Yes             | `Bearer` or `Token`                                                          |
-| 10   | SW360.Token                               | Auth token for SW360                                          | Yes             | `xxxxxx`                                                                   |
+| 9    | SW360.AuthTokenType                       | Type of the SW360 token (used with legacy token auth)         | No†             | `Bearer` or `Token`                                                          |
+| 10   | SW360.Token                               | Static auth token for SW360 (legacy, deprecated Sep 5 2026)  | No†             | `xxxxxx`                                                                   |
+| 10a  | SW360.Keycloak.ClientId                   | Keycloak Client ID for SW360 authentication (recommended)     | Yes             | `my-sw360-client`                                                          |
+| 10b  | SW360.Keycloak.ClientSecret               | Keycloak Client Secret for SW360 authentication (recommended) | Yes             | `xxxxxx`                                                                   |
 | 11   | SW360.Fossology.URL                       | URL of Fossology server                                       | Yes             | [https://fossology.example.com](https://fossology.example.com)           |
 | 12   | SW360.Fossology.EnableTrigger             | Enable Fossology scan trigger                                 | No              | `True`                                                                     |
 | 13   | SW360.IgnoreDevDependency                 | Ignore development dependencies                               | No              | `True`                                                                     |
@@ -485,8 +559,13 @@ Description for the settings in appSettings.json file
 You can also pass the above mentioned arguments in the command line.
 Note: If the second approach is followed then make sure you provide all the settings mentioned in the appsettings.json in the command line
 
+For Keycloak authentication, use the following nested colon syntax:
+```
+--SW360:Keycloak:ClientId "your-client-id" --SW360:Keycloak:ClientSecret "your-client-secret"
+```
+
 #### **Method 3 (Recommended) - AppSettings + Cmd paramaters**
-- **Secrets Management**: Sensitive data such as the JFrog token, SW360 token, and SBOM signing credentials should be passed as secure variables via command line parameters. This practice ensures that confidential information remains protected.
+- **Secrets Management**: Sensitive data such as the JFrog token, SW360 Keycloak credentials (`--SW360:Keycloak:ClientId`, `--SW360:Keycloak:ClientSecret`), and SBOM signing credentials should be passed as secure variables via command line parameters. This practice ensures that confidential information remains protected.
 
 - **Project Configuration**:
   - Project-specific details such as the project type, SW360 project ID, project name, and directories can be conveniently passed as command line parameters. This allows for flexible and dynamic execution based on project requirements.
@@ -503,6 +582,48 @@ In order to exclude any components ,it can be configured in the  `appSettings.js
 
 
 In order to **Exclude specific folders** from the execution, It can be specified under the **Exclude section** of that specific **package type**.
+
+#### Glob Pattern Support in `Include` and `Exclude`
+
+The `Include` and `Exclude` sections of each package type in `appSettings.json` support POSIX-style **glob patterns**, giving you fine-grained control over which files and folders the tool scans.
+
+**Supported wildcards**
+
+| Pattern | Meaning |
+|---------|---------|
+| `*`     | Matches any sequence of characters within a single path segment (does not cross `/`). |
+| `**`    | Matches zero or more path segments (recurses into subdirectories). |
+
+Matching is **case-insensitive** and works with both `/` and `\` path separators.
+
+**Include pattern examples**
+
+```jsonc
+"Nuget": {
+  "Include": [
+    "packages.config",        // bare name — matched recursively (same as "**/packages.config")
+    "**/p*.assets.json",      // project.assets.json, private.assets.json, etc.
+    "src/**/packages.lock.json" // only under the src folder tree
+  ]
+}
+```
+
+> A bare filename with no separator (e.g. `packages.config`) is automatically treated as recursive (`**/packages.config`) for backward compatibility.
+
+**Exclude pattern examples**
+
+```jsonc
+"Npm": {
+  "Exclude": [
+    "**/node_modules/**",     // exclude everything under any node_modules folder
+    "**/*Test*/**",           // exclude any folder whose name CONTAINS "Test" (e.g. TestFiles, ViewModel.tests)
+    "**/*Test/**",            // exclude only folders whose name ENDS with "Test"
+    "node_modules"            // bare name — legacy behavior, also excludes the directory contents
+  ]
+}
+```
+
+> **Tip:** To exclude any folder that *contains* a keyword (e.g. `TestFiles`, `IntegrationTestFiles`, `ViewModel.tests`), use `**/*Test*/**`. The pattern `**/*Test/**` only matches folders whose name **ends** with `Test`.
 
 ### **Continuous Clearing Tool Execution**
 
@@ -529,6 +650,10 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
   **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Scan.dll --settingsfilepath /etc/CATool/appSettings.json`
 
+* **With Keycloak authentication** (recommended — credentials passed as command line parameters):
+
+  **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Scan.dll --settingsfilepath /etc/CATool/appSettings.json --SW360:Keycloak:ClientId "your-client-id" --SW360:Keycloak:ClientSecret "your-client-secret"`
+
 * **With SBOM Signing enabled** (credentials from appSettings.json or command line parameters):
 
   **Example** : `docker run --rm -it -v /path/to/InputDirectory:/mnt/Input -v /path/to/OutputDirectory:/mnt/Output -v /path/to/LogDirectory:/var/log -v /path/to/configDirectory:/etc/CATool ghcr.io/siemens/continuous-clearing dotnet SIT.Scan.dll --settingsfilepath /etc/CATool/appSettings.json --SbomSigning:SBOMSignVerify true --SbomSigning:KeyVaultURI "https://your-keyvault.vault.azure.net/" --SbomSigning:CertificateName "your-certificate" --SbomSigning:ClientId "your-client-id" --SbomSigning:ClientSecret "your-client-secret" --SbomSigning:TenantId "your-tenant-id"`
@@ -554,7 +679,7 @@ Continuous Clearing Tool can be executed as container or as binaries,
 
 ### Prerequisite
 
-1. .NET 8 runtime [https://dotnet.microsoft.com/download/dotnet-core/8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+1. .NET 10 runtime [https://dotnet.microsoft.com/download/dotnet-core/10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 2. Node.js and Git latest
 
 ### SIT.Scan
@@ -718,6 +843,8 @@ Both templates share common parameters with some implementation-specific differe
 | Parameter | Type | Default | Description |Mandatory|
 |-----------|------|---------|-------------|---------|
 | `sw360Token` | string | '' | SW360 authentication token |:white_check_mark:|
+| `sw360ClientId` | string | '' | SW360 authentication Client_id |:white_check_mark:|
+| `sw360ClientSecret` | string | '' | SW360 authentication Client_secret |:white_check_mark:|
 | `sw360ProjectId` | string | '' | Target SW360 project ID  |:white_check_mark:|
 | `sw360ProjectName` | string | '' | SW360 project name  |:white_check_mark:|
 | `projectDefinitions` | object | [] | List of project configurations to scan  |:white_check_mark:|
