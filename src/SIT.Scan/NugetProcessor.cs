@@ -1354,7 +1354,8 @@ namespace SIT.Scan
         /// <param name="appSettings"></param>
         /// <returns></returns>
         private bool DetectDeploymentType(CommonAppSettings appSettings)
-        {            
+        {
+            _runtimeIdentifier.Register();
             runtimeInfo = new RuntimeInfo();
             runtimeInfo = _runtimeIdentifier.IdentifyRuntime(appSettings);
             return runtimeInfo.IsSelfContained;

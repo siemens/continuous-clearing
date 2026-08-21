@@ -88,7 +88,6 @@ namespace SIT.Scan
                 WriteDetailLog(info);
                 return info;
             }
-            Register();
             return ProcessAssetFiles(assetsFiles);
         }
 
