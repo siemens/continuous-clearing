@@ -133,9 +133,12 @@ namespace SIT.Scan
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
+            List<AqlResult> internalAqlResultList = CommonIdentiferHelper.FilterAqlResultsByRepos(aqlResultList, CommonIdentiferHelper.GetInternalRepos(appSettings));
+
             foreach (var component in componentsForBOM)
             {
-                Component updatedComponent = UpdateComponentDetails(component, aqlResultList, appSettings, projectType);
+                var componentAqlResultList = CommonIdentiferHelper.GetAqlResultsForComponent(component, aqlResultList, internalAqlResultList);
+                Component updatedComponent = UpdateComponentDetails(component, componentAqlResultList, appSettings, projectType);
                 modifiedBOM.Add(updatedComponent);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);

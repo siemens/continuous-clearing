@@ -9,7 +9,9 @@ using NUnit.Framework;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
 using SIT.Common.Constants;
+using SIT.Common.Model;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SIT.Scan.UTest
 {
@@ -227,5 +229,237 @@ namespace SIT.Scan.UTest
             Assert.That(bom.Components[0].Name, Is.EqualTo("lib"));
             Assert.That(bom.Components[0].Type, Is.EqualTo(Component.Classification.Library));
         }
+
+        #region IsComponentInternal
+
+        [Test]
+        public void IsComponentInternal_NullComponent_ReturnsFalse()
+        {
+            Assert.IsFalse(CommonIdentiferHelper.IsComponentInternal(null));
+        }
+
+        [Test]
+        public void IsComponentInternal_NullProperties_ReturnsFalse()
+        {
+            var component = new Component { Name = "a", Version = "1.0" };
+            Assert.IsFalse(CommonIdentiferHelper.IsComponentInternal(component));
+        }
+
+        [Test]
+        public void IsComponentInternal_PropertyMissing_ReturnsFalse()
+        {
+            var component = new Component
+            {
+                Properties = new List<Property>
+                {
+                    new Property { Name = Dataconstant.Cdx_IsDevelopment, Value = "true" }
+                }
+            };
+            Assert.IsFalse(CommonIdentiferHelper.IsComponentInternal(component));
+        }
+
+        [Test]
+        public void IsComponentInternal_PropertyFalse_ReturnsFalse()
+        {
+            var component = new Component
+            {
+                Properties = new List<Property>
+                {
+                    new Property { Name = Dataconstant.Cdx_IsInternal, Value = "false" }
+                }
+            };
+            Assert.IsFalse(CommonIdentiferHelper.IsComponentInternal(component));
+        }
+
+        [Test]
+        public void IsComponentInternal_PropertyTrue_ReturnsTrue()
+        {
+            var component = new Component
+            {
+                Properties = new List<Property>
+                {
+                    new Property { Name = Dataconstant.Cdx_IsInternal, Value = "true" }
+                }
+            };
+            Assert.IsTrue(CommonIdentiferHelper.IsComponentInternal(component));
+        }
+
+        #endregion
+
+        #region GetInternalRepos
+
+        [Test]
+        public void GetInternalRepos_NullAppSettings_ReturnsEmpty()
+        {
+            var result = CommonIdentiferHelper.GetInternalRepos(null);
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetInternalRepos_EmptyProjectType_ReturnsEmpty()
+        {
+            var appSettings = new CommonAppSettings { ProjectType = string.Empty };
+            var result = CommonIdentiferHelper.GetInternalRepos(appSettings);
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetInternalRepos_UnknownProjectType_ReturnsEmpty()
+        {
+            var appSettings = new CommonAppSettings { ProjectType = "UNKNOWN" };
+            var result = CommonIdentiferHelper.GetInternalRepos(appSettings);
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetInternalRepos_NpmWithInternalRepos_ReturnsRepos()
+        {
+            var appSettings = new CommonAppSettings
+            {
+                ProjectType = "NPM",
+                Npm = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = new[] { "npm-internal", "npm-shared", string.Empty }
+                    }
+                }
+            };
+            var result = CommonIdentiferHelper.GetInternalRepos(appSettings);
+            Assert.That(result, Is.EquivalentTo(new[] { "npm-internal", "npm-shared" }));
+        }
+
+        [Test]
+        public void GetInternalRepos_ConfigWithoutArtifactory_ReturnsEmpty()
+        {
+            var appSettings = new CommonAppSettings
+            {
+                ProjectType = "NUGET",
+                Nuget = new Config()
+            };
+            var result = CommonIdentiferHelper.GetInternalRepos(appSettings);
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetInternalRepos_ProjectTypeIsCaseInsensitive()
+        {
+            var appSettings = new CommonAppSettings
+            {
+                ProjectType = "npm",
+                Npm = new Config
+                {
+                    Artifactory = new Artifactory
+                    {
+                        InternalRepos = new[] { "npm-internal" }
+                    }
+                }
+            };
+            var result = CommonIdentiferHelper.GetInternalRepos(appSettings);
+            Assert.That(result, Is.EquivalentTo(new[] { "npm-internal" }));
+        }
+
+        #endregion
+
+        #region FilterAqlResultsByRepos
+
+        [Test]
+        public void FilterAqlResultsByRepos_NullAqlList_ReturnsEmpty()
+        {
+            var result = CommonIdentiferHelper.FilterAqlResultsByRepos(null, new[] { "repo" });
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void FilterAqlResultsByRepos_NullReposList_ReturnsEmpty()
+        {
+            var aql = new List<AqlResult> { new AqlResult { Repo = "any" } };
+            var result = CommonIdentiferHelper.FilterAqlResultsByRepos(aql, null);
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void FilterAqlResultsByRepos_FiltersOnlyMatchingReposCaseInsensitive()
+        {
+            var aql = new List<AqlResult>
+            {
+                new AqlResult { Repo = "npm-internal", Name = "a" },
+                new AqlResult { Repo = "NPM-Release", Name = "b" },
+                new AqlResult { Repo = "npm-dev", Name = "c" },
+                new AqlResult { Repo = null, Name = "d" }
+            };
+
+            var result = CommonIdentiferHelper.FilterAqlResultsByRepos(aql, new[] { "npm-internal", "npm-release" });
+
+            Assert.That(result.Count, Is.EqualTo(2));
+            CollectionAssert.AreEquivalent(new[] { "a", "b" }, result.Select(x => x.Name).ToList());
+        }
+
+        [Test]
+        public void FilterAqlResultsByRepos_NoMatches_ReturnsEmpty()
+        {
+            var aql = new List<AqlResult>
+            {
+                new AqlResult { Repo = "some-repo", Name = "a" }
+            };
+            var result = CommonIdentiferHelper.FilterAqlResultsByRepos(aql, new[] { "other-repo" });
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        #endregion
+
+        #region GetAqlResultsForComponent
+
+        [Test]
+        public void GetAqlResultsForComponent_InternalComponent_ReturnsInternalList()
+        {
+            var full = new List<AqlResult> { new AqlResult { Repo = "full" } };
+            var internalList = new List<AqlResult> { new AqlResult { Repo = "internal" } };
+            var component = new Component
+            {
+                Properties = new List<Property>
+                {
+                    new Property { Name = Dataconstant.Cdx_IsInternal, Value = "true" }
+                }
+            };
+
+            var result = CommonIdentiferHelper.GetAqlResultsForComponent(component, full, internalList);
+
+            Assert.AreSame(internalList, result);
+        }
+
+        [Test]
+        public void GetAqlResultsForComponent_NonInternalComponent_ReturnsFullList()
+        {
+            var full = new List<AqlResult> { new AqlResult { Repo = "full" } };
+            var internalList = new List<AqlResult> { new AqlResult { Repo = "internal" } };
+            var component = new Component
+            {
+                Properties = new List<Property>
+                {
+                    new Property { Name = Dataconstant.Cdx_IsInternal, Value = "false" }
+                }
+            };
+
+            var result = CommonIdentiferHelper.GetAqlResultsForComponent(component, full, internalList);
+
+            Assert.AreSame(full, result);
+        }
+
+        [Test]
+        public void GetAqlResultsForComponent_NoInternalProperty_ReturnsFullList()
+        {
+            var full = new List<AqlResult>();
+            var internalList = new List<AqlResult>();
+            var component = new Component { Name = "a" };
+
+            var result = CommonIdentiferHelper.GetAqlResultsForComponent(component, full, internalList);
+
+            Assert.AreSame(full, result);
+        }
+
+        #endregion
     }
 }
