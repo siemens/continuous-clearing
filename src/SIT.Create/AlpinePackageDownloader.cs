@@ -41,22 +41,7 @@ namespace SIT.Create
             var sourceData = component.AlpineSource;
             string sourceCodeDownloadedFolder = GetCurrentDownloadFolderPath(localPathforDownload, component);
             string downloadPath = await DownloadTarFileAndGetPath(component, component.SourceUrl, sourceCodeDownloadedFolder, sourceData, localPathforSourceRepo);
-
-            if (!string.IsNullOrEmpty(downloadPath) && File.Exists(downloadPath))
-            {
-                var previousColor = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"[ALPINE] SUCCESS: Downloaded source for {component.Name}@{component.Version} -> {downloadPath}");
-                Console.ForegroundColor = previousColor;
-            }
-            else
-            {
-                var previousColor = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"[ALPINE] SKIPPED: No source downloaded for {component.Name}@{component.Version}");
-                Console.ForegroundColor = previousColor;
-            }
-
+                       
             return downloadPath;
 
         }

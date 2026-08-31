@@ -262,10 +262,7 @@ namespace SIT.Create
             string localPathforSourceRepo = string.Empty;
             try
             {
-                string parentDir = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName
-                                   ?? Directory.GetCurrentDirectory();
-                localPathforSourceRepo = Path.Combine(parentDir, "ClearingTool", "DownloadedFiles")
-                                         + Path.DirectorySeparatorChar;
+                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
                 if (!Directory.Exists(localPathforSourceRepo))
                 {
                     localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();
@@ -318,77 +315,52 @@ namespace SIT.Create
         /// exists, the specified Alpine distribution is checked out.</param>
         private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
         {
-            Logger.DebugFormat("CloneSource(): Start cloneing from git - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
-            WriteAlpineCliStatus(ConsoleColor.Cyan, $"[ALPINE] Cloning aports repo ({CommonAppSettings.AlpineAportsGitURL}) into {localPathforSourceRepo} ...");
-            List<string> gitCommands = GetGitCloneCommands();
-            int lastExitCode = -1;
-            string lastStdErr = string.Empty;
-            string lastStdOut = string.Empty;
-            string lastCommand = string.Empty;
+            Logger.DebugFormat("CloneSource(): Start cloneing from git - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);            
+            List<string> gitCommands = GetGitCloneCommands();            
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 foreach (string command in gitCommands)
                 {
-                    (lastExitCode, lastStdOut, lastStdErr) = RunGitCommand(command, localPathforSourceRepo);
-                    lastCommand = command;
+                    Logger.DebugFormat("CloneSource(): Executing Git command: {0}", command);
+                    Process p = new Process();
+                    p.StartInfo.RedirectStandardError = true;
+                    p.StartInfo.RedirectStandardOutput = true;
+                    p.StartInfo.RedirectStandardInput = true;
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.FileName = Path.Combine(@"git");
+                    p.StartInfo.Arguments = command;
+                    p.StartInfo.WorkingDirectory = localPathforSourceRepo;
+
+                    p.Start();
+                    p.WaitForExit();
+                    Logger.DebugFormat("CloneSource(): Git command completed with ExitCode: {0}", p.ExitCode);
                 }
             }
             else
             {
-                (lastExitCode, lastStdOut, lastStdErr) = RunGitCommand(gitCommands[1], localPathforSourceRepo);
-                lastCommand = gitCommands[1];
+                Logger.DebugFormat("CloneSource(): Executing Git command: {0}", gitCommands[1]);
+                Process p = new Process();
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardInput = true;
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = Path.Combine(@"git");
+                p.StartInfo.Arguments = gitCommands[1];
+                p.StartInfo.WorkingDirectory = localPathforSourceRepo;
+
+                p.Start();
+                p.WaitForExit();
+                Logger.DebugFormat("CloneSource(): Git command completed with ExitCode: {0}", p.ExitCode);
             }
             if (Directory.Exists(fullPath))
-            {
-                WriteAlpineCliStatus(ConsoleColor.Green, $"[ALPINE] SUCCESS: aports repo cloned at {fullPath}");
+            {                
                 Logger.DebugFormat("CloneSource(): Directory exists at {0}, proceeding to checkout distro.", fullPath);
                 CheckoutDistro(alpineDistro, fullPath);
-            }
-            else
-            {
-                WriteAlpineCliStatus(ConsoleColor.Red, $"[ALPINE] FAILED: git {lastCommand} (ExitCode: {lastExitCode}) did not produce {fullPath}");
-                if (!string.IsNullOrWhiteSpace(lastStdErr))
-                {
-                    WriteAlpineCliStatus(ConsoleColor.Red, $"[ALPINE] git stderr: {lastStdErr.Trim()}");
-                }
-                if (!string.IsNullOrWhiteSpace(lastStdOut))
-                {
-                    WriteAlpineCliStatus(ConsoleColor.Yellow, $"[ALPINE] git stdout: {lastStdOut.Trim()}");
-                }
-                Logger.ErrorFormat("CloneSource(): git command failed. Command='{0}', ExitCode={1}, StdErr={2}, StdOut={3}",
-                    lastCommand, lastExitCode, lastStdErr, lastStdOut);
-            }
+            }            
             Logger.DebugFormat("CloneSource(): completed cloneing - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
-        }
-
-        private static (int ExitCode, string StdOut, string StdErr) RunGitCommand(string arguments, string workingDirectory)
-        {
-            Logger.DebugFormat("RunGitCommand(): Executing Git command: {0} (cwd: {1})", arguments, workingDirectory);
-            using Process p = new Process();
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.RedirectStandardInput = true;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = "git";
-            p.StartInfo.Arguments = arguments;
-            p.StartInfo.WorkingDirectory = workingDirectory;
-
-            p.Start();
-            string stdOut = p.StandardOutput.ReadToEnd();
-            string stdErr = p.StandardError.ReadToEnd();
-            p.WaitForExit();
-            Logger.DebugFormat("RunGitCommand(): Git command completed with ExitCode: {0}", p.ExitCode);
-            return (p.ExitCode, stdOut, stdErr);
-        }
-
-        private static void WriteAlpineCliStatus(ConsoleColor color, string message)
-        {
-            var previousColor = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            Console.WriteLine(message);
-            Console.ForegroundColor = previousColor;
-        }
+        }        
 
         /// <summary>
         /// Check out Distro

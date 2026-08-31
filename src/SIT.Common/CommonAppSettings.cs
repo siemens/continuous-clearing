@@ -29,7 +29,7 @@ namespace SIT.Common
         public static string SnapshotDownloadURL { get; set; } = $"https://snapshot.debian.org/archive/";
         public static string PyPiURL { get; set; } = $"https://pypi.org/pypi/";
         public static string SourceURLConan { get; set; } = "https://raw.githubusercontent.com/conan-io/conan-center-index/master/recipes/";
-        public static string AlpineAportsGitURL { get; set; } = $"https://gitlab.alpinelinux.org/alpine/aports.git";
+        public static string AlpineAportsGitURL { get; set; } = $"https://github.com/alpinelinux/aports.git";
 
         public static string SourceUrlForCargo { get; set; } = $"api/v1/crates/";
         public static string SourceBaseUrlForCargo { get; set; } = $"https://crates.io";
