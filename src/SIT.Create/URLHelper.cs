@@ -262,10 +262,7 @@ namespace SIT.Create
             string localPathforSourceRepo = string.Empty;
             try
             {
-                string parentDir = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName
-                                   ?? Directory.GetCurrentDirectory();
-                localPathforSourceRepo = Path.Combine(parentDir, "ClearingTool", "DownloadedFiles")
-                                         + Path.DirectorySeparatorChar;
+                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
                 if (!Directory.Exists(localPathforSourceRepo))
                 {
                     localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();
@@ -319,51 +316,42 @@ namespace SIT.Create
         private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
         {
             Logger.DebugFormat("CloneSource(): Start cloneing from git - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
-            WriteAlpineCliStatus(ConsoleColor.Cyan, $"[ALPINE] Cloning aports repo ({CommonAppSettings.AlpineAportsGitURL}) into {localPathforSourceRepo} ...");
             List<string> gitCommands = GetGitCloneCommands();
-            int lastExitCode = -1;
-            string lastStdErr = string.Empty;
-            string lastStdOut = string.Empty;
-            string lastCommand = string.Empty;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 foreach (string command in gitCommands)
                 {
-                    (lastExitCode, lastStdOut, lastStdErr) = RunGitCommand(command, localPathforSourceRepo);
-                    lastCommand = command;
+                    RunGitProcess(command, localPathforSourceRepo);
                 }
             }
             else
             {
-                (lastExitCode, lastStdOut, lastStdErr) = RunGitCommand(gitCommands[1], localPathforSourceRepo);
-                lastCommand = gitCommands[1];
+                // config first, then clone (mirrors Windows behavior for consistency)
+                RunGitProcess(gitCommands[0], localPathforSourceRepo);
+                RunGitProcess(gitCommands[1], localPathforSourceRepo);
             }
+
+            // Fallback: if primary URL (gitlab.alpinelinux.org) was blocked (e.g. HTTP 418 from CI IPs),
+            // retry with the GitHub mirror so downstream lookup still works.
+            if (!Directory.Exists(fullPath))
+            {
+                string mirrorCommand = GetGitCloneMirrorCommand();
+                Logger.WarnFormat("CloneSource(): Primary clone did not produce {0}. Falling back to mirror: {1}", fullPath, CommonAppSettings.AlpineAportsGitMirrorURL);
+                Console.WriteLine($"[ALPINE] Primary clone failed. Falling back to mirror: {CommonAppSettings.AlpineAportsGitMirrorURL}");
+                RunGitProcess(mirrorCommand, localPathforSourceRepo);
+            }
+
             if (Directory.Exists(fullPath))
             {
-                WriteAlpineCliStatus(ConsoleColor.Green, $"[ALPINE] SUCCESS: aports repo cloned at {fullPath}");
                 Logger.DebugFormat("CloneSource(): Directory exists at {0}, proceeding to checkout distro.", fullPath);
                 CheckoutDistro(alpineDistro, fullPath);
-            }
-            else
-            {
-                WriteAlpineCliStatus(ConsoleColor.Red, $"[ALPINE] FAILED: git {lastCommand} (ExitCode: {lastExitCode}) did not produce {fullPath}");
-                if (!string.IsNullOrWhiteSpace(lastStdErr))
-                {
-                    WriteAlpineCliStatus(ConsoleColor.Red, $"[ALPINE] git stderr: {lastStdErr.Trim()}");
-                }
-                if (!string.IsNullOrWhiteSpace(lastStdOut))
-                {
-                    WriteAlpineCliStatus(ConsoleColor.Yellow, $"[ALPINE] git stdout: {lastStdOut.Trim()}");
-                }
-                Logger.ErrorFormat("CloneSource(): git command failed. Command='{0}', ExitCode={1}, StdErr={2}, StdOut={3}",
-                    lastCommand, lastExitCode, lastStdErr, lastStdOut);
             }
             Logger.DebugFormat("CloneSource(): completed cloneing - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
         }
 
-        private static (int ExitCode, string StdOut, string StdErr) RunGitCommand(string arguments, string workingDirectory)
+        private static void RunGitProcess(string arguments, string workingDirectory)
         {
-            Logger.DebugFormat("RunGitCommand(): Executing Git command: {0} (cwd: {1})", arguments, workingDirectory);
+            Logger.DebugFormat("RunGitProcess(): Executing Git command: {0}", arguments);
             using Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardOutput = true;
@@ -378,16 +366,12 @@ namespace SIT.Create
             string stdOut = p.StandardOutput.ReadToEnd();
             string stdErr = p.StandardError.ReadToEnd();
             p.WaitForExit();
-            Logger.DebugFormat("RunGitCommand(): Git command completed with ExitCode: {0}", p.ExitCode);
-            return (p.ExitCode, stdOut, stdErr);
-        }
-
-        private static void WriteAlpineCliStatus(ConsoleColor color, string message)
-        {
-            var previousColor = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            Console.WriteLine(message);
-            Console.ForegroundColor = previousColor;
+            Logger.DebugFormat("RunGitProcess(): Git command completed with ExitCode: {0}", p.ExitCode);
+            if (p.ExitCode != 0 && !string.IsNullOrWhiteSpace(stdErr))
+            {
+                Logger.WarnFormat("RunGitProcess(): git {0} failed. StdErr: {1}", arguments, stdErr.Trim());
+                Console.WriteLine($"[ALPINE] git {arguments} exit {p.ExitCode}: {stdErr.Trim()}");
+            }
         }
 
         /// <summary>
@@ -420,7 +404,9 @@ namespace SIT.Create
         }
 
         /// <summary>
-        /// Get Git Clone Commands
+        /// Get Git Clone Commands. Returns config + primary clone. If the primary clone fails
+        /// (e.g. gitlab.alpinelinux.org returns HTTP 418 from CI IP ranges), <see cref="CloneSource"/>
+        /// falls back to the GitHub mirror.
         /// </summary>
         /// <returns></returns>
         private static List<string> GetGitCloneCommands()
@@ -430,6 +416,11 @@ namespace SIT.Create
                $"config --global core.protectNTFS false",
                $"clone" +" "+ CommonAppSettings.AlpineAportsGitURL,
            };
+        }
+
+        private static string GetGitCloneMirrorCommand()
+        {
+            return $"clone {CommonAppSettings.AlpineAportsGitMirrorURL}";
         }
 
         /// <summary>
