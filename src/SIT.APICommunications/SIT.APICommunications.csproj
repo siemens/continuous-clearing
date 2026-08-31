@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
-		<Version>11.0.0</Version>
+		<Version>11.0.1</Version>
 		<NoWarn>$(NoWarn);NETSDK1206</NoWarn>
 	</PropertyGroup>
 
