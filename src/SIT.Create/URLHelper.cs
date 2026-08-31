@@ -315,8 +315,8 @@ namespace SIT.Create
         /// exists, the specified Alpine distribution is checked out.</param>
         private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
         {
-            Logger.DebugFormat("CloneSource(): Start cloneing from git - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);            
-            List<string> gitCommands = GetGitCloneCommands();            
+            Logger.DebugFormat("CloneSource(): Start cloneing from git - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
+            List<string> gitCommands = GetGitCloneCommands();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 foreach (string command in gitCommands)
@@ -335,6 +335,7 @@ namespace SIT.Create
                     p.Start();
                     p.WaitForExit();
                     Logger.DebugFormat("CloneSource(): Git command completed with ExitCode: {0}", p.ExitCode);
+
                 }
             }
             else
@@ -355,12 +356,12 @@ namespace SIT.Create
                 Logger.DebugFormat("CloneSource(): Git command completed with ExitCode: {0}", p.ExitCode);
             }
             if (Directory.Exists(fullPath))
-            {                
+            {
                 Logger.DebugFormat("CloneSource(): Directory exists at {0}, proceeding to checkout distro.", fullPath);
                 CheckoutDistro(alpineDistro, fullPath);
-            }            
+            }
             Logger.DebugFormat("CloneSource(): completed cloneing - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
-        }        
+        }
 
         /// <summary>
         /// Check out Distro
