@@ -9,6 +9,8 @@ using log4net;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
 using SIT.Common.Constants;
+using SIT.Scan.Interface;
+using SIT.Services.Interface;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -159,6 +161,26 @@ namespace SIT.Scan
         public static List<AqlResult> GetAqlResultsForComponent(Component component, List<AqlResult> aqlResultList, List<AqlResult> internalAqlResultList)
         {
             return IsComponentInternal(component) ? internalAqlResultList : aqlResultList;
+        }
+
+        /// <summary>
+        /// Performs the common JFrog repository preparation shared by all processors:
+        /// resolves the repo list, queries AQL results, builds the project-type property,
+        /// and computes the internal AQL result subset.
+        /// </summary>
+        public static async System.Threading.Tasks.Task<(List<AqlResult> AqlResultList,
+                                                         List<AqlResult> InternalAqlResultList,
+                                                         Property ProjectType)>
+            PrepareJfrogRepoDetailsAsync(CommonAppSettings appSettings,
+                                         IJFrogService jFrogService,
+                                         IBomHelper bomhelper)
+        {
+            // get the component list from Jfrog for given repo + internal repo
+            string[] repoList = CommonHelper.GetRepoList(appSettings);
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
+            Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
+            List<AqlResult> internalAqlResultList = FilterAqlResultsByRepos(aqlResultList, GetInternalRepos(appSettings));
+            return (aqlResultList, internalAqlResultList, projectType);
         }
 
         public static Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings, System.Func<string, Bom> parseCycloneDxBom)
