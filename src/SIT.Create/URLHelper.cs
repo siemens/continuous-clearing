@@ -262,7 +262,10 @@ namespace SIT.Create
             string localPathforSourceRepo = string.Empty;
             try
             {
-                localPathforSourceRepo = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\DownloadedFiles\\";
+                string parentDir = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName
+                                   ?? Directory.GetCurrentDirectory();
+                localPathforSourceRepo = Path.Combine(parentDir, "ClearingTool", "DownloadedFiles")
+                                         + Path.DirectorySeparatorChar;
                 if (!Directory.Exists(localPathforSourceRepo))
                 {
                     localPathforSourceRepo = Directory.CreateDirectory(localPathforSourceRepo).ToString();
@@ -316,7 +319,9 @@ namespace SIT.Create
         private static void CloneSource(string localPathforSourceRepo, string alpineDistro, string fullPath)
         {
             Logger.DebugFormat("CloneSource(): Start cloneing from git - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
+            WriteAlpineCliStatus(ConsoleColor.Cyan, $"[ALPINE] Cloning aports repo ({CommonAppSettings.AlpineAportsGitURL}) into {localPathforSourceRepo} ...");
             List<string> gitCommands = GetGitCloneCommands();
+            int lastExitCode = -1;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 foreach (string command in gitCommands)
@@ -334,6 +339,7 @@ namespace SIT.Create
 
                     p.Start();
                     p.WaitForExit();
+                    lastExitCode = p.ExitCode;
                     Logger.DebugFormat("CloneSource(): Git command completed with ExitCode: {0}", p.ExitCode);
 
                 }
@@ -353,14 +359,28 @@ namespace SIT.Create
 
                 p.Start();
                 p.WaitForExit();
+                lastExitCode = p.ExitCode;
                 Logger.DebugFormat("CloneSource(): Git command completed with ExitCode: {0}", p.ExitCode);
             }
             if (Directory.Exists(fullPath))
             {
+                WriteAlpineCliStatus(ConsoleColor.Green, $"[ALPINE] SUCCESS: aports repo cloned at {fullPath}");
                 Logger.DebugFormat("CloneSource(): Directory exists at {0}, proceeding to checkout distro.", fullPath);
                 CheckoutDistro(alpineDistro, fullPath);
             }
+            else
+            {
+                WriteAlpineCliStatus(ConsoleColor.Red, $"[ALPINE] FAILED: aports clone did not produce {fullPath} (git ExitCode: {lastExitCode})");
+            }
             Logger.DebugFormat("CloneSource(): completed cloneing - LocalPath: {0}, AlpineDistro: {1}, FullPath: {2}", localPathforSourceRepo, alpineDistro, fullPath);
+        }
+
+        private static void WriteAlpineCliStatus(ConsoleColor color, string message)
+        {
+            var previousColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ForegroundColor = previousColor;
         }
 
         /// <summary>
