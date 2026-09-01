@@ -9,6 +9,8 @@ using log4net;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
 using SIT.Common.Constants;
+using SIT.Scan.Interface;
+using SIT.Services.Interface;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -60,7 +62,8 @@ namespace SIT.Scan
         private static string[] FindRepositoryOrder(Component component)
         {
             bool isDevelopment = component?.Properties?.Any(p => p.Name == Dataconstant.Cdx_IsDevelopment && p.Value == "true") == true;
-            if (isDevelopment)
+            bool isInternal = component?.Properties?.Any(p => p.Name == Dataconstant.Cdx_IsInternal && p.Value == "true") == true;
+            if (isDevelopment&&!isInternal)
             {
                 return ["devdep", "release", "dev"];
             }
@@ -98,6 +101,86 @@ namespace SIT.Scan
             }
 
             return projectName;
+        }
+
+        /// <summary>
+        /// Returns true when the component has the Cdx_IsInternal property set to "true".
+        /// </summary>
+        public static bool IsComponentInternal(Component component)
+        {
+            return component?.Properties?.Any(p => p.Name == Dataconstant.Cdx_IsInternal && p.Value == "true") == true;
+        }
+
+        /// <summary>
+        /// Returns the configured internal Artifactory repositories for the current project type.
+        /// </summary>
+        public static IReadOnlyCollection<string> GetInternalRepos(CommonAppSettings appSettings)
+        {
+            if (appSettings == null || string.IsNullOrEmpty(appSettings.ProjectType))
+            {
+                return System.Array.Empty<string>();
+            }
+
+            var repoMapping = new Dictionary<string, System.Func<IEnumerable<string>>>(System.StringComparer.OrdinalIgnoreCase)
+            {
+                { "NPM", () => appSettings.Npm?.Artifactory?.InternalRepos },
+                { "NUGET", () => appSettings.Nuget?.Artifactory?.InternalRepos },
+                { "MAVEN", () => appSettings.Maven?.Artifactory?.InternalRepos },
+                { "DEBIAN", () => appSettings.Debian?.Artifactory?.InternalRepos },
+                { "POETRY", () => appSettings.Poetry?.Artifactory?.InternalRepos },
+                { "CONAN", () => appSettings.Conan?.Artifactory?.InternalRepos },
+                { "ALPINE", () => appSettings.Alpine?.Artifactory?.InternalRepos },
+                { "CARGO", () => appSettings.Cargo?.Artifactory?.InternalRepos },
+                { "CHOCO", () => appSettings.Choco?.Artifactory?.InternalRepos }
+            };
+
+            if (repoMapping.TryGetValue(appSettings.ProjectType, out var getRepos))
+            {
+                return getRepos()?.Where(r => !string.IsNullOrEmpty(r)).ToList() ?? (IReadOnlyCollection<string>)System.Array.Empty<string>();
+            }
+            return System.Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// Filters the AQL result list to only include entries whose Repo matches one of the supplied internal repositories.
+        /// </summary>
+        public static List<AqlResult> FilterAqlResultsByRepos(List<AqlResult> aqlResultList, IEnumerable<string> repos)
+        {
+            if (aqlResultList == null || repos == null)
+            {
+                return new List<AqlResult>();
+            }
+            var repoSet = new HashSet<string>(repos, System.StringComparer.OrdinalIgnoreCase);
+            return aqlResultList.Where(x => x.Repo != null && repoSet.Contains(x.Repo)).ToList();
+        }
+
+        /// <summary>
+        /// Returns the AQL result list to use for the component based on its internal flag.
+        /// Internal components are matched against the internal repo subset only.
+        /// </summary>
+        public static List<AqlResult> GetAqlResultsForComponent(Component component, List<AqlResult> aqlResultList, List<AqlResult> internalAqlResultList)
+        {
+            return IsComponentInternal(component) ? internalAqlResultList : aqlResultList;
+        }
+
+        /// <summary>
+        /// Performs the common JFrog repository preparation shared by all processors:
+        /// resolves the repo list, queries AQL results, builds the project-type property,
+        /// and computes the internal AQL result subset.
+        /// </summary>
+        public static async System.Threading.Tasks.Task<(List<AqlResult> AqlResultList,
+                                                         List<AqlResult> InternalAqlResultList,
+                                                         Property ProjectType)>
+            PrepareJfrogRepoDetailsAsync(CommonAppSettings appSettings,
+                                         IJFrogService jFrogService,
+                                         IBomHelper bomhelper)
+        {
+            // get the component list from Jfrog for given repo + internal repo
+            string[] repoList = CommonHelper.GetRepoList(appSettings);
+            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
+            Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
+            List<AqlResult> internalAqlResultList = FilterAqlResultsByRepos(aqlResultList, GetInternalRepos(appSettings));
+            return (aqlResultList, internalAqlResultList, projectType);
         }
 
         public static Bom GetCdxGenBomData(List<string> configFiles, CommonAppSettings appSettings, System.Func<string, Bom> parseCycloneDxBom)

@@ -531,9 +531,13 @@ namespace SIT.Scan
             Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
             List<Component> modifiedBOM = new List<Component>();
 
+            // Pre-compute the internal-repo subset of AQL results for internal components.
+            List<AqlResult> internalAqlResultList = CommonIdentiferHelper.FilterAqlResultsByRepos(aqlResultList, CommonIdentiferHelper.GetInternalRepos(appSettings));
+
             foreach (var component in componentsForBOM)
             {
-                var processedComponent = ProcessComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                var componentAqlResultList = CommonIdentiferHelper.GetAqlResultsForComponent(component, aqlResultList, internalAqlResultList);
+                var processedComponent = ProcessComponent(component, componentAqlResultList, bomhelper, appSettings, projectType);
                 modifiedBOM.Add(processedComponent);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
@@ -948,7 +952,7 @@ namespace SIT.Scan
                                                                 Component component,
                                                                 IBomHelper bomHelper,
                                                                 out string jfrogRepoPath)
-        {
+        {            
             Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Starting identify JFrog repository details retrieval for component [Name: {0}, Version: {1}].", component.Name, component.Version);
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;

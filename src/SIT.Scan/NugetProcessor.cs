@@ -306,15 +306,14 @@ namespace SIT.Scan
                                                           IBomHelper bomhelper)
         {
             Logger.Debug("GetJfrogRepoDetailsOfAComponent():Starting to retrieve JFrog repository details for components.\n");
-            // get the  component list from Jfrog for given repo + internal repo
-            string[] repoList = CommonHelper.GetRepoList(appSettings);
-            List<AqlResult> aqlResultList = await bomhelper.GetListOfComponentsFromRepo(repoList, jFrogService);
-            Property projectType = new() { Name = Dataconstant.Cdx_ProjectType, Value = appSettings.ProjectType };
+            var (aqlResultList, internalAqlResultList, projectType) =
+                await CommonIdentiferHelper.PrepareJfrogRepoDetailsAsync(appSettings, jFrogService, bomhelper);
             List<Component> modifiedBOM = new List<Component>();
 
             foreach (var component in componentsForBOM)
             {
-                var processedComponent = ProcessNugetComponent(component, aqlResultList, bomhelper, appSettings, projectType);
+                var componentAqlResultList = CommonIdentiferHelper.GetAqlResultsForComponent(component, aqlResultList, internalAqlResultList);
+                var processedComponent = ProcessNugetComponent(component, componentAqlResultList, bomhelper, appSettings, projectType);
                 modifiedBOM.Add(processedComponent);
             }
             LogHandlingHelper.IdentifierComponentsData(componentsForBOM, listOfInternalComponents);
