@@ -123,6 +123,12 @@ namespace SIT.Create.Model
             public string ClearingState { get; set; }
 
             /// <summary>
+            /// Gets or sets the flat attachments list, used by SW360 versions that no longer nest attachments under "_embedded".
+            /// </summary>
+            [JsonProperty("attachments")]
+            public List<Attachment> Attachments { get; set; }
+
+            /// <summary>
             /// Gets or sets the links associated with the release.
             /// </summary>
             [JsonProperty("_links")]
