@@ -83,8 +83,6 @@ namespace SIT.Create
             int page = 0;
             const int pageEntries = 40;
             int pageCount = 0;
-            int releasesScanned = 0;
-            int approvedCount = 0;
 
             while (pageCount < 10)
             {
@@ -96,12 +94,12 @@ namespace SIT.Create
                     break;
                 }
 
-                var releases = releaseResponse.Embedded?.Sw360releases;
-                releasesScanned += releases?.Count ?? 0;
-                approvedCount += releases?.Count(release => release?.ClearingState == "APPROVED") ?? 0;
-
-                var validRelease = releases?.FirstOrDefault(release =>
-                    release?.ClearingState == "APPROVED" && HasSingleSourceAttachment(release));
+                var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
+                    release?.ClearingState == "APPROVED" &&
+                    release.AllReleasesEmbedded?.Sw360attachments != null &&
+                    release.AllReleasesEmbedded.Sw360attachments.Any(attachments =>
+                        attachments.Count != 0 &&
+                        attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1));
 
                 if (validRelease != null)
                 {
@@ -114,28 +112,7 @@ namespace SIT.Create
                 }
             }
 
-            Logger.DebugFormat("FindValidRelease(): No valid release found. Releases scanned-{0}, APPROVED-{1}.", releasesScanned, approvedCount);
             return null;
-        }
-
-        /// <summary>
-        /// Checks whether a release has exactly one SOURCE attachment, supporting both the legacy
-        /// nested "_embedded.sw360:attachments" shape and the flat "attachments" shape returned by newer SW360 versions.
-        /// </summary>
-        /// <param name="release">The release to inspect.</param>
-        /// <returns>true if exactly one SOURCE attachment is found; otherwise false.</returns>
-        private static bool HasSingleSourceAttachment(ReleasesAllDetails.Sw360Release release)
-        {
-            var flatAttachments = release?.Attachments;
-            if (flatAttachments != null)
-            {
-                return flatAttachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1;
-            }
-
-            var nestedAttachments = release?.AllReleasesEmbedded?.Sw360attachments;
-            return nestedAttachments != null && nestedAttachments.Any(attachments =>
-                attachments.Count != 0 &&
-                attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1);
         }
 
         /// <summary>
