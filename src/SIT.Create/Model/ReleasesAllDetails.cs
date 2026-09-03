@@ -46,7 +46,7 @@ namespace SIT.Create.Model
             /// Gets or sets the list of SW360 attachments for each release.
             /// </summary>
             [JsonProperty("sw360:attachments")]
-            public List<List<Attachment>> Sw360attachments { get; set; }
+            public List<Attachment> Sw360attachments { get; set; }
             #endregion
         }
 

@@ -94,12 +94,11 @@ namespace SIT.Create
                     break;
                 }
 
+                // Only an already-APPROVED release with source is a safe target to probe the Fossology connection
                 var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
-                    release?.ClearingState == "APPROVED" &&
+                    release?.ClearingState == Dataconstant.Approved &&
                     release.AllReleasesEmbedded?.Sw360attachments != null &&
-                    release.AllReleasesEmbedded.Sw360attachments.Any(attachments =>
-                        attachments.Count != 0 &&
-                        attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1));
+                    release.AllReleasesEmbedded.Sw360attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1);
 
                 if (validRelease != null)
                 {
