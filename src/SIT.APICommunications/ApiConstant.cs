@@ -40,12 +40,27 @@ namespace SIT.APICommunications
         /// The page size requested per call when paging through SW360 list endpoints. Kept close to the server's
         /// 200000 cap so most datasets fit on a single page, avoiding SW360's unreliable deep-pagination behavior.
         /// </summary>
-        public const int ListPageSize = 10000;
+        public const int ListPageSize = 100;
+
+        /// <summary>
+        /// The page size requested per call when paging through the SW360 releases endpoint specifically.
+        /// </summary>
+        public const int ReleaseListPageSize = 10000;
 
         /// <summary>
         /// The maximum number of pages fetched concurrently when paging through SW360 list endpoints.
         /// </summary>
-        public const int MaxParallelPageRequests = 1;
+        public const int MaxParallelPageRequests = 4;
+
+        /// <summary>
+        /// Query params requesting full details plus Lucene-backed search, used by list endpoints that support both.
+        /// </summary>
+        public const string AllDetailsAndLuceneSearchParams = "allDetails=true&luceneSearch=true&";
+
+        /// <summary>
+        /// Query params requesting Lucene-backed search only, for endpoints (e.g. users) that don't support allDetails.
+        /// </summary>
+        public const string LuceneSearchOnlyParam = "luceneSearch=true&";
 
         /// <summary>
         /// The API suffix for SW360 resource endpoints.
@@ -86,6 +101,11 @@ namespace SIT.APICommunications
         /// The MIME type for JSON content.
         /// </summary>
         public const string ApplicationJson = "application/json";
+
+        /// <summary>
+        /// The HAL+JSON MIME type SW360's Spring HATEOAS API actually serves, per its Swagger documentation.
+        /// </summary>
+        public const string ApplicationHalJson = "application/hal+json";
 
         /// <summary>
         /// The MIME type for all application content types.
