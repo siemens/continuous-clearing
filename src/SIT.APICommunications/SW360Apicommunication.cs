@@ -534,7 +534,7 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "Unable to retrieve full details for SW360 releases.");
-            string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&page_entries={pageEntries}";
+            string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&luceneSearch=true&page_entries={pageEntries}";
             await LogHandlingHelper.HttpRequestHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData()", httpClient, url);
             return await httpClient.GetAsync(url);
         }
