@@ -45,7 +45,7 @@ namespace SIT.APICommunications
         /// <summary>
         /// The maximum number of pages fetched concurrently when paging through SW360 list endpoints.
         /// </summary>
-        public const int MaxParallelPageRequests = 4;
+        public const int MaxParallelPageRequests = 2;
 
         /// <summary>
         /// The API suffix for SW360 resource endpoints.

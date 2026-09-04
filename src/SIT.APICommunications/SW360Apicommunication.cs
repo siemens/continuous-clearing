@@ -619,7 +619,7 @@ namespace SIT.APICommunications
         /// <returns>A configured HttpClient instance for SW360 API communication.</returns>
         private HttpClient GetHttpClient()
         {
-            var retryHandler = new RetryHttpClientHandler
+            var retryHandler = new RetryHttpClientHandler(timeOut)
             {
                 InnerHandler = new HttpClientHandler()
             };
@@ -629,8 +629,10 @@ namespace SIT.APICommunications
                 : retryHandler;
 
             var httpClient = new HttpClient(outerHandler);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(timeOut);
-            httpClient.Timeout = timeOutInSec;
+            // The per-attempt timeout is enforced inside RetryHttpClientHandler so that each retry attempt gets its
+            // own timeout budget. Disable HttpClient's global timeout, which would otherwise cap the entire retry
+            // chain (all attempts plus back-off waits) and cancel the whole operation once exceeded.
+            httpClient.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
             httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue(ApiConstant.ApplicationJson));
             httpClient.DefaultRequestHeaders.Authorization =
