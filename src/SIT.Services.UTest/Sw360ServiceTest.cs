@@ -15,6 +15,7 @@ using SIT.Facade.Interfaces;
 using SIT.Services.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -48,7 +49,7 @@ namespace SIT.Services.UTest
         public void Setup()
         {
             // Clear the invalid list before each test
-            var list = (List<Components>)InvalidComponentsField.GetValue(null);
+            var list = (System.Collections.Concurrent.ConcurrentBag<Components>)InvalidComponentsField.GetValue(null);
             list.Clear();
         }
 
@@ -599,7 +600,7 @@ namespace SIT.Services.UTest
             Assert.AreEqual("123", component.ComponentId);
 
             // Check that it was added to the invalid list
-            var list = (List<Components>)InvalidComponentsField.GetValue(null);
+            var list = (System.Collections.Concurrent.ConcurrentBag<Components>)InvalidComponentsField.GetValue(null);
             Assert.IsTrue(list.Contains(component));
         }
 
@@ -620,7 +621,7 @@ namespace SIT.Services.UTest
             Assert.AreEqual("http://test/component/456", component.ComponentLink);
             Assert.AreEqual("456", component.ComponentId);
 
-            var list = (List<Components>)InvalidComponentsField.GetValue(null);
+            var list = (System.Collections.Concurrent.ConcurrentBag<Components>)InvalidComponentsField.GetValue(null);
             Assert.IsTrue(list.Contains(component));
         }
         [Test]
@@ -641,7 +642,7 @@ namespace SIT.Services.UTest
         public void RemoveInvalidComponentsByPurlId_OneMatch_RemovesComponent()
         {
             var invalid = new Components { Name = "apt", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" };
-            var invalidList = (List<Components>)InvalidComponentsField.GetValue(null);
+            var invalidList = (System.Collections.Concurrent.ConcurrentBag<Components>)InvalidComponentsField.GetValue(null);
             invalidList.Add(invalid);
 
             var components = new List<Components>
@@ -660,7 +661,7 @@ namespace SIT.Services.UTest
         public void RemoveInvalidComponentsByPurlId_NoMatch_ListUnchanged()
         {
             var invalid = new Components { Name = "C", Version = "3.0", ReleaseExternalId = "ref3" };
-            var invalidList = (List<Components>)InvalidComponentsField.GetValue(null);
+            var invalidList = (System.Collections.Concurrent.ConcurrentBag<Components>)InvalidComponentsField.GetValue(null);
             invalidList.Add(invalid);
 
             var components = new List<Components>
@@ -678,7 +679,7 @@ namespace SIT.Services.UTest
         public void RemoveInvalidComponentsByPurlId_MatchIsCaseInsensitiveAndTrimmed()
         {
             var invalid = new Components { Name = " apt ", Version = "2.6.1", ReleaseExternalId = "pkg:deb/debian/apt@2.6.1?arch=source" };
-            var invalidList = (List<Components>)InvalidComponentsField.GetValue(null);
+            var invalidList = (System.Collections.Concurrent.ConcurrentBag<Components>)InvalidComponentsField.GetValue(null);
             invalidList.Add(invalid);
 
             var components = new List<Components>
@@ -713,9 +714,9 @@ namespace SIT.Services.UTest
             AddToAvailableListMethod.Invoke(null, new object[] { sw360Release, component });
 
             // Assert
-            var list = (List<Components>)AvailableComponentListField.GetValue(null);
+            var list = (System.Collections.Concurrent.ConcurrentBag<Components>)AvailableComponentListField.GetValue(null);
             Assert.AreEqual(1, list.Count);
-            var added = list[0];
+            var added = list.First();
             Assert.AreEqual("TestLib", added.Name);
             Assert.AreEqual("2.1.0", added.Version);
             Assert.AreEqual("http://sw360/release/123", added.ReleaseLink);

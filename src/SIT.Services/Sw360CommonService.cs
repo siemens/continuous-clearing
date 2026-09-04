@@ -63,23 +63,23 @@ namespace SIT.Services
 
             try
             {
-                foreach (string externalIdKey in externalIdKeyList)
+                // The two external-id key formats are independent lookups; run them concurrently instead of
+                // sequentially so a component's total lookup latency isn't the sum of both round-trips.
+                ComponentStatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
+                    TryGetComponentByKey(componentName, externalIdUriString, externalIdKey)));
+
+                // Replicate the original sequential loop's merge: whichever key (in list order) last had a
+                // non-empty match wins, unless an earlier key already matched true (which would have short-circuited).
+                foreach (ComponentStatus result in results)
                 {
-                    var sw360ComponentsList = await GetCompListFromExternalIDCombinations(externalIdUriString, externalIdKey);
-                    if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                    if (result == null)
                     {
-                        string NewExternalIdUriString = Uri.EscapeDataString(componentExternalId.Replace("?arch=source", ""));
-                        sw360ComponentsList = await GetCompListFromExternalIDCombinations(NewExternalIdUriString, externalIdKey);
+                        continue;
                     }
-
-                    if (sw360ComponentsList.Count > 0)
+                    sw360components = result;
+                    if (sw360components.isComponentExist)
                     {
-                        sw360components = GetComponentExistStatus(componentName, externalIdKey, sw360ComponentsList);
-
-                        if (sw360components.isComponentExist)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
@@ -97,6 +97,24 @@ namespace SIT.Services
             }
 
             return sw360components;
+        }
+
+        /// <summary>
+        /// Looks up a component using a single external-id key format, retrying with an escaped id for Debian
+        /// packages when the first attempt returns no matches.
+        /// </summary>
+        private async Task<ComponentStatus> TryGetComponentByKey(string componentName, string externalIdUriString, string externalIdKey)
+        {
+            var sw360ComponentsList = await GetCompListFromExternalIDCombinations(externalIdUriString, externalIdKey);
+            if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+            {
+                string newExternalIdUriString = Uri.EscapeDataString(externalIdUriString.Replace("?arch=source", ""));
+                sw360ComponentsList = await GetCompListFromExternalIDCombinations(newExternalIdUriString, externalIdKey);
+            }
+
+            return sw360ComponentsList.Count > 0
+                ? GetComponentExistStatus(componentName, externalIdKey, sw360ComponentsList)
+                : null;
         }
 
         /// <summary>
@@ -132,35 +150,23 @@ namespace SIT.Services
 
             try
             {
-                foreach (string externalIdKey in externalIdKeyList)
+                // The two external-id key formats are independent lookups; run them concurrently instead of
+                // sequentially so a component's total lookup latency isn't the sum of both round-trips.
+                Releasestatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
+                    TryGetReleaseByKey(releaseName, releaseExternalId, externalIdKey)));
+
+                // Replicate the original sequential loop's merge: whichever key (in list order) last had a
+                // non-empty match wins, unless an earlier key already matched true (which would have short-circuited).
+                foreach (Releasestatus result in results)
                 {
-                    HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
-                    await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
-                    var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
-                    var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
-                    var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
-
-                    //It's for Local Sw360 servers,making an API call with EscapeDataString..
-                    if (sw360releasesdata.Count == 0 && (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
+                    if (result == null)
                     {
-                        Logger.Debug("GetReleaseDataByExternalId(): If releaseExternalId have NPM or Debian or Alpine . We reruning the api call.");
-                        releaseExternalId = Uri.EscapeDataString(releaseExternalId);
-                        httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
-                        await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
-                        responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
-                        componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
-                        sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+                        continue;
                     }
-
-                    if (sw360releasesdata.Count > 0)
+                    releasestatus = result;
+                    if (releasestatus.isReleaseExist)
                     {
-                        Releasestatus releaseStatus = GetReleaseExistStatus(releaseName, externalIdKey, sw360releasesdata);
-                        if (releaseStatus.isReleaseExist)
-                        {
-                            releasestatus.sw360Releases = releaseStatus.sw360Releases;
-                            releasestatus.isReleaseExist = releaseStatus.isReleaseExist;
-                            break;
-                        }
+                        break;
                     }
                 }
             }
@@ -182,6 +188,35 @@ namespace SIT.Services
             }
 
             return releasestatus;
+        }
+
+        /// <summary>
+        /// Looks up a release using a single external-id key format, retrying with an escaped id for NPM/Debian/
+        /// Alpine packages when the first attempt returns no matches.
+        /// </summary>
+        private async Task<Releasestatus> TryGetReleaseByKey(string releaseName, string releaseExternalId, string externalIdKey)
+        {
+            HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
+            await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
+            var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+            var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
+            var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+
+            //It's for Local Sw360 servers,making an API call with EscapeDataString..
+            if (sw360releasesdata.Count == 0 && (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
+            {
+                Logger.Debug("GetReleaseDataByExternalId(): If releaseExternalId have NPM or Debian or Alpine . We reruning the api call.");
+                string escapedReleaseExternalId = Uri.EscapeDataString(releaseExternalId);
+                httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(escapedReleaseExternalId, externalIdKey);
+                await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
+                responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
+                sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+            }
+
+            return sw360releasesdata.Count > 0
+                ? GetReleaseExistStatus(releaseName, externalIdKey, sw360releasesdata)
+                : null;
         }
 
         /// <summary>
@@ -246,6 +281,11 @@ namespace SIT.Services
             {
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, release, packageUrl);
+                if (string.IsNullOrEmpty(packageUrl))
+                {
+                    UpdateCollection(name, ref releaseCollection, release);
+                    continue;
+                }
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);
@@ -289,6 +329,11 @@ namespace SIT.Services
                 string packageUrl = string.Empty;
                 packageUrl = GetPackageUrlValue(externlaIdKey, componentsData, packageUrl);
                 Logger.DebugFormat("GetComponentExistStatus(): Component Name : {0} from {1}", name, packageUrl);
+                if (string.IsNullOrEmpty(packageUrl))
+                {
+                    UpdateCollection(name, ref componentCollection, componentsData);
+                    continue;
+                }
                 try
                 {
                     var purlids = JsonConvert.DeserializeObject<List<string>>(packageUrl);

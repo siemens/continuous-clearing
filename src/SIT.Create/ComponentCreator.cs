@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using Level = log4net.Core.Level;
@@ -45,7 +46,8 @@ namespace SIT.Create
         public List<Components> ComponentsNotLinked { get; set; } = new List<Components>();
         private Bom bom = new Bom();
         private List<Components> ListofBomComponents { get; set; } = new List<Components>();
-        private List<Components> ListofChocoComponents { get; set; } = new List<Components>();
+        // Populated concurrently from the parallel BOM-loading loop in GetListOfBomData.
+        private readonly System.Collections.Concurrent.ConcurrentBag<Components> ListofChocoComponents = new();
         public static int TotalComponentsFromPackageIdentifier { get; private set; }
 
         /// <summary>
@@ -82,58 +84,70 @@ namespace SIT.Create
         /// <returns>components list</returns>
         private async Task<List<Components>> GetListOfBomData(List<Component> components, CommonAppSettings appSettings)
         {
-            List<Components> lstOfBomDataToBeCompared = new List<Components>();
+            var lstOfBomDataToBeCompared = new System.Collections.Concurrent.ConcurrentBag<Components>();
 
-            foreach (Component item in components)
+            // Each iteration's only real cost is the external registry lookup in GetSourceUrl (npm/NuGet/Debian/
+            // PyPI/Conan/Alpine/Cargo); the rest is CPU-bound. Bound the fan-out instead of awaiting components
+            // one-by-one, since that sequential loop was the dominant cost before SW360 is even contacted.
+            using SemaphoreSlim throttle = new SemaphoreSlim(APICommunications.ApiConstant.Sw360LookupMaxConcurrency);
+            await Task.WhenAll(components.Select(async item =>
             {
-                Components componentsData = new Components();
-
-                string currName = item.Name;
-                string currVersion = item.Version;
-
-                bool isInternalComponent = GetPackageType(item, ref componentsData);
-                UpdatePurlForProjectType(item, componentsData.ProjectType);
-                if (componentsData.ProjectType.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
+                await throttle.WaitAsync();
+                try
                 {
-                    Logger.DebugFormat("{0}-{1} found as Choco component.", item.Name, item.Version);
-                    ListofChocoComponents.Add(new Components
+                    Components componentsData = new Components();
+
+                    string currName = item.Name;
+                    string currVersion = item.Version;
+
+                    bool isInternalComponent = GetPackageType(item, ref componentsData);
+                    UpdatePurlForProjectType(item, componentsData.ProjectType);
+                    if (componentsData.ProjectType.Equals("choco", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        Name = item.Name,
-                        Version = item.Version,
-                        ProjectType = componentsData.ProjectType
-                    });
-                }
-                else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
-                {
-                    LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);
-                }
-                else
-                {
-                    componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
-                    componentsData.Name = GetPackageName(item);
-                    componentsData.Group = item.Group;
-                    componentsData.Version = item.Version;
-                    componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
-                    componentsData.ReleaseExternalId = item.Purl;
-                    Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
-                    componentsData.SourceUrl = component.SourceUrl;
-
-                    if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        componentsData.AlpineSourceData = component.AlpineSourceData;
+                        Logger.DebugFormat("{0}-{1} found as Choco component.", item.Name, item.Version);
+                        ListofChocoComponents.Add(new Components
+                        {
+                            Name = item.Name,
+                            Version = item.Version,
+                            ProjectType = componentsData.ProjectType
+                        });
                     }
-
-                    if (componentsData.ProjectType.Equals(DebianProjectType, StringComparison.InvariantCultureIgnoreCase))
+                    else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
                     {
-                        componentsData = component;
+                        LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);
                     }
-                    UpdateToLocalBomFile(componentsData, currName, currVersion);
+                    else
+                    {
+                        componentsData.DownloadUrl = Dataconstant.DownloadUrlNotFound;
+                        componentsData.Name = GetPackageName(item);
+                        componentsData.Group = item.Group;
+                        componentsData.Version = item.Version;
+                        componentsData.ComponentExternalId = item.Purl.Substring(0, item.Purl.IndexOf('@'));
+                        componentsData.ReleaseExternalId = item.Purl;
+                        Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
+                        componentsData.SourceUrl = component.SourceUrl;
 
-                    lstOfBomDataToBeCompared.Add(componentsData);
+                        if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            componentsData.AlpineSourceData = component.AlpineSourceData;
+                        }
+
+                        if (componentsData.ProjectType.Equals(DebianProjectType, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            componentsData = component;
+                        }
+                        UpdateToLocalBomFile(componentsData, currName, currVersion);
+
+                        lstOfBomDataToBeCompared.Add(componentsData);
+                    }
                 }
-            }
+                finally
+                {
+                    throttle.Release();
+                }
+            }));
 
-            return lstOfBomDataToBeCompared;
+            return lstOfBomDataToBeCompared.ToList();
         }
 
         /// <summary>
@@ -393,7 +407,7 @@ namespace SIT.Create
             LoggerHelper.WriteComponentsNotLinkedListInConsole(ComponentsNotLinked);
 
             // Notify user about manual steps required for Choco packages
-            LoggerHelper.WriteChocoManualStepsNotification(ListofChocoComponents);
+            LoggerHelper.WriteChocoManualStepsNotification(ListofChocoComponents.ToList());
 
             Logger.Debug("CreateComponentInSw360():Create component process completed");
         }
