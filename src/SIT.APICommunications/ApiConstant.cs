@@ -44,16 +44,19 @@ namespace SIT.APICommunications
 
         /// <summary>
         /// The page size requested per call when paging through the SW360 releases endpoint specifically.
-        /// Lowered from 100000 so large release lists are split into multiple pages and fetched concurrently
-        /// (see <see cref="MaxParallelPageRequests"/>) instead of one very slow single-page request, while still
-        /// staying high enough to avoid SW360's unreliable deep-pagination behavior for typical dataset sizes.
         /// </summary>
-        public const int ReleaseListPageSize = 20000;
+        public const int ReleaseListPageSize = 100000;
 
         /// <summary>
         /// The maximum number of pages fetched concurrently when paging through SW360 list endpoints.
         /// </summary>
         public const int MaxParallelPageRequests = 4;
+
+        /// <summary>
+        /// The maximum number of concurrent SW360 lookups (release/component existence checks) per component,
+        /// bounded to avoid overwhelming the server while still parallelizing slow searchByExternalIds calls.
+        /// </summary>
+        public const int Sw360LookupMaxConcurrency = 8;
 
         /// <summary>
         /// Query params requesting full details plus Lucene-backed search, used by list endpoints that support both.

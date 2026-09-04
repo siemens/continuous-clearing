@@ -25,6 +25,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using File = System.IO.File;
 
@@ -41,8 +42,9 @@ namespace SIT.Services
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         private readonly ISW360CommonService m_SW360CommonService;
-        private static List<Components> availableComponentList = new List<Components>();
-        private static readonly List<Components> InvalidComponentsIdentifiedByPurlId = new List<Components>();
+        // Concurrent bags: components are checked in parallel, so additions must be thread-safe.
+        private static readonly System.Collections.Concurrent.ConcurrentBag<Components> availableComponentList = new();
+        private static readonly System.Collections.Concurrent.ConcurrentBag<Components> InvalidComponentsIdentifiedByPurlId = new();
         public Sw360Service(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, IEnvironmentHelper _environmentHelper)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
@@ -63,7 +65,7 @@ namespace SIT.Services
         /// duplicates are found.</returns>
         public List<Components> GetDuplicateComponentsByPurlId()
         {
-            return InvalidComponentsIdentifiedByPurlId;
+            return InvalidComponentsIdentifiedByPurlId.ToList();
         }
 
         /// <summary>
@@ -388,28 +390,39 @@ namespace SIT.Services
             IList<Sw360Components> sw360ComponentList = await GetAvailableComponenentsListFromSw360();
             if (sw360Releases == null || sw360Releases.Count == 0)
             {
-                return availableComponentList;
+                return availableComponentList.ToList();
             }
 
-            foreach (Components component in listOfComponentsToBom)
+            // Each iteration is an independent, slow (network-bound) SW360 lookup, so bound the fan-out
+            // instead of awaiting components one-by-one to avoid multi-hour sequential runs.
+            using SemaphoreSlim throttle = new SemaphoreSlim(APICommunications.ApiConstant.Sw360LookupMaxConcurrency);
+            await Task.WhenAll(listOfComponentsToBom.Select(async component =>
             {
-                if (await CheckReleaseExistenceByExternalId(component) ||
-                       CheckAvailabilityByNameAndVersion(sw360Releases, component, sw360ComponentList))
+                await throttle.WaitAsync();
+                try
                 {
-                    Logger.DebugFormat("GetAvailableComponenentsList():  Release Exist : Release name - {0}, version - {1}", component.Name, component.Version);
+                    if (await CheckReleaseExistenceByExternalId(component) ||
+                           CheckAvailabilityByNameAndVersion(sw360Releases, component, sw360ComponentList))
+                    {
+                        Logger.DebugFormat("GetAvailableComponenentsList():  Release Exist : Release name - {0}, version - {1}", component.Name, component.Version);
+                    }
+                    else if (await CheckComponentExistenceByExternalId(component) ||
+                             CheckAvailabilityByName(sw360ComponentList, component))
+                    {
+                        Logger.DebugFormat("GetAvailableComponenentsList():  Component Exist : Component name - {0}, version - {1}", component.Name, component.Version);
+                    }
+                    else
+                    {
+                        // Do Nothing or to be implemented
+                    }
                 }
-                else if (await CheckComponentExistenceByExternalId(component) ||
-                         CheckAvailabilityByName(sw360ComponentList, component))
+                finally
                 {
-                    Logger.DebugFormat("GetAvailableComponenentsList():  Component Exist : Component name - {0}, version - {1}", component.Name, component.Version);
+                    throttle.Release();
                 }
-                else
-                {
-                    // Do Nothing or to be implemented
-                }
-            }
+            }));
             RemoveInvalidComponentsByPurlId(listOfComponentsToBom);
-            return availableComponentList;
+            return availableComponentList.ToList();
         }
 
         /// <summary>
