@@ -37,22 +37,10 @@ namespace SIT.APICommunications
         public const string Sw360UsersSuffix = "/resource/api/users";
 
         /// <summary>
-        /// The page size requested per call when paging through SW360 list endpoints. Kept close to the server's
-        /// 200000 cap so most datasets fit on a single page, avoiding SW360's unreliable deep-pagination behavior.
+        /// The page size used for the cheap first-page probe against SW360 list endpoints, before deciding whether
+        /// to fetch every remaining record in a single follow-up call.
         /// </summary>
-        public const int ListPageSize = 100;
-
-        /// <summary>
-        /// The page size requested per call when paging through the SW360 releases endpoint specifically. Kept
-        /// well under the prior 100000 cap so large datasets span multiple pages, letting FetchAllPagesAsync's
-        /// concurrent page fetching actually kick in instead of the server resolving everything in one huge query.
-        /// </summary>
-        public const int ReleaseListPageSize = 10000;
-
-        /// <summary>
-        /// The maximum number of pages fetched concurrently when paging through SW360 list endpoints.
-        /// </summary>
-        public const int MaxParallelPageRequests = 4;
+        public const int ListPageSize = 10;
 
         /// <summary>
         /// The maximum number of concurrent SW360 lookups (release/component existence checks) per component,

@@ -81,7 +81,9 @@ namespace SIT.Create
         /// <returns></returns>
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
-            ReleasesAllDetails firstPageResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, 0, ApiConstant.ReleaseListPageSize);
+            // Cheap probe: most datasets have a qualifying release near the start, so try a small first page
+            // before paying for a full-dataset fetch.
+            ReleasesAllDetails firstPageResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, 0, ApiConstant.ListPageSize);
             if (firstPageResponse == null)
             {
                 Logger.Debug($"FindValidRelease(): Fossology token validation failed in SW360 due to release not found");
@@ -94,28 +96,24 @@ namespace SIT.Create
                 return validRelease;
             }
 
-            // Worst-case datasets span hundreds of pages, and a match could be on the very last one, so scanning
-            // every page sequentially isn't safe to cap. Fetch remaining pages in concurrent batches instead,
-            // stopping as soon as any page in a batch yields a match.
-            int totalPages = firstPageResponse.Page?.TotalPages ?? 1;
-            foreach (int[] batch in Enumerable.Range(1, Math.Max(0, totalPages - 1)).Chunk(ApiConstant.MaxParallelPageRequests))
+            int totalElements = firstPageResponse.Page?.TotalElements ?? 0;
+            if (totalElements <= ApiConstant.ListPageSize)
             {
-                ReleasesAllDetails[] pageResponses = await Task.WhenAll(batch.Select(page =>
-                    GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ReleaseListPageSize)));
-
-                foreach (ReleasesAllDetails pageResponse in pageResponses)
-                {
-                    Logger.Debug($"FindValidRelease(): Release response data: {JsonConvert.SerializeObject(pageResponse)}");
-                    validRelease = TryFindValidReleaseInPage(pageResponse);
-                    if (validRelease != null)
-                    {
-                        return validRelease;
-                    }
-                }
+                Logger.Debug($"FindValidRelease(): No valid release found across all pages");
+                return null;
             }
 
-            Logger.Debug($"FindValidRelease(): No valid release found across all pages");
-            return null;
+            // No match on the probe page: discard it and fetch every remaining release in a single call
+            // instead of paging through the rest, trading one larger request for many smaller round-trips.
+            Logger.DebugFormat("FindValidRelease(): No match in first {0} releases; fetching remaining {1} in one call", ApiConstant.ListPageSize, totalElements);
+            ReleasesAllDetails fullResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, 0, totalElements);
+            validRelease = TryFindValidReleaseInPage(fullResponse);
+            if (validRelease == null)
+            {
+                Logger.Debug($"FindValidRelease(): No valid release found across all pages");
+            }
+
+            return validRelease;
         }
 
         /// <summary>

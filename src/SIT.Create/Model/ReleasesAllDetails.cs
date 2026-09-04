@@ -147,6 +147,12 @@ namespace SIT.Create.Model
             /// </summary>
             [JsonProperty("totalPages")]
             public int TotalPages { get; set; }
+
+            /// <summary>
+            /// Gets or sets the total number of elements across all pages.
+            /// </summary>
+            [JsonProperty("totalElements")]
+            public int TotalElements { get; set; }
             #endregion
         }
     }

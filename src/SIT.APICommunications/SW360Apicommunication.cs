@@ -183,7 +183,7 @@ namespace SIT.APICommunications
             try
             {
                 await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases()", httpClient, sw360ReleaseApi);
-                using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, ApiConstant.ReleaseListPageSize);
+                using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, ApiConstant.ListPageSize);
                 response.EnsureSuccessStatusCode();
                 result = await response.Content.ReadAsStringAsync();
             }
@@ -282,7 +282,8 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get release details by externalid");
             string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
             await LogHandlingHelper.HttpRequestHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", httpClient, releaseByExternalIdUrl);
-            return await httpClient.GetAsync(releaseByExternalIdUrl);
+            // Matches are expected to be few, but route through the pagination-aware fetch so a large match count isn't silently truncated.
+            return await FetchAllPagesAsync(httpClient, releaseByExternalIdUrl, ApiConstant.ListPageSize);
         }
 
         /// <summary>
@@ -297,7 +298,8 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get component details by externalid");
             string componentByExternalIdUrl = $"{sw360ComponentByExternalId}{externalIdKey}{purlId}";
             await LogHandlingHelper.HttpRequestHandling("Request for get component data by ExternalId", $"MethodName:GetComponentByExternalId()", httpClient, componentByExternalIdUrl);
-            return await httpClient.GetAsync(componentByExternalIdUrl);
+            // Matches are expected to be few, but route through the pagination-aware fetch so a large match count isn't silently truncated.
+            return await FetchAllPagesAsync(httpClient, componentByExternalIdUrl, ApiConstant.ListPageSize);
         }
 
         /// <summary>
@@ -555,9 +557,9 @@ namespace SIT.APICommunications
 
         /// <summary>
         /// Fetches every page of a paginated SW360 list endpoint and merges the "_embedded" arrays into one JSON payload,
-        /// so callers keep seeing the full result set even when it exceeds the server's per-page cap. The first page is
-        /// fetched alone to discover the page count; remaining pages are then fetched concurrently, bounded by
-        /// <see cref="ApiConstant.MaxParallelPageRequests"/>.
+        /// so callers keep seeing the full result set even when it exceeds the server's per-page cap. A small first page
+        /// is fetched to discover the total element count; if more records exist, that page is discarded and every
+        /// remaining record is fetched in a single follow-up call instead of paging through the rest.
         /// </summary>
         /// <param name="httpClient">The configured HttpClient to issue requests with.</param>
         /// <param name="baseUrl">The list endpoint URL, optionally including filter query parameters but not pagination parameters.</param>
@@ -580,28 +582,14 @@ namespace SIT.APICommunications
             }
 
             JObject firstPage = JObject.Parse(await firstPageResponse.Content.ReadAsStringAsync());
-            int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
+            int totalElements = firstPage["page"]?["totalElements"]?.Value<int>() ?? 0;
 
-            if (totalPages > 1)
+            if (totalElements > pageSize)
             {
-                var remainingPages = new JObject[totalPages - 1];
-
-                // Fetch pages in fixed-size batches so logs stay grouped by batch instead of interleaving
-                // across a continuously rolling window of concurrent requests.
-                foreach (int[] batch in Enumerable.Range(1, totalPages - 1).Chunk(ApiConstant.MaxParallelPageRequests))
-                {
-                    await Task.WhenAll(batch.Select(async pageNumber =>
-                    {
-                        using HttpResponseMessage pageResponse = await GetPageAsync(httpClient, baseUrl, pageNumber, pageSize, extraQueryParams);
-                        pageResponse.EnsureSuccessStatusCode();
-                        remainingPages[pageNumber - 1] = JObject.Parse(await pageResponse.Content.ReadAsStringAsync());
-                    }));
-                }
-
-                foreach (JObject page in remainingPages)
-                {
-                    MergeEmbeddedPage(firstPage, page);
-                }
+                // No need to keep paging: discard the probe page and pull every remaining record in one shot.
+                using HttpResponseMessage fullResponse = await GetPageAsync(httpClient, baseUrl, 0, totalElements, extraQueryParams);
+                fullResponse.EnsureSuccessStatusCode();
+                firstPage = JObject.Parse(await fullResponse.Content.ReadAsStringAsync());
             }
 
             return new HttpResponseMessage(firstPageResponse.StatusCode)
@@ -627,28 +615,6 @@ namespace SIT.APICommunications
             string extraQueryPrefix = string.IsNullOrEmpty(normalizedExtraQueryParams) ? string.Empty : $"{normalizedExtraQueryParams}&";
             string pageUrl = $"{baseUrl}{querySeparator}{extraQueryPrefix}page={page}&page_entries={pageSize}";
             return httpClient.GetAsync(pageUrl);
-        }
-
-        /// <summary>
-        /// Appends the "_embedded" array items of a subsequent page onto the accumulated result, for whichever
-        /// entity key (sw360:releases, sw360:components, etc.) the response uses.
-        /// </summary>
-        /// <param name="accumulated">The merged result built up so far; mutated in place.</param>
-        /// <param name="page">The newly fetched page to merge in.</param>
-        private static void MergeEmbeddedPage(JObject accumulated, JObject page)
-        {
-            if (accumulated["_embedded"] is not JObject accumulatedEmbedded || page["_embedded"] is not JObject pageEmbedded)
-            {
-                return;
-            }
-
-            foreach (JProperty property in pageEmbedded.Properties())
-            {
-                if (accumulatedEmbedded[property.Name] is JArray accumulatedArray && property.Value is JArray pageArray)
-                {
-                    accumulatedArray.Merge(pageArray);
-                }
-            }
         }
 
         /// <summary>
