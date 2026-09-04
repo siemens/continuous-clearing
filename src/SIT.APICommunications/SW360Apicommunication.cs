@@ -177,7 +177,7 @@ namespace SIT.APICommunications
             try
             {
                 await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases()", httpClient, sw360ReleaseApi);
-                result = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, ApiConstant.ReleaseListPageSize, ApiConstant.AllDetailsAndLuceneSearchParams);
+                result = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, ApiConstant.ReleaseListPageSize);
             }
             catch (TaskCanceledException ex)
             {
@@ -257,7 +257,7 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get components details");
             await LogHandlingHelper.HttpRequestHandling("Request for get components data", $"MethodName:GetComponents()", httpClient, sw360ComponentApi);
-            return await FetchAllPagesAsync(httpClient, sw360ComponentApi, ApiConstant.ListPageSize, ApiConstant.AllDetailsAndLuceneSearchParams);
+            return await FetchAllPagesAsync(httpClient, sw360ComponentApi, ApiConstant.ListPageSize);
         }
 
         /// <summary>
