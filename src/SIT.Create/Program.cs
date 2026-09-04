@@ -105,7 +105,10 @@ namespace SIT.Create
             //Validate Fossology Url
             if (appSettings.SW360.Fossology.EnableTrigger && !appSettings.IsTestMode)
             {
-                HttpClient client = new HttpClient();
+                HttpClient client = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(appSettings.TimeOut)
+                };
                 if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))
                     await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
             }

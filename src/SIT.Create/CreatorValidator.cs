@@ -252,6 +252,13 @@ namespace SIT.Create
                         LogHandlingHelper.ExceptionErrorHandling("HttpRequestException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "Check the network connection and ensure the Fossology server is reachable.");
                         environmentHelper.CallEnvironmentExit(-1);
                     }
+                    catch (TaskCanceledException ex)
+                    {
+                        // Request timed out (HttpClient.Timeout elapsed) rather than failing outright
+                        Logger.Error($"Fossology URL validation timed out. Please check and try again.", ex);
+                        LogHandlingHelper.ExceptionErrorHandling("TaskCanceledException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "The Fossology server took too long to respond. Check connectivity or increase the timeout and try again.");
+                        environmentHelper.CallEnvironmentExit(-1);
+                    }
                 }
                 else
                 {

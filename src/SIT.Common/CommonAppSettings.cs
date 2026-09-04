@@ -40,7 +40,7 @@ namespace SIT.Common
             Directory = new Directory();
         }
 
-        public int TimeOut { get; set; } = 200;
+        public int TimeOut { get; set; } = 800;
         public string ProjectType
         {
             get
