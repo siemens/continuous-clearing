@@ -177,7 +177,7 @@ namespace SIT.APICommunications
             try
             {
                 await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases()", httpClient, sw360ReleaseApi);
-                result = await FetchAllPagesAsync(httpClient, sw360ReleaseApi);
+                result = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, "allDetails=true&luceneSearch=true&");
             }
             catch (TaskCanceledException ex)
             {
@@ -547,10 +547,11 @@ namespace SIT.APICommunications
         /// </summary>
         /// <param name="httpClient">The configured HttpClient to issue requests with.</param>
         /// <param name="baseUrl">The list endpoint URL, without pagination query parameters.</param>
+        /// <param name="extraQueryParams">Additional query string (starting with '&amp;') appended to every page request.</param>
         /// <returns>A single merged JSON string covering every page.</returns>
-        private static async Task<string> FetchAllPagesAsync(HttpClient httpClient, string baseUrl)
+        private static async Task<string> FetchAllPagesAsync(HttpClient httpClient, string baseUrl, string extraQueryParams = "")
         {
-            JObject firstPage = await GetPageAsync(httpClient, baseUrl, 0);
+            JObject firstPage = await GetPageAsync(httpClient, baseUrl, 0, extraQueryParams);
             int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
 
             if (totalPages > 1)
@@ -566,7 +567,7 @@ namespace SIT.APICommunications
                     parallelOptions,
                     async (pageNumber, cancellationToken) =>
                     {
-                        remainingPages[pageNumber - 1] = await GetPageAsync(httpClient, baseUrl, pageNumber);
+                        remainingPages[pageNumber - 1] = await GetPageAsync(httpClient, baseUrl, pageNumber, extraQueryParams);
                     });
 
                 foreach (JObject page in remainingPages)
@@ -584,9 +585,10 @@ namespace SIT.APICommunications
         /// <param name="httpClient">The configured HttpClient to issue the request with.</param>
         /// <param name="baseUrl">The list endpoint URL, without pagination query parameters.</param>
         /// <param name="page">The 0-based page number to request.</param>
-        private static async Task<JObject> GetPageAsync(HttpClient httpClient, string baseUrl, int page)
+        /// <param name="extraQueryParams">Additional query string (starting with '&amp;') appended to the request.</param>
+        private static async Task<JObject> GetPageAsync(HttpClient httpClient, string baseUrl, int page, string extraQueryParams = "")
         {
-            string pageUrl = $"{baseUrl}?allDetails=true&luceneSearch=true&page={page}&page_entries={ApiConstant.ListPageSize}";
+            string pageUrl = $"{baseUrl}?{extraQueryParams}page={page}&page_entries={ApiConstant.ListPageSize}";
             string pageContent = await httpClient.GetStringAsync(pageUrl);
             return JObject.Parse(pageContent);
         }

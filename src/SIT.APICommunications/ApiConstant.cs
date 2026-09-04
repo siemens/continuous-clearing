@@ -40,7 +40,7 @@ namespace SIT.APICommunications
         /// The page size requested per call when paging through SW360 list endpoints. Kept close to the server's
         /// 200000 cap so most datasets fit on a single page, avoiding SW360's unreliable deep-pagination behavior.
         /// </summary>
-        public const int ListPageSize = 100000;
+        public const int ListPageSize = 10000;
 
         /// <summary>
         /// The maximum number of pages fetched concurrently when paging through SW360 list endpoints.
