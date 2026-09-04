@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIT.APICommunications
@@ -39,6 +40,13 @@ namespace SIT.APICommunications
         /// </summary>
         private bool _initialRetryLogged = false;
 
+        /// <summary>
+        /// The timeout applied to each individual HTTP attempt. When this elapses the current attempt is
+        /// cancelled and (if retries remain) retried, instead of the whole retry chain sharing a single
+        /// <see cref="HttpClient.Timeout"/> budget.
+        /// </summary>
+        private readonly TimeSpan _perAttemptTimeout;
+
         #endregion Fields
 
         #region Constructors
@@ -46,8 +54,16 @@ namespace SIT.APICommunications
         /// <summary>
         /// Initializes a new instance of the <see cref="RetryHttpClientHandler"/> class with a default retry policy.
         /// </summary>
-        public RetryHttpClientHandler()
+        /// <param name="perAttemptTimeoutSeconds">
+        /// The timeout, in seconds, applied to each individual HTTP attempt. Use a value less than or equal to zero
+        /// to disable the per-attempt timeout.
+        /// </param>
+        public RetryHttpClientHandler(int perAttemptTimeoutSeconds = 0)
         {
+            _perAttemptTimeout = perAttemptTimeoutSeconds > 0
+                ? TimeSpan.FromSeconds(perAttemptTimeoutSeconds)
+                : Timeout.InfiniteTimeSpan;
+
             // Define the retry policy (retry on 5xx, 408, 406, 400 and transient errors; exclude 401 and 403)
             _retryPolicy = Policy
                 .Handle<HttpRequestException>()
@@ -113,7 +129,26 @@ namespace SIT.APICommunications
 
             var response = await _retryPolicy.ExecuteAsync(async (ctx) =>
             {
-                return await base.SendAsync(request, cancellationToken); // Pass the request to the next handler (HttpClient)
+                // Apply a per-attempt timeout so a single slow attempt is cancelled and retried, rather than
+                // every attempt (plus back-off waits) sharing one HttpClient.Timeout budget that, once exceeded,
+                // cancels the whole operation.
+                if (_perAttemptTimeout == Timeout.InfiniteTimeSpan)
+                {
+                    return await base.SendAsync(request, cancellationToken); // Pass the request to the next handler (HttpClient)
+                }
+
+                using var attemptCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                attemptCts.CancelAfter(_perAttemptTimeout);
+                try
+                {
+                    return await base.SendAsync(request, attemptCts.Token);
+                }
+                catch (OperationCanceledException) when (attemptCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                {
+                    // The per-attempt timeout elapsed (not an external cancellation); surface as a timeout so the
+                    // retry policy treats it as a transient failure and retries.
+                    throw new TaskCanceledException($"The attempt timed out after {_perAttemptTimeout.TotalSeconds} seconds.");
+                }
             }, context);
 
             if (_initialRetryLogged)

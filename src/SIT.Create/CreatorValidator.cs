@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using log4net;
+using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
@@ -81,25 +82,27 @@ namespace SIT.Create
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             int page = 0;
-            const int pageEntries = 40;
             int pageCount = 0;
 
             while (pageCount < 10)
             {
-                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, pageEntries);
+                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ListPageSize);
 
                 if (releaseResponse == null)
                 {
                     Logger.Debug($"FindValidRelease(): Fossology token validation failed in SW360 due to release not found");
                     break;
                 }
+                // Log all the release response data for debugging purposes
+                Logger.Debug($"FindValidRelease(): Release response data: {JsonConvert.SerializeObject(releaseResponse)}");
 
+                var source = "SOURCE";
+
+                // Only an already-APPROVED release with source is a safe target to probe the Fossology connection
                 var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
-                    release?.ClearingState == "APPROVED" &&
+                    release?.ClearingState == Dataconstant.Approved &&
                     release.AllReleasesEmbedded?.Sw360attachments != null &&
-                    release.AllReleasesEmbedded.Sw360attachments.Any(attachments =>
-                        attachments.Count != 0 &&
-                        attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1));
+                    release.AllReleasesEmbedded.Sw360attachments.Any(attachment => source.Equals(attachment?.AttachmentType, StringComparison.OrdinalIgnoreCase)));
 
                 if (validRelease != null)
                 {
