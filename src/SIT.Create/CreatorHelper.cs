@@ -26,6 +26,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
@@ -383,25 +384,38 @@ namespace SIT.Create
         /// <returns>BOM data</returns>
         private async Task<List<ComparisonBomData>> GetComparisionBomItems(List<Components> lstComponentForBOM, ISW360Service sw360Service)
         {
-            List<ComparisonBomData> comparisonBomData = new();
-            ComparisonBomData mapper;
+            var comparisonBomData = new ComparisonBomData[lstComponentForBOM.Count];
 
-            foreach (Components item in lstComponentForBOM)
+            // Each iteration's only network call is the release-info lookup below; the rest is CPU-bound
+            // mapping. Bound the fan-out so a large BOM doesn't run these lookups one-by-one sequentially.
+            using SemaphoreSlim throttle = new SemaphoreSlim(APICommunications.ApiConstant.Sw360LookupMaxConcurrency);
+            await Task.WhenAll(lstComponentForBOM.Select(async (item, index) =>
             {
-                mapper = new ComparisonBomData();
-                ReleasesInfo releasesInfo = await GetReleaseInfoFromSw360(item, componentsAvailableInSw360, sw360Service);
-                IRepository repo = new Repository();
+                await throttle.WaitAsync();
+                ReleasesInfo releasesInfo;
+                try
+                {
+                    releasesInfo = await GetReleaseInfoFromSw360(item, componentsAvailableInSw360, sw360Service);
+                }
+                finally
+                {
+                    throttle.Release();
+                }
 
-                mapper.Name = item.Name;
-                mapper.Group = item.Group;
-                mapper.Version = item.Version;
-                mapper.ComponentExternalId = item.ComponentExternalId;
-                mapper.ReleaseExternalId = item.ReleaseExternalId;
-                mapper.SourceUrl = item.SourceUrl;
-                mapper.DownloadUrl = item.DownloadUrl;
-                mapper.ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item);
-                mapper.ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId);
-                mapper.AlpineSource = item.AlpineSourceData;
+                IRepository repo = new Repository();
+                ComparisonBomData mapper = new ComparisonBomData
+                {
+                    Name = item.Name,
+                    Group = item.Group,
+                    Version = item.Version,
+                    ComponentExternalId = item.ComponentExternalId,
+                    ReleaseExternalId = item.ReleaseExternalId,
+                    SourceUrl = item.SourceUrl,
+                    DownloadUrl = item.DownloadUrl,
+                    ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item),
+                    ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId),
+                    AlpineSource = item.AlpineSourceData
+                };
 
                 if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
                 {
@@ -421,9 +435,9 @@ namespace SIT.Create
                 }
                 SetMapperStatus(mapper, releasesInfo);
                 Logger.DebugFormat("Sw360 availability status for Name {0}: {1}={2} - Version {3}: {4}={5}", mapper.Name, mapper.ComponentExternalId, mapper.ComponentStatus, mapper.Version, mapper.ReleaseExternalId, mapper.ReleaseStatus);
-                comparisonBomData.Add(mapper);
-            }
-            return comparisonBomData;
+                comparisonBomData[index] = mapper;
+            }));
+            return comparisonBomData.ToList();
         }
 
         /// <summary>
