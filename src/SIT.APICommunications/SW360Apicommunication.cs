@@ -492,7 +492,7 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get release data by component name");
             string url = $"{sw360ReleaseNameApi}{componentName}";
             await LogHandlingHelper.HttpRequestHandling("Get Release By Compoenent Name", $"MethodName:GetReleaseByCompoenentName()", httpClient, url);
-            using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, url, ApiConstant.ReleaseListPageSize);
+            using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, url, ApiConstant.ListPageSize);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }

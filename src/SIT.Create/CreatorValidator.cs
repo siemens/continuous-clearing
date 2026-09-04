@@ -81,63 +81,57 @@ namespace SIT.Create
         /// <returns></returns>
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
-            int page = 0;
-            int pageCount = 0;
-
-            while (pageCount < 10)
+            ReleasesAllDetails firstPageResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, 0, ApiConstant.ReleaseListPageSize);
+            if (firstPageResponse == null)
             {
-                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ReleaseListPageSize);
+                Logger.Debug($"FindValidRelease(): Fossology token validation failed in SW360 due to release not found");
+                return null;
+            }
 
-                if (releaseResponse == null)
+            var validRelease = TryFindValidReleaseInPage(firstPageResponse);
+            if (validRelease != null)
+            {
+                return validRelease;
+            }
+
+            // Worst-case datasets span hundreds of pages, and a match could be on the very last one, so scanning
+            // every page sequentially isn't safe to cap. Fetch remaining pages in concurrent batches instead,
+            // stopping as soon as any page in a batch yields a match.
+            int totalPages = firstPageResponse.Page?.TotalPages ?? 1;
+            foreach (int[] batch in Enumerable.Range(1, Math.Max(0, totalPages - 1)).Chunk(ApiConstant.MaxParallelPageRequests))
+            {
+                ReleasesAllDetails[] pageResponses = await Task.WhenAll(batch.Select(page =>
+                    GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ReleaseListPageSize)));
+
+                foreach (ReleasesAllDetails pageResponse in pageResponses)
                 {
-                    Logger.Debug($"FindValidRelease(): Fossology token validation failed in SW360 due to release not found");
-                    break;
-                }
-                // Log all the release response data for debugging purposes
-                Logger.Debug($"FindValidRelease(): Release response data: {JsonConvert.SerializeObject(releaseResponse)}");
-
-                var source = "SOURCE";
-
-                // Only an already-APPROVED release with source is a safe target to probe the Fossology connection
-                var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
-                    release?.ClearingState == Dataconstant.Approved &&
-                    release.AllReleasesEmbedded?.Sw360attachments != null &&
-                    release.AllReleasesEmbedded.Sw360attachments.Any(attachment => source.Equals(attachment?.AttachmentType, StringComparison.OrdinalIgnoreCase)));
-
-                if (validRelease != null)
-                {
-                    return validRelease;
-                }
-
-                if (!MoveToNextPage(releaseResponse, ref page, ref pageCount))
-                {
-                    break;
+                    Logger.Debug($"FindValidRelease(): Release response data: {JsonConvert.SerializeObject(pageResponse)}");
+                    validRelease = TryFindValidReleaseInPage(pageResponse);
+                    if (validRelease != null)
+                    {
+                        return validRelease;
+                    }
                 }
             }
 
+            Logger.Debug($"FindValidRelease(): No valid release found across all pages");
             return null;
         }
 
         /// <summary>
-        /// Moves To Next Page
+        /// Finds the first release in a page that is already APPROVED and has a SOURCE attachment, making it a
+        /// safe target to probe the Fossology connection.
         /// </summary>
         /// <param name="releaseResponse"></param>
-        /// <param name="page"></param>
-        /// <param name="pageCount"></param>
-        /// <returns>boolean value</returns>
-        private static bool MoveToNextPage(ReleasesAllDetails releaseResponse, ref int page, ref int pageCount)
+        /// <returns>the matching release, or null if the page has no qualifying release</returns>
+        private static ReleasesAllDetails.Sw360Release TryFindValidReleaseInPage(ReleasesAllDetails releaseResponse)
         {
-            int currentPage = page;
-            int totalPages = releaseResponse?.Page?.TotalPages ?? 0;
+            const string source = "SOURCE";
 
-            if (currentPage < totalPages - 1)
-            {
-                page = currentPage + 1;
-                pageCount++;
-                return true;
-            }
-
-            return false;
+            return releaseResponse?.Embedded?.Sw360releases?.FirstOrDefault(release =>
+                release?.ClearingState == Dataconstant.Approved &&
+                release.AllReleasesEmbedded?.Sw360attachments != null &&
+                release.AllReleasesEmbedded.Sw360attachments.Any(attachment => source.Equals(attachment?.AttachmentType, StringComparison.OrdinalIgnoreCase)));
         }
 
         /// <summary>
