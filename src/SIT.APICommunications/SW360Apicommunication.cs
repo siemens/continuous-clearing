@@ -82,7 +82,9 @@ namespace SIT.APICommunications
             var result = string.Empty;
             try
             {
-                result = await FetchAllPagesAsync(httpClient, sw360ProjectsApi, ApiConstant.ListPageSize, ApiConstant.AllDetailsAndLuceneSearchParams);
+                using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, sw360ProjectsApi, ApiConstant.ListPageSize, ApiConstant.AllDetailsAndLuceneSearchParams);
+                response.EnsureSuccessStatusCode();
+                result = await response.Content.ReadAsStringAsync();
             }
             catch (TaskCanceledException ex)
             {
@@ -101,7 +103,9 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get Sw360 users");
-            return await FetchAllPagesAsync(httpClient, sw360UsersApi, ApiConstant.ListPageSize, ApiConstant.LuceneSearchOnlyParam);
+            using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, sw360UsersApi, ApiConstant.ListPageSize, ApiConstant.LuceneSearchOnlyParam);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         /// <summary>
@@ -114,7 +118,9 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get projects by name");
             string projectNameApiUrl = $"{sw360ProjectsApi}{ApiConstant.ComponentNameUrl}{projectName}";
-            return await httpClient.GetStringAsync(projectNameApiUrl);
+            using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, projectNameApiUrl, ApiConstant.ListPageSize);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         /// <summary>
@@ -127,7 +133,7 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get projects by tag");
             string projectsByTagUrl = $"{sw360ProjectByTagApi}{projectTag}";
-            return await httpClient.GetAsync(projectsByTagUrl);
+            return await FetchAllPagesAsync(httpClient, projectsByTagUrl, ApiConstant.ListPageSize);
         }
 
         /// <summary>
@@ -177,7 +183,9 @@ namespace SIT.APICommunications
             try
             {
                 await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases()", httpClient, sw360ReleaseApi);
-                result = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, ApiConstant.ReleaseListPageSize);
+                using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, ApiConstant.ReleaseListPageSize);
+                response.EnsureSuccessStatusCode();
+                result = await response.Content.ReadAsStringAsync();
             }
             catch (TaskCanceledException ex)
             {
@@ -257,7 +265,9 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get components details");
             await LogHandlingHelper.HttpRequestHandling("Request for get components data", $"MethodName:GetComponents()", httpClient, sw360ComponentApi);
-            return await FetchAllPagesAsync(httpClient, sw360ComponentApi, ApiConstant.ListPageSize);
+            using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, sw360ComponentApi, ApiConstant.ListPageSize);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         /// <summary>
@@ -482,7 +492,9 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get release data by component name");
             string url = $"{sw360ReleaseNameApi}{componentName}";
             await LogHandlingHelper.HttpRequestHandling("Get Release By Compoenent Name", $"MethodName:GetReleaseByCompoenentName()", httpClient, url);
-            return await httpClient.GetStringAsync(url);
+            using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, url, ApiConstant.ReleaseListPageSize);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         /// <summary>
@@ -508,7 +520,9 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get component details by component name");
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
             await LogHandlingHelper.HttpRequestHandling("Get Component By Name", $"MethodName:GetComponentByName()", httpClient, url);
-            return await httpClient.GetStringAsync(url);
+            using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, url, ApiConstant.ListPageSize);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
         /// <summary>
@@ -521,7 +535,7 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get component details by component name");
             string url = $"{sw360ComponentApi}{ApiConstant.ComponentNameUrl}{componentName}";
-            return await httpClient.GetAsync(url);
+            return await FetchAllPagesAsync(httpClient, url, ApiConstant.ListPageSize);
         }
 
         /// <summary>
@@ -546,13 +560,26 @@ namespace SIT.APICommunications
         /// <see cref="ApiConstant.MaxParallelPageRequests"/>.
         /// </summary>
         /// <param name="httpClient">The configured HttpClient to issue requests with.</param>
-        /// <param name="baseUrl">The list endpoint URL, without pagination query parameters.</param>
+        /// <param name="baseUrl">The list endpoint URL, optionally including filter query parameters but not pagination parameters.</param>
         /// <param name="pageSize">The number of entries requested per page.</param>
-        /// <param name="extraQueryParams">Additional query string (starting with '&amp;') appended to every page request.</param>
-        /// <returns>A single merged JSON string covering every page.</returns>
-        private static async Task<string> FetchAllPagesAsync(HttpClient httpClient, string baseUrl, int pageSize, string extraQueryParams = "")
+        /// <param name="extraQueryParams">Additional query parameters appended to every page request.</param>
+        /// <returns>
+        /// A new HTTP response (status code preserved from the first page, or from any failing page) whose content
+        /// is the merged JSON payload; this never mutates the original per-page responses returned by SW360.
+        /// </returns>
+        private static async Task<HttpResponseMessage> FetchAllPagesAsync(HttpClient httpClient, string baseUrl, int pageSize, string extraQueryParams = "")
         {
-            JObject firstPage = await GetPageAsync(httpClient, baseUrl, 0, pageSize, extraQueryParams);
+            using HttpResponseMessage firstPageResponse = await GetPageAsync(httpClient, baseUrl, 0, pageSize, extraQueryParams);
+            if (!firstPageResponse.IsSuccessStatusCode)
+            {
+                return new HttpResponseMessage(firstPageResponse.StatusCode)
+                {
+                    ReasonPhrase = firstPageResponse.ReasonPhrase,
+                    Content = new StringContent(await firstPageResponse.Content.ReadAsStringAsync(), Encoding.UTF8, ApiConstant.ApplicationHalJson)
+                };
+            }
+
+            JObject firstPage = JObject.Parse(await firstPageResponse.Content.ReadAsStringAsync());
             int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
 
             if (totalPages > 1)
@@ -565,7 +592,9 @@ namespace SIT.APICommunications
                 {
                     await Task.WhenAll(batch.Select(async pageNumber =>
                     {
-                        remainingPages[pageNumber - 1] = await GetPageAsync(httpClient, baseUrl, pageNumber, pageSize, extraQueryParams);
+                        using HttpResponseMessage pageResponse = await GetPageAsync(httpClient, baseUrl, pageNumber, pageSize, extraQueryParams);
+                        pageResponse.EnsureSuccessStatusCode();
+                        remainingPages[pageNumber - 1] = JObject.Parse(await pageResponse.Content.ReadAsStringAsync());
                     }));
                 }
 
@@ -575,22 +604,29 @@ namespace SIT.APICommunications
                 }
             }
 
-            return firstPage.ToString(Formatting.None);
+            return new HttpResponseMessage(firstPageResponse.StatusCode)
+            {
+                ReasonPhrase = firstPageResponse.ReasonPhrase,
+                Content = new StringContent(firstPage.ToString(Formatting.None), Encoding.UTF8, ApiConstant.ApplicationHalJson)
+            };
         }
 
         /// <summary>
-        /// Fetches and parses a single page of a paginated SW360 list endpoint.
+        /// Fetches a single page of a paginated SW360 list endpoint.
         /// </summary>
         /// <param name="httpClient">The configured HttpClient to issue the request with.</param>
-        /// <param name="baseUrl">The list endpoint URL, without pagination query parameters.</param>
+        /// <param name="baseUrl">The list endpoint URL, optionally including filter query parameters but not pagination parameters.</param>
         /// <param name="page">The 0-based page number to request.</param>
         /// <param name="pageSize">The number of entries requested per page.</param>
-        /// <param name="extraQueryParams">Additional query string (starting with '&amp;') appended to the request.</param>
-        private static async Task<JObject> GetPageAsync(HttpClient httpClient, string baseUrl, int page, int pageSize, string extraQueryParams = "")
+        /// <param name="extraQueryParams">Additional query parameters appended to the request.</param>
+        /// <returns>The HTTP response for the requested page.</returns>
+        private static Task<HttpResponseMessage> GetPageAsync(HttpClient httpClient, string baseUrl, int page, int pageSize, string extraQueryParams = "")
         {
-            string pageUrl = $"{baseUrl}?{extraQueryParams}page={page}&page_entries={pageSize}";
-            string pageContent = await httpClient.GetStringAsync(pageUrl);
-            return JObject.Parse(pageContent);
+            string querySeparator = baseUrl.Contains("?", StringComparison.Ordinal) ? "&" : "?";
+            string normalizedExtraQueryParams = extraQueryParams.Trim('?', '&');
+            string extraQueryPrefix = string.IsNullOrEmpty(normalizedExtraQueryParams) ? string.Empty : $"{normalizedExtraQueryParams}&";
+            string pageUrl = $"{baseUrl}{querySeparator}{extraQueryPrefix}page={page}&page_entries={pageSize}";
+            return httpClient.GetAsync(pageUrl);
         }
 
         /// <summary>
