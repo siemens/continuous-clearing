@@ -45,7 +45,7 @@ namespace SIT.APICommunications
         /// <summary>
         /// The page size requested per call when paging through the SW360 releases endpoint specifically.
         /// </summary>
-        public const int ReleaseListPageSize = 10000;
+        public const int ReleaseListPageSize = 100000;
 
         /// <summary>
         /// The maximum number of pages fetched concurrently when paging through SW360 list endpoints.
