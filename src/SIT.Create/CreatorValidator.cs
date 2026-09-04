@@ -86,7 +86,7 @@ namespace SIT.Create
 
             while (pageCount < 10)
             {
-                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ListPageSize);
+                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ReleaseListPageSize);
 
                 if (releaseResponse == null)
                 {
