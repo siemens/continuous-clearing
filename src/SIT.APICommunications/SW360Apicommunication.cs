@@ -6,6 +6,7 @@
 
 using log4net;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.Common;
@@ -14,11 +15,13 @@ using SW360KeycloakService;
 using SW360KeycloakService.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIT.APICommunications
@@ -79,7 +82,7 @@ namespace SIT.APICommunications
             var result = string.Empty;
             try
             {
-                result = await httpClient.GetStringAsync(sw360ProjectsApi);
+                result = await FetchAllPagesAsync(httpClient, sw360ProjectsApi);
             }
             catch (TaskCanceledException ex)
             {
@@ -98,7 +101,7 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get Sw360 users");
-            return await httpClient.GetStringAsync(sw360UsersApi);
+            return await FetchAllPagesAsync(httpClient, sw360UsersApi);
         }
 
         /// <summary>
@@ -174,21 +177,7 @@ namespace SIT.APICommunications
             try
             {
                 await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases()", httpClient, sw360ReleaseApi);
-                HttpResponseMessage responseMessage = await httpClient.GetAsync(sw360ReleaseApi);
-                await LogHandlingHelper.HttpResponseHandling("Response of get all releases", $"MethodName:GetReleases()", responseMessage);
-                if (responseMessage != null && responseMessage.StatusCode.Equals(HttpStatusCode.OK))
-                {
-                    return await responseMessage.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    LogHandlingHelper.BasicErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()",
-                $"SW360 server is not accessible. StatusCode: {responseMessage?.StatusCode}, ReasonPhrase: {responseMessage?.ReasonPhrase}",
-                "Please wait for some time and re-run the pipeline.");
-                    Logger.ErrorFormat("SW360 server is not accessible while getting All Releases,Please wait for sometime and re run the pipeline again..." +
-                        "StatusCode:{0} & ReasonPhrase:{1}", responseMessage?.StatusCode, responseMessage?.ReasonPhrase);
-                    environmentHelper.CallEnvironmentExit(-1);
-                }
+                result = await FetchAllPagesAsync(httpClient, sw360ReleaseApi);
             }
             catch (TaskCanceledException ex)
             {
@@ -268,7 +257,7 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get components details");
             await LogHandlingHelper.HttpRequestHandling("Request for get components data", $"MethodName:GetComponents()", httpClient, sw360ComponentApi);
-            return await httpClient.GetStringAsync(sw360ComponentApi);
+            return await FetchAllPagesAsync(httpClient, sw360ComponentApi);
         }
 
         /// <summary>
@@ -549,6 +538,81 @@ namespace SIT.APICommunications
             await LogHandlingHelper.HttpRequestHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData()", httpClient, url);
             return await httpClient.GetAsync(url);
         }
+
+        /// <summary>
+        /// Fetches every page of a paginated SW360 list endpoint and merges the "_embedded" arrays into one JSON payload,
+        /// so callers keep seeing the full result set even when it exceeds the server's per-page cap. The first page is
+        /// fetched alone to discover the page count; remaining pages are then fetched concurrently, bounded by
+        /// <see cref="ApiConstant.MaxParallelPageRequests"/>.
+        /// </summary>
+        /// <param name="httpClient">The configured HttpClient to issue requests with.</param>
+        /// <param name="baseUrl">The list endpoint URL, without pagination query parameters.</param>
+        /// <returns>A single merged JSON string covering every page.</returns>
+        private static async Task<string> FetchAllPagesAsync(HttpClient httpClient, string baseUrl)
+        {
+            JObject firstPage = await GetPageAsync(httpClient, baseUrl, 0);
+            int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
+
+            if (totalPages > 1)
+            {
+                var remainingPages = new JObject[totalPages - 1];
+                var parallelOptions = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = ApiConstant.MaxParallelPageRequests
+                };
+
+                await Parallel.ForEachAsync(
+                    Enumerable.Range(1, totalPages - 1),
+                    parallelOptions,
+                    async (pageNumber, cancellationToken) =>
+                    {
+                        remainingPages[pageNumber - 1] = await GetPageAsync(httpClient, baseUrl, pageNumber);
+                    });
+
+                foreach (JObject page in remainingPages)
+                {
+                    MergeEmbeddedPage(firstPage, page);
+                }
+            }
+
+            return firstPage.ToString(Formatting.None);
+        }
+
+        /// <summary>
+        /// Fetches and parses a single page of a paginated SW360 list endpoint.
+        /// </summary>
+        /// <param name="httpClient">The configured HttpClient to issue the request with.</param>
+        /// <param name="baseUrl">The list endpoint URL, without pagination query parameters.</param>
+        /// <param name="page">The 0-based page number to request.</param>
+        private static async Task<JObject> GetPageAsync(HttpClient httpClient, string baseUrl, int page)
+        {
+            string pageUrl = $"{baseUrl}?page={page}&page_entries={ApiConstant.ListPageSize}";
+            string pageContent = await httpClient.GetStringAsync(pageUrl);
+            return JObject.Parse(pageContent);
+        }
+
+        /// <summary>
+        /// Appends the "_embedded" array items of a subsequent page onto the accumulated result, for whichever
+        /// entity key (sw360:releases, sw360:components, etc.) the response uses.
+        /// </summary>
+        /// <param name="accumulated">The merged result built up so far; mutated in place.</param>
+        /// <param name="page">The newly fetched page to merge in.</param>
+        private static void MergeEmbeddedPage(JObject accumulated, JObject page)
+        {
+            if (accumulated["_embedded"] is not JObject accumulatedEmbedded || page["_embedded"] is not JObject pageEmbedded)
+            {
+                return;
+            }
+
+            foreach (JProperty property in pageEmbedded.Properties())
+            {
+                if (accumulatedEmbedded[property.Name] is JArray accumulatedArray && property.Value is JArray pageArray)
+                {
+                    accumulatedArray.Merge(pageArray);
+                }
+            }
+        }
+
         /// <summary>
         /// Creates and configures an HttpClient instance with authentication and timeout settings.
         /// </summary>
