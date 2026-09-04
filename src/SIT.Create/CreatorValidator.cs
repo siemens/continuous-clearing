@@ -82,12 +82,11 @@ namespace SIT.Create
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
             int page = 0;
-            const int pageEntries = 100;
             int pageCount = 0;
 
             while (pageCount < 10)
             {
-                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, pageEntries);
+                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ListPageSize);
 
                 if (releaseResponse == null)
                 {
