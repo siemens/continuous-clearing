@@ -534,7 +534,7 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "Unable to retrieve full details for SW360 releases.");
-            string url = $"{sw360ReleaseApi}?page={page}&allDetails=true&luceneSearch=true&page_entries={pageEntries}";
+            string url = $"{sw360ReleaseApi}?allDetails=true&luceneSearch=true&page={page}&page_entries={pageEntries}";
             await LogHandlingHelper.HttpRequestHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData()", httpClient, url);
             return await httpClient.GetAsync(url);
         }
@@ -586,7 +586,7 @@ namespace SIT.APICommunications
         /// <param name="page">The 0-based page number to request.</param>
         private static async Task<JObject> GetPageAsync(HttpClient httpClient, string baseUrl, int page)
         {
-            string pageUrl = $"{baseUrl}?page={page}&page_entries={ApiConstant.ListPageSize}";
+            string pageUrl = $"{baseUrl}?allDetails=true&luceneSearch=true&page={page}&page_entries={ApiConstant.ListPageSize}";
             string pageContent = await httpClient.GetStringAsync(pageUrl);
             return JObject.Parse(pageContent);
         }
