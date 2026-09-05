@@ -149,7 +149,7 @@ namespace SIT.Create.UTest
 
             var triggerStatusResponse = JsonConvert.SerializeObject(fossTriggerStatus);
 
-            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage
+            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage
             {
                 Content = new StringContent(responseBody)
             });
@@ -161,7 +161,7 @@ namespace SIT.Create.UTest
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object, mockEnvironmentHelper.Object);
             // Assert
-            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
             mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
         [Test]
