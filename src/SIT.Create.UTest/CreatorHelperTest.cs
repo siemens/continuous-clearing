@@ -268,7 +268,6 @@ namespace SIT.Create.UTest
                 Content = new StringContent("", Encoding.UTF8)
             };
             var iSW360ApicommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            iSW360ApicommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(await responseMessage.Content.ReadAsStringAsync());
             iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
             iSW360Service.Setup(x => x.GetReleaseDataOfComponent(comparisonBomData[0].ReleaseLink)).ReturnsAsync(releasesInfo);
 

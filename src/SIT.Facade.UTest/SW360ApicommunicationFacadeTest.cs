@@ -91,21 +91,6 @@ namespace SIT.Facade.UTest
         }
 
         [Test]
-        public async Task GetReleases_OnSuccess_ReturnsReleaseInfoInAString()
-        {
-            //Arange 
-            Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
-            mockSw360comm.Setup(x => x.GetReleases()).ReturnsAsync("Zone.js_v1.0.0");
-
-            //Act          
-            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
-            string actual = await sW360ApicommunicationFacade.GetReleases();
-
-            //Assert
-            Assert.That(actual, Is.EqualTo("Zone.js_v1.0.0"));
-        }
-
-        [Test]
         public async Task GetReleaseById_OnSuccess_ReturnsReleaseInfoInAString()
         {
             //Arange 

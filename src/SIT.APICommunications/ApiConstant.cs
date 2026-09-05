@@ -40,7 +40,14 @@ namespace SIT.APICommunications
         /// The page size used for the cheap first-page probe against SW360 list endpoints, before deciding whether
         /// to fetch every remaining record in a single follow-up call.
         /// </summary>
-        public const int ListPageSize = 10;
+        public const int ListPageSize = 100;
+
+        /// <summary>
+        /// Page size for fetching SW360 releases (Fossology validation's page-by-page early-exit search, and the
+        /// cached full-releases fetch used for BOM comparison). SW360 default page size is 10; server max is
+        /// 200000; this is well above ListPageSize so far fewer round trips are needed either way.
+        /// </summary>
+        public const int ReleasePageSize = 20000;
 
         /// <summary>
         /// The maximum number of concurrent SW360 lookups (release/component existence checks) per component,

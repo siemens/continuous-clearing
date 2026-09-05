@@ -65,7 +65,6 @@ namespace SIT.APICommunications
         private readonly int timeOut = sw360ConnectionSettings.Timeout;
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
-        private const string GetReleasesMessage = "Get Releases";
         private const string TriggerFossologyMessage = "Trigger Fossology Process";
         #endregion
 
@@ -151,7 +150,7 @@ namespace SIT.APICommunications
             await LogHandlingHelper.HttpRequestHandling("Get sw360 Project details for validating", $"MethodName:GetProjectById()", httpClient, projectsByTagUrl);
             try
             {
-                result = await httpClient.GetAsync(projectsByTagUrl);
+                result = await SendGetAsync(httpClient, projectsByTagUrl);
                 await LogHandlingHelper.HttpResponseHandling("Get sw360 Project details", $"MethodName:GetProjectById()", result);
                 result.EnsureSuccessStatusCode();
             }
@@ -172,45 +171,6 @@ namespace SIT.APICommunications
         }
 
         /// <summary>
-        /// Asynchronously retrieves all releases from SW360.
-        /// </summary>
-        /// <returns>A JSON string containing the release data.</returns>
-        public async Task<string> GetReleases()
-        {
-            HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(true, "Unable to retrieve details for SW360 releases.");
-            var result = string.Empty;
-            try
-            {
-                await LogHandlingHelper.HttpRequestHandling("Request for get all releases", $"MethodName:GetReleases()", httpClient, sw360ReleaseApi);
-                using HttpResponseMessage response = await FetchAllPagesAsync(httpClient, sw360ReleaseApi, ApiConstant.ListPageSize);
-                response.EnsureSuccessStatusCode();
-                result = await response.Content.ReadAsStringAsync();
-            }
-            catch (TaskCanceledException ex)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex,
-            "TaskCanceledException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
-                Logger.ErrorFormat("TaskCanceledException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            catch (HttpRequestException ex)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex, "");
-                Logger.ErrorFormat("HttpRequestException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            catch (InvalidOperationException ex)
-            {
-                LogHandlingHelper.ExceptionErrorHandling(GetReleasesMessage, $"MethodName:GetReleases()", ex,
-            "InvalidOperationException occurred while getting all releases from the SW360 server. Please wait for some time and re-run the pipeline.");
-                Logger.ErrorFormat("InvalidOperationException error has error while getting all releases from the SW360 server,Please wait for sometime and re run the pipeline again. Error : {0}", ex.Message);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Asynchronously triggers the Fossology scanning process for a release.
         /// </summary>
         /// <param name="releaseId">The unique identifier of the release.</param>
@@ -224,7 +184,7 @@ namespace SIT.APICommunications
             try
             {
                 await LogHandlingHelper.HttpRequestHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", httpClient, url);
-                var response = await httpClient.GetAsync(url);
+                var response = await SendGetAsync(httpClient, url);
                 await LogHandlingHelper.HttpResponseHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", response);
                 if (!response.IsSuccessStatusCode)
                 {
@@ -253,7 +213,7 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to check fossology process status");
             await LogHandlingHelper.HttpRequestHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", httpClient, link);
-            return await httpClient.GetAsync(link);
+            return await SendGetAsync(httpClient, link);
         }
 
         /// <summary>
@@ -313,7 +273,7 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get release details by releaseid");
             string url = $"{sw360ReleaseApi}/{releaseId}";
             await LogHandlingHelper.HttpRequestHandling("Request for get release data by ReleaseId", $"MethodName:GetReleaseById()", httpClient, url);
-            return await httpClient.GetAsync(url);
+            return await SendGetAsync(httpClient, url);
         }
 
         /// <summary>
@@ -325,7 +285,7 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get release details by releaselink");
-            return await httpClient.GetAsync(releaseLink);
+            return await SendGetAsync(httpClient, releaseLink);
         }
 
         /// <summary>
@@ -398,7 +358,7 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get release data by component id");
             string componentUrl = $"{sw360ComponentApi}/{componentId}";
             await LogHandlingHelper.HttpRequestHandling("Get Release Of Component By Id", $"MethodName:GetReleaseOfComponentById()", httpClient, componentUrl);
-            return await httpClient.GetStringAsync(componentUrl);
+            return await SendGetStringAsync(httpClient, componentUrl);
         }
 
         /// <summary>
@@ -410,7 +370,7 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get release attachments");
-            return await httpClient.GetStringAsync(releaseAttachmentsUrl);
+            return await SendGetStringAsync(httpClient, releaseAttachmentsUrl);
         }
 
         /// <summary>
@@ -422,7 +382,7 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get attachment information");
-            return await httpClient.GetStringAsync(attachmentUrl);
+            return await SendGetStringAsync(httpClient, attachmentUrl);
         }
 
         /// <summary>
@@ -508,7 +468,7 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "unable to get component details by component link");
-            return await httpClient.GetAsync(componentLink);
+            return await SendGetAsync(httpClient, componentLink);
         }
 
         /// <summary>
@@ -545,21 +505,25 @@ namespace SIT.APICommunications
         /// </summary>
         /// <param name="page">The page number to retrieve.</param>
         /// <param name="pageEntries">The number of entries per page.</param>
+        /// <param name="extraQueryParams">Additional query parameters (e.g. server-side filters) appended to the request.</param>
         /// <returns>An HttpResponseMessage containing the paginated release data with all details.</returns>
-        public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
+        public async Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string extraQueryParams = "")
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(true, "Unable to retrieve full details for SW360 releases.");
-            string url = $"{sw360ReleaseApi}?{ApiConstant.AllDetailsAndLuceneSearchParams}page={page}&page_entries={pageEntries}";
+            string normalizedExtraQueryParams = extraQueryParams.Trim('?', '&');
+            string extraQueryPrefix = string.IsNullOrEmpty(normalizedExtraQueryParams) ? string.Empty : $"{normalizedExtraQueryParams}&";
+            string url = $"{sw360ReleaseApi}?{ApiConstant.AllDetailsAndLuceneSearchParams}{extraQueryPrefix}page={page}&page_entries={pageEntries}";
             await LogHandlingHelper.HttpRequestHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData()", httpClient, url);
-            return await httpClient.GetAsync(url);
+            return await SendGetAsync(httpClient, url);
         }
 
         /// <summary>
         /// Fetches every page of a paginated SW360 list endpoint and merges the "_embedded" arrays into one JSON payload,
-        /// so callers keep seeing the full result set even when it exceeds the server's per-page cap. A small first page
-        /// is fetched to discover the total element count; if more records exist, that page is discarded and every
-        /// remaining record is fetched in a single follow-up call instead of paging through the rest.
+        /// so callers keep seeing the full result set even when it exceeds the server's per-page cap. The first page is
+        /// fetched to learn the total page count, then remaining pages are fetched concurrently in small bounded
+        /// batches (chunks) rather than a single oversized page_entries request, so no one request holds the server
+        /// too long.
         /// </summary>
         /// <param name="httpClient">The configured HttpClient to issue requests with.</param>
         /// <param name="baseUrl">The list endpoint URL, optionally including filter query parameters but not pagination parameters.</param>
@@ -582,14 +546,28 @@ namespace SIT.APICommunications
             }
 
             JObject firstPage = JObject.Parse(await firstPageResponse.Content.ReadAsStringAsync());
-            int totalElements = firstPage["page"]?["totalElements"]?.Value<int>() ?? 0;
+            int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
 
-            if (totalElements > pageSize)
+            if (totalPages > 1)
             {
-                // No need to keep paging: discard the probe page and pull every remaining record in one shot.
-                using HttpResponseMessage fullResponse = await GetPageAsync(httpClient, baseUrl, 0, totalElements, extraQueryParams);
-                fullResponse.EnsureSuccessStatusCode();
-                firstPage = JObject.Parse(await fullResponse.Content.ReadAsStringAsync());
+                using SemaphoreSlim throttle = new(ApiConstant.Sw360LookupMaxConcurrency);
+                var remainingPageTasks = Enumerable.Range(1, totalPages - 1).Select(async page =>
+                {
+                    await throttle.WaitAsync();
+                    try
+                    {
+                        using HttpResponseMessage pageResponse = await GetPageAsync(httpClient, baseUrl, page, pageSize, extraQueryParams);
+                        pageResponse.EnsureSuccessStatusCode();
+                        return JObject.Parse(await pageResponse.Content.ReadAsStringAsync());
+                    }
+                    finally
+                    {
+                        throttle.Release();
+                    }
+                });
+
+                JObject[] remainingPages = await Task.WhenAll(remainingPageTasks);
+                MergeEmbeddedPages(firstPage, remainingPages);
             }
 
             return new HttpResponseMessage(firstPageResponse.StatusCode)
@@ -597,6 +575,33 @@ namespace SIT.APICommunications
                 ReasonPhrase = firstPageResponse.ReasonPhrase,
                 Content = new StringContent(firstPage.ToString(Formatting.None), Encoding.UTF8, ApiConstant.ApplicationHalJson)
             };
+        }
+
+        /// <summary>
+        /// Appends every "_embedded" array from each subsequent page onto the matching array on the first page.
+        /// </summary>
+        private static void MergeEmbeddedPages(JObject firstPage, JObject[] remainingPages)
+        {
+            if (firstPage["_embedded"] is not JObject embedded)
+            {
+                return;
+            }
+
+            foreach (JObject page in remainingPages)
+            {
+                if (page["_embedded"] is not JObject pageEmbedded)
+                {
+                    continue;
+                }
+
+                foreach (JProperty property in pageEmbedded.Properties())
+                {
+                    if (embedded[property.Name] is JArray existingArray && property.Value is JArray pageArray)
+                    {
+                        existingArray.Merge(pageArray);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -614,36 +619,35 @@ namespace SIT.APICommunications
             string normalizedExtraQueryParams = extraQueryParams.Trim('?', '&');
             string extraQueryPrefix = string.IsNullOrEmpty(normalizedExtraQueryParams) ? string.Empty : $"{normalizedExtraQueryParams}&";
             string pageUrl = $"{baseUrl}{querySeparator}{extraQueryPrefix}page={page}&page_entries={pageSize}";
-            return httpClient.GetAsync(pageUrl);
+            return SendGetAsync(httpClient, pageUrl);
         }
 
         /// <summary>
-        /// Creates and configures an HttpClient instance with authentication and timeout settings.
+        /// Issues a GET via SendAsync with ResponseHeadersRead so the caller unblocks as soon as headers arrive
+        /// instead of waiting for the full response body to buffer.
+        /// </summary>
+        private static Task<HttpResponseMessage> SendGetAsync(HttpClient httpClient, string url)
+        {
+            return httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, url), HttpCompletionOption.ResponseHeadersRead);
+        }
+
+        /// <summary>
+        /// GetStringAsync equivalent built on <see cref="SendGetAsync"/> for the faster header-first response path.
+        /// </summary>
+        private static async Task<string> SendGetStringAsync(HttpClient httpClient, string url)
+        {
+            using HttpResponseMessage response = await SendGetAsync(httpClient, url);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// Gets a pooled HttpClient (via IHttpClientFactory) configured with authentication and retry/refresh handlers.
         /// </summary>
         /// <returns>A configured HttpClient instance for SW360 API communication.</returns>
         private HttpClient GetHttpClient()
         {
-            var retryHandler = new RetryHttpClientHandler(timeOut)
-            {
-                InnerHandler = new HttpClientHandler()
-            };
-
-            HttpMessageHandler outerHandler = tokenService != null
-                ? new TokenRefreshDelegatingHandler(tokenService) { InnerHandler = retryHandler }
-                : retryHandler;
-
-            var httpClient = new HttpClient(outerHandler);
-            // The per-attempt timeout is enforced inside RetryHttpClientHandler so that each retry attempt gets its
-            // own timeout budget. Disable HttpClient's global timeout, which would otherwise cap the entire retry
-            // chain (all attempts plus back-off waits) and cancel the whole operation once exceeded.
-            httpClient.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
-            httpClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue(ApiConstant.ApplicationJson));
-            httpClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue(ApiConstant.ApplicationHalJson));
-            httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue(sw360AuthTokenType, sw360AuthToken);
-            return httpClient;
+            return Sw360HttpClientFactory.CreateClient(sw360ConnectionSettings, tokenService, timeOut);
         }
 
         #endregion Methods

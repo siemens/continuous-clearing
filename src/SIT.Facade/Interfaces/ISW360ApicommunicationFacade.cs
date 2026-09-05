@@ -17,7 +17,6 @@ namespace SIT.Facade.Interfaces
     public interface ISW360ApicommunicationFacade
     {
         Task<string> GetProjects();
-        Task<string> GetReleases();
         Task<string> GetSw360Users();
         Task<string> GetComponents();
         Task<string> GetProjectsByName(string projectName);
@@ -44,6 +43,11 @@ namespace SIT.Facade.Interfaces
         Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease);
         Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
-        Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries);
+        Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string extraQueryParams = "");
+        /// <summary>
+        /// Returns the full SW360 releases dataset (allDetails=true) fetched once per process and reused by all
+        /// callers (Fossology validation, BOM comparison) instead of each issuing its own full fetch.
+        /// </summary>
+        Task<string> GetAllReleasesWithAllDataCached();
     }
 }

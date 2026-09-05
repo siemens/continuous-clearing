@@ -84,7 +84,9 @@ namespace SIT.Services
             try
             {
                 Sw360ServiceStopWatch.Start();
-                string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
+                // Reuses the single full-dataset fetch shared with Fossology validation (allDetails=true is a
+                // superset of the plain shape; unmapped extra fields are ignored by JsonConvert).
+                string responseBody = await m_SW360ApiCommunicationFacade.GetAllReleasesWithAllDataCached();
                 Sw360ServiceStopWatch.Stop();
                 Logger.DebugFormat("GetAvailableReleasesInSw360():Time taken for Get all Releases api call-{0}", TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds);
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);

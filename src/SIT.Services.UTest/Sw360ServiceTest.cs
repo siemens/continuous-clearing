@@ -86,7 +86,7 @@ namespace SIT.Services.UTest
             ComponentsRelease componentRelease = new ComponentsRelease();
             componentRelease.Embedded = new ReleaseEmbedded();
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(string.Empty);
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataCached()).ReturnsAsync(string.Empty);
 
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
@@ -164,7 +164,7 @@ namespace SIT.Services.UTest
             componentStatus.isComponentExist = compnentstate;
 
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(componentsReleaseModelSerialized);
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataCached()).ReturnsAsync(componentsReleaseModelSerialized);
             swApiCommunicationFacade.Setup(x => x.GetComponents()).ReturnsAsync(componentsModelSerialized);
 
             Mock<ISW360CommonService> sw360CommonService = new Mock<ISW360CommonService>();
@@ -212,7 +212,7 @@ namespace SIT.Services.UTest
             ComponentsRelease componentRelease = new ComponentsRelease();
             componentRelease.Embedded = new ReleaseEmbedded();
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetReleases()).Throws<HttpRequestException>();
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataCached()).Throws<HttpRequestException>();
 
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));

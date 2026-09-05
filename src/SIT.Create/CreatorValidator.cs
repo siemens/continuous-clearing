@@ -81,39 +81,32 @@ namespace SIT.Create
         /// <returns></returns>
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
-            // Cheap probe: most datasets have a qualifying release near the start, so try a small first page
-            // before paying for a full-dataset fetch.
-            ReleasesAllDetails firstPageResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, 0, ApiConstant.ListPageSize);
-            if (firstPageResponse == null)
+            // Walks pages one at a time and stops as soon as a qualifying release is found, instead of pulling
+            // the full releases dataset up front — validation usually only needs the first few pages.
+            int page = 0;
+            int totalPages = 1;
+            while (page < totalPages)
             {
-                Logger.Debug($"FindValidRelease(): Fossology token validation failed in SW360 due to release not found");
-                return null;
+                // Filters to APPROVED server-side so fewer/no client-side-empty pages are fetched; the SOURCE
+                // attachment check still has to happen client-side since attachments aren't a filterable column.
+                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ReleasePageSize, $"clearingState={Dataconstant.Approved}");
+                if (releaseResponse?.Embedded?.Sw360releases == null || releaseResponse.Embedded.Sw360releases.Count == 0)
+                {
+                    break;
+                }
+
+                var validRelease = TryFindValidReleaseInPage(releaseResponse);
+                if (validRelease != null)
+                {
+                    return validRelease;
+                }
+
+                totalPages = releaseResponse.Page?.TotalPages ?? 1;
+                page++;
             }
 
-            var validRelease = TryFindValidReleaseInPage(firstPageResponse);
-            if (validRelease != null)
-            {
-                return validRelease;
-            }
-
-            int totalElements = firstPageResponse.Page?.TotalElements ?? 0;
-            if (totalElements <= ApiConstant.ListPageSize)
-            {
-                Logger.Debug($"FindValidRelease(): No valid release found across all pages");
-                return null;
-            }
-
-            // No match on the probe page: discard it and fetch every remaining release in a single call
-            // instead of paging through the rest, trading one larger request for many smaller round-trips.
-            Logger.DebugFormat("FindValidRelease(): No match in first {0} releases; fetching remaining {1} in one call", ApiConstant.ListPageSize, totalElements);
-            ReleasesAllDetails fullResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, 0, totalElements);
-            validRelease = TryFindValidReleaseInPage(fullResponse);
-            if (validRelease == null)
-            {
-                Logger.Debug($"FindValidRelease(): No valid release found across all pages");
-            }
-
-            return validRelease;
+            Logger.Debug($"FindValidRelease(): No valid release found across all pages");
+            return null;
         }
 
         /// <summary>
@@ -156,18 +149,19 @@ namespace SIT.Create
         }
 
         /// <summary>
-        /// Gets All Releases Details
+        /// Gets a single page of releases with all details (used to search page-by-page with early exit).
         /// </summary>
         /// <param name="sW360ApicommunicationFacade"></param>
         /// <param name="page"></param>
         /// <param name="pageEntries"></param>
+        /// <param name="extraQueryParams">Additional server-side filter query parameters, e.g. clearingState.</param>
         /// <returns>release details</returns>
-        private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries)
+        private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries, string extraQueryParams = "")
         {
             ReleasesAllDetails releaseResponse = null;
             try
             {
-                var responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries);
+                var responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries, extraQueryParams);
                 await LogHandlingHelper.HttpResponseHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails()", responseData);
                 string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);

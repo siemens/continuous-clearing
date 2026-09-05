@@ -4,13 +4,18 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.Common.Model;
 using SIT.Facade.Interfaces;
 using SW360KeycloakService.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIT.Facade
@@ -23,6 +28,9 @@ namespace SIT.Facade
     {
         #region Fields
         private readonly ISw360ApiCommunication m_sw360ApiCommunication;
+        // Guards the one-time full releases fetch used by BOM comparison.
+        private readonly SemaphoreSlim m_allReleasesCacheLock = new(1, 1);
+        private string m_allReleasesCachedJson;
         #endregion
 
         #region Constructors
@@ -103,15 +111,6 @@ namespace SIT.Facade
         public Task<HttpResponseMessage> GetProjectById(string projectId)
         {
             return m_sw360ApiCommunication.GetProjectById(projectId);
-        }
-
-        /// <summary>
-        /// Asynchronously gets all releases from SW360.
-        /// </summary>
-        /// <returns>A task representing the asynchronous operation that returns the releases as a JSON string.</returns>
-        public Task<string> GetReleases()
-        {
-            return m_sw360ApiCommunication.GetReleases();
         }
 
         /// <summary>
@@ -349,9 +348,98 @@ namespace SIT.Facade
         /// <param name="page">The page number.</param>
         /// <param name="pageEntries">The number of entries per page.</param>
         /// <returns>A task representing the asynchronous operation that returns an HTTP response message.</returns>
-        public Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries)
+        public Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string extraQueryParams = "")
         {
-            return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries);
+            return m_sw360ApiCommunication.GetAllReleasesWithAllData(page, pageEntries, extraQueryParams);
+        }
+
+        /// <summary>
+        /// Asynchronously fetches the full SW360 releases dataset (allDetails=true) once and memoizes it for the
+        /// lifetime of this facade instance, so BOM comparison doesn't refetch it. Pages are fetched one at a time
+        /// to learn the total page count, then remaining pages are pulled concurrently in small bounded batches
+        /// (chunks) and merged, instead of one oversized page_entries request.
+        /// </summary>
+        public async Task<string> GetAllReleasesWithAllDataCached()
+        {
+            if (m_allReleasesCachedJson != null)
+            {
+                return m_allReleasesCachedJson;
+            }
+
+            await m_allReleasesCacheLock.WaitAsync();
+            try
+            {
+                if (m_allReleasesCachedJson != null)
+                {
+                    return m_allReleasesCachedJson;
+                }
+
+                m_allReleasesCachedJson = await FetchAllReleasesJsonInChunks();
+                return m_allReleasesCachedJson;
+            }
+            finally
+            {
+                m_allReleasesCacheLock.Release();
+            }
+        }
+
+        private async Task<string> FetchAllReleasesJsonInChunks()
+        {
+            using HttpResponseMessage firstPageResponse = await GetAllReleasesWithAllData(0, ApiConstant.ReleasePageSize);
+            string firstPageJson = await firstPageResponse.Content.ReadAsStringAsync();
+            JObject firstPage = JObject.Parse(firstPageJson);
+            int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
+
+            if (totalPages > 1)
+            {
+                using SemaphoreSlim throttle = new(ApiConstant.Sw360LookupMaxConcurrency);
+                var remainingPageTasks = Enumerable.Range(1, totalPages - 1).Select(async page =>
+                {
+                    await throttle.WaitAsync();
+                    try
+                    {
+                        using HttpResponseMessage pageResponse = await GetAllReleasesWithAllData(page, ApiConstant.ReleasePageSize);
+                        string pageJson = await pageResponse.Content.ReadAsStringAsync();
+                        return JObject.Parse(pageJson);
+                    }
+                    finally
+                    {
+                        throttle.Release();
+                    }
+                });
+
+                JObject[] remainingPages = await Task.WhenAll(remainingPageTasks);
+                MergeEmbeddedPages(firstPage, remainingPages);
+            }
+
+            return firstPage.ToString(Formatting.None);
+        }
+
+        /// <summary>
+        /// Appends every "_embedded" array from each subsequent page onto the matching array on the first page.
+        /// </summary>
+        private static void MergeEmbeddedPages(JObject firstPage, IEnumerable<JObject> remainingPages)
+        {
+            if (firstPage["_embedded"] is not JObject embedded)
+            {
+                return;
+            }
+
+            foreach (JObject page in remainingPages)
+            {
+                if (page["_embedded"] is not JObject pageEmbedded)
+                {
+                    continue;
+                }
+
+                foreach (JProperty property in pageEmbedded.Properties())
+                {
+                    if (embedded[property.Name] is JArray existingArray && property.Value is JArray pageArray)
+                    {
+                        existingArray.Merge(pageArray);
+                    }
+                }
+            }
         }
         #endregion
     }
