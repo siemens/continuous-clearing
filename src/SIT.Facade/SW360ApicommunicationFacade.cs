@@ -354,6 +354,14 @@ namespace SIT.Facade
         }
 
         /// <summary>
+        /// Asynchronously fetches the full SW360 releases dataset without reading from or updating the cache.
+        /// </summary>
+        public Task<string> GetAllReleasesWithAllDataUncached()
+        {
+            return FetchAllReleasesJsonInChunks();
+        }
+
+        /// <summary>
         /// Asynchronously fetches the full SW360 releases dataset (allDetails=true) once and memoizes it for the
         /// lifetime of this facade instance, so BOM comparison doesn't refetch it. Pages are fetched one at a time
         /// to learn the total page count, then remaining pages are pulled concurrently in small bounded batches

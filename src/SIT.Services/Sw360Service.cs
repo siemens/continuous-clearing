@@ -74,9 +74,10 @@ namespace SIT.Services
         /// </summary>       
         /// <param name="listOfComponentsToBom">The list of components to check for available releases in SW360. Each component in the list is compared
         /// against the releases retrieved from SW360.</param>
+        /// <param name="fetchFromCache">Whether to reuse the cached SW360 release data.</param>
         /// <returns>A list of components representing the available releases in SW360 that correspond to the specified
         /// components. The list is empty if no matching releases are found.</returns>
-        public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom)
+        public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom, bool fetchFromCache = true)
         {
             Logger.Debug("GetAvailableReleasesInSw360():Starting to get available releases in sw360");
             List<Components> availableComponentsList = new List<Components>();
@@ -86,7 +87,9 @@ namespace SIT.Services
                 Sw360ServiceStopWatch.Start();
                 // Reuses the single full-dataset fetch shared with Fossology validation (allDetails=true is a
                 // superset of the plain shape; unmapped extra fields are ignored by JsonConvert).
-                string responseBody = await m_SW360ApiCommunicationFacade.GetAllReleasesWithAllDataCached();
+                string responseBody = fetchFromCache
+                    ? await m_SW360ApiCommunicationFacade.GetAllReleasesWithAllDataCached()
+                    : await m_SW360ApiCommunicationFacade.GetAllReleasesWithAllDataUncached();
                 Sw360ServiceStopWatch.Stop();
                 Logger.DebugFormat("GetAvailableReleasesInSw360():Time taken for Get all Releases api call-{0}", TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds);
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);

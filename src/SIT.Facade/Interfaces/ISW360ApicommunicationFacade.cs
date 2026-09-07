@@ -45,6 +45,10 @@ namespace SIT.Facade.Interfaces
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string extraQueryParams = "");
         /// <summary>
+        /// Fetches the complete SW360 releases dataset without reading from or updating the cache.
+        /// </summary>
+        Task<string> GetAllReleasesWithAllDataUncached();
+        /// <summary>
         /// Returns the full SW360 releases dataset (allDetails=true) fetched once per process and reused by all
         /// callers (Fossology validation, BOM comparison) instead of each issuing its own full fetch.
         /// </summary>

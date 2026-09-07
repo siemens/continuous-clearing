@@ -99,6 +99,33 @@ namespace SIT.Services.UTest
         }
 
         [Test]
+        public async Task GetAvailableReleasesInSw360_WhenCacheIsBypassed_FetchesUncachedReleaseData()
+        {
+            // Arrange
+            List<Components> components = new List<Components>
+            {
+                new Components { Name = "Zone.js", Version = "1.0.0" }
+            };
+            ComponentsRelease componentsRelease = new ComponentsRelease
+            {
+                Embedded = new ReleaseEmbedded { Sw360Releases = new List<Sw360Releases>() }
+            };
+            Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataUncached())
+                .ReturnsAsync(JsonConvert.SerializeObject(componentsRelease));
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+
+            ISW360Service sw360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
+
+            // Act
+            await sw360Service.GetAvailableReleasesInSw360(components, fetchFromCache: false);
+
+            // Assert
+            swApiCommunicationFacade.Verify(x => x.GetAllReleasesWithAllDataUncached(), Times.Once);
+            swApiCommunicationFacade.Verify(x => x.GetAllReleasesWithAllDataCached(), Times.Never);
+        }
+
+        [Test]
         [TestCase("Zone.js", "1.0.0", false, false, true, false, true)]
         [TestCase("Zone.js", "1.0.0", false, false, true, false, false)]
         [TestCase("Zone.js", "1.0.0", true, false, true, false, false)]

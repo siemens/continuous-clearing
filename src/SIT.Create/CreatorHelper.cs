@@ -524,7 +524,7 @@ namespace SIT.Create
             ISW360Service sw360Service, Bom bom)
         {
             //To get latest ReleaseLinks after component creation
-            componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(ListofBomComponents);
+            componentsAvailableInSw360 = await sw360Service.GetAvailableReleasesInSw360(ListofBomComponents, fetchFromCache: false);
 
             foreach (ComparisonBomData comBom in updatedCompareBomData)
             {
