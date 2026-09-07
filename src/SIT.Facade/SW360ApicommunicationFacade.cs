@@ -354,11 +354,12 @@ namespace SIT.Facade
         }
 
         /// <summary>
-        /// Asynchronously fetches the full SW360 releases dataset without reading from or updating the cache.
+        /// Asynchronously fetches the full SW360 releases dataset without reading from the cache and refreshes it with
+        /// the fetched data.
         /// </summary>
         public Task<string> GetAllReleasesWithAllDataUncached()
         {
-            return FetchAllReleasesJsonInChunks();
+            return GetAllReleasesWithAllData(fetchFromCache: false);
         }
 
         /// <summary>
@@ -367,9 +368,14 @@ namespace SIT.Facade
         /// to learn the total page count, then remaining pages are pulled concurrently in small bounded batches
         /// (chunks) and merged, instead of one oversized page_entries request.
         /// </summary>
-        public async Task<string> GetAllReleasesWithAllDataCached()
+        public Task<string> GetAllReleasesWithAllDataCached()
         {
-            if (m_allReleasesCachedJson != null)
+            return GetAllReleasesWithAllData(fetchFromCache: true);
+        }
+
+        private async Task<string> GetAllReleasesWithAllData(bool fetchFromCache)
+        {
+            if (fetchFromCache && m_allReleasesCachedJson != null)
             {
                 return m_allReleasesCachedJson;
             }
@@ -377,7 +383,7 @@ namespace SIT.Facade
             await m_allReleasesCacheLock.WaitAsync();
             try
             {
-                if (m_allReleasesCachedJson != null)
+                if (fetchFromCache && m_allReleasesCachedJson != null)
                 {
                     return m_allReleasesCachedJson;
                 }

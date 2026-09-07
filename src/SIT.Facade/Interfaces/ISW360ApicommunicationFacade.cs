@@ -45,7 +45,8 @@ namespace SIT.Facade.Interfaces
         Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "");
         Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string extraQueryParams = "");
         /// <summary>
-        /// Fetches the complete SW360 releases dataset without reading from or updating the cache.
+        /// Fetches the complete SW360 releases dataset without reading from the cache and refreshes it with the fetched
+        /// data.
         /// </summary>
         Task<string> GetAllReleasesWithAllDataUncached();
         /// <summary>

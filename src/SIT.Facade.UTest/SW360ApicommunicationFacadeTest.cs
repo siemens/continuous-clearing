@@ -480,5 +480,26 @@ namespace SIT.Facade.UTest
             //Assert
             Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
+
+        [Test]
+        public async Task GetAllReleasesWithAllDataUncached_WhenCalled_RefreshesCachedReleaseData()
+        {
+            // Arrange
+            Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
+            mockSw360comm.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("{\"page\":{\"totalPages\":1},\"version\":\"refreshed\"}")
+                });
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
+
+            // Act
+            string uncachedResult = await sW360ApicommunicationFacade.GetAllReleasesWithAllDataUncached();
+            string cachedResult = await sW360ApicommunicationFacade.GetAllReleasesWithAllDataCached();
+
+            // Assert
+            Assert.That(cachedResult, Is.EqualTo(uncachedResult));
+            mockSw360comm.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
+        }
     }
 }
