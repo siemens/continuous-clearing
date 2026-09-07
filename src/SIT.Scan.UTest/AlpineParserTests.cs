@@ -215,5 +215,44 @@ namespace SIT.Scan.UTest
             //Assert
             Assert.IsTrue(isUpdated, "Checks For Updated Property In List ");
         }
+
+        [TestCase("pkg:apk/alpine/busybox@1.37.0-r20?arch=x86_64&distro=alpine-3.22", "pkg:apk/alpine/busybox@1.37.0-r20?distro=alpine-3.22")]
+        [TestCase("pkg:apk/alpine/busybox@1.37.0-r20?os_name=alpine&os_version=3.22", "pkg:apk/alpine/busybox@1.37.0-r20?distro=alpine-3.22")]
+        [TestCase("pkg:apk/alpine/busybox@1.37.0-r20?arch=x86_64", "pkg:apk/alpine/busybox@1.37.0-r20")]
+        public void ParsePackageConfig_GivenAPurlWithDistributionQualifiers_ReturnsBomRefWithTheDistribution(string purl, string expectedBomRef)
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string[] Includes = { "CycloneDX_Alpine.cdx.json" };
+
+            Bom bom = new()
+            {
+                Components = new List<Component>
+                {
+                    new Component() { Name = "busybox", Version = "1.37.0-r20", Purl = purl }
+                }
+            };
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            AlpineProcessor alpineProcessor = new AlpineProcessor(cycloneDXBomParser.Object, new Mock<ISpdxBomParser>().Object);
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "ALPINE",
+                Alpine = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new SIT.Common.Directory()
+                {
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
+                }
+            };
+
+            //Act
+            Bom listofcomponents = alpineProcessor.ParsePackageFile(appSettings, ref ListUnsupportedComponentsForBom);
+
+            //Assert
+            Assert.That(listofcomponents.Components[0].BomRef, Is.EqualTo(expectedBomRef));
+        }
     }
 }

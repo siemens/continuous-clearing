@@ -43,6 +43,11 @@ namespace SIT.Common.Model
         /// </summary>
         public string DevDepRepo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the APT archives that are used to resolve Debian source packages.
+        /// </summary>
+        public List<AptRepository> AptRepositories { get; set; }
+
         #endregion
     }
 
