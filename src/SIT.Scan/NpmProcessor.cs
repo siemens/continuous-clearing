@@ -952,7 +952,7 @@ namespace SIT.Scan
                                                                 Component component,
                                                                 IBomHelper bomHelper,
                                                                 out string jfrogRepoPath)
-        {            
+        {
             Logger.DebugFormat("GetJfrogArtifactoryRepoDetials(): Starting identify JFrog repository details retrieval for component [Name: {0}, Version: {1}].", component.Name, component.Version);
             AqlResult aqlResult = new AqlResult();
             jfrogRepoPath = Dataconstant.JfrogRepoPathNotFound;

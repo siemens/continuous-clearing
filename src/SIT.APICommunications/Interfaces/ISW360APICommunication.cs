@@ -14,7 +14,6 @@ namespace SIT.APICommunications.Interfaces
     public interface ISw360ApiCommunication
     {
         Task<string> GetProjects();
-        Task<string> GetReleases();
         Task<string> GetSw360Users();
         Task<string> GetComponents();
         Task<string> GetProjectsByName(string projectName);
@@ -41,6 +40,6 @@ namespace SIT.APICommunications.Interfaces
         string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData);
         void DownloadAttachmentUsingWebClient(string attachmentDownloadLink, string fileName);
         Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink);
-        Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries);
+        Task<HttpResponseMessage> GetAllReleasesWithAllData(int page, int pageEntries, string extraQueryParams = "");
     }
 }

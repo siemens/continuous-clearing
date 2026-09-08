@@ -80,61 +80,48 @@ namespace SIT.Create
         /// <returns></returns>
         private static async Task<ReleasesAllDetails.Sw360Release> FindValidRelease(ISW360ApicommunicationFacade sW360ApicommunicationFacade)
         {
+            // Walks pages one at a time and stops as soon as a qualifying release is found, instead of pulling
+            // the full releases dataset up front — validation usually only needs the first few pages.
             int page = 0;
-            const int pageEntries = 40;
-            int pageCount = 0;
-
-            while (pageCount < 10)
+            int totalPages = 1;
+            while (page < totalPages)
             {
-                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, pageEntries);
-
-                if (releaseResponse == null)
+                // Filters to APPROVED server-side so fewer/no client-side-empty pages are fetched; the SOURCE
+                // attachment check still has to happen client-side since attachments aren't a filterable column.
+                ReleasesAllDetails releaseResponse = await GetAllReleasesDetails(sW360ApicommunicationFacade, page, ApiConstant.ReleasePageSize, $"clearingState={Dataconstant.Approved}");
+                if (releaseResponse?.Embedded?.Sw360releases == null || releaseResponse.Embedded.Sw360releases.Count == 0)
                 {
-                    Logger.Debug($"FindValidRelease(): Fossology token validation failed in SW360 due to release not found");
                     break;
                 }
 
-                var validRelease = releaseResponse.Embedded?.Sw360releases?.FirstOrDefault(release =>
-                    release?.ClearingState == "APPROVED" &&
-                    release.AllReleasesEmbedded?.Sw360attachments != null &&
-                    release.AllReleasesEmbedded.Sw360attachments.Any(attachments =>
-                        attachments.Count != 0 &&
-                        attachments.Count(attachment => attachment?.AttachmentType == "SOURCE") == 1));
-
+                var validRelease = TryFindValidReleaseInPage(releaseResponse);
                 if (validRelease != null)
                 {
                     return validRelease;
                 }
 
-                if (!MoveToNextPage(releaseResponse, ref page, ref pageCount))
-                {
-                    break;
-                }
+                totalPages = releaseResponse.Page?.TotalPages ?? 1;
+                page++;
             }
 
+            Logger.Debug($"FindValidRelease(): No valid release found across all pages");
             return null;
         }
 
         /// <summary>
-        /// Moves To Next Page
+        /// Finds the first release in a page that is already APPROVED and has a SOURCE attachment, making it a
+        /// safe target to probe the Fossology connection.
         /// </summary>
         /// <param name="releaseResponse"></param>
-        /// <param name="page"></param>
-        /// <param name="pageCount"></param>
-        /// <returns>boolean value</returns>
-        private static bool MoveToNextPage(ReleasesAllDetails releaseResponse, ref int page, ref int pageCount)
+        /// <returns>the matching release, or null if the page has no qualifying release</returns>
+        private static ReleasesAllDetails.Sw360Release TryFindValidReleaseInPage(ReleasesAllDetails releaseResponse)
         {
-            int currentPage = page;
-            int totalPages = releaseResponse?.Page?.TotalPages ?? 0;
+            const string source = "SOURCE";
 
-            if (currentPage < totalPages - 1)
-            {
-                page = currentPage + 1;
-                pageCount++;
-                return true;
-            }
-
-            return false;
+            return releaseResponse?.Embedded?.Sw360releases?.FirstOrDefault(release =>
+                release?.ClearingState == Dataconstant.Approved &&
+                release.AllReleasesEmbedded?.Sw360attachments != null &&
+                release.AllReleasesEmbedded.Sw360attachments.Any(attachment => source.Equals(attachment?.AttachmentType, StringComparison.OrdinalIgnoreCase)));
         }
 
         /// <summary>
@@ -161,18 +148,19 @@ namespace SIT.Create
         }
 
         /// <summary>
-        /// Gets All Releases Details
+        /// Gets a single page of releases with all details (used to search page-by-page with early exit).
         /// </summary>
         /// <param name="sW360ApicommunicationFacade"></param>
         /// <param name="page"></param>
         /// <param name="pageEntries"></param>
+        /// <param name="extraQueryParams">Additional server-side filter query parameters, e.g. clearingState.</param>
         /// <returns>release details</returns>
-        private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries)
+        private static async Task<ReleasesAllDetails> GetAllReleasesDetails(ISW360ApicommunicationFacade sW360ApicommunicationFacade, int page, int pageEntries, string extraQueryParams = "")
         {
             ReleasesAllDetails releaseResponse = null;
             try
             {
-                var responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries);
+                var responseData = await sW360ApicommunicationFacade.GetAllReleasesWithAllData(page, pageEntries, extraQueryParams);
                 await LogHandlingHelper.HttpResponseHandling("Get All Releases Details", $"MethodName:GetAllReleasesDetails()", responseData);
                 string response = responseData?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 releaseResponse = JsonConvert.DeserializeObject<ReleasesAllDetails>(response);
@@ -247,6 +235,13 @@ namespace SIT.Create
                         // Fossology URL is not valid                                   
                         Logger.Error($"Fossology URL is not working. Please check and try again.", ex);
                         LogHandlingHelper.ExceptionErrorHandling("HttpRequestException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "Check the network connection and ensure the Fossology server is reachable.");
+                        environmentHelper.CallEnvironmentExit(-1);
+                    }
+                    catch (TaskCanceledException ex)
+                    {
+                        // Request timed out (HttpClient.Timeout elapsed) rather than failing outright
+                        Logger.Error($"Fossology URL validation timed out. Please check and try again.", ex);
+                        LogHandlingHelper.ExceptionErrorHandling("TaskCanceledException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "The Fossology server took too long to respond. Check connectivity or increase the timeout and try again.");
                         environmentHelper.CallEnvironmentExit(-1);
                     }
                 }

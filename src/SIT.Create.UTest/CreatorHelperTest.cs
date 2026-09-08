@@ -268,7 +268,6 @@ namespace SIT.Create.UTest
                 Content = new StringContent("", Encoding.UTF8)
             };
             var iSW360ApicommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            iSW360ApicommunicationFacade.Setup(x => x.GetReleases()).ReturnsAsync(await responseMessage.Content.ReadAsStringAsync());
             iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
             iSW360Service.Setup(x => x.GetReleaseDataOfComponent(comparisonBomData[0].ReleaseLink)).ReturnsAsync(releasesInfo);
 
@@ -325,13 +324,14 @@ namespace SIT.Create.UTest
                 DownloadUrl = "https://snapshot.debian.org/archive/debian/20180915T211528Z/pool/main/a/adduser/adduser_3.118.tar.xz"
             });
             var iSW360Service = new Mock<ISW360Service>();
-            iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData)).ReturnsAsync(componentsAvailableInSw360);
+            iSW360Service.Setup(x => x.GetAvailableReleasesInSw360(comparisonBomData, false)).ReturnsAsync(componentsAvailableInSw360);
 
             //Act
             Bom data = await creatorHelper.GetUpdatedComponentsDetails(comparisonBomData, updatedCompareBomData, iSW360Service.Object, bom);
 
             //Assert
             Assert.That(data.Components[0].Properties.Count > 0);
+            iSW360Service.Verify(x => x.GetAvailableReleasesInSw360(comparisonBomData, false), Times.Once);
         }
 
         [Test]
