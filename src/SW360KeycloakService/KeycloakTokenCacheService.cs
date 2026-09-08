@@ -147,7 +147,7 @@ namespace SW360KeycloakService
         {
             if (HasStaticTokenFallback)
             {
-                Logger.Debug("KeycloakTokenCacheService: Keycloak authentication failed; falling back to static token.");                
+                Logger.Debug("KeycloakTokenCacheService: Keycloak authentication failed; falling back to static token.");
                 return _settings.KeyCloakToken;
             }
             Logger.Error(userFacingErrorMessage);
@@ -230,7 +230,7 @@ namespace SW360KeycloakService
 
             Logger.DebugFormat("KeycloakTokenCacheService: Token cached for {0} seconds.", expirySeconds);
             return tokenResponse.AccessToken;
-        }        
+        }
 
         #endregion
     }

@@ -6,7 +6,6 @@
 
 using log4net;
 using log4net.Core;
-using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.Common;
 using SIT.Common.ComplianceValidator;
@@ -89,13 +88,13 @@ namespace SIT.Create
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            
+
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"SIT Create is running in TEST mode \n", null);
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Create, bomFilePath: bomFilePath);
-            
+
 
             if (appSettings.SbomSigning.SBOMSignVerify)
             {

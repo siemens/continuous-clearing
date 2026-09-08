@@ -5,11 +5,9 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http;
 using SIT.Common.Model;
 using SW360KeycloakService;
 using SW360KeycloakService.Interfaces;
-using System;
 using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Net.Http.Headers;

@@ -4,7 +4,6 @@
 //  SPDX-License-Identifier: MIT
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
 using System.Text.RegularExpressions;
 
 namespace SIT.Common

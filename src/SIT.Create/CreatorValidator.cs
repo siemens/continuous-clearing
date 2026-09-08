@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using log4net;
-using Microsoft.Web.Administration;
 using Newtonsoft.Json;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;

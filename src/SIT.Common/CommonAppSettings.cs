@@ -92,7 +92,7 @@ namespace SIT.Common
         public string ProjectName { get; set; }
         public string ProjectID { get; set; }
         public string AuthTokenType { get; set; } = "Bearer";
-        public string Token { get; set; }        
+        public string Token { get; set; }
         public Keycloak Keycloak { get; set; }
         public Fossology Fossology { get; set; }
         public bool IgnoreDevDependency { get; set; } = true;
