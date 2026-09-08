@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-	<version>11.0.1</version>
+	<version>11.2.0</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -80,6 +80,7 @@
     <file src="out\net10.0\Microsoft.Extensions.FileProviders.Abstractions.dll" target="tools\Microsoft.Extensions.FileProviders.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileProviders.Physical.dll" target="tools\Microsoft.Extensions.FileProviders.Physical.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\Microsoft.Extensions.FileSystemGlobbing.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Http.dll" target="tools\Microsoft.Extensions.Http.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.Abstractions.dll" target="tools\Microsoft.Extensions.Logging.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.dll" target="tools\Microsoft.Extensions.Logging.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll" target="tools\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll"/>
