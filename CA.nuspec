@@ -77,6 +77,8 @@
     <file src="out\net10.0\Microsoft.Extensions.Configuration.Json.dll" target="tools\Microsoft.Extensions.Configuration.Json.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll" target="tools\Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.DependencyInjection.dll" target="tools\Microsoft.Extensions.DependencyInjection.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Diagnostics.Abstractions.dll" target="tools\Microsoft.Extensions.Diagnostics.Abstractions.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Diagnostics.dll" target="tools\Microsoft.Extensions.Diagnostics.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileProviders.Abstractions.dll" target="tools\Microsoft.Extensions.FileProviders.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileProviders.Physical.dll" target="tools\Microsoft.Extensions.FileProviders.Physical.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\Microsoft.Extensions.FileSystemGlobbing.dll"/>
