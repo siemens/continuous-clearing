@@ -68,6 +68,8 @@
     <file src="out\net10.0\Microsoft.ComponentDetection.Common.dll" target="tools\Microsoft.ComponentDetection.Common.dll"/>
     <file src="out\net10.0\Microsoft.ComponentDetection.Contracts.dll" target="tools\Microsoft.ComponentDetection.Contracts.dll"/>
     <file src="out\net10.0\Microsoft.ComponentDetection.Detectors.dll" target="tools\Microsoft.ComponentDetection.Detectors.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Caching.Abstractions.dll" target="tools\Microsoft.Extensions.Caching.Abstractions.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Caching.Memory.dll" target="tools\Microsoft.Extensions.Caching.Memory.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Configuration.Abstractions.dll" target="tools\Microsoft.Extensions.Configuration.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Configuration.Binder.dll" target="tools\Microsoft.Extensions.Configuration.Binder.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Configuration.CommandLine.dll" target="tools\Microsoft.Extensions.Configuration.CommandLine.dll"/>
@@ -87,6 +89,7 @@
     <file src="out\net10.0\Microsoft.Extensions.Logging.dll" target="tools\Microsoft.Extensions.Logging.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll" target="tools\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Options.dll" target="tools\Microsoft.Extensions.Options.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll" target="tools\Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Primitives.dll" target="tools\Microsoft.Extensions.Primitives.dll"/>
     <file src="out\net10.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="tools\Microsoft.VisualStudio.CodeCoverage.Shim.dll"/>
     <file src="out\net10.0\Microsoft.Web.Administration.dll" target="tools\Microsoft.Web.Administration.dll"/>
