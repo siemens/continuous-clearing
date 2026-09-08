@@ -534,16 +534,18 @@ namespace SIT.APICommunications
         private static async Task<HttpResponseMessage> FetchAllPagesAsync(HttpClient httpClient, string baseUrl, int pageSize, string extraQueryParams = "")
         {
             using HttpResponseMessage firstPageResponse = await GetPageAsync(httpClient, baseUrl, 0, pageSize, extraQueryParams);
-            if (!firstPageResponse.IsSuccessStatusCode)
+            string firstPageContent = await firstPageResponse.Content.ReadAsStringAsync();
+            if (!firstPageResponse.IsSuccessStatusCode || !TryParseJObject(firstPageContent, out JObject firstPage))
             {
+                // A non-success status, or a "successful" response with an empty/non-JSON body (observed from
+                // some SW360 search endpoints on no-match), is treated as an empty result instead of crashing.
                 return new HttpResponseMessage(firstPageResponse.StatusCode)
                 {
                     ReasonPhrase = firstPageResponse.ReasonPhrase,
-                    Content = new StringContent(await firstPageResponse.Content.ReadAsStringAsync(), Encoding.UTF8, ApiConstant.ApplicationHalJson)
+                    Content = new StringContent(firstPageContent, Encoding.UTF8, ApiConstant.ApplicationHalJson)
                 };
             }
 
-            JObject firstPage = JObject.Parse(await firstPageResponse.Content.ReadAsStringAsync());
             int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
 
             if (totalPages > 1)
@@ -556,7 +558,8 @@ namespace SIT.APICommunications
                     {
                         using HttpResponseMessage pageResponse = await GetPageAsync(httpClient, baseUrl, page, pageSize, extraQueryParams);
                         pageResponse.EnsureSuccessStatusCode();
-                        return JObject.Parse(await pageResponse.Content.ReadAsStringAsync());
+                        string pageContent = await pageResponse.Content.ReadAsStringAsync();
+                        return TryParseJObject(pageContent, out JObject page2) ? page2 : null;
                     }
                     finally
                     {
@@ -565,7 +568,7 @@ namespace SIT.APICommunications
                 });
 
                 JObject[] remainingPages = await Task.WhenAll(remainingPageTasks);
-                MergeEmbeddedPages(firstPage, remainingPages);
+                MergeEmbeddedPages(firstPage, remainingPages.Where(p => p != null).ToArray());
             }
 
             return new HttpResponseMessage(firstPageResponse.StatusCode)
@@ -573,6 +576,28 @@ namespace SIT.APICommunications
                 ReasonPhrase = firstPageResponse.ReasonPhrase,
                 Content = new StringContent(firstPage.ToString(Formatting.None), Encoding.UTF8, ApiConstant.ApplicationHalJson)
             };
+        }
+
+        /// <summary>
+        /// Parses JSON safely, treating an empty/whitespace body or malformed content as "no object" rather than
+        /// letting <see cref="JsonReaderException"/> propagate as an unhandled exception.
+        /// </summary>
+        private static bool TryParseJObject(string content, out JObject result)
+        {
+            result = null;
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return false;
+            }
+            try
+            {
+                result = JObject.Parse(content);
+                return true;
+            }
+            catch (JsonReaderException)
+            {
+                return false;
+            }
         }
 
         /// <summary>
