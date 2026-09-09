@@ -202,63 +202,63 @@ namespace SIT.Create
                 environmentHelper.CallEnvironmentExit(-1);
                 return false;
             }
-            url = url.ToLower();
-            string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
-            string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();
 
-            if (Uri.IsWellFormedUriString(appSettings.SW360.Fossology.URL, UriKind.Absolute))
-            {
-                if (url.Contains(prodFossUrl) || url.Contains(stageFossUrl))
-                {
-                    // Send GET request to validate Fossology URL
-                    try
-                    {
-                        await LogHandlingHelper.HttpRequestHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", client, url);
-                        HttpResponseMessage response = await client.GetAsync(new Uri(appSettings.SW360.Fossology.URL));
-                        await LogHandlingHelper.HttpResponseHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", response);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            // Fossology URL is valid                            
-                            Logger.Debug("FossologyUrlValidation(): Completed Fossology URL validation process.");
-                            return true;
-                        }
-                        else
-                        {
-                            // Fossology URL is not valid                                   
-                            Logger.Error($"Fossology URL is not valid. Please make sure to add a valid Fossology URL in appsettings.");
-                            LogHandlingHelper.ExceptionErrorHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", new Exception($"Fossology URL not working. Received HTTP status code: {response.StatusCode}. URL: {url}"), $"Ensure the Fossology URL is accessible and returns a successful response. URL: {url}");
-                            environmentHelper.CallEnvironmentExit(-1);
-                        }
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        // Fossology URL is not valid                                   
-                        Logger.Error($"Fossology URL is not working. Please check and try again.", ex);
-                        LogHandlingHelper.ExceptionErrorHandling("HttpRequestException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "Check the network connection and ensure the Fossology server is reachable.");
-                        environmentHelper.CallEnvironmentExit(-1);
-                    }
-                    catch (TaskCanceledException ex)
-                    {
-                        // Request timed out (HttpClient.Timeout elapsed) rather than failing outright
-                        Logger.Error($"Fossology URL validation timed out. Please check and try again.", ex);
-                        LogHandlingHelper.ExceptionErrorHandling("TaskCanceledException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "The Fossology server took too long to respond. Check connectivity or increase the timeout and try again.");
-                        environmentHelper.CallEnvironmentExit(-1);
-                    }
-                }
-                else
-                {
-                    Logger.Debug($"FossologyUrlValidation(): Fossology URL is not valid.");
-                    LogHandlingHelper.BasicErrorHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", $"Fossology URL does not match the configured production or staging URLs. URL: {url}", "Ensure the Fossology URL matches the configured production or staging URLs.");
-                    environmentHelper.CallEnvironmentExit(-1);
-                }
-            }
-            else
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
                 Logger.Error($"Fossology URL is not valid. Please make sure to add a valid Fossology URL in appsettings.");
                 LogHandlingHelper.BasicErrorHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", "The provided Fossology URL is not a valid absolute URI.", "Check the Fossology URL format in the appsettings configuration.");
                 environmentHelper.CallEnvironmentExit(-1);
+                Logger.Debug("FossologyUrlValidation(): Completed Fossology URL validation process with failure.");
+                return false;
             }
-            Logger.Debug("FossologyUrlValidation(): Completed Fossology URL validation process with failure.");
+
+            string lowerUrl = url.ToLower();
+            string prodFossUrl = Dataconstant.ProductionFossologyURL.ToLower();
+            string stageFossUrl = Dataconstant.StageFossologyURL.ToLower();
+            if (!lowerUrl.Contains(prodFossUrl) && !lowerUrl.Contains(stageFossUrl))
+            {
+                Logger.Debug($"FossologyUrlValidation(): Fossology URL is not valid.");
+                LogHandlingHelper.BasicErrorHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", $"Fossology URL does not match the configured production or staging URLs. URL: {lowerUrl}", "Ensure the Fossology URL matches the configured production or staging URLs.");
+                environmentHelper.CallEnvironmentExit(-1);
+                Logger.Debug("FossologyUrlValidation(): Completed Fossology URL validation process with failure.");
+                return false;
+            }
+
+            bool isValid = await TryProbeFossologyUrlAsync(url, lowerUrl, client, environmentHelper);
+            Logger.Debug(isValid
+                ? "FossologyUrlValidation(): Completed Fossology URL validation process."
+                : "FossologyUrlValidation(): Completed Fossology URL validation process with failure.");
+            return isValid;
+        }
+
+        private static async Task<bool> TryProbeFossologyUrlAsync(string url, string lowerUrl, HttpClient client, IEnvironmentHelper environmentHelper)
+        {
+            try
+            {
+                await LogHandlingHelper.HttpRequestHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", client, url);
+                HttpResponseMessage response = await client.GetAsync(new Uri(url));
+                await LogHandlingHelper.HttpResponseHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", response);
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+
+                Logger.Error($"Fossology URL is not valid. Please make sure to add a valid Fossology URL in appsettings.");
+                LogHandlingHelper.ExceptionErrorHandling(FossologyUrlValidationContext, $"Methodname:FossologyUrlValidation()", new Exception($"Fossology URL not working. Received HTTP status code: {response.StatusCode}. URL: {lowerUrl}"), $"Ensure the Fossology URL is accessible and returns a successful response. URL: {lowerUrl}");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"Fossology URL is not working. Please check and try again.", ex);
+                LogHandlingHelper.ExceptionErrorHandling("HttpRequestException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "Check the network connection and ensure the Fossology server is reachable.");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.Error($"Fossology URL validation timed out. Please check and try again.", ex);
+                LogHandlingHelper.ExceptionErrorHandling("TaskCanceledException while Fossology URL Validation", $"Methodname:FossologyUrlValidation()", ex, "The Fossology server took too long to respond. Check connectivity or increase the timeout and try again.");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
             return false;
         }
 

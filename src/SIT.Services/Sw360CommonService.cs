@@ -66,7 +66,7 @@ namespace SIT.Services
                 // The two external-id key formats are independent lookups; run them concurrently instead of
                 // sequentially so a component's total lookup latency isn't the sum of both round-trips.
                 ComponentStatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
-                    TryGetComponentByKey(componentName, externalIdUriString, externalIdKey)));
+                    TryGetComponentByKey(componentName, componentExternalId, externalIdUriString, externalIdKey)));
 
                 // Replicate the original sequential loop's merge: whichever key (in list order) last had a
                 // non-empty match wins, unless an earlier key already matched true (which would have short-circuited).
@@ -103,12 +103,12 @@ namespace SIT.Services
         /// Looks up a component using a single external-id key format, retrying with an escaped id for Debian
         /// packages when the first attempt returns no matches.
         /// </summary>
-        private async Task<ComponentStatus> TryGetComponentByKey(string componentName, string externalIdUriString, string externalIdKey)
+        private async Task<ComponentStatus> TryGetComponentByKey(string componentName, string componentExternalId, string externalIdUriString, string externalIdKey)
         {
             var sw360ComponentsList = await GetCompListFromExternalIDCombinations(externalIdUriString, externalIdKey);
             if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
             {
-                string newExternalIdUriString = Uri.EscapeDataString(externalIdUriString.Replace("?arch=source", ""));
+                string newExternalIdUriString = Uri.EscapeDataString(componentExternalId.Replace("?arch=source", ""));
                 sw360ComponentsList = await GetCompListFromExternalIDCombinations(newExternalIdUriString, externalIdKey);
             }
 
@@ -155,17 +155,13 @@ namespace SIT.Services
                 Releasestatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
                     TryGetReleaseByKey(releaseName, releaseExternalId, externalIdKey)));
 
-                // Replicate the original sequential loop's merge: whichever key (in list order) last had a
-                // non-empty match wins, unless an earlier key already matched true (which would have short-circuited).
+                // Original code only assigned sw360Releases/isReleaseExist when a key's lookup actually matched;
+                // a non-matching "best guess" result must not overwrite the default empty status.
                 foreach (Releasestatus result in results)
                 {
-                    if (result == null)
+                    if (result != null && result.isReleaseExist)
                     {
-                        continue;
-                    }
-                    releasestatus = result;
-                    if (releasestatus.isReleaseExist)
-                    {
+                        releasestatus = result;
                         break;
                     }
                 }
