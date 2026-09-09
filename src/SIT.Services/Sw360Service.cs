@@ -436,7 +436,7 @@ namespace SIT.Services
         /// <param name="components"></param>
         private static void RemoveInvalidComponentsByPurlId(List<Components> components)
         {
-            if (InvalidComponentsIdentifiedByPurlId.Count == 0)
+            if (InvalidComponentsIdentifiedByPurlId.IsEmpty)
                 return;
 
             components.RemoveAll(component =>

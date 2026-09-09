@@ -638,7 +638,7 @@ namespace SIT.APICommunications
         /// <returns>The HTTP response for the requested page.</returns>
         private static Task<HttpResponseMessage> GetPageAsync(HttpClient httpClient, string baseUrl, int page, int pageSize, string extraQueryParams = "")
         {
-            string querySeparator = baseUrl.Contains("?", StringComparison.Ordinal) ? "&" : "?";
+            string querySeparator = baseUrl.Contains('?') ? "&" : "?";
             string normalizedExtraQueryParams = extraQueryParams.Trim('?', '&');
             string extraQueryPrefix = string.IsNullOrEmpty(normalizedExtraQueryParams) ? string.Empty : $"{normalizedExtraQueryParams}&";
             string pageUrl = $"{baseUrl}{querySeparator}{extraQueryPrefix}page={page}&page_entries={pageSize}";
