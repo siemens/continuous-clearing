@@ -129,7 +129,7 @@ namespace SIT.Create.UTest
                 }
             };
             var mockEnvironmentHelper = new Mock<IEnvironmentHelper>();
-            var responseBody = @"{""_embedded"": {""sw360:releases"": [{""id"": ""a3c5c9d1dd469d668433fb147c01bad2"",""name"": ""HC-Test Pugixml"",""version"": ""V1.2"",""clearingState"": ""APPROVED"",""_embedded"": {""sw360:attachments"": [[{""filename"": ""Protocol_Pugixml - 1.2.doc"",""attachmentType"": ""SOURCE""}]]},""_links"": {""self"": {""href"": ""https://sw360.siemens.com/resource/api/releases/a3c5c9d1dd469d668433fb147c01bad2""}}}]},""page"": {""totalPages"": 1}}";
+            var responseBody = @"{""_embedded"": {""sw360:releases"": [{""id"": ""a3c5c9d1dd469d668433fb147c01bad2"",""name"": ""HC-Test Pugixml"",""version"": ""V1.2"",""clearingState"": ""APPROVED"",""_embedded"": {""sw360:attachments"": [{""filename"": ""Protocol_Pugixml - 1.2.doc"",""attachmentType"": ""SOURCE""}]},""_links"": {""self"": {""href"": ""https://sw360.siemens.com/resource/api/releases/a3c5c9d1dd469d668433fb147c01bad2""}}}]},""page"": {""totalPages"": 1}}";
             var releasesInfo = new ReleasesInfo
             {
                 Name = "TestRelease",
@@ -149,7 +149,7 @@ namespace SIT.Create.UTest
 
             var triggerStatusResponse = JsonConvert.SerializeObject(fossTriggerStatus);
 
-            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage
+            mockISW360ApicommunicationFacade.Setup(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage
             {
                 Content = new StringContent(responseBody)
             });
@@ -161,7 +161,7 @@ namespace SIT.Create.UTest
             // Act
             await CreatorValidator.TriggerFossologyValidation(appSettings, mockISW360ApicommunicationFacade.Object, mockEnvironmentHelper.Object);
             // Assert
-            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            mockISW360ApicommunicationFacade.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
             mockISW360ApicommunicationFacade.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
         [Test]

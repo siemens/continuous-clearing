@@ -63,7 +63,7 @@ namespace SIT.Scan
         {
             bool isDevelopment = component?.Properties?.Any(p => p.Name == Dataconstant.Cdx_IsDevelopment && p.Value == "true") == true;
             bool isInternal = component?.Properties?.Any(p => p.Name == Dataconstant.Cdx_IsInternal && p.Value == "true") == true;
-            if (isDevelopment&&!isInternal)
+            if (isDevelopment && !isInternal)
             {
                 return ["devdep", "release", "dev"];
             }

@@ -4,7 +4,7 @@
 <package >
   <metadata>
     <id>continuous-clearing</id>
-	<version>11.0.1</version>
+	<version>11.1.1</version>
     <authors>Siemens AG</authors>
     <owners>continuous-clearing contributors</owners>
     <projectUrl>https://github.com/siemens/continuous-clearing</projectUrl>
@@ -68,6 +68,8 @@
     <file src="out\net10.0\Microsoft.ComponentDetection.Common.dll" target="tools\Microsoft.ComponentDetection.Common.dll"/>
     <file src="out\net10.0\Microsoft.ComponentDetection.Contracts.dll" target="tools\Microsoft.ComponentDetection.Contracts.dll"/>
     <file src="out\net10.0\Microsoft.ComponentDetection.Detectors.dll" target="tools\Microsoft.ComponentDetection.Detectors.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Caching.Abstractions.dll" target="tools\Microsoft.Extensions.Caching.Abstractions.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Caching.Memory.dll" target="tools\Microsoft.Extensions.Caching.Memory.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Configuration.Abstractions.dll" target="tools\Microsoft.Extensions.Configuration.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Configuration.Binder.dll" target="tools\Microsoft.Extensions.Configuration.Binder.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Configuration.CommandLine.dll" target="tools\Microsoft.Extensions.Configuration.CommandLine.dll"/>
@@ -77,13 +79,17 @@
     <file src="out\net10.0\Microsoft.Extensions.Configuration.Json.dll" target="tools\Microsoft.Extensions.Configuration.Json.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll" target="tools\Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.DependencyInjection.dll" target="tools\Microsoft.Extensions.DependencyInjection.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Diagnostics.Abstractions.dll" target="tools\Microsoft.Extensions.Diagnostics.Abstractions.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Diagnostics.dll" target="tools\Microsoft.Extensions.Diagnostics.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileProviders.Abstractions.dll" target="tools\Microsoft.Extensions.FileProviders.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileProviders.Physical.dll" target="tools\Microsoft.Extensions.FileProviders.Physical.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\Microsoft.Extensions.FileSystemGlobbing.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Http.dll" target="tools\Microsoft.Extensions.Http.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.Abstractions.dll" target="tools\Microsoft.Extensions.Logging.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.dll" target="tools\Microsoft.Extensions.Logging.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll" target="tools\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Options.dll" target="tools\Microsoft.Extensions.Options.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll" target="tools\Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Primitives.dll" target="tools\Microsoft.Extensions.Primitives.dll"/>
     <file src="out\net10.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="tools\Microsoft.VisualStudio.CodeCoverage.Shim.dll"/>
     <file src="out\net10.0\Microsoft.Web.Administration.dll" target="tools\Microsoft.Web.Administration.dll"/>

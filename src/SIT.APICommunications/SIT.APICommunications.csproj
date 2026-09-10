@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
-		<Version>11.0.1</Version>
+		<Version>11.1.1</Version>
 		<NoWarn>$(NoWarn);NETSDK1206</NoWarn>
 	</PropertyGroup>
 
@@ -30,6 +30,7 @@
 		<PackageReference Include="System.Management.Automation" Version="7.0.3" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
 		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" ExcludeAssets="runtime" />
 	</ItemGroup>
 

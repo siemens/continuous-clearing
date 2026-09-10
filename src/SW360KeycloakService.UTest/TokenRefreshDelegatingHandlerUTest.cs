@@ -9,10 +9,7 @@ using Moq.Protected;
 using NUnit.Framework;
 using SW360KeycloakService.Interfaces;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SW360KeycloakService.UTest
 {

@@ -44,8 +44,9 @@ namespace SIT.Services.Interface
         /// Asynchronously gets the available releases in SW360 for the specified components.
         /// </summary>
         /// <param name="listOfComponentsToBom">The list of components to query.</param>
+        /// <param name="fetchFromCache">Whether to reuse the cached SW360 release data.</param>
         /// <returns>A task representing the asynchronous operation that returns a list of available components.</returns>
-        Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom);
+        Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom, bool fetchFromCache = true);
 
         /// <summary>
         /// Asynchronously gets the attachment download link.

@@ -40,7 +40,6 @@ namespace SIT.Create
     {
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly HttpClient httpClient = new HttpClient();
-        public static string GithubUrl { get; set; } = string.Empty;
         public static UrlHelper Instance { get; } = new UrlHelper();
         public CommonAppSettings CommonAppSettings { get; } = new CommonAppSettings();
 
@@ -501,12 +500,12 @@ namespace SIT.Create
             string sourceUrl = result?.StdOut?.TrimEnd();
             Logger.DebugFormat("GetSourceUrlForNpmPackage(): NPM view command output - StdOut: {0}, StdErr: {1}", result?.StdOut, result?.StdErr);
             IRepository repo = new Repository();
-            GithubUrl = repo.IdentifyRepoURLForGit(sourceUrl, componentName);
+            string githubUrl = repo.IdentifyRepoURLForGit(sourceUrl, componentName);
 
-            Logger.DebugFormat("GetSourceUrlForNpmPackage(): Final GitHub URL for source code: {0}", GithubUrl);
+            Logger.DebugFormat("GetSourceUrlForNpmPackage(): Final GitHub URL for source code: {0}", githubUrl);
             Logger.DebugFormat("GetSourceUrlForNpmPackage():Completed to identify sourceUrl - ComponentName: {0}, Version: {1}", componentName, version);
 
-            return GithubUrl;
+            return githubUrl;
         }
         /// <summary>
         /// Gets the Source URL for CARGO Packages
@@ -623,7 +622,7 @@ namespace SIT.Create
         {
             string response;
             string url = string.Empty;
-            GithubUrl = string.Empty;
+            string githubUrl = string.Empty;
             try
             {
                 response = await httpClient.GetStringAsync(nuspecURL);
@@ -636,11 +635,11 @@ namespace SIT.Create
                     url = node.Attributes["url"]?.Value;
                 }
                 IRepository repo = new Repository();
-                GithubUrl = repo.IdentifyRepoURLForGit(url, componentName);
-                if (GithubUrl == string.Empty)
+                githubUrl = repo.IdentifyRepoURLForGit(url, componentName);
+                if (githubUrl == string.Empty)
                 {
-                    GithubUrl = SearchForProjectURLTagInNuspecFile(xmlDoc);
-                    return GithubUrl;
+                    githubUrl = SearchForProjectURLTagInNuspecFile(xmlDoc);
+                    return githubUrl;
                 }
             }
             catch (AggregateException ex)
@@ -652,7 +651,7 @@ namespace SIT.Create
                 Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                 LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromNuspecFile", $"MethodName:GetSourceURLFromNuspecFile(), ComponentName: {componentName}, NuspecURL: {nuspecURL}", ex, "An HTTP request error occurred while trying to fetch the Nuspec file.");
             }
-            return GithubUrl;
+            return githubUrl;
         }
 
         /// <summary>

@@ -12,7 +12,6 @@ using SIT.Common.Logging;
 using SIT.Common.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 namespace SIT.Scan

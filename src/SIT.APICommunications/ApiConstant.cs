@@ -37,6 +37,35 @@ namespace SIT.APICommunications
         public const string Sw360UsersSuffix = "/resource/api/users";
 
         /// <summary>
+        /// The page size used for the cheap first-page probe against SW360 list endpoints, before deciding whether
+        /// to fetch every remaining record in a single follow-up call.
+        /// </summary>
+        public const int ListPageSize = 100;
+
+        /// <summary>
+        /// Page size for fetching SW360 releases (Fossology validation's page-by-page early-exit search, and the
+        /// cached full-releases fetch used for BOM comparison). SW360 default page size is 10; server max is
+        /// 200000; this is well above ListPageSize so far fewer round trips are needed either way.
+        /// </summary>
+        public const int ReleasePageSize = 20000;
+
+        /// <summary>
+        /// The maximum number of concurrent SW360 lookups (release/component existence checks) per component,
+        /// bounded to avoid overwhelming the server while still parallelizing slow searchByExternalIds calls.
+        /// </summary>
+        public const int Sw360LookupMaxConcurrency = 8;
+
+        /// <summary>
+        /// Query params requesting full details plus Lucene-backed search, used by list endpoints that support both.
+        /// </summary>
+        public const string AllDetailsAndLuceneSearchParams = "allDetails=true&luceneSearch=true&";
+
+        /// <summary>
+        /// Query params requesting Lucene-backed search only, for endpoints (e.g. users) that don't support allDetails.
+        /// </summary>
+        public const string LuceneSearchOnlyParam = "luceneSearch=true&";
+
+        /// <summary>
         /// The API suffix for SW360 resource endpoints.
         /// </summary>
         public const string Sw360ResourceApiSuffix = "/resource/";
@@ -75,6 +104,11 @@ namespace SIT.APICommunications
         /// The MIME type for JSON content.
         /// </summary>
         public const string ApplicationJson = "application/json";
+
+        /// <summary>
+        /// The HAL+JSON MIME type SW360's Spring HATEOAS API actually serves, per its Swagger documentation.
+        /// </summary>
+        public const string ApplicationHalJson = "application/hal+json";
 
         /// <summary>
         /// The MIME type for all application content types.

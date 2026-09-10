@@ -25,6 +25,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using File = System.IO.File;
 
@@ -41,8 +42,9 @@ namespace SIT.Services
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade;
         private readonly ISW360CommonService m_SW360CommonService;
-        private static List<Components> availableComponentList = new List<Components>();
-        private static readonly List<Components> InvalidComponentsIdentifiedByPurlId = new List<Components>();
+        // Concurrent bags: components are checked in parallel, so additions must be thread-safe.
+        private static readonly System.Collections.Concurrent.ConcurrentBag<Components> availableComponentList = new();
+        private static readonly System.Collections.Concurrent.ConcurrentBag<Components> InvalidComponentsIdentifiedByPurlId = new();
         public Sw360Service(ISW360ApicommunicationFacade sw360ApiCommunicationFacade, IEnvironmentHelper _environmentHelper)
         {
             m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
@@ -63,7 +65,7 @@ namespace SIT.Services
         /// duplicates are found.</returns>
         public List<Components> GetDuplicateComponentsByPurlId()
         {
-            return InvalidComponentsIdentifiedByPurlId;
+            return InvalidComponentsIdentifiedByPurlId.ToList();
         }
 
         /// <summary>
@@ -72,9 +74,10 @@ namespace SIT.Services
         /// </summary>       
         /// <param name="listOfComponentsToBom">The list of components to check for available releases in SW360. Each component in the list is compared
         /// against the releases retrieved from SW360.</param>
+        /// <param name="fetchFromCache">Whether to reuse the cached SW360 release data.</param>
         /// <returns>A list of components representing the available releases in SW360 that correspond to the specified
         /// components. The list is empty if no matching releases are found.</returns>
-        public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom)
+        public async Task<List<Components>> GetAvailableReleasesInSw360(List<Components> listOfComponentsToBom, bool fetchFromCache = true)
         {
             Logger.Debug("GetAvailableReleasesInSw360():Starting to get available releases in sw360");
             List<Components> availableComponentsList = new List<Components>();
@@ -82,7 +85,11 @@ namespace SIT.Services
             try
             {
                 Sw360ServiceStopWatch.Start();
-                string responseBody = await m_SW360ApiCommunicationFacade.GetReleases();
+                // Reuses the single full-dataset fetch shared with Fossology validation (allDetails=true is a
+                // superset of the plain shape; unmapped extra fields are ignored by JsonConvert).
+                string responseBody = fetchFromCache
+                    ? await m_SW360ApiCommunicationFacade.GetAllReleasesWithAllDataCached()
+                    : await m_SW360ApiCommunicationFacade.GetAllReleasesWithAllDataUncached();
                 Sw360ServiceStopWatch.Stop();
                 Logger.DebugFormat("GetAvailableReleasesInSw360():Time taken for Get all Releases api call-{0}", TimeSpan.FromMilliseconds(Sw360ServiceStopWatch.ElapsedMilliseconds).TotalSeconds);
                 var modelMappedObject = JsonConvert.DeserializeObject<ComponentsRelease>(responseBody);
@@ -388,28 +395,39 @@ namespace SIT.Services
             IList<Sw360Components> sw360ComponentList = await GetAvailableComponenentsListFromSw360();
             if (sw360Releases == null || sw360Releases.Count == 0)
             {
-                return availableComponentList;
+                return availableComponentList.ToList();
             }
 
-            foreach (Components component in listOfComponentsToBom)
+            // Each iteration is an independent, slow (network-bound) SW360 lookup, so bound the fan-out
+            // instead of awaiting components one-by-one to avoid multi-hour sequential runs.
+            using SemaphoreSlim throttle = new SemaphoreSlim(APICommunications.ApiConstant.Sw360LookupMaxConcurrency);
+            await Task.WhenAll(listOfComponentsToBom.Select(async component =>
             {
-                if (await CheckReleaseExistenceByExternalId(component) ||
-                       CheckAvailabilityByNameAndVersion(sw360Releases, component, sw360ComponentList))
+                await throttle.WaitAsync();
+                try
                 {
-                    Logger.DebugFormat("GetAvailableComponenentsList():  Release Exist : Release name - {0}, version - {1}", component.Name, component.Version);
+                    if (await CheckReleaseExistenceByExternalId(component) ||
+                           CheckAvailabilityByNameAndVersion(sw360Releases, component, sw360ComponentList))
+                    {
+                        Logger.DebugFormat("GetAvailableComponenentsList():  Release Exist : Release name - {0}, version - {1}", component.Name, component.Version);
+                    }
+                    else if (await CheckComponentExistenceByExternalId(component) ||
+                             CheckAvailabilityByName(sw360ComponentList, component))
+                    {
+                        Logger.DebugFormat("GetAvailableComponenentsList():  Component Exist : Component name - {0}, version - {1}", component.Name, component.Version);
+                    }
+                    else
+                    {
+                        // Do Nothing or to be implemented
+                    }
                 }
-                else if (await CheckComponentExistenceByExternalId(component) ||
-                         CheckAvailabilityByName(sw360ComponentList, component))
+                finally
                 {
-                    Logger.DebugFormat("GetAvailableComponenentsList():  Component Exist : Component name - {0}, version - {1}", component.Name, component.Version);
+                    throttle.Release();
                 }
-                else
-                {
-                    // Do Nothing or to be implemented
-                }
-            }
+            }));
             RemoveInvalidComponentsByPurlId(listOfComponentsToBom);
-            return availableComponentList;
+            return availableComponentList.ToList();
         }
 
         /// <summary>
@@ -418,7 +436,7 @@ namespace SIT.Services
         /// <param name="components"></param>
         private static void RemoveInvalidComponentsByPurlId(List<Components> components)
         {
-            if (InvalidComponentsIdentifiedByPurlId.Count == 0)
+            if (InvalidComponentsIdentifiedByPurlId.IsEmpty)
                 return;
 
             components.RemoveAll(component =>

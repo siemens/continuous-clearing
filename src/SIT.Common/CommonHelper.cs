@@ -1088,7 +1088,7 @@ namespace SIT.Common
             {
                 Logger.Warn("Legacy token authentication will be deprecated on October 3, 2026. Please switch to the new Keycloak authentication using clientId and clientSecret");
             }
-            
+
         }
 
         #endregion
