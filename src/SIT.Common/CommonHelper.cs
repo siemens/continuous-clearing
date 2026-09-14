@@ -9,6 +9,8 @@
 using CycloneDX.Models;
 using log4net;
 using log4net.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SIT.Common.Constants;
 using SIT.Common.Model;
 using SW360KeycloakService;
@@ -60,6 +62,28 @@ namespace SIT.Common
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Parses JSON safely, treating an empty/whitespace body or malformed content as "no object" rather than
+        /// letting <see cref="JsonReaderException"/> propagate as an unhandled exception.
+        /// </summary>
+        public static bool TryParseJObject(string content, out JObject result)
+        {
+            result = null;
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return false;
+            }
+            try
+            {
+                result = JObject.Parse(content);
+                return true;
+            }
+            catch (JsonReaderException)
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// Determines whether Azure DevOps debug mode is enabled.

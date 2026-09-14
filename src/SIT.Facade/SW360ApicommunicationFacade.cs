@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using SIT.Common;
 
 namespace SIT.Facade
 {
@@ -400,8 +401,14 @@ namespace SIT.Facade
         private async Task<string> FetchAllReleasesJsonInChunks()
         {
             using HttpResponseMessage firstPageResponse = await GetAllReleasesWithAllData(0, ApiConstant.ReleasePageSize);
+            firstPageResponse.EnsureSuccessStatusCode();
             string firstPageJson = await firstPageResponse.Content.ReadAsStringAsync();
-            JObject firstPage = JObject.Parse(firstPageJson);
+            if (!CommonHelper.TryParseJObject(firstPageJson, out JObject firstPage))
+            {
+                // A "successful" response with an empty/non-JSON body (e.g. an HTML error page) is treated as empty
+                // instead of letting JsonReaderException crash the process.
+                return firstPageJson;
+            }
             int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
 
             if (totalPages > 1)
@@ -413,8 +420,9 @@ namespace SIT.Facade
                     try
                     {
                         using HttpResponseMessage pageResponse = await GetAllReleasesWithAllData(page, ApiConstant.ReleasePageSize);
+                        pageResponse.EnsureSuccessStatusCode();
                         string pageJson = await pageResponse.Content.ReadAsStringAsync();
-                        return JObject.Parse(pageJson);
+                        return CommonHelper.TryParseJObject(pageJson, out JObject page2) ? page2 : null;
                     }
                     finally
                     {
@@ -423,7 +431,7 @@ namespace SIT.Facade
                 });
 
                 JObject[] remainingPages = await Task.WhenAll(remainingPageTasks);
-                MergeEmbeddedPages(firstPage, remainingPages);
+                MergeEmbeddedPages(firstPage, remainingPages.Where(p => p != null));
             }
 
             return firstPage.ToString(Formatting.None);
