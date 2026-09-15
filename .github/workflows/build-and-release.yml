@@ -32,6 +32,17 @@ jobs:
           ref: ${{ github.event.inputs.ref || github.ref }}
           fetch-depth: 0
 
+      - name: Debug Git Tags and History
+        shell: pwsh
+        run: |
+          Write-Host "Current commit: $(git rev-parse HEAD)"
+          Write-Host "---- All tags reachable from HEAD ----"
+          git tag --merged HEAD
+          Write-Host "---- All tags in repo (sorted) ----"
+          git tag -l | Sort-Object
+          Write-Host "---- Describe ----"
+          git describe --tags --long
+
       - name: Setup GitVersion
         uses: gittools/actions/gitversion/setup@51d325634925d7d9ce0a7efc2c586c0bc2b9eee6 # v3.2.1
         with:
@@ -43,6 +54,16 @@ jobs:
         with:
           useConfigFile: true
           configFilePath: GitVersion.yml
+
+      - name: Print Full GitVersion Output
+        shell: pwsh
+        run: |
+          Write-Host "Sha: ${{ steps.gitversion.outputs.sha }}"
+          Write-Host "VersionSourceSha: ${{ steps.gitversion.outputs.versionSourceSha }}"
+          Write-Host "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          Write-Host "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+          Write-Host "PreReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}"
+          Write-Host "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.commitsSinceVersionSource }}"
 
       - name: Determine Prerelease Flag
         id: set_prerelease
