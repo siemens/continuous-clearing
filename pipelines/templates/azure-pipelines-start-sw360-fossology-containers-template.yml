@@ -48,10 +48,15 @@ steps:
 
  
   - script: |
-      echo "Waiting for 10 minutes to allow sw360 to start..."
-      sleep 600
-    displayName: "Initial Wait (10 minutes)"
+      echo "Waiting for 5 minutes to allow sw360 to start..."
+      sleep 300
+    displayName: "Initial Wait (5 minutes)"
     enabled: true
+
+  - script: |
+      docker ps -a
+      docker logs sw360 --tail 200
+    displayName: "Debug sw360 container state"
 
   - script: |
       echo "Waiting for sw360 API to be available..."
