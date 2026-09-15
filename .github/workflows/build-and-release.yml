@@ -52,8 +52,8 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@51d325634925d7d9ce0a7efc2c586c0bc2b9eee6 # v3.2.1
         with:
-          useConfigFile: true
           configFilePath: GitVersion.yml
+          disableCache: true
 
       - name: Print Full GitVersion Output
         shell: pwsh
