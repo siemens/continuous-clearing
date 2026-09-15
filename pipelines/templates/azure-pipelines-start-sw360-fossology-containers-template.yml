@@ -48,9 +48,9 @@ steps:
 
  
   - script: |
-      echo "Waiting for 5 minutes to allow sw360 to start..."
-      sleep 300
-    displayName: "Initial Wait (5 minutes)"
+      echo "Waiting for 10 minutes to allow sw360 to start..."
+      sleep 600
+    displayName: "Initial Wait (10 minutes)"
     enabled: true
 
   - script: |
