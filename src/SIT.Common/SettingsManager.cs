@@ -164,7 +164,7 @@ namespace SIT.Common
                     "ProjectType"
                 };
 
-                if (appSettings.SW360 != null)
+                if (appSettings.SW360 != null && !appSettings.IsTestMode)
                 {
                     identifierReqParameters.Add($"SW360.ProjectID");
                     identifierReqParameters.Add($"SW360.URL");

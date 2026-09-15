@@ -139,10 +139,10 @@ namespace SIT.Scan
             }
 
             if (appSettings.IsTestMode)
-                Logger.Logger.Log(null, Level.Alert, $"SIT Scan is running in TEST mode \n", null);
+                Logger.Logger.Log(null, Level.Alert, $"SIT Scan is running in dry run mode \n", null);
 
             // Validate application settings
-            if (appSettings.SW360 != null)
+            if (appSettings.SW360 != null && !appSettings.IsTestMode)
             {
                 CommonHelper.DisplayTokenExpiryWarning(appSettings);
                 await ValidateAppsettingsFile(appSettings, projectReleases);
