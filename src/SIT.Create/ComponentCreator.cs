@@ -843,9 +843,7 @@ namespace SIT.Create
                 string componentId = CommonHelper.GetSubstringOfLastOccurance(releasesInfo.Links?.Sw360Component?.Href, "/");
                 item.ReleaseID = releaseId;
                 await GetUploadIdWhenReleaseExists(item, releasesInfo, appSettings);
-
-                // This method handles the upload of source code and updates the source code download URL for an existing release in SW360.If you don't want to upload source code just comment this method.
-                await IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, creatorHelper, sw360CreatorService);
+                releasesInfo = await IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(item, releasesInfo, releaseId, creatorHelper, sw360CreatorService);
                 UpdatedCompareBomData.Add(item);
                 if (IsReleaseAttachmentExist(releasesInfo) && !string.IsNullOrEmpty(item.ReleaseID))
                 {
@@ -865,7 +863,7 @@ namespace SIT.Create
         /// <param name="creatorHelper"></param>
         /// <param name="sw360CreatorService"></param>
         /// <returns>task that returns asynchronous operation</returns>
-        public static async Task IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(ComparisonBomData item, ReleasesInfo releasesInfo, string releaseId, ICreatorHelper creatorHelper, ISw360CreatorService sw360CreatorService)
+        public static async Task<ReleasesInfo> IfAlreadyReleaseExistsUploadSourceCodeAndUrlInSW360(ComparisonBomData item, ReleasesInfo releasesInfo, string releaseId, ICreatorHelper creatorHelper, ISw360CreatorService sw360CreatorService)
         {
             if (item.ApprovedStatus == Dataconstant.NewClearing && !AreAttachmentsPresent(releasesInfo))
             {
@@ -879,8 +877,8 @@ namespace SIT.Create
                     }
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
-                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
-
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;                    
+                    releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);
                 }
                 else
                 {
@@ -888,6 +886,7 @@ namespace SIT.Create
                 }
 
             }
+            return releasesInfo;
         }
 
         /// <summary>
