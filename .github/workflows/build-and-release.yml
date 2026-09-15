@@ -172,8 +172,23 @@ jobs:
         with:
           name: nuget-continuous-clearing
 
+      - name: Check if version tag already exists
+        id: check_tag
+        shell: pwsh
+        run: |
+          $tag = "v${{ env.SEMVER }}"
+          git fetch --tags
+          $exists = (git tag -l $tag)
+          if ($exists) {
+            Write-Host "Tag $tag already exists on this commit history. Skipping release creation to avoid duplicate/escalating tags."
+            echo "exists=true" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "exists=false" >> $env:GITHUB_OUTPUT
+          }
+
       - name: Create Release
         id: create_release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -186,10 +201,12 @@ jobs:
           prerelease: ${{ env.IS_PRERELEASE == 'true' }}
 
       - name: Compress Full Build Output into ZIP
+        if: steps.check_tag.outputs.exists == 'false'
         run: |
           powershell -Command "& {Compress-Archive -Path ${{ github.workspace }}/out/* -DestinationPath ${{ github.workspace }}/continuous-clearing-v${{ env.SEMVER }}.zip}"
 
       - name: Upload Full Build Output ZIP to Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -200,6 +217,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload Docker Image(tar) to Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -210,6 +228,7 @@ jobs:
           asset_content_type: application/x-tar
 
       - name: Upload NuGet Package to Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -220,6 +239,7 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload ReadmeOSS_nupkg file to Release 
+        if: steps.check_tag.outputs.exists == 'false'
         uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -230,6 +250,7 @@ jobs:
           asset_content_type: text/html
 
       - name: Upload ReadmeOSS_Docker file to Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
