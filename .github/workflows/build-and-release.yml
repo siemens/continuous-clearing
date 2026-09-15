@@ -54,6 +54,7 @@ jobs:
         with:
           configFilePath: GitVersion.yml
           disableCache: true
+          verbosity: diagnostic
 
       - name: Print Full GitVersion Output
         shell: pwsh
