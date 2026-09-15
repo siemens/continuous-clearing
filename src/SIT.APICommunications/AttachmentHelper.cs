@@ -120,7 +120,8 @@ namespace SIT.APICommunications
                     FileInfo fileToUpload = new FileInfo(attachReport.AttachmentFile);
                     string localPath = $"{Path.GetTempPath()}/ClearingTool/DownloadedFiles";
 
-                    WriteAttachmentsJSONFile(ApiConstant.AttachmentJsonFileName, localPath, attachReport);
+                    var filename = fileToUpload.Exists && !string.IsNullOrEmpty(fileToUpload.Name) ? fileToUpload.Name : ApiConstant.AttachmentJsonFileName;
+                    WriteAttachmentsJSONFile(filename, localPath, attachReport);
                     FileInfo attachmentToUpload = new FileInfo(fullPathOfAttachmentJSON);
 
                     if (attachmentToUpload.Exists)
