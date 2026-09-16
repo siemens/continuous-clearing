@@ -53,7 +53,7 @@ namespace SIT.APICommunications
         /// The maximum number of concurrent SW360 lookups (release/component existence checks) per component,
         /// bounded to avoid overwhelming the server while still parallelizing slow searchByExternalIds calls.
         /// </summary>
-        public const int Sw360LookupMaxConcurrency = 8;
+        public const int Sw360LookupMaxConcurrency = 4;
 
         /// <summary>
         /// Query params requesting full details plus Lucene-backed search, used by list endpoints that support both.

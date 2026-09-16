@@ -29,9 +29,6 @@ namespace SIT.Facade
     {
         #region Fields
         private readonly ISw360ApiCommunication m_sw360ApiCommunication;
-        // Guards the one-time full releases fetch used by BOM comparison.
-        private readonly SemaphoreSlim m_allReleasesCacheLock = new(1, 1);
-        private string m_allReleasesCachedJson;
         #endregion
 
         #region Constructors
@@ -355,47 +352,13 @@ namespace SIT.Facade
         }
 
         /// <summary>
-        /// Asynchronously fetches the full SW360 releases dataset without reading from the cache and refreshes it with
-        /// the fetched data.
-        /// </summary>
-        public Task<string> GetAllReleasesWithAllDataUncached()
-        {
-            return GetAllReleasesWithAllData(fetchFromCache: false);
-        }
-
-        /// <summary>
-        /// Asynchronously fetches the full SW360 releases dataset (allDetails=true) once and memoizes it for the
-        /// lifetime of this facade instance, so BOM comparison doesn't refetch it. Pages are fetched one at a time
+        /// Asynchronously fetches the full SW360 releases dataset (allDetails=true). Pages are fetched one at a time
         /// to learn the total page count, then remaining pages are pulled concurrently in small bounded batches
         /// (chunks) and merged, instead of one oversized page_entries request.
         /// </summary>
-        public Task<string> GetAllReleasesWithAllDataCached()
+        public Task<string> GetAllReleasesJson()
         {
-            return GetAllReleasesWithAllData(fetchFromCache: true);
-        }
-
-        private async Task<string> GetAllReleasesWithAllData(bool fetchFromCache)
-        {
-            if (fetchFromCache && m_allReleasesCachedJson != null)
-            {
-                return m_allReleasesCachedJson;
-            }
-
-            await m_allReleasesCacheLock.WaitAsync();
-            try
-            {
-                if (fetchFromCache && m_allReleasesCachedJson != null)
-                {
-                    return m_allReleasesCachedJson;
-                }
-
-                m_allReleasesCachedJson = await FetchAllReleasesJsonInChunks();
-                return m_allReleasesCachedJson;
-            }
-            finally
-            {
-                m_allReleasesCacheLock.Release();
-            }
+            return FetchAllReleasesJsonInChunks();
         }
 
         private async Task<string> FetchAllReleasesJsonInChunks()

@@ -86,7 +86,7 @@ namespace SIT.Services.UTest
             ComponentsRelease componentRelease = new ComponentsRelease();
             componentRelease.Embedded = new ReleaseEmbedded();
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataCached()).ReturnsAsync(string.Empty);
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesJson()).ReturnsAsync(string.Empty);
 
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
@@ -99,7 +99,7 @@ namespace SIT.Services.UTest
         }
 
         [Test]
-        public async Task GetAvailableReleasesInSw360_WhenCacheIsBypassed_FetchesUncachedReleaseData()
+        public async Task GetAvailableReleasesInSw360_ForGivenData_FetchesReleaseData()
         {
             // Arrange
             List<Components> components = new List<Components>
@@ -111,18 +111,17 @@ namespace SIT.Services.UTest
                 Embedded = new ReleaseEmbedded { Sw360Releases = new List<Sw360Releases>() }
             };
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataUncached())
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesJson())
                 .ReturnsAsync(JsonConvert.SerializeObject(componentsRelease));
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
 
             ISW360Service sw360Service = new Sw360Service(swApiCommunicationFacade.Object, environmentHelperMock.Object);
 
             // Act
-            await sw360Service.GetAvailableReleasesInSw360(components, fetchFromCache: false);
+            await sw360Service.GetAvailableReleasesInSw360(components);
 
             // Assert
-            swApiCommunicationFacade.Verify(x => x.GetAllReleasesWithAllDataUncached(), Times.Once);
-            swApiCommunicationFacade.Verify(x => x.GetAllReleasesWithAllDataCached(), Times.Never);
+            swApiCommunicationFacade.Verify(x => x.GetAllReleasesJson(), Times.Once);
         }
 
         [Test]
@@ -191,7 +190,7 @@ namespace SIT.Services.UTest
             componentStatus.isComponentExist = compnentstate;
 
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataCached()).ReturnsAsync(componentsReleaseModelSerialized);
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesJson()).ReturnsAsync(componentsReleaseModelSerialized);
             swApiCommunicationFacade.Setup(x => x.GetComponents()).ReturnsAsync(componentsModelSerialized);
 
             Mock<ISW360CommonService> sw360CommonService = new Mock<ISW360CommonService>();
@@ -239,7 +238,7 @@ namespace SIT.Services.UTest
             ComponentsRelease componentRelease = new ComponentsRelease();
             componentRelease.Embedded = new ReleaseEmbedded();
             Mock<ISW360ApicommunicationFacade> swApiCommunicationFacade = new Mock<ISW360ApicommunicationFacade>();
-            swApiCommunicationFacade.Setup(x => x.GetAllReleasesWithAllDataCached()).Throws<HttpRequestException>();
+            swApiCommunicationFacade.Setup(x => x.GetAllReleasesJson()).Throws<HttpRequestException>();
 
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
