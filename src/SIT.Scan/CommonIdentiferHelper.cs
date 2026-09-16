@@ -91,7 +91,7 @@ namespace SIT.Scan
         public static string GetDefaultProjectName(CommonAppSettings appSettings)
         {
             string projectName;
-            if (appSettings.SW360 != null)
+            if (appSettings.SW360 != null && !appSettings.IsTestMode)
             {
                 projectName = appSettings.SW360.ProjectName;
             }
