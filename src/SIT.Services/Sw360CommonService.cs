@@ -155,8 +155,7 @@ namespace SIT.Services
                 Releasestatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
                     TryGetReleaseByKey(releaseName, releaseExternalId, externalIdKey)));
 
-                // Original code only assigned sw360Releases/isReleaseExist when a key's lookup actually matched;
-                // a non-matching "best guess" result must not overwrite the default empty status.
+              
                 foreach (Releasestatus result in results)
                 {
                     if (result != null && result.isReleaseExist)

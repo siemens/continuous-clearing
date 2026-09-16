@@ -34,8 +34,16 @@ steps:
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
 
   - script: |
+      docker rm -f sw360 fossology 2>/dev/null || true
+      docker container prune -f
+      docker image prune -af
+      free -h
+    displayName: "Clean up stale Docker state before starting containers"
+
+  - script: |
       echo "Starting a new sw360 container..."
-      CONTAINER_ID=$(docker run -dit --name sw360 --memory=5g -p ${{ parameters.sw360Port }}:8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway ${{ parameters.sw360DockerImage }})
+      # container memory must exceed the image's JVM -Xmx6g to avoid OOM kills
+      CONTAINER_ID=$(docker run -dit --name sw360 --memory=7g -p ${{ parameters.sw360Port }}:8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway ${{ parameters.sw360DockerImage }})
 
       if [ -z "$CONTAINER_ID" ]; then
           echo "Failed to start sw360 container!"
@@ -52,6 +60,18 @@ steps:
       sleep 300
     displayName: "Initial Wait (5 minutes)"
     enabled: true
+
+  - script: |
+      echo "Host memory:"
+      free -h
+      echo "Container state:"
+      docker ps -a
+      docker inspect sw360 --format 'OOMKilled={{.State.OOMKilled}} Status={{.State.Status}} ExitCode={{.State.ExitCode}} StartedAt={{.State.StartedAt}}'
+      echo "Container resource usage:"
+      docker stats sw360 --no-stream
+      echo "Container logs:"
+      docker logs sw360 --tail 200
+    displayName: "Debug sw360 container state"
 
   - script: |
       echo "Waiting for sw360 API to be available..."
@@ -80,6 +100,10 @@ steps:
               echo "sw360 API is up and running!"
               exit 0
           fi
+
+          echo "--- Container health at attempt $i ---"
+          docker inspect sw360 --format 'OOMKilled={{.State.OOMKilled}} Status={{.State.Status}} ExitCode={{.State.ExitCode}}' || echo "sw360 container not found!"
+          free -h
 
           echo "sw360 API not ready yet (Status: $HTTP_STATUS). Retrying in $RETRY_INTERVAL seconds..."
           sleep $RETRY_INTERVAL

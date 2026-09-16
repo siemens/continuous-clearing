@@ -482,7 +482,7 @@ namespace SIT.Facade.UTest
         }
 
         [Test]
-        public async Task GetAllReleasesWithAllDataUncached_WhenCalled_RefreshesCachedReleaseData()
+        public async Task GetAllReleasesJson_WhenCalled_FetchesReleaseData()
         {
             // Arrange
             Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
@@ -494,12 +494,37 @@ namespace SIT.Facade.UTest
             sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
 
             // Act
-            string uncachedResult = await sW360ApicommunicationFacade.GetAllReleasesWithAllDataUncached();
-            string cachedResult = await sW360ApicommunicationFacade.GetAllReleasesWithAllDataCached();
+            string result = await sW360ApicommunicationFacade.GetAllReleasesJson();
 
             // Assert
-            Assert.That(cachedResult, Is.EqualTo(uncachedResult));
+            Assert.That(result, Does.Contain("refreshed"));
             mockSw360comm.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Test]
+        public async Task GetAllReleasesJson_WhenMultiplePages_MergesEmbeddedReleasesFromEachPage()
+        {
+            // Arrange
+            Mock<ISw360ApiCommunication> mockSw360comm = new Mock<ISw360ApiCommunication>();
+            mockSw360comm.Setup(x => x.GetAllReleasesWithAllData(0, It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("{\"page\":{\"totalPages\":2},\"_embedded\":{\"sw360:releases\":[{\"name\":\"page0release\"}]}}")
+                });
+            mockSw360comm.Setup(x => x.GetAllReleasesWithAllData(1, It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("{\"page\":{\"totalPages\":2},\"_embedded\":{\"sw360:releases\":[{\"name\":\"page1release\"}]}}")
+                });
+            sW360ApicommunicationFacade = new SW360ApicommunicationFacade(mockSw360comm.Object);
+
+            // Act
+            string result = await sW360ApicommunicationFacade.GetAllReleasesJson();
+
+            // Assert
+            Assert.That(result, Does.Contain("page0release"));
+            Assert.That(result, Does.Contain("page1release"));
+            mockSw360comm.Verify(x => x.GetAllReleasesWithAllData(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()), Times.Exactly(2));
         }
     }
 }

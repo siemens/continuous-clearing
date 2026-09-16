@@ -126,7 +126,7 @@ namespace SIT.Scan
             fileOperations.WriteContentToFile(bomKpiData, appSettings.Directory.OutputFolder,
                 FileConstant.BomKpiDataFileName, defaultProjectName);
             Logger.DebugFormat("GenerateBom(): Successfully wrote KPI data to the output folder - {0}.\n", appSettings.Directory.OutputFolder);
-            if (appSettings.SW360 != null)
+            if (appSettings.SW360 != null && !appSettings.IsTestMode)
             {
                 // Writes Project Summary Url on CLI
                 string projectURL = bomHelper.GetProjectSummaryLink(appSettings.SW360.ProjectID, appSettings.SW360.URL);
