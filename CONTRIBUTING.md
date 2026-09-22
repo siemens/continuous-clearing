@@ -1,4 +1,4 @@
-# Contributing
+﻿# Contributing
 
 When contributing to this repository, first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. Make sure a pull request is made after every changes before merging to master.
 
@@ -39,3 +39,58 @@ The simplest way to run tests:
 
 
 
+
+## Release Process
+
+Releases are automated via the `Build & Release` GitHub Actions workflow
+(`.github/workflows/build-and-release.yml`). Version numbers are computed
+automatically by **GitVersion** based on branch/tag naming, using the rules
+defined in [`GitVersion.yml`](GitVersion.yml).
+
+### Versioning rules (GitVersion.yml)
+
+| Branch / Tag pattern         | GitVersion tag | Example version   | Release type       |
+|-------------------------------|----------------|--------------------|----------------------|
+| `main` / `master`             | (none)         | `2.5.0`            | Stable               |
+| `beta/*` or `beta-*`          | `beta`         | `2.5.0-beta.1`     | Pre-release (beta)   |
+| `release/*` or `release-*`    | `rc`           | `2.5.0-rc.1`       | Pre-release (RC)     |
+
+### How releases are triggered
+
+The workflow runs on:
+- Push to `main` (stable release)
+- Push to `beta/**` or `release/**` branches (pre-release)
+- Manual `workflow_dispatch` with an optional `ref` input (branch or tag),
+  allowing a maintainer to trigger a build/release from any approved ref
+  without depending on Power Branch details - useful for hotfixes.
+
+> Note: Pushing a git tag does **not** trigger this workflow. Tags are only
+> created as a result of the `release` job (via `actions/create-release`)
+> once a release is published.
+
+### Pre-release vs. stable behavior
+
+- If GitVersion's `preReleaseTag` output is non-empty (beta/rc), the release
+  is created with `prerelease: true` in GitHub - clearly marked and does
+  **not** replace the "Latest release" pointer.
+- Stable releases (no pre-release tag) are created as drafts and require a
+  maintainer to manually publish them from the **Releases** page.
+- Before creating a release, the workflow checks whether the computed tag
+  (`vX.Y.Z`) already exists and skips release creation if so, to avoid
+  duplicate/escalating releases.
+
+### Creating a hotfix release
+
+1. Use **Actions -> Build & Release -> Run workflow** and supply the approved
+   branch or tag name in the `ref` input.
+
+No dependency on Power Branch details is required.
+
+### Contributor checklist for release-related changes
+
+If your change affects branch naming, versioning, or the release workflow:
+- Update [`GitVersion.yml`](GitVersion.yml) and this section together.
+- Update `.github/workflows/build-and-release.yml` and document any new
+  triggers, jobs, or release-type behavior here.
+- Verify the change with a test run (PR or manual `workflow_dispatch`)
+  before merging to `main`.
