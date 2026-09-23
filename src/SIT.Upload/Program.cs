@@ -80,15 +80,18 @@ namespace SIT.Upload
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
+            string verifiedBomContent = null;
             if (appSettings.SbomSigning.SBOMSignVerify)
             {
-                sbomSigningValidation.SigningVerification(appSettings, bomFilePath, environmentHelper);
+                // Verify signature and capture the exact verified content so the upload consumes
+                // the same bytes that were validated, instead of re-reading the file from disk.
+                verifiedBomContent = sbomSigningValidation.SigningVerificationWithContent(appSettings, bomFilePath, environmentHelper);
             }
             //Uploading Package to artifactory
             PackageUploadHelper.JFrogService = GetJfrogService(appSettings);
             UploadToArtifactory.JFrogService = GetJfrogService(appSettings);
             JfrogRepoUpdater.JFrogService = GetJfrogService(appSettings);
-            await PackageUploader.UploadPackageToArtifactory(appSettings);
+            await PackageUploader.UploadPackageToArtifactory(appSettings, verifiedBomContent);
 
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry.Enable)

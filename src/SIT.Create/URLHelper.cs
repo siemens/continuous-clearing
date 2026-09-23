@@ -467,8 +467,6 @@ namespace SIT.Create
         {
             Logger.DebugFormat("GetSourceUrlForNpmPackage(): Start identifying sourceUrl for Npm Package - ComponentName: {0}, Version: {1}", componentName, version);
 
-            string npmViewCommandToGetUrl = String.Empty;
-
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardOutput = true;
@@ -476,25 +474,51 @@ namespace SIT.Create
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
 
+            // Build the "npm view <name>@<version> repository.url" call by passing every token
+            // through ArgumentList instead of concatenating it into a shell command string. This
+            // way the component name/version are delivered to the process as discrete, already
+            // separated arguments and are never interpreted by a shell (/bin/bash -c or cmd /c),
+            // which permanently removes the command-injection vector while still running npm view.
+            string packageSpec = $"{componentName}@{version}";
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                npmViewCommandToGetUrl = $"-c \" npm view {componentName}@{version} repository.url --registry https://registry.npmjs.org/ \"";
-                p.StartInfo.FileName = FileConstant.DockerCMDTool;
-                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Linux OS detected. Command: {0}", npmViewCommandToGetUrl);
+                p.StartInfo.FileName = FileConstant.NpmCLITool;
+                p.StartInfo.ArgumentList.Add("view");
+                p.StartInfo.ArgumentList.Add(packageSpec);
+                p.StartInfo.ArgumentList.Add("repository.url");
+                p.StartInfo.ArgumentList.Add("--registry");
+                p.StartInfo.ArgumentList.Add("https://registry.npmjs.org/");
+                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Linux OS detected. Executing npm view for package: {0}", packageSpec);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                npmViewCommandToGetUrl = $"/c npm view {componentName}@{version} repository.url --registry https://registry.npmjs.org/";
-                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Windows OS detected. Command: {0}", npmViewCommandToGetUrl);
+                // On Windows npm is a batch script (npm.cmd) that can only be launched via cmd.exe.
+                // cmd.exe does not honour the standard argv escaping used by ArgumentList, so the
+                // package name/version are additionally validated against the strict npm character
+                // set to ensure no cmd metacharacters can ever reach the shell. Legitimate npm
+                // packages always satisfy this, so real components continue to be processed.
+                if (!IsValidNpmComponentName(componentName) || !IsValidNpmComponentVersion(version))
+                {
+                    Logger.WarnFormat("GetSourceUrlForNpmPackage(): Skipping npm view for unsafe component name/version - ComponentName: {0}, Version: {1}", componentName, version);
+                    return string.Empty;
+                }
+
+                p.StartInfo.FileName = "cmd.exe";
+                p.StartInfo.ArgumentList.Add("/c");
+                p.StartInfo.ArgumentList.Add("npm");
+                p.StartInfo.ArgumentList.Add("view");
+                p.StartInfo.ArgumentList.Add(packageSpec);
+                p.StartInfo.ArgumentList.Add("repository.url");
+                p.StartInfo.ArgumentList.Add("--registry");
+                p.StartInfo.ArgumentList.Add("https://registry.npmjs.org/");
+                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Windows OS detected. Executing npm view for package: {0}", packageSpec);
             }
             else
             {
                 Logger.Debug("GetSourceUrlForNpmPackage(): OS not recognized. Unable to determine the command to execute.");
             }
 
-
-            p.StartInfo.Arguments = npmViewCommandToGetUrl;
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
             Result result = processResult?.Result;
             string sourceUrl = result?.StdOut?.TrimEnd();
@@ -507,8 +531,44 @@ namespace SIT.Create
 
             return githubUrl;
         }
+
         /// <summary>
-        /// Gets the Source URL for CARGO Packages
+        /// Validates that an npm component name only contains characters allowed in a valid
+        /// npm package name. This prevents shell command injection when the name is passed to
+        /// the "npm view" command line.
+        /// </summary>
+        private static bool IsValidNpmComponentName(string componentName)
+        {
+            if (string.IsNullOrWhiteSpace(componentName) || componentName.Length > 214)
+            {
+                return false;
+            }
+
+            // Optional scope (@scope/) followed by the package name. Allowed characters are
+            // limited to the npm package name character set (lowercase letters, digits and
+            // a small set of safe symbols) - no shell metacharacters are permitted.
+            return Regex.IsMatch(
+                componentName,
+                @"^(@[a-z0-9][a-z0-9-._~]*\/)?[a-z0-9][a-z0-9-._~]*$");
+        }
+
+        /// <summary>
+        /// Validates that an npm component version only contains characters allowed in a
+        /// semantic version string. This prevents shell command injection when the version is
+        /// passed to the "npm view" command line.
+        /// </summary>
+        private static bool IsValidNpmComponentVersion(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version) || version.Length > 256)
+            {
+                return false;
+            }
+
+            // Semantic version characters only (digits, letters, dot, hyphen, plus) - no
+            // whitespace or shell metacharacters are permitted.
+            return Regex.IsMatch(version, @"^[a-zA-Z0-9.\-+]+$");
+        }
+
         /// </summary>
         /// <param name="componentName"></param>
         /// <param name="componentVersion"></param>
@@ -626,7 +686,7 @@ namespace SIT.Create
             try
             {
                 response = await httpClient.GetStringAsync(nuspecURL);
-                XmlDocument xmlDoc = new XmlDocument();
+                XmlDocument xmlDoc = new XmlDocument() { XmlResolver = null };
                 xmlDoc.LoadXml(response);
 
                 XmlNodeList nodeList = xmlDoc.GetElementsByTagName("repository");
