@@ -112,8 +112,7 @@ namespace SIT.APICommunications
 
                 string boundary = CreateFormDataBoundary();
                 request.ContentType = "multipart/form-data; boundary=" + boundary;
-
-                Stream requestStream = request.GetRequestStream();
+                byte[] endBytes = System.Text.Encoding.UTF8.GetBytes($"--{boundary}--");
 
                 lock (attachmentsJSONFileLock)
                 {
@@ -124,19 +123,37 @@ namespace SIT.APICommunications
                     WriteAttachmentsJSONFile(filename, localPath, attachReport);
                     FileInfo attachmentToUpload = new FileInfo(fullPathOfAttachmentJSON);
 
+                    // The exact body length is computed up front so the request can be sent with
+                    // AllowWriteStreamBuffering disabled: HttpWebRequest then streams each file straight to the
+                    // socket instead of buffering the whole multipart body (which could be several GB) in memory.
+                    long contentLength = endBytes.Length;
                     if (attachmentToUpload.Exists)
                     {
-                        attachmentToUpload.WriteMultipartFormData(requestStream, boundary, ApiConstant.ApplicationJson, "attachment");
+                        contentLength += GetMultipartPartLength(attachmentToUpload, boundary, ApiConstant.ApplicationJson, "attachment");
                     }
-
                     if (fileToUpload.Exists)
                     {
-                        fileToUpload.WriteMultipartFormData(requestStream, boundary, fileMimeType, fileFormKey);
+                        contentLength += GetMultipartPartLength(fileToUpload, boundary, fileMimeType, fileFormKey);
                     }
 
-                    byte[] endBytes = System.Text.Encoding.UTF8.GetBytes($"--{boundary}--");
-                    requestStream.Write(endBytes, 0, endBytes.Length);
-                    requestStream.Close();
+                    request.AllowWriteStreamBuffering = false;
+                    request.ContentLength = contentLength;
+
+                    using (Stream requestStream = request.GetRequestStream())
+                    {
+                        if (attachmentToUpload.Exists)
+                        {
+                            attachmentToUpload.WriteMultipartFormData(requestStream, boundary, ApiConstant.ApplicationJson, "attachment");
+                        }
+
+                        if (fileToUpload.Exists)
+                        {
+                            fileToUpload.WriteMultipartFormData(requestStream, boundary, fileMimeType, fileFormKey);
+                        }
+
+                        requestStream.Write(endBytes, 0, endBytes.Length);
+                    }
+
                     LogHandlingHelper.LogHttpWebRequest("Attach Component Source", $"Uploading component source for ReleaseId: {attachReport.ReleaseId}", request);
                     using WebResponse response = request.GetResponse();
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
@@ -158,17 +175,13 @@ namespace SIT.APICommunications
             }
             catch (WebException webex)
             {
-                WebResponse errResp = webex.Response;
-                using (Stream respStream = errResp?.GetResponseStream())
-                {
-                    if (respStream != null)
-                    {
-                        StreamReader reader = new StreamReader(respStream);
-                        string text = reader.ReadToEnd();
-                        LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", webex, $"Web exception occurred. Details: {text}");
-                        Logger.WarnFormat("   └── Web exception: {0}", text, webex);
-                    }
-                }
+                LogWebException(webex, attachReport);
+            }
+            catch (AggregateException aggEx) when (aggEx.GetBaseException() is WebException innerWebEx)
+            {
+                // With AllowWriteStreamBuffering disabled, GetRequestStream()/GetResponse() can surface connection
+                // failures (e.g. DNS/connect errors) wrapped in an AggregateException instead of a plain WebException.
+                LogWebException(innerWebEx, attachReport);
             }
             catch (IOException ex)
             {
@@ -176,6 +189,28 @@ namespace SIT.APICommunications
                 LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"AttachComponentSourceToSW360():Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", ex, "An I/O error occurred while processing the attachment.");
             }
             return releaseAttachementApi;
+        }
+
+        /// <summary>
+        /// Logs a <see cref="WebException"/> raised while attaching a component source, including the server's
+        /// response body when one is available.
+        /// </summary>
+        private static void LogWebException(WebException webex, AttachReport attachReport)
+        {
+            WebResponse errResp = webex.Response;
+            using Stream respStream = errResp?.GetResponseStream();
+            if (respStream != null)
+            {
+                StreamReader reader = new StreamReader(respStream);
+                string text = reader.ReadToEnd();
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", webex, $"Web exception occurred. Details: {text}");
+                Logger.WarnFormat("   └── Web exception: {0}", text, webex);
+            }
+            else
+            {
+                LogHandlingHelper.ExceptionErrorHandling(AttachmentErrorMessage, $"Failed to attach component source for ReleaseId: {attachReport.ReleaseId}", webex, "Web exception occurred with no server response (e.g. a connection or DNS failure).");
+                Logger.Warn("   └── Web exception with no response.", webex);
+            }
         }
 
 
@@ -219,6 +254,19 @@ namespace SIT.APICommunications
         private static string CreateFormDataBoundary()
         {
             return "---------------------------" + DateTime.Now.Ticks.ToString("x");
+        }
+
+        /// <summary>
+        /// Computes the exact byte length of a <see cref="FileInfoExtensions.WriteMultipartFormData"/> part
+        /// (header + file content + trailing CRLF) without reading the file, so the request's total
+        /// Content-Length can be known before any bytes are written to the socket.
+        /// </summary>
+        private static long GetMultipartPartLength(FileInfo file, string boundary, string mimeType, string formKey)
+        {
+            string header = string.Format(FileInfoExtensions.HeaderTemplate, boundary, formKey, file.Name, mimeType);
+            long headerLength = System.Text.Encoding.UTF8.GetByteCount(header);
+            const long trailingNewLineLength = 2; // "\r\n" written after each part's content
+            return headerLength + file.Length + trailingNewLineLength;
         }
 
         /// <summary>
