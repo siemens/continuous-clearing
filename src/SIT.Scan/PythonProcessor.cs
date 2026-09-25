@@ -185,7 +185,7 @@ namespace SIT.Scan
                 {
                     Name = node["name"].ToString(),
                     Version = node["version"].ToString(),
-                    PurlID = Dataconstant.PurlCheck()[PoetryProjectType] + "/" + NormalizePypiName(node["name"].ToString()) + "@" + node["version"].ToString(),
+                    PurlID = Dataconstant.PurlCheck()[PoetryProjectType] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
                     // Support both Poetry 1.x (category) and Poetry 2.x (groups)
                     Isdevdependent = IsDevDependency(node),
                     FoundType = Dataconstant.Discovered,
@@ -335,15 +335,14 @@ namespace SIT.Scan
         private static string FormRefFromNodeDetails(KeyValuePair<string, TomlNode> valuePair, List<PythonPackage> PythonPackages)
         {
             var value = PythonPackages.Find(val => val.Name == valuePair.Key)?.Version;
-            string normalizedName = NormalizePypiName(valuePair.Key);
 
             if (string.IsNullOrEmpty(value))
             {
-                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + normalizedName + "@" + "*";
+                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + valuePair.Key + "@" + "*";
             }
             else
             {
-                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + normalizedName + "@" + value;
+                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + valuePair.Key + "@" + value;
             }
         }
 
@@ -412,18 +411,6 @@ namespace SIT.Scan
 
 
         /// <summary>
-        /// Normalizes a PyPI package name to its canonical lowercase form and validates it
-        /// using the packageurl-dotnet PackageURL type. Falls back to the lowercased name
-        /// if the purl cannot be constructed.
-        /// </summary>
-        /// <param name="name">The package name to normalize.</param>
-        /// <returns>The normalized (lowercase) package name.</returns>
-        private static string NormalizePypiName(string name)
-        {
-            return PurlNameNormalizer.Normalize(name, "pypi");
-        }
-
-        /// <summary>
         /// Gets Release ExternalId
         /// </summary>
         /// <param name="name"></param>
@@ -431,7 +418,6 @@ namespace SIT.Scan
         /// <returns>release id</returns>
         private static string GetReleaseExternalId(string name, string version)
         {
-            name = NormalizePypiName(name);
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
@@ -512,15 +498,8 @@ namespace SIT.Scan
         /// <returns>boolean value</returns>
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
-            string fullName = bomHelper.GetFullNameOfComponent(component);
-
-            bool ExistsInJfrog(string searchName) => aqlResultList.Exists(x =>
-                x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == searchName) &&
-                x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
-
-            // First check with the original name, then fall back to the normalized (lowercase) name.
-            string jfrogcomponentName = ExistsInJfrog(fullName) ? fullName : NormalizePypiName(fullName);
-            if (ExistsInJfrog(jfrogcomponentName))
+            string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
+            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version)))
             {
                 Logger.DebugFormat("IsInternalPythonComponent(): Component [Name: {0}, Version: {1}] is internal,Found in JFrog repository with full name: {2}.", component.Name, component.Version, jfrogcomponentName);
                 return true;
@@ -540,13 +519,8 @@ namespace SIT.Scan
         {
 
 
-            string FindName(string searchName) => aqlResultList.FirstOrDefault(x =>
-                x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == searchName) &&
-                x.Properties.Any(p => p.Key == "pypi.version" && p.Value == version))?.Name ?? string.Empty;
-
-            // First check with the original name, then fall back to the normalized (lowercase) name.
-            string nameVerison = FindName(name);
-            if (string.IsNullOrEmpty(nameVerison)) { nameVerison = FindName(NormalizePypiName(name)); }
+            string nameVerison = string.Empty;
+            nameVerison = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == version))?.Name ?? string.Empty;
 
             if (string.IsNullOrEmpty(nameVerison)) { nameVerison = Dataconstant.PackageNameNotFoundInJfrog; }
             return nameVerison;
@@ -593,12 +567,7 @@ namespace SIT.Scan
         {
             string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out string jfrogPackageNameWhlExten, out string jfrogRepoPath);
 
-            AqlResult FindHashes(string searchName) => aqlResultList.FirstOrDefault(x =>
-                x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == searchName) &&
-                x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
-
-            // First check with the original name, then fall back to the normalized (lowercase) name.
-            var hashes = FindHashes(component.Name) ?? FindHashes(NormalizePypiName(component.Name));
+            var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
 
             Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
             Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };
