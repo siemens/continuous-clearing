@@ -56,6 +56,12 @@ namespace SIT.APICommunications
         public const int Sw360LookupMaxConcurrency = 4;
 
         /// <summary>
+        /// Page size (max artifacts per page) used when paginating JFrog AQL "items.find" searches via the
+        /// "created" timestamp cursor, since JFrog's ".offset()" operator requires an Enterprise license.
+        /// </summary>
+        public const int JfrogAqlPageLimit = 500000;
+
+        /// <summary>
         /// Query params requesting full details plus Lucene-backed search, used by list endpoints that support both.
         /// </summary>
         public const string AllDetailsAndLuceneSearchParams = "allDetails=true&luceneSearch=true&";
