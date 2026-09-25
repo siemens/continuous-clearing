@@ -111,7 +111,16 @@ namespace SIT.Scan
             try
             {
                 List<ReferenceDetails> referenceList = Parsecsproj(appSettings);
-                XDocument packageFile = XDocument.Load(packagesFilePath, LoadOptions.SetLineInfo);
+                XDocument packageFile;
+                XmlReaderSettings readerSettings = new XmlReaderSettings
+                {
+                    DtdProcessing = DtdProcessing.Prohibit,
+                    XmlResolver = null
+                };
+                using (XmlReader xmlReader = XmlReader.Create(packagesFilePath, readerSettings))
+                {
+                    packageFile = XDocument.Load(xmlReader, LoadOptions.SetLineInfo);
+                }
                 IEnumerable<XElement> nodes = packageFile.Descendants("package");
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += nodes.Count();
                 foreach (XElement element in nodes)
@@ -199,7 +208,7 @@ namespace SIT.Scan
             try
             {
                 List<string> foundCsprojFiles = GetValidCsprojfile(appSettings);
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new XmlDocument() { XmlResolver = null };
                 foreach (var csprojFile in foundCsprojFiles)
                 {
                     doc.Load(csprojFile);

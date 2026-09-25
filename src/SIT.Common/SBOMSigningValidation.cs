@@ -136,5 +136,68 @@ namespace SIT.Common
                 environmentHelper.CallEnvironmentExit(-1);
             }
         }
+
+        /// <summary>
+        /// Validates the SBOM signature and returns the exact content that was verified.
+        /// The file is read once; the returned content is the same content whose signature
+        /// was verified, so the caller must consume it directly instead of re-reading the
+        /// file from disk. This closes the TOCTOU window between verification and use.
+        /// </summary>
+        /// <param name="appSettings">Application settings</param>
+        /// <param name="bomFilePath">Path to BOM file</param>
+        /// <param name="environmentHelper">Environment helper for exit handling</param>
+        /// <returns>The verified BOM content, or null if verification failed.</returns>
+        public string SigningVerificationWithContent(CommonAppSettings appSettings, string bomFilePath, IEnvironmentHelper environmentHelper)
+        {
+            try
+            {
+                var sbomSigningAppSettings = new SBOMSigningVerification.AppSettings
+                {
+                    BomFilePath = bomFilePath,
+                    Operation = OperationType.Validate,
+                    KeyVaultURI = appSettings.SbomSigning.KeyVaultURI,
+                    CertificateName = appSettings.SbomSigning.CertificateName,
+                    ClientId = appSettings.SbomSigning.ClientId,
+                    ClientSecret = appSettings.SbomSigning.ClientSecret,
+                    TenantId = appSettings.SbomSigning.TenantId,
+                    SBOMSignVerify = appSettings.SbomSigning.SBOMSignVerify
+                };
+
+                var certificateHelper = new CertificateHelper(sbomSigningAppSettings);
+                var signatureHelper = new SignatureHelper();
+                var jsonFileHelper = new JsonFileHelper(sbomSigningAppSettings, certificateHelper, signatureHelper);
+
+                jsonFileHelper.ReadSBOMFile(bomFilePath, out bool isValid, out string verifiedContent);
+
+                if (isValid)
+                {
+                    Logger.Info("SBOM Verified successfully.");
+                    return verifiedContent;
+                }
+
+                Logger.Error("SBOM signature verification failed ");
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (InvalidOperationException ex)
+            {
+                string errorMsg = $"SBOM Verification failed: {ex.Message}";
+                Logger.ErrorFormat(errorMsg);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (FileNotFoundException ex)
+            {
+                string errorMsg = $"SBOM Verification failed: {ex.Message}";
+                Logger.ErrorFormat(errorMsg);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+            catch (ArgumentNullException ex)
+            {
+                string errorMsg = $"SBOM Verification failed: {ex.Message}";
+                Logger.ErrorFormat(errorMsg);
+                environmentHelper.CallEnvironmentExit(-1);
+            }
+
+            return null;
+        }
     }
 }

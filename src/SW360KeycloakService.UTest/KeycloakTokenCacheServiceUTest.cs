@@ -245,6 +245,29 @@ namespace SW360KeycloakService.UTest
             Assert.That(token, Is.EqualTo("fallback-static-token"));
         }
 
+        // ─── Scenario 7b: Missing SW360 URL returns fallback token (no crash) ─────
+
+        [Test]
+        public async Task GetOrRefreshTokenAsync_ShouldReturnFallbackToken_WhenSW360UrlMissing()
+        {
+            // Arrange — credentials present but SW360BaseUrl empty (would build a non-absolute URL)
+            var settings = new TokenServiceSettings
+            {
+                SW360BaseUrl = "",
+                ClientId = "test-client",
+                ClientSecret = "test-secret",
+                KeyCloakToken = "fallback-static-token",
+                KeyCloakTokenType = "Token"
+            };
+            var sut = new KeycloakTokenCacheService(settings, _ => { });
+
+            // Act
+            string token = await sut.GetOrRefreshTokenAsync();
+
+            // Assert — no HTTP call, fallback token returned instead of an unhandled exception
+            Assert.That(token, Is.EqualTo("fallback-static-token"));
+        }
+
         // ─── Scenario 8: Token expiry causes re-fetch ─────────────────────────────
 
         [Test]

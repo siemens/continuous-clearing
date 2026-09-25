@@ -39,14 +39,19 @@ namespace SIT.Upload
         /// Asynchronously uploads packages to Artifactory based on the application settings.
         /// </summary>
         /// <param name="appSettings">The common application settings.</param>
+        /// <param name="verifiedBomContent">
+        /// Optional pre-verified BOM content produced by SBOM signature verification. When supplied,
+        /// this exact content is used instead of re-reading the BOM file from disk, closing the TOCTOU
+        /// window between signature verification and upload.
+        /// </param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings)
+        public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings, string verifiedBomContent = null)
         {
             Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has started");
             //Reading the CycloneBOM data
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Logger.DebugFormat("UploadPackageToArtifactory(): Identified bom file with path: {0}", bomFilePath);
-            Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper);
+            Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper, verifiedBomContent);
 
             LoggerHelper.DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;

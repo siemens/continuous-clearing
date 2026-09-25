@@ -54,14 +54,25 @@ namespace SIT.Upload
         /// </summary>
         /// <param name="comparisonBomFilePath">The file path to the comparison BOM.</param>
         /// <param name="environmentHelper">The environment helper for exit operations.</param>
+        /// <param name="verifiedBomContent">
+        /// Optional pre-verified BOM content. When supplied (SBOM signing verification is enabled),
+        /// this exact content is deserialized instead of re-reading the file from disk, ensuring the
+        /// content consumed is the same content whose signature was verified (TOCTOU protection).
+        /// </param>
         /// <returns>A Bom object containing the components.</returns>
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper)
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string verifiedBomContent = null)
         {
             Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
             Bom componentsToBoms = null;
             try
             {
-                if (File.Exists(comparisonBomFilePath))
+                if (!string.IsNullOrEmpty(verifiedBomContent))
+                {
+                    // Use the already signature-verified content; do not re-read from disk.
+                    componentsToBoms = CycloneDX.Json.Serializer.Deserialize(verifiedBomContent);
+                    LogHandlingHelper.ListOfBomFileComponents(comparisonBomFilePath, componentsToBoms.Components ?? new List<Component>());
+                }
+                else if (File.Exists(comparisonBomFilePath))
                 {
                     string json = File.ReadAllText(comparisonBomFilePath);
                     componentsToBoms = CycloneDX.Json.Serializer.Deserialize(json);
