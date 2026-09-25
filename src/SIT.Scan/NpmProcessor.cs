@@ -280,7 +280,7 @@ namespace SIT.Scan
                 }
 
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
-                string packageName = GetPackageName(properties, prop);
+                string packageName = PurlNameNormalizer.Normalize(GetPackageName(properties, prop), "npm", lowercase: true);
                 string bomrefName = packageName;
                 string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 

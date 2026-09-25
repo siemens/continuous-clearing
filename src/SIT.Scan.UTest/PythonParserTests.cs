@@ -851,6 +851,88 @@ namespace SIT.Scan.UTest
             Assert.That(six, Is.Not.Null, "six should be found in packages");
             Assert.IsFalse(six.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
         }
+
+        [Test]
+        public void ParsePackageFile_MixedCasePypiName_NormalizesPurlAndBomRefKeepsName()
+        {
+            //Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component() { Name = "PyJWT", Version = "2.10.1", Purl = "pkg:pypi/PyJWT@2.10.1" }
+            };
+            Bom bom = new() { Components = components };
+
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            PythonProcessor processor = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string[] Includes = { "CycloneDX_Python.cdx.json" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "POETRY",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new SIT.Common.Directory()
+                {
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
+                }
+            };
+            Bom unsupported = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+
+            //Act
+            Bom result = processor.ParsePackageFile(appSettings, ref unsupported);
+
+            //Assert
+            var component = result.Components.Find(c => c.Version == "2.10.1");
+            Assert.That(component, Is.Not.Null, "PyJWT component should be present");
+            Assert.That(component.Name, Is.EqualTo("PyJWT"), "Name should keep original casing");
+            Assert.That(component.Purl, Is.EqualTo("pkg:pypi/pyjwt@2.10.1"), "Purl should be normalized to lowercase name");
+            Assert.That(component.BomRef, Is.EqualTo("pkg:pypi/pyjwt@2.10.1"), "BomRef should be normalized to lowercase name");
+        }
+
+        [Test]
+        public void ParsePackageFile_VersionWithColon_PreservesColonInPurl()
+        {
+            //Arrange
+            List<Component> components = new List<Component>
+            {
+                new Component() { Name = "SamplePkg", Version = "1:2.3.4", Purl = "pkg:pypi/SamplePkg@1:2.3.4" }
+            };
+            Bom bom = new() { Components = components };
+
+            Mock<ICycloneDXBomParser> cycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            Mock<ISpdxBomParser> spdxBomParser = new Mock<ISpdxBomParser>();
+            cycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(It.IsAny<string>())).Returns(bom);
+            PythonProcessor processor = new PythonProcessor(cycloneDXBomParser.Object, spdxBomParser.Object);
+
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string OutFolder = Path.GetDirectoryName(exePath);
+            string[] Includes = { "CycloneDX_Python.cdx.json" };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                ProjectType = "POETRY",
+                Poetry = new Config() { Include = Includes },
+                SW360 = new SW360() { IgnoreDevDependency = true },
+                Directory = new SIT.Common.Directory()
+                {
+                    InputFolder = Path.GetFullPath(Path.Combine(OutFolder, "SITScanUTTestFiles"))
+                }
+            };
+            Bom unsupported = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+
+            //Act
+            Bom result = processor.ParsePackageFile(appSettings, ref unsupported);
+
+            //Assert
+            var component = result.Components.Find(c => c.Version == "1:2.3.4");
+            Assert.That(component, Is.Not.Null, "SamplePkg component should be present");
+            Assert.That(component.Purl, Is.EqualTo("pkg:pypi/samplepkg@1:2.3.4"), "Version colon should be preserved and name normalized");
+        }
     }
 }
 

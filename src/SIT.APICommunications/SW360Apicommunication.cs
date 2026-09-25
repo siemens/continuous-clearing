@@ -212,7 +212,9 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to check fossology process status");
             await LogHandlingHelper.HttpRequestHandling(TriggerFossologyMessage, $"MethodName:TriggerFossologyProcess()", httpClient, link);
-            return await SendGetAsync(httpClient, link);
+            HttpResponseMessage response = await SendGetAsync(httpClient, link);
+            await LogHandlingHelper.HttpResponseHandling(TriggerFossologyMessage, $"MethodName:CheckFossologyProcessStatus()", response);
+            return response;
         }
 
         /// <summary>
@@ -243,7 +245,9 @@ namespace SIT.APICommunications
             string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
             await LogHandlingHelper.HttpRequestHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", httpClient, releaseByExternalIdUrl);
             // Matches are expected to be few, but route through the pagination-aware fetch so a large match count isn't silently truncated.
-            return await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, releaseByExternalIdUrl, ApiConstant.ListPageSize);
+            HttpResponseMessage response = await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, releaseByExternalIdUrl, ApiConstant.ListPageSize);
+            await LogHandlingHelper.HttpResponseHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", response);
+            return response;
         }
 
         /// <summary>
@@ -259,7 +263,9 @@ namespace SIT.APICommunications
             string componentByExternalIdUrl = $"{sw360ComponentByExternalId}{externalIdKey}{purlId}";
             await LogHandlingHelper.HttpRequestHandling("Request for get component data by ExternalId", $"MethodName:GetComponentByExternalId()", httpClient, componentByExternalIdUrl);
             // Matches are expected to be few, but route through the pagination-aware fetch so a large match count isn't silently truncated.
-            return await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, componentByExternalIdUrl, ApiConstant.ListPageSize);
+            HttpResponseMessage response = await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, componentByExternalIdUrl, ApiConstant.ListPageSize);
+            await LogHandlingHelper.HttpResponseHandling("Request for get component data by ExternalId", $"MethodName:GetComponentByExternalId()", response);
+            return response;
         }
 
         /// <summary>
@@ -273,7 +279,9 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to get release details by releaseid");
             string url = $"{sw360ReleaseApi}/{releaseId}";
             await LogHandlingHelper.HttpRequestHandling("Request for get release data by ReleaseId", $"MethodName:GetReleaseById()", httpClient, url);
-            return await SendGetAsync(httpClient, url);
+            HttpResponseMessage response = await SendGetAsync(httpClient, url);
+            await LogHandlingHelper.HttpResponseHandling("Request for get release data by ReleaseId", $"MethodName:GetReleaseById()", response);
+            return response;
         }
 
         /// <summary>
@@ -300,7 +308,9 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(true, "unable to link releases to the project");
             string url = $"{sw360ProjectsApi}/{sw360ProjectId}/{ApiConstant.Releases}";
             await LogHandlingHelper.HttpRequestHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", httpClient, url, httpContent);
-            return await httpClient.PostAsync(url, httpContent);
+            HttpResponseMessage response = await httpClient.PostAsync(url, httpContent);
+            await LogHandlingHelper.HttpResponseHandling("LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", response);
+            return response;
         }
 
         /// <summary>
@@ -331,7 +341,9 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to create component");
             await LogHandlingHelper.HttpRequestHandling("CreateComponent", $"MethodName:CreateComponent()", httpClient, sw360ComponentApi, new StringContent(JsonConvert.SerializeObject(createComponentContent), Encoding.UTF8, ApiConstant.ApplicationJson));
-            return await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent);
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync(sw360ComponentApi, createComponentContent);
+            await LogHandlingHelper.HttpResponseHandling("CreateComponent", $"MethodName:CreateComponent()", response);
+            return response;
         }
 
         /// <summary>
@@ -344,7 +356,9 @@ namespace SIT.APICommunications
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to create release");
             await LogHandlingHelper.HttpRequestHandling("CreateRelease", $"MethodName:CreateRelease()", httpClient, sw360ReleaseApi, new StringContent(JsonConvert.SerializeObject(createReleaseContent), Encoding.UTF8, ApiConstant.ApplicationJson));
-            return await httpClient.PostAsJsonAsync(sw360ReleaseApi, createReleaseContent);
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync(sw360ReleaseApi, createReleaseContent);
+            await LogHandlingHelper.HttpResponseHandling("CreateRelease", $"MethodName:CreateRelease()", response);
+            return response;
         }
 
         /// <summary>
@@ -413,7 +427,9 @@ namespace SIT.APICommunications
             httpClient.SetLogWarnings(false, "unable to update the release data");
             string releaseApi = $"{sw360ReleaseApi}/{releaseId}";
             await LogHandlingHelper.HttpRequestHandling("UpdateRelease", $"MethodName:UpdateRelease(), ReleaseId: {releaseId}", httpClient, releaseApi, httpContent);
-            return await httpClient.PatchAsync(releaseApi, httpContent);
+            HttpResponseMessage response = await httpClient.PatchAsync(releaseApi, httpContent);
+            await LogHandlingHelper.HttpResponseHandling("UpdateRelease", $"MethodName:UpdateRelease(), ReleaseId: {releaseId}", response);
+            return response;
         }
 
         /// <summary>
@@ -515,7 +531,9 @@ namespace SIT.APICommunications
             string extraQueryPrefix = string.IsNullOrEmpty(normalizedExtraQueryParams) ? string.Empty : $"{normalizedExtraQueryParams}&";
             string url = $"{sw360ReleaseApi}?{ApiConstant.AllDetailsAndLuceneSearchParams}{extraQueryPrefix}page={page}&page_entries={pageEntries}";
             await LogHandlingHelper.HttpRequestHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData()", httpClient, url);
-            return await SendGetAsync(httpClient, url);
+            HttpResponseMessage response = await SendGetAsync(httpClient, url);
+            await LogHandlingHelper.HttpResponseHandling("Get All Releases With All Data", $"MethodName:GetAllReleasesWithAllData()", response);
+            return response;
         }
 
         /// <summary>
