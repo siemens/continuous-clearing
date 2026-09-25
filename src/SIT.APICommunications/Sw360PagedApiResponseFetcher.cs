@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SIT.APICommunications.Model;
@@ -12,6 +13,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +28,8 @@ namespace SIT.APICommunications
     /// </summary>
     public static class Sw360PagedApiResponseFetcher
     {
+        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Fetches every page via <paramref name="getPageAsync"/>, merges the typed item lists, and returns the
         /// combined result serialized back to JSON. Strict: throws if the first page is not a success/valid JSON
@@ -60,6 +64,8 @@ namespace SIT.APICommunications
             }
 
             int totalPages = firstPage.Page?.TotalPages ?? 1;
+            int totalElements = firstPage.Page?.ExtensionData != null && firstPage.Page.ExtensionData.TryGetValue("totalElements", out JToken totalElementsToken) ? totalElementsToken.Value<int>() : -1;
+            Logger.DebugFormat("SW360 totalElements={0}", totalElements);
 
             if (totalPages > 1)
             {
@@ -141,6 +147,8 @@ namespace SIT.APICommunications
             }
 
             int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
+            int totalElements = firstPage["page"]?["totalElements"]?.Value<int>() ?? -1;
+            Logger.DebugFormat("SW360 totalElements={0} for url={1}", totalElements, baseUrl);
 
             if (totalPages > 1)
             {
