@@ -9,8 +9,11 @@ using SIT.APICommunications.Model;
 using SIT.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace SIT.APICommunications
@@ -72,20 +75,131 @@ namespace SIT.APICommunications
 
         /// <summary>
         /// Asynchronously retrieves component data from a specified repository using AQL.
+        /// Paginates through all results (using a "created" timestamp cursor, since JFrog's
+        /// AQL ".offset()" operator requires an Enterprise license) and wraps the aggregated
+        /// results back into a single HttpResponseMessage so callers can keep deserializing
+        /// via the existing "results" JSON shape.
         /// </summary>
         /// <param name="repoName">The name of the repository to query.</param>
         /// <param name="includeFields">The fields to include in the AQL query result.</param>
-        /// <returns>An HttpResponseMessage containing the component data.</returns>
+        /// <returns>An HttpResponseMessage containing the aggregated component data.</returns>
         private async Task<HttpResponseMessage> GetComponentDataByRepo(string repoName, string includeFields)
         {
-            string aqlQueryToBody = BuildSimpleAqlQuery(repoName, includeFields);
+            // Fetch all pages so large repos aren't silently truncated.
+            List<JsonNode> allResults = await GetAllComponentDataByRepoAsync(repoName, includeFields);
+
+            // Re-wrap into JFrog's normal "{ results: [...] }" shape so existing callers are unaffected.
+            var responseJson = new JsonObject
+            {
+                ["results"] = new JsonArray(allResults.Select(n => n?.DeepClone()).ToArray())
+            };
+
+            // Return a synthetic 200 OK response to keep the method signature unchanged.
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent(responseJson.ToJsonString(), System.Text.Encoding.UTF8, "application/json")
+            };
+        }
+
+
+        /// <summary>
+        /// Retrieves all artifacts for a repo by paginating through JFrog AQL results
+        /// using a "created" timestamp cursor.
+        /// </summary>
+        public async Task<List<JsonNode>> GetAllComponentDataByRepoAsync(string repoName, string includeFields)
+        {
+            int limit = ApiConstant.JfrogAqlPageLimit; // Max artifacts per page
+            string lastCreatedTimestamp = null; // Cursor for the next page
+            bool hasMoreResults = true;
+            List<JsonNode> combinedResults = new List<JsonNode>();
+
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
-            HttpContent httpContent = new StringContent(aqlQueryToBody);
-            await LogHandlingHelper.HttpRequestHandling("Get component data from jfrog repository", $"MethodName:GetComponentDataByRepo()", httpClient, uri, httpContent);
-            return await httpClient.PostAsync(uri, httpContent);
+            httpClient.Timeout = TimeSpan.FromSeconds(TimeoutInSec);
+
+            while (hasMoreResults)
+            {
+                // First iteration fetches from the start; later ones filter by cursor.
+                string aqlQueryToBody = BuildProAqlQuery(repoName, includeFields, limit, lastCreatedTimestamp);
+                HttpContent httpContent = new StringContent(aqlQueryToBody, System.Text.Encoding.UTF8, "text/plain");
+
+                await LogHandlingHelper.HttpRequestHandling(
+                    "Get component data from jfrog repository",
+                    $"MethodName:GetComponentDataByRepo() | LastTimestamp: {lastCreatedTimestamp ?? "Initial Run"}",
+                    httpClient, uri, httpContent
+                );
+
+                HttpResponseMessage response = await httpClient.PostAsync(uri, httpContent);
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Log the failure details before throwing, for diagnosability.
+                    await LogHandlingHelper.HttpResponseHandling(
+                        "AQL query failed",
+                        $"MethodName:GetAllComponentDataByRepoAsync() | LastTimestamp: {lastCreatedTimestamp ?? "Initial Run"}",
+                        response
+                    );
+                }
+                response.EnsureSuccessStatusCode();
+
+                string jsonString = await response.Content.ReadAsStringAsync();
+                var jsonDocument = JsonNode.Parse(jsonString);
+                var resultsArray = jsonDocument?["results"]?.AsArray();
+
+                if (resultsArray != null && resultsArray.Count > 0)
+                {
+                    foreach (var node in resultsArray)
+                    {
+                        combinedResults.Add(node.Deserialize<JsonNode>());
+                    }
+
+                    // Advance cursor to the last item's "created" value (results sorted ascending).
+                    var lastNode = resultsArray.Last();
+                    lastCreatedTimestamp = lastNode?["created"]?.GetValue<string>();
+
+                    // Full page => more data may remain; partial page => end of repo contents.
+                    if (resultsArray.Count == limit && !string.IsNullOrEmpty(lastCreatedTimestamp))
+                    {
+                        // Continue to next batch
+                    }
+                    else
+                    {
+                        hasMoreResults = false;
+                    }
+                }
+                else
+                {
+                    hasMoreResults = false; // Empty page => no more data
+                }
+            }
+
+            return combinedResults;
+        }
+
+        /// <summary>
+        /// Builds a cursor-paginated AQL query for a repo, filtering by "created" and sorting ascending.
+        /// </summary>
+        private static string BuildProAqlQuery(string repoName, string includeFields, int limit, string lastCreatedTimestamp)
+        {
+            // "created" is required as the pagination cursor, so always include it.
+            if (!includeFields.Contains("created"))
+            {
+                includeFields += ",created";
+            }
+
+            // Normalize/quote each include field for the AQL ".include(...)" clause.
+            string formattedFields = string.Join(",", includeFields
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(f => f.Trim().StartsWith("\"") ? f.Trim() : $"\"{f.Trim()}\""));
+
+            // Filter by repo; add a "created > cursor" filter on subsequent pages.
+            string criteria = $"\"repo\":\"{repoName}\"";
+            if (!string.IsNullOrEmpty(lastCreatedTimestamp))
+            {
+                criteria += $",\"created\":{{\"$gt\":\"{lastCreatedTimestamp}\"}}";
+            }
+
+            // Ascending sort ensures a stable cursor order across pages.
+            return $"items.find({{{criteria}}}).include({formattedFields}).sort({{\"$asc\":[\"created\"]}}).limit({limit})";
         }
 
         /// <summary>
