@@ -474,11 +474,8 @@ namespace SIT.Create
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
 
-            // Build the "npm view <name>@<version> repository.url" call by passing every token
-            // through ArgumentList instead of concatenating it into a shell command string. This
-            // way the component name/version are delivered to the process as discrete, already
-            // separated arguments and are never interpreted by a shell (/bin/bash -c or cmd /c),
-            // which permanently removes the command-injection vector while still running npm view.
+            // Build the "npm view name& version repository.url" call by passing every token
+            // through ArgumentList instead of concatenating it into a shell command string. 
             string packageSpec = $"{componentName}@{version}";
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -494,10 +491,6 @@ namespace SIT.Create
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // On Windows npm is a batch script (npm.cmd) that can only be launched via cmd.exe.
-                // cmd.exe does not honour the standard argv escaping used by ArgumentList, so the
-                // package name/version are additionally validated against the strict npm character
-                // set to ensure no cmd metacharacters can ever reach the shell. Legitimate npm
-                // packages always satisfy this, so real components continue to be processed.
                 if (!IsValidNpmComponentName(componentName) || !IsValidNpmComponentVersion(version))
                 {
                     Logger.WarnFormat("GetSourceUrlForNpmPackage(): Skipping npm view for unsafe component name/version - ComponentName: {0}, Version: {1}", componentName, version);
