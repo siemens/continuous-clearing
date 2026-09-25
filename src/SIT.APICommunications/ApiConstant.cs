@@ -59,7 +59,7 @@ namespace SIT.APICommunications
         /// Page size (max artifacts per page) used when paginating JFrog AQL "items.find" searches via the
         /// "created" timestamp cursor, since JFrog's ".offset()" operator requires an Enterprise license.
         /// </summary>
-        public const int JfrogAqlPageLimit = 400000;
+        public const int JfrogAqlPageLimit = 500000;
 
         /// <summary>
         /// Query params requesting full details plus Lucene-backed search, used by list endpoints that support both.
