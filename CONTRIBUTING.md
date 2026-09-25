@@ -68,6 +68,12 @@ The workflow runs on:
 > created as a result of the `release` job (via `actions/create-release`)
 > once a release is published.
 
+> **Important:** Only create and push a `release/*` or `beta/*` branch when
+> you actually intend to cut a pre-release. Because pushing these branches
+> immediately triggers a tag and pre-release, avoid using these prefixes
+> for regular feature/work-in-progress branches - use them exclusively for
+> preparing a beta or RC pre-release.
+
 ### Pre-release vs. stable behavior
 
 - If GitVersion's `preReleaseTag` output is non-empty (beta/rc), the release
