@@ -290,7 +290,7 @@ namespace SIT.Scan
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
                 components.Manufacturer.BomRef = BuildResolvedDependencies(prop.Value[Dependencies], componentList, prop.Name);
-                components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.Purl = GenerateNpmPurl(packageName, components.Version);
                 components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
 
                 CheckAndAddToBundleComponents(bundledComponents, prop, components);
@@ -481,7 +481,7 @@ namespace SIT.Scan
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
                 components.Manufacturer.BomRef = prop.Value[Requires]?.ToString();
-                components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.Purl = GenerateNpmPurl(prop.Name, components.Version);
                 components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
                 components.Type = Component.Classification.Library;
                 string isDirect = GetIsDirect(directDependenciesList, prop);
@@ -803,6 +803,28 @@ namespace SIT.Scan
             }
             dependencies.AddRange(dependencyList);
             Logger.Debug("GetdependencyDetails(): Completed dependency extraction process.");
+        }
+
+        /// <summary>
+        /// Generates a spec-compliant npm purl using the packageurl-dotnet library. Scoped packages
+        /// (e.g. "@angular/animations") are split into namespace ("@angular") and name ("animations"),
+        /// which the library canonicalizes (encoding the scope "@" as "%40").
+        /// </summary>
+        /// <param name="packageName">The npm package name, possibly scoped.</param>
+        /// <param name="version">The component version.</param>
+        /// <returns>A generated, spec-compliant npm purl string.</returns>
+        private static string GenerateNpmPurl(string packageName, string version)
+        {
+            string scope = null;
+            string name = packageName;
+            if (packageName.StartsWith('@') && packageName.Contains('/'))
+            {
+                int slashIndex = packageName.IndexOf('/');
+                scope = packageName[..slashIndex];
+                name = packageName[(slashIndex + 1)..];
+            }
+
+            return CommonHelper.GeneratePurlForProjectType("NPM", name, version, namespaceOverride: scope);
         }
 
         /// <summary>

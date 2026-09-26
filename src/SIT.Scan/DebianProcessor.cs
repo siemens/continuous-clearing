@@ -460,7 +460,8 @@ namespace SIT.Scan
         /// <returns>release id</returns>
         private static string GetReleaseExternalId(string name, string version)
         {
-            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()["DEBIAN"]);
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+            return CommonHelper.GeneratePurlForProjectType("DEBIAN", name, version, qualifiers);
         }
 
         /// <summary>

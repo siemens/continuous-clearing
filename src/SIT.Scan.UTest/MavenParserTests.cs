@@ -893,5 +893,103 @@ namespace SIT.Scan.UTest
 
         #endregion
 
+        #region RemoveTypeJarSuffix
+
+        private static void InvokeRemoveTypeJarSuffix(Bom bom)
+        {
+            MethodInfo method = typeof(MavenProcessor).GetMethod(
+                "RemoveTypeJarSuffix",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { bom });
+        }
+
+        [Test]
+        public void RemoveTypeJarSuffix_ValidPurlAfterStrip_StripsJarSuffix()
+        {
+            // Arrange
+            Bom bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Group = "org.apache.commons",
+                        Name = "commons-lang3",
+                        Version = "3.12.0",
+                        Purl = "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar",
+                        BomRef = "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar"
+                    }
+                },
+                Dependencies = new List<Dependency>()
+            };
+
+            // Act
+            InvokeRemoveTypeJarSuffix(bom);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(bom.Components[0].Purl, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+                Assert.That(bom.Components[0].BomRef, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+                Assert.That(bom.Components[0].Purl, Does.Not.Contain("type=jar"));
+            });
+        }
+
+        [Test]
+        public void RemoveTypeJarSuffix_InvalidPurlAfterStrip_RegeneratesFromGroupNameVersion()
+        {
+            // Arrange - a malformed purl that stays invalid after stripping the suffix
+            Bom bom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component
+                    {
+                        Group = "org.apache.commons",
+                        Name = "commons-lang3",
+                        Version = "3.12.0",
+                        Purl = "not-a-valid-purl?type=jar",
+                        BomRef = "not-a-valid-purl?type=jar"
+                    }
+                },
+                Dependencies = new List<Dependency>()
+            };
+
+            // Act
+            InvokeRemoveTypeJarSuffix(bom);
+
+            // Assert - regenerated canonical purl from group/name/version, assigned to both
+            Assert.Multiple(() =>
+            {
+                Assert.That(bom.Components[0].Purl, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+                Assert.That(bom.Components[0].BomRef, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+            });
+        }
+
+        [Test]
+        public void RemoveTypeJarSuffix_StripsJarSuffixFromDependencyRefs()
+        {
+            // Arrange
+            Bom bom = new Bom
+            {
+                Components = new List<Component>(),
+                Dependencies = new List<Dependency>
+                {
+                    new Dependency
+                    {
+                        Ref = "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar"
+                    }
+                }
+            };
+
+            // Act
+            InvokeRemoveTypeJarSuffix(bom);
+
+            // Assert
+            Assert.That(bom.Dependencies[0].Ref, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+        }
+
+        #endregion
+
     }
 }

@@ -463,8 +463,8 @@ namespace SIT.Scan
                 };
 
                 component.Type = Component.Classification.Library;
-                component.Purl = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
-                component.BomRef = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
+                component.Purl = CommonHelper.GeneratePurlForProjectType("CONAN", component.Name, component.Version);
+                component.BomRef = component.Purl;
                 component.Properties = new List<Property>();
                 component.Properties.Add(isdev);
                 component.Properties.Add(siemensDirect);
@@ -515,7 +515,7 @@ namespace SIT.Scan
                     var dependentNode = nodePackages.FirstOrDefault(x => x.Key == dep.Key);
                     if (dependentNode.Value != null && !string.IsNullOrEmpty(dependentNode.Value.Name))
                     {
-                        string depPurl = $"{ApiConstant.ConanExternalID}{dependentNode.Value.Name}@{dependentNode.Value.Version}";
+                        string depPurl = CommonHelper.GeneratePurlForProjectType("CONAN", dependentNode.Value.Name, dependentNode.Value.Version);
                         subDependencies.Add(new Dependency { Ref = depPurl });
                     }
                 }

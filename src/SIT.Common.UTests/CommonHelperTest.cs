@@ -2098,7 +2098,198 @@ namespace SIT.Common.UTest
             Assert.That(bom.Components.Count, Is.EqualTo(1));
             Assert.That(configFiles, Does.Not.Contain(dep), "Dependency file should be removed from the list");
         }
+
+        [Test]
+        public void GeneratePypiPurl_WronglyCasedName_ReturnsLowercasedPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType("POETRY", "Pygments", "2.18.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/pygments@2.18.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_UnderscoreInName_ReturnsHyphenatedPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType("POETRY", "typing_extensions", "4.12.2");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/typing-extensions@4.12.2"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_AlreadyValidName_ReturnsUnchanged()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType("POETRY", "requests", "2.31.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/requests@2.31.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_MixedCaseName_ReturnsLowercasedPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType("POETRY", "Flask", "3.0.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/flask@3.0.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_LowerCaseProjectType_ReturnsPypiPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType("poetry", "Flask", "3.0.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/flask@3.0.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_VersionWithColon_PreservesColon()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType("POETRY", "somepackage", "1:2.3.4");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/somepackage@1:2.3.4"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_NameAndVersion_NormalizesName()
+        {
+            // Act - manually-added component path (name/version only)
+            string result = CommonHelper.GeneratePurlForProjectType("POETRY", "MarkupSafe", "3.0.3");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/markupsafe@3.0.3"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Nuget_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType("NUGET", "Newtonsoft.Json", "13.0.3");
+
+            Assert.That(result, Is.EqualTo("pkg:nuget/Newtonsoft.Json@13.0.3"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Conan_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType("CONAN", "zlib", "1.3.1");
+
+            Assert.That(result, Is.EqualTo("pkg:conan/zlib@1.3.1"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Cargo_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType("CARGO", "adler", "1.0.2");
+
+            Assert.That(result, Is.EqualTo("pkg:cargo/adler@1.0.2"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Debian_WithArchQualifier_ReturnsNamespacedPurl()
+        {
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+
+            string result = CommonHelper.GeneratePurlForProjectType("DEBIAN", "adduser", "3.118", qualifiers);
+
+            Assert.That(result, Is.EqualTo("pkg:deb/debian/adduser@3.118?arch=source"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Alpine_WithArchQualifier_ReturnsNamespacedPurl()
+        {
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+
+            string result = CommonHelper.GeneratePurlForProjectType("ALPINE", "apk-tools", "2.12.9-r3", qualifiers);
+
+            Assert.That(result, Is.EqualTo("pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_NpmScoped_UsesNamespaceOverride()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType("NPM", "animations", "12.3.1", namespaceOverride: "@angular");
+
+            Assert.That(result, Is.EqualTo("pkg:npm/%40angular/animations@12.3.1"));
+        }
+
+        [Test]
+        public void GeneratePurl_WithQualifiers_ReturnsCanonicalPurl()
+        {
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+
+            string result = CommonHelper.GeneratePurl("deb", "debian", "dash", "0.5.10.2-5", qualifiers);
+
+            Assert.That(result, Is.EqualTo("pkg:deb/debian/dash@0.5.10.2-5?arch=source"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Maven_WithGroupNamespace_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType("MAVEN", "commons-lang3", "3.12.0", namespaceOverride: "org.apache.commons");
+
+            Assert.That(result, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Maven_HasNoTypeJarSuffix()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType("MAVEN", "commons-lang3", "3.12.0", namespaceOverride: "org.apache.commons");
+
+            Assert.That(result, Does.Not.Contain("type=jar"));
+        }
+
+        [Test]
+        public void IsValidPurl_WithValidMavenPurl_ReturnsTrue()
+        {
+            bool result = CommonHelper.IsValidPurl("pkg:maven/org.apache.commons/commons-lang3@3.12.0");
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void IsValidPurl_WithStrippedTypeJarPurl_ReturnsTrue()
+        {
+            bool result = CommonHelper.IsValidPurl("pkg:maven/org.apache.commons/commons-lang3@3.12.0");
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void IsValidPurl_WithNull_ReturnsFalse()
+        {
+            bool result = CommonHelper.IsValidPurl(null);
+
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void IsValidPurl_WithEmptyOrWhitespace_ReturnsFalse()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(CommonHelper.IsValidPurl(string.Empty), Is.False);
+                Assert.That(CommonHelper.IsValidPurl("   "), Is.False);
+            });
+        }
+
+        [Test]
+        public void IsValidPurl_WithMalformedPurl_ReturnsFalse()
+        {
+            bool result = CommonHelper.IsValidPurl("not-a-valid-purl");
+
+            Assert.That(result, Is.False);
+        }
     }
+
 
     public class TestObject
     {

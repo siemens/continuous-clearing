@@ -207,7 +207,8 @@ namespace SIT.Scan
         /// <param name="listofComponents">Reference to the component list to deduplicate.</param>
         private static string GetReleaseExternalId(string name, string version)
         {
-            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()[ProjectTypeAlpine]);
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+            return CommonHelper.GeneratePurlForProjectType(ProjectTypeAlpine, name, version, qualifiers);
         }
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
@@ -246,7 +247,8 @@ namespace SIT.Scan
                     Version = prop.Version
                 };
                 component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
-                component.BomRef = string.IsNullOrEmpty(distro) ? $"{Dataconstant.PurlCheck()[ProjectTypeAlpine]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}" : $"{Dataconstant.PurlCheck()[ProjectTypeAlpine]}{Dataconstant.ForwardSlash}{prop.Name}@{prop.Version}?{distro}";
+                string bomRefBase = CommonHelper.GeneratePurlForProjectType(ProjectTypeAlpine, prop.Name, prop.Version);
+                component.BomRef = string.IsNullOrEmpty(distro) ? bomRefBase : $"{bomRefBase}?{distro}";
                 component.Type = Component.Classification.Library;
                 AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);

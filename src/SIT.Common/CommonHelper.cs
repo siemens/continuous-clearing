@@ -15,10 +15,12 @@ using SIT.Common.Constants;
 using SIT.Common.Model;
 using SW360KeycloakService;
 using SW360KeycloakService.Model;
+using PackageUrl;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -259,7 +261,7 @@ namespace SIT.Common
         {
             if (suffixToRemove != null && input.EndsWith(suffixToRemove, comparisonType))
             {
-                return input.Substring(0, input.Length - suffixToRemove.Length);
+                return input[..^suffixToRemove.Length];
             }
 
             return input;
@@ -904,8 +906,72 @@ namespace SIT.Common
         }
 
         /// <summary>
-        /// Canonicalizes the project type string to standardized format.
+        /// Generates a spec-compliant package-url (purl) using the packageurl-dotnet library.
+        /// The library canonicalizes the output per the package-url spec (e.g. ecosystem-specific
+        /// name normalization and qualifier encoding/sorting).
         /// </summary>
+        /// <param name="type">The purl type (e.g. "npm", "nuget", "deb", "apk", "pypi").</param>
+        /// <param name="namespace">The purl namespace (e.g. "debian", "alpine", npm scope); may be null.</param>
+        /// <param name="name">The component name.</param>
+        /// <param name="version">The component version.</param>
+        /// <param name="qualifiers">Optional purl qualifiers (e.g. arch=source); may be null.</param>
+        /// <returns>A generated, spec-compliant purl string.</returns>
+        public static string GeneratePurl(string type, string @namespace, string name, string version, SortedDictionary<string, string> qualifiers = null)
+        {
+            PackageURL purl = new PackageURL(type, @namespace, name, version, qualifiers, null);
+            return purl.ToString();        }
+
+        /// <summary>
+        /// Generates a spec-compliant package-url (purl) for a given project type key
+        /// (as defined in <see cref="Dataconstant.PurlCheck"/>) using the packageurl-dotnet library.
+        /// The prefix is split into the purl type and namespace (e.g. "pkg:deb/debian" =&gt; type "deb",
+        /// namespace "debian"). An optional npm-style scope can be supplied to override the namespace.
+        /// </summary>
+        /// <param name="projectTypeKey">The project type key (e.g. "NPM", "NUGET", "DEBIAN", "ALPINE").</param>
+        /// <param name="name">The component name.</param>
+        /// <param name="version">The component version.</param>
+        /// <param name="qualifiers">Optional purl qualifiers (e.g. arch=source); may be null.</param>
+        /// <param name="namespaceOverride">Optional namespace/scope to use instead of the prefix-derived namespace.</param>
+        /// <returns>A generated, spec-compliant purl string.</returns>
+        public static string GeneratePurlForProjectType(string projectTypeKey, string name, string version, SortedDictionary<string, string> qualifiers = null, string namespaceOverride = null)
+        {
+            string key = projectTypeKey?.Trim().ToUpperInvariant();
+            string prefix = Dataconstant.PurlCheck()[key];
+
+            // The prefix is of the form "pkg:<type>[/<namespace>]"; strip the scheme then split.
+            string typeAndNamespace = prefix[(prefix.IndexOf(':') + 1)..];
+            string[] segments = typeAndNamespace.Split('/', 2);
+            string type = segments[0];
+            string @namespace = namespaceOverride ?? (segments.Length > 1 ? segments[1] : null);
+
+            return GeneratePurl(type, @namespace, name, version, qualifiers);
+        }
+
+        /// <summary>
+        /// Validates whether the provided string is a well-formed package-url (purl) by attempting
+        /// to parse it with the packageurl-dotnet library. A valid purl must parse successfully and
+        /// contain a non-empty type and name.
+        /// </summary>
+        /// <param name="purl">The purl string to validate.</param>
+        /// <returns><c>true</c> when the string is a valid purl; otherwise <c>false</c>.</returns>
+        public static bool IsValidPurl(string purl)
+        {
+            if (string.IsNullOrWhiteSpace(purl))
+            {
+                return false;
+            }
+
+            try
+            {
+                PackageURL parsed = new PackageURL(purl);
+                return !string.IsNullOrEmpty(parsed.Type) && !string.IsNullOrEmpty(parsed.Name);
+            }
+            catch (MalformedPackageUrlException)
+            {
+                return false;
+            }
+        }
+
         /// <param name="projectType">The project type to canonicalize.</param>
         /// <returns>The canonicalized project type string.</returns>
         public static string CanonicalizeProjectType(string projectType)

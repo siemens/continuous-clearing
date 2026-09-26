@@ -93,7 +93,7 @@ namespace SIT.Scan
             if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
-            }
+            }            
             int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
@@ -118,14 +118,49 @@ namespace SIT.Scan
 
             foreach (var component in bom?.Components ?? Enumerable.Empty<Component>())
             {
-                component.BomRef = RemoveSuffix(component.BomRef, suffix);
-                component.Purl = RemoveSuffix(component.Purl, suffix);
+                string strippedPurl = RemoveSuffix(component.Purl, suffix);     // .jar removed from purl
+                string strippedBomRef = RemoveSuffix(component.BomRef, suffix); // .jar removed from bom-ref
+
+                if (CommonHelper.IsValidPurl(strippedPurl))
+                {
+
+                    component.Purl = strippedPurl;
+                    component.BomRef = strippedBomRef;
+                }
+                else
+                {
+                    // Validation failed → regenerate from group/name/version (no type=jar).
+                    string regenerated = GenerateMavenPurl(component.Group, component.Name, component.Version);
+                    component.Purl = regenerated ?? strippedPurl;
+                    component.BomRef = regenerated ?? strippedBomRef;
+                }
             }
 
             foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>())
             {
                 RemoveTypeJarSuffixFromDependency(dependency);
             }
+        }
+
+        /// <summary>
+        /// Generates a canonical Maven purl from the component's group, name and version.
+        /// </summary>
+        /// <param name="group">Maven group id used as the purl namespace.</param>
+        /// <param name="name">Component name.</param>
+        /// <param name="version">Component version.</param>
+        /// <returns>A canonical Maven purl, or null when name or version is missing.</returns>
+        private static string GenerateMavenPurl(string group, string name, string version)
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(version))
+            {
+                return null;
+            }
+
+            return CommonHelper.GeneratePurlForProjectType(
+                "MAVEN",
+                name,
+                version,
+                namespaceOverride: group);
         }
 
         /// <summary>

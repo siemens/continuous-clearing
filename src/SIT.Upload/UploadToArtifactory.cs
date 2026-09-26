@@ -691,7 +691,7 @@ namespace SIT.Upload
             if (component.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
                 return aqlResultList.Find(x => x.Properties != null &&
-                                      x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogpackageName) &&
+                                      x.Properties.Any(p => p.Key == "pypi.normalized.name" && string.Equals(p.Value, jfrogpackageName, StringComparison.OrdinalIgnoreCase)) &&
                                       x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
             }
             else if (component.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
