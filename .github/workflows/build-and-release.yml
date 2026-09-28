@@ -194,7 +194,7 @@ jobs:
           release_name: Release v${{ env.SEMVER }}
           body: |
             ${{ github.event.head_commit.message }}
-          draft: ${{ env.IS_PRERELEASE == 'false' }}
+          draft: ${{ env.IS_PRERELEASE == 'true' }}
           prerelease: ${{ env.IS_PRERELEASE == 'true' }}
 
       - name: Compress Full Build Output into ZIP
