@@ -98,12 +98,50 @@ namespace SIT.Create
         /// <returns>distro</returns>
         public static string GetAlpineDistro(string bomRef)
         {
+            if (string.IsNullOrWhiteSpace(bomRef))
+            {
+                return string.Empty;
+            }
 
             string[] getDistro = bomRef.Split("distro");
+            if (getDistro.Length < 2)
+            {
+                return string.Empty;
+            }
+
             string[] getDestroVersion = getDistro[1].Split("-");
+            if (getDestroVersion.Length < 2 || getDestroVersion[1].Length < 2)
+            {
+                return string.Empty;
+            }
+
             var output = getDestroVersion[1][..^2];
             var distro = output + "-stable";
+
+            // The distro value is derived from an untrusted bom-ref and is later passed to
+            // "git checkout". Only accept well-formed Alpine stable branch names (e.g. "3.19-stable")
+            // so that no value containing an option prefix ("-"/"--") or shell/argument
+            // metacharacters can ever reach the git command line.
+            if (!IsValidAlpineDistro(distro))
+            {
+                Logger.WarnFormat("GetAlpineDistro(): Ignoring unsafe distro value derived from bomRef: {0}", distro);
+                return string.Empty;
+            }
+
             return distro;
+        }
+
+        /// <summary>
+        /// Validates that an Alpine distro string is a well-formed stable branch name. This
+        /// guarantees the value begins with a digit and contains only safe characters, which
+        /// prevents argument/command injection when it is passed to "git checkout".
+        /// </summary>
+        /// <param name="distro">The distro branch name to validate.</param>
+        /// <returns>True when the value is a valid Alpine stable branch name; otherwise false.</returns>
+        private static bool IsValidAlpineDistro(string distro)
+        {
+            return !string.IsNullOrWhiteSpace(distro)
+                && Regex.IsMatch(distro, @"^v?\d+\.\d+-stable$");
         }
 
         /// <summary>
@@ -369,6 +407,15 @@ namespace SIT.Create
         /// <param name="fullPath"></param>
         private static void CheckoutDistro(string alpineDistro, string fullPath)
         {
+            // Defense in depth: even though the value is validated when produced, re-validate here
+            // and skip the checkout entirely if it is empty or unsafe, so this method can never
+            // forward an attacker-controlled option/argument to git.
+            if (!IsValidAlpineDistro(alpineDistro))
+            {
+                Logger.WarnFormat("CheckoutDistro(): Skipping git checkout for unsafe or empty distro value: {0}", alpineDistro);
+                return;
+            }
+
             Logger.DebugFormat("CheckoutDistro(): Start checkout github repo - AlpineDistro: {0}, FullPath: {1}", alpineDistro, fullPath);
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
@@ -377,7 +424,10 @@ namespace SIT.Create
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.FileName = Path.Combine(@"git");
-            p.StartInfo.Arguments = $"checkout" + " " + alpineDistro;
+            // Pass the branch name as a discrete argument via ArgumentList instead of concatenating
+            // it into the command line, so it is never subject to shell/quoting interpretation.
+            p.StartInfo.ArgumentList.Add("checkout");
+            p.StartInfo.ArgumentList.Add(alpineDistro);
             p.StartInfo.WorkingDirectory = fullPath;
 
             p.Start();
