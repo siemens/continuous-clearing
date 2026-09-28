@@ -282,7 +282,6 @@ namespace SIT.Scan
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
                 string packageName = GetPackageName(properties, prop);
                 string bomrefName = packageName;
-                string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
                 SetComponentGroupAndName(components, packageName);
 
@@ -464,7 +463,6 @@ namespace SIT.Scan
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
                 string bomrefName = prop.Name;
-                string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
 
                 if (prop.Name.Contains('@'))
@@ -824,7 +822,7 @@ namespace SIT.Scan
                 name = packageName[(slashIndex + 1)..];
             }
 
-            return CommonHelper.GeneratePurlForProjectType("NPM", name, version, namespaceOverride: scope);
+            return CommonHelper.GeneratePurl("NPM", name, version, namespaceOverride: scope);
         }
 
         /// <summary>

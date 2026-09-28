@@ -461,7 +461,7 @@ namespace SIT.Scan
         private static string GetReleaseExternalId(string name, string version)
         {
             var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
-            return CommonHelper.GeneratePurlForProjectType("DEBIAN", name, version, qualifiers);
+            return CommonHelper.GeneratePurl("DEBIAN", name, version, qualifiers);
         }
 
         /// <summary>

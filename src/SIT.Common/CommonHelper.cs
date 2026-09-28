@@ -933,7 +933,7 @@ namespace SIT.Common
         /// <param name="qualifiers">Optional purl qualifiers (e.g. arch=source); may be null.</param>
         /// <param name="namespaceOverride">Optional namespace/scope to use instead of the prefix-derived namespace.</param>
         /// <returns>A generated, spec-compliant purl string.</returns>
-        public static string GeneratePurlForProjectType(string projectTypeKey, string name, string version, SortedDictionary<string, string> qualifiers = null, string namespaceOverride = null)
+        public static string GeneratePurl(string projectTypeKey, string name, string version, SortedDictionary<string, string> qualifiers = null, string namespaceOverride = null)
         {
             string key = projectTypeKey?.Trim().ToUpperInvariant();
             string prefix = Dataconstant.PurlCheck()[key];

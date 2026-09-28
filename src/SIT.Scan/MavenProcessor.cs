@@ -156,7 +156,7 @@ namespace SIT.Scan
                 return null;
             }
 
-            return CommonHelper.GeneratePurlForProjectType(
+            return CommonHelper.GeneratePurl(
                 "MAVEN",
                 name,
                 version,
