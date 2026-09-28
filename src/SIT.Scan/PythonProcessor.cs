@@ -348,7 +348,7 @@ namespace SIT.Scan
 
         /// <summary>
         /// Generates a spec-compliant PyPI (Poetry) package-url from a component name and version
-        /// using the packageurl-dotnet library (via the common GeneratePurlForProjectType helper).
+        /// using the packageurl-dotnet library (via the common GeneratePurl helper).
         /// Per the package-url spec, the pypi type lowercases the name and replaces underscores with
         /// hyphens (e.g. "MarkupSafe" =&gt; "markupsafe").
         /// </summary>
@@ -359,7 +359,7 @@ namespace SIT.Scan
         private static string GeneratePypiPurl(string name, string version, string projectType)
         {
             string projectTypeKey = string.IsNullOrWhiteSpace(projectType) ? PoetryProjectType : projectType;
-            return CommonHelper.GeneratePurlForProjectType(projectTypeKey, name, version);
+            return CommonHelper.GeneratePurl(projectTypeKey, name, version);
         }
 
         /// <summary>

@@ -463,7 +463,7 @@ namespace SIT.Scan
                 };
 
                 component.Type = Component.Classification.Library;
-                component.Purl = CommonHelper.GeneratePurlForProjectType("CONAN", component.Name, component.Version);
+                component.Purl = CommonHelper.GeneratePurl("CONAN", component.Name, component.Version);
                 component.BomRef = component.Purl;
                 component.Properties = new List<Property>();
                 component.Properties.Add(isdev);
@@ -515,7 +515,7 @@ namespace SIT.Scan
                     var dependentNode = nodePackages.FirstOrDefault(x => x.Key == dep.Key);
                     if (dependentNode.Value != null && !string.IsNullOrEmpty(dependentNode.Value.Name))
                     {
-                        string depPurl = CommonHelper.GeneratePurlForProjectType("CONAN", dependentNode.Value.Name, dependentNode.Value.Version);
+                        string depPurl = CommonHelper.GeneratePurl("CONAN", dependentNode.Value.Name, dependentNode.Value.Version);
                         subDependencies.Add(new Dependency { Ref = depPurl });
                     }
                 }

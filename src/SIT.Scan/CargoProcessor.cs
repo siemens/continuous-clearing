@@ -553,7 +553,7 @@ namespace SIT.Scan
 
                 string name = pkg.Name;
                 string version = pkg.Version;
-                string purl = CommonHelper.GeneratePurlForProjectType("CARGO", name, version);
+                string purl = CommonHelper.GeneratePurl("CARGO", name, version);
                 string id = pkg.Id;
 
                 var component = CommonHelper.CreateComponentWithProperties(name, version, purl);

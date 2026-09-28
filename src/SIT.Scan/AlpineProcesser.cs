@@ -208,7 +208,7 @@ namespace SIT.Scan
         private static string GetReleaseExternalId(string name, string version)
         {
             var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
-            return CommonHelper.GeneratePurlForProjectType(ProjectTypeAlpine, name, version, qualifiers);
+            return CommonHelper.GeneratePurl(ProjectTypeAlpine, name, version, qualifiers);
         }
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
@@ -247,7 +247,7 @@ namespace SIT.Scan
                     Version = prop.Version
                 };
                 component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
-                string bomRefBase = CommonHelper.GeneratePurlForProjectType(ProjectTypeAlpine, prop.Name, prop.Version);
+                string bomRefBase = CommonHelper.GeneratePurl(ProjectTypeAlpine, prop.Name, prop.Version);
                 component.BomRef = string.IsNullOrEmpty(distro) ? bomRefBase : $"{bomRefBase}?{distro}";
                 component.Type = Component.Classification.Library;
                 AddComponentProperties(prop, component);

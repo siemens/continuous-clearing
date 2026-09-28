@@ -923,7 +923,7 @@ namespace SIT.Scan
                     Type = Component.Classification.Library
                 };
 
-                components.Purl = CommonHelper.GeneratePurlForProjectType("NUGET", prop.ID, components.Version);
+                components.Purl = CommonHelper.GeneratePurl("NUGET", prop.ID, components.Version);
                 components.BomRef = components.Purl;
                 components.Description = prop.Filepath;
                 components.Properties = new List<Property>()
