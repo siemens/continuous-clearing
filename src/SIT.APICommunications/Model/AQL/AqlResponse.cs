@@ -23,6 +23,12 @@ namespace SIT.APICommunications.Model.AQL
         [JsonProperty("results")]
         public IList<AqlResult> Results { get; set; }
 
+        /// <summary>
+        /// Gets or sets the range metadata, including a notification when the server's hard result limit is reached.
+        /// </summary>
+        [JsonProperty("range")]
+        public AqlRange Range { get; set; }
+
         #endregion Properties
     }
 }
