@@ -241,8 +241,9 @@ namespace SIT.APICommunications.UTest
         [Test]
         public async Task JfrogAqlApiCommunication_GetInternalComponentDataByRepo_MergesAllPagesWhenFirstPageIsFull()
         {
-            // Arrange: pagination continues only when a page returns exactly AqlPageSize items ("full"); a full
-            // first page followed by a short second page must be merged into one result set.
+            // Arrange: pagination continues only when a page returns exactly AqlPageSize items ("full"). A full first
+            // page triggers one whole batch of AqlMaxConcurrency follow-up requests; only the last page in that batch
+            // needs to be short to stop pagination after it.
             int port = GetFreeTcpPort();
             string prefix = $"http://127.0.0.1:{port}/";
 
@@ -252,10 +253,11 @@ namespace SIT.APICommunications.UTest
 
             string fullPageJson = BuildResultsJson(ApiConstant.AqlPageSize, "full-page-item");
             string shortPageJson = BuildResultsJson(1, "n2");
+            int totalRequests = 1 + ApiConstant.AqlMaxConcurrency;
 
             Task serverTask = Task.Run(async () =>
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < totalRequests; i++)
                 {
                     HttpListenerContext context = await listener.GetContextAsync();
                     using StreamReader reader = new StreamReader(context.Request.InputStream);
