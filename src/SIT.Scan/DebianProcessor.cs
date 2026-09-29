@@ -414,17 +414,7 @@ namespace SIT.Scan
             var refMap = new Dictionary<string, string>();
             foreach (var componentsInfo in bom.Components)
             {
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version))
-                {
-                    string regeneratedPurl = GetReleaseExternalId(componentsInfo.Name, componentsInfo.Version);
-                    if (!string.IsNullOrEmpty(componentsInfo.BomRef))
-                    {
-                        refMap[componentsInfo.BomRef] = regeneratedPurl;
-                    }
-                    componentsInfo.Purl = regeneratedPurl;
-                    componentsInfo.BomRef = regeneratedPurl;
-                }
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;               
                 DebianPackage package = new DebianPackage
                 {
                     Name = componentsInfo.Name,

@@ -170,10 +170,6 @@ namespace SIT.Scan
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version))
-                {
-                    componentsInfo.Purl = GetReleaseExternalId(componentsInfo.Name, componentsInfo.Version);
-                }
                 AlpinePackage package = new AlpinePackage
                 {
                     Name = componentsInfo.Name,
