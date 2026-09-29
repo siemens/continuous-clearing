@@ -4,14 +4,20 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using Newtonsoft.Json;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
+using SIT.APICommunications.Model.AQL;
 using SIT.Common;
 using SIT.Common.Constants;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIT.APICommunications
@@ -72,33 +78,134 @@ namespace SIT.APICommunications
         }
 
         /// <summary>
-        /// Asynchronously retrieves component data from a specified repository using AQL.
+        /// <summary>
+        /// Asynchronously retrieves component data from a specified repository using AQL. The first page is buffered
+        /// once, then remaining pages are fetched in bounded, concurrent batches - continuing another batch only when
+        /// the last page of the previous batch came back "full" (exactly <see cref="ApiConstant.AqlPageSize"/> items),
+        /// which is the only reliable end-of-results signal: AQL's "range.total" reflects just the current page's
+        /// count, not the true total across the whole matching set, so it cannot be used to precompute page count.
+        /// Each page is deserialized directly from its response stream into <see cref="AqlResult"/> lists and merged,
+        /// so no more than one page's worth of raw JSON is ever held in memory at a time.
         /// </summary>
         /// <param name="repoName">The name of the repository to query.</param>
         /// <param name="includeFields">The fields to include in the AQL query result.</param>
-        /// <returns>An HttpResponseMessage containing the component data.</returns>
+        /// <returns>An HttpResponseMessage containing the full, combined component data.</returns>
         private async Task<HttpResponseMessage> GetComponentDataByRepo(string repoName, string includeFields)
         {
-            string aqlQueryToBody = BuildSimpleAqlQuery(repoName, includeFields);
+            using HttpResponseMessage firstPageResponse = await GetAqlPageAsync(repoName, includeFields, 0);
+            if (!firstPageResponse.IsSuccessStatusCode)
+            {
+                string failureContent = await firstPageResponse.Content.ReadAsStringAsync();
+                return new HttpResponseMessage(firstPageResponse.StatusCode)
+                {
+                    ReasonPhrase = firstPageResponse.ReasonPhrase,
+                    Content = new StringContent(failureContent)
+                };
+            }
+
+            string firstPageJson = await firstPageResponse.Content.ReadAsStringAsync();
+            AqlResponse firstPage;
+            try
+            {
+                firstPage = JsonConvert.DeserializeObject<AqlResponse>(firstPageJson);
+            }
+            catch (JsonReaderException)
+            {
+                firstPage = null;
+            }
+
+            if (firstPage?.Results == null)
+            {
+                return new HttpResponseMessage(firstPageResponse.StatusCode) { Content = new StringContent(firstPageJson) };
+            }
+
+            int nextPage = 1;
+            bool lastPageWasFull = firstPage.Results.Count == ApiConstant.AqlPageSize;
+
+            while (lastPageWasFull)
+            {
+                using SemaphoreSlim throttle = new(ApiConstant.AqlMaxConcurrency);
+                var batchTasks = Enumerable.Range(nextPage, ApiConstant.AqlMaxConcurrency).Select(async page =>
+                {
+                    await throttle.WaitAsync();
+                    try
+                    {
+                        using HttpResponseMessage pageResponse = await GetAqlPageAsync(repoName, includeFields, page);
+                        pageResponse.EnsureSuccessStatusCode();
+                        return await DeserializePageAsync(pageResponse);
+                    }
+                    finally
+                    {
+                        throttle.Release();
+                    }
+                }).ToList();
+
+                AqlResponse[] batchPages = await Task.WhenAll(batchTasks);
+                foreach (AqlResult item in batchPages.Where(p => p?.Results != null).SelectMany(p => p.Results))
+                {
+                    firstPage.Results.Add(item);
+                }
+
+                lastPageWasFull = batchPages[^1]?.Results?.Count == ApiConstant.AqlPageSize;
+                nextPage += ApiConstant.AqlMaxConcurrency;
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                // Preserve range.notification so callers can still detect a single page hitting the server's hard limit.
+                Content = new StringContent(JsonConvert.SerializeObject(new { results = firstPage.Results, range = firstPage.Range }))
+            };
+        }
+
+        /// <summary>
+        /// Deserializes an AQL page straight from the response stream via <see cref="JsonTextReader"/>, so the full
+        /// page body never needs to be buffered as a single string.
+        /// </summary>
+        private static async Task<AqlResponse> DeserializePageAsync(HttpResponseMessage response)
+        {
+            using Stream contentStream = await response.Content.ReadAsStreamAsync();
+            using StreamReader streamReader = new(contentStream);
+            using JsonTextReader jsonReader = new(streamReader);
+            try
+            {
+                return JsonSerializer.CreateDefault().Deserialize<AqlResponse>(jsonReader);
+            }
+            catch (JsonReaderException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Requests a single AQL page (limit/offset) for a repository.
+        /// </summary>
+        /// <param name="repoName">The name of the repository to query.</param>
+        /// <param name="includeFields">The fields to include in the AQL query result.</param>
+        /// <param name="page">The 0-based page number to request.</param>
+        /// <returns>The HTTP response for the requested page.</returns>
+        private async Task<HttpResponseMessage> GetAqlPageAsync(string repoName, string includeFields, int page)
+        {
+            string aqlQueryToBody = BuildSimpleAqlQuery(repoName, includeFields, ApiConstant.AqlPageSize, page * ApiConstant.AqlPageSize);
             string uri = $"{DomainName}{ApiConstant.JfrogArtifactoryApiSearchAql}";
             HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            TimeSpan timeOutInSec = TimeSpan.FromSeconds(TimeoutInSec);
-            httpClient.Timeout = timeOutInSec;
+            httpClient.Timeout = TimeSpan.FromSeconds(TimeoutInSec);
             HttpContent httpContent = new StringContent(aqlQueryToBody);
-            await LogHandlingHelper.HttpRequestHandling("Get component data from jfrog repository", $"MethodName:GetComponentDataByRepo()", httpClient, uri, httpContent);
+            await LogHandlingHelper.HttpRequestHandling("Get component data from jfrog repository", $"MethodName:GetComponentDataByRepo() page:{page}", httpClient, uri, httpContent);
             return await httpClient.PostAsync(uri, httpContent);
         }
 
         /// <summary>
-        /// Builds a simple AQL query string for a repository with specified include fields.
+        /// Builds a simple AQL query string for a repository with specified include fields, paginated via limit/offset.
         /// </summary>
         /// <param name="repoName">The name of the repository to query.</param>
         /// <param name="includeFields">The fields to include in the query result.</param>
+        /// <param name="limit">The maximum number of results to return for this page.</param>
+        /// <param name="offset">The number of results to skip before returning this page.</param>
         /// <returns>A formatted AQL query string.</returns>
-        private static string BuildSimpleAqlQuery(string repoName, string includeFields)
+        private static string BuildSimpleAqlQuery(string repoName, string includeFields, int limit, int offset)
         {
-            // Helper to build simple AQL queries for repo and include fields
-            return $"items.find({{\"repo\":\"{repoName}\"}}).include({includeFields})";
+            // AQL requires offset() before limit(), otherwise the server rejects it with a syntax error.
+            return $"items.find({{\"repo\":\"{repoName}\"}}).include({includeFields}).offset({offset}).limit({limit})";
         }
 
         /// <summary>

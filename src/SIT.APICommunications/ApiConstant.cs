@@ -56,6 +56,17 @@ namespace SIT.APICommunications
         public const int Sw360LookupMaxConcurrency = 4;
 
         /// <summary>
+        /// The page size used to paginate JFrog AQL queries, kept below JFrog's configured aql.search.query.max.limit.
+        /// </summary>
+        public const int AqlPageSize = 400000;
+
+        /// <summary>
+        /// The maximum number of concurrent AQL page requests per repository, bounded to avoid overwhelming the
+        /// Artifactory server while still parallelizing the remaining-page fetches.
+        /// </summary>
+        public const int AqlMaxConcurrency = 2;
+
+        /// <summary>
         /// Query params requesting full details plus Lucene-backed search, used by list endpoints that support both.
         /// </summary>
         public const string AllDetailsAndLuceneSearchParams = "allDetails=true&luceneSearch=true&";
