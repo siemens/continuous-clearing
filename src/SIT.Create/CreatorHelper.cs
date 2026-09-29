@@ -44,9 +44,6 @@ namespace SIT.Create
         List<Components> componentsAvailableInSw360 = new List<Components>();
         List<Components> DuplicateComponentsByPurlId = new List<Components>();
         private const string SOURCE = "SOURCE";
-        private const string AlpinePackageType = Dataconstant.AlpineProjectType;
-        private const string DebianPackageType = Dataconstant.DebianProjectType;
-        private const string NpmDownloaderKey = Dataconstant.NpmProjectType;
         private const string CratesDownloadSuffix = "download";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
@@ -134,11 +131,11 @@ namespace SIT.Create
         private async Task<string> GetAttachmentUrlList(ComparisonBomData component, Dictionary<string, string> AttachmentUrlList, string localPathforDownload)
         {
             string downloadPath = string.Empty;
-            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
+            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
                 {
-                    downloadPath = await _packageDownloderList[DebianPackageType].DownloadPackage(component, localPathforDownload);
+                    downloadPath = await _packageDownloderList[Dataconstant.DebianProjectType].DownloadPackage(component, localPathforDownload);
                 }
             }
             else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.PoetryProjectType]))
@@ -155,7 +152,7 @@ namespace SIT.Create
             {
                 downloadPath = await DownloadCargoSource(component, localPathforDownload);
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
                 {
@@ -220,7 +217,7 @@ namespace SIT.Create
 
             component.SourceUrl = repositoryUrl;
             component.DownloadUrl = repositoryUrl;
-            return await _packageDownloderList[NpmDownloaderKey].DownloadPackage(component, localPathforDownload);
+            return await _packageDownloderList[Dataconstant.NpmProjectType].DownloadPackage(component, localPathforDownload);
         }
 
         private static async Task<string> TryDownloadFromCratesIo(ComparisonBomData component, string localPathforDownload, string repositoryUrl, string cratesDownloadUrl)
@@ -417,7 +414,7 @@ namespace SIT.Create
                     AlpineSource = item.AlpineSourceData
                 };
 
-                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
+                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
                 {
                     SetDebianUrls(item, releasesInfo, mapper);
                 }
@@ -466,7 +463,7 @@ namespace SIT.Create
         {
             return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.PoetryProjectType]) ||
                    item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.ConanProjectType]) ||
-                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]) ||
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]) ||
                    item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.CargoProjectType]);
         }
 
@@ -609,11 +606,11 @@ namespace SIT.Create
             string localPathforDownload = string.Empty;
             try
             {
-                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
+                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
-                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]))
+                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
