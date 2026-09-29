@@ -508,7 +508,7 @@ namespace SIT.Scan
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
             string normalizedComponentName = CommonHelper.NormalizePypiName(jfrogcomponentName);
 
-            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedComponentName, StringComparison.Ordinal)) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version)))
+            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == Dataconstant.PypiNormalizedNameKey && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedComponentName, StringComparison.Ordinal)) && x.Properties.Any(p => p.Key == Dataconstant.PypiVersionKey && p.Value == component.Version)))
             {
                 Logger.DebugFormat("IsInternalPythonComponent(): Component [Name: {0}, Version: {1}] is internal,Found in JFrog repository with full name: {2}.", component.Name, component.Version, jfrogcomponentName);
                 return true;
@@ -529,9 +529,9 @@ namespace SIT.Scan
             string normalizedName = CommonHelper.NormalizePypiName(name);
 
             string nameVerison = aqlResultList.FirstOrDefault(x =>
-                x.Properties.Any(p => p.Key == "pypi.normalized.name"
+                x.Properties.Any(p => p.Key == Dataconstant.PypiNormalizedNameKey
                     && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedName, StringComparison.Ordinal))
-                && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == version))?.Name ?? string.Empty;
+                && x.Properties.Any(p => p.Key == Dataconstant.PypiVersionKey && p.Value == version))?.Name ?? string.Empty;
 
             if (string.IsNullOrEmpty(nameVerison)) { nameVerison = Dataconstant.PackageNameNotFoundInJfrog; }
             return nameVerison;
@@ -579,7 +579,7 @@ namespace SIT.Scan
             string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out string jfrogPackageNameWhlExten, out string jfrogRepoPath);
 
             string normalizedComponentName = CommonHelper.NormalizePypiName(component.Name);
-            var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedComponentName, StringComparison.Ordinal)) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
+            var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == Dataconstant.PypiNormalizedNameKey && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedComponentName, StringComparison.Ordinal)) && x.Properties.Any(p => p.Key == Dataconstant.PypiVersionKey && p.Value == component.Version));
 
             Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
             Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };

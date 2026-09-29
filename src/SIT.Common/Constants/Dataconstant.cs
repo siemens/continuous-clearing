@@ -199,6 +199,14 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string Cdx_ExcludeComponent = "internal:siemens:clearing:sw360:exclude";
         /// <summary>
+        /// JFrog Artifactory PyPI normalized name property key.
+        /// </summary>
+        public const string PypiNormalizedNameKey = "pypi.normalized.name";
+        /// <summary>
+        /// JFrog Artifactory PyPI version property key.
+        /// </summary>
+        public const string PypiVersionKey = "pypi.version";
+        /// <summary>
         /// Production Fossology URL.
         /// </summary>
         public const string ProductionFossologyURL = "automation.fossology";
