@@ -26,7 +26,6 @@ namespace SIT.Scan
     public class AlpineProcessor(ICycloneDXBomParser cycloneDXBomParser, ISpdxBomParser spdxBomParser) : IParser
     {
         #region Fields
-        private const string ProjectTypeAlpine = "ALPINE";
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
@@ -179,7 +178,7 @@ namespace SIT.Scan
                 };
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[ProjectTypeAlpine]))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]))
                 {
 
                     alpinePackages.Add(package);
@@ -207,8 +206,8 @@ namespace SIT.Scan
         /// <param name="listofComponents">Reference to the component list to deduplicate.</param>
         private static string GetReleaseExternalId(string name, string version)
         {
-            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
-            return CommonHelper.GeneratePurl(ProjectTypeAlpine, name, version, qualifiers);
+            var qualifiers = new SortedDictionary<string, string> { { Dataconstant.PurlArchQualifierKey, Dataconstant.PurlSourceQualifierValue } };
+            return CommonHelper.GeneratePurlForProjectType(Dataconstant.AlpineProjectType, name, version, qualifiers);
         }
         private static void GetDistinctComponentList(ref List<AlpinePackage> listofComponents)
         {
@@ -247,7 +246,7 @@ namespace SIT.Scan
                     Version = prop.Version
                 };
                 component.Purl = GetReleaseExternalId(prop.Name, prop.Version);
-                string bomRefBase = CommonHelper.GeneratePurl(ProjectTypeAlpine, prop.Name, prop.Version);
+                string bomRefBase = CommonHelper.GeneratePurlForProjectType(Dataconstant.AlpineProjectType, prop.Name, prop.Version);
                 component.BomRef = string.IsNullOrEmpty(distro) ? bomRefBase : $"{bomRefBase}?{distro}";
                 component.Type = Component.Classification.Library;
                 AddComponentProperties(prop, component);

@@ -65,7 +65,7 @@ namespace SIT.Scan
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CONAN"], appSettings?.ProjectType);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()[Dataconstant.ConanProjectType], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
@@ -324,7 +324,7 @@ namespace SIT.Scan
                     {
                         if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
                         {
-                            component.Purl = CommonHelper.GeneratePurl("CONAN", component.Name, component.Version);
+                            component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, component.Name, component.Version);
                         }
                     }
                     BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
@@ -470,7 +470,7 @@ namespace SIT.Scan
                 };
 
                 component.Type = Component.Classification.Library;
-                component.Purl = CommonHelper.GeneratePurl("CONAN", component.Name, component.Version);
+                component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, component.Name, component.Version);
                 component.BomRef = component.Purl;
                 component.Properties = new List<Property>();
                 component.Properties.Add(isdev);
@@ -522,7 +522,7 @@ namespace SIT.Scan
                     var dependentNode = nodePackages.FirstOrDefault(x => x.Key == dep.Key);
                     if (dependentNode.Value != null && !string.IsNullOrEmpty(dependentNode.Value.Name))
                     {
-                        string depPurl = CommonHelper.GeneratePurl("CONAN", dependentNode.Value.Name, dependentNode.Value.Version);
+                        string depPurl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, dependentNode.Value.Name, dependentNode.Value.Version);
                         subDependencies.Add(new Dependency { Ref = depPurl });
                     }
                 }

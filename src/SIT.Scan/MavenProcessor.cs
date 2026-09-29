@@ -121,8 +121,8 @@ namespace SIT.Scan
                 return null;
             }
 
-            return CommonHelper.GeneratePurl(
-                "MAVEN",
+            return CommonHelper.GeneratePurlForProjectType(
+                Dataconstant.MavenProjectType,
                 name,
                 version,
                 namespaceOverride: group);

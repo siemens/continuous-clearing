@@ -62,7 +62,7 @@ namespace SIT.Scan
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CARGO"], appSettings?.ProjectType);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()[Dataconstant.CargoProjectType], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             bom.Components = componentsForBOM;
@@ -410,7 +410,7 @@ namespace SIT.Scan
             {
                 if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
                 {
-                    component.Purl = CommonHelper.GeneratePurl("CARGO", component.Name, component.Version);
+                    component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.CargoProjectType, component.Name, component.Version);
                 }
             }
             BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
@@ -560,7 +560,7 @@ namespace SIT.Scan
 
                 string name = pkg.Name;
                 string version = pkg.Version;
-                string purl = CommonHelper.GeneratePurl("CARGO", name, version);
+                string purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.CargoProjectType, name, version);
                 string id = pkg.Id;
 
                 var component = CommonHelper.CreateComponentWithProperties(name, version, purl);

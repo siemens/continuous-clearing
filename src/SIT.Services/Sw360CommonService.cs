@@ -50,7 +50,7 @@ namespace SIT.Services
         {
             Logger.DebugFormat("GetComponentDataByExternalId(): Starting to identifying Component through External Id - Name-{0},ExternalId-{1}", componentName, componentExternalId);
             string externalIdUriString;
-            if (componentExternalId.Contains(Dataconstant.PurlCheck()["NPM"]))
+            if (componentExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.NpmProjectType]))
             {
                 externalIdUriString = Uri.EscapeDataString(componentExternalId);
             }
@@ -106,7 +106,7 @@ namespace SIT.Services
         private async Task<ComponentStatus> TryGetComponentByKey(string componentName, string componentExternalId, string externalIdUriString, string externalIdKey)
         {
             var sw360ComponentsList = await GetCompListFromExternalIDCombinations(externalIdUriString, externalIdKey);
-            if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+            if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
             {
                 string newExternalIdUriString = Uri.EscapeDataString(componentExternalId.Replace("?arch=source", ""));
                 sw360ComponentsList = await GetCompListFromExternalIDCombinations(newExternalIdUriString, externalIdKey);
@@ -198,7 +198,7 @@ namespace SIT.Services
             var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
 
             //It's for Local Sw360 servers,making an API call with EscapeDataString..
-            if (sw360releasesdata.Count == 0 && (releaseExternalId.Contains(Dataconstant.PurlCheck()["NPM"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) || releaseExternalId.Contains(Dataconstant.PurlCheck()["ALPINE"])))
+            if (sw360releasesdata.Count == 0 && (releaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.NpmProjectType]) || releaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]) || releaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType])))
             {
                 Logger.Debug("GetReleaseDataByExternalId(): If releaseExternalId have NPM or Debian or Alpine . We reruning the api call.");
                 string escapedReleaseExternalId = Uri.EscapeDataString(releaseExternalId);

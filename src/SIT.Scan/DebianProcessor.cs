@@ -411,7 +411,6 @@ namespace SIT.Scan
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser, appSettings, ref listUnsupportedComponents);
 
-            var refMap = new Dictionary<string, string>();
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;               
@@ -424,7 +423,7 @@ namespace SIT.Scan
                 };
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     debianPackages.Add(package);
@@ -436,36 +435,9 @@ namespace SIT.Scan
                 }
             }
 
-            foreach (var dependency in bom.Dependencies ?? Enumerable.Empty<Dependency>())
-            {
-                RemapDependencyRef(dependency, refMap);
-            }
-
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
             return bom;
-        }
-
-        /// <summary>
-        /// Recursively remaps a dependency's ref (and nested refs) using the provided
-        /// original-bom-ref to regenerated-purl mapping so the dependency graph stays consistent.
-        /// </summary>
-        /// <param name="dependency">Dependency node to remap.</param>
-        /// <param name="refMap">Map of original bom-ref to regenerated purl.</param>
-        private static void RemapDependencyRef(Dependency dependency, IReadOnlyDictionary<string, string> refMap)
-        {
-            if (!string.IsNullOrEmpty(dependency.Ref) && refMap.TryGetValue(dependency.Ref, out string newRef))
-            {
-                dependency.Ref = newRef;
-            }
-
-            if (dependency.Dependencies != null && dependency.Dependencies.Count != 0)
-            {
-                foreach (var nestedDependency in dependency.Dependencies)
-                {
-                    RemapDependencyRef(nestedDependency, refMap);
-                }
-            }
         }
 
         /// <summary>
@@ -489,8 +461,8 @@ namespace SIT.Scan
         /// <returns>release id</returns>
         private static string GetReleaseExternalId(string name, string version)
         {
-            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
-            return CommonHelper.GeneratePurl("DEBIAN", name, version, qualifiers);
+            var qualifiers = new SortedDictionary<string, string> { { Dataconstant.PurlArchQualifierKey, Dataconstant.PurlSourceQualifierValue } };
+            return CommonHelper.GeneratePurlForProjectType(Dataconstant.DebianProjectType, name, version, qualifiers);
         }
 
         /// <summary>

@@ -940,7 +940,7 @@ namespace SIT.Common
         /// <param name="version">The component version.</param>
         /// <param name="qualifiers">Optional purl qualifiers (e.g. arch=source); may be null.</param>
         /// <returns>A generated, spec-compliant purl string.</returns>
-        public static string GeneratePurl(string type, string @namespace, string name, string version, SortedDictionary<string, string> qualifiers = null)
+        public static string BuildPurl(string type, string @namespace, string name, string version, SortedDictionary<string, string> qualifiers = null)
         {
             PackageURL purl = new PackageURL(type, @namespace, name, version, qualifiers, null);
             return purl.ToString();        }
@@ -957,7 +957,7 @@ namespace SIT.Common
         /// <param name="qualifiers">Optional purl qualifiers (e.g. arch=source); may be null.</param>
         /// <param name="namespaceOverride">Optional namespace/scope to use instead of the prefix-derived namespace.</param>
         /// <returns>A generated, spec-compliant purl string.</returns>
-        public static string GeneratePurl(string projectTypeKey, string name, string version, SortedDictionary<string, string> qualifiers = null, string namespaceOverride = null)
+        public static string GeneratePurlForProjectType(string projectTypeKey, string name, string version, SortedDictionary<string, string> qualifiers = null, string namespaceOverride = null)
         {
             string key = projectTypeKey?.Trim().ToUpperInvariant();
             string prefix = Dataconstant.PurlCheck()[key];
@@ -968,7 +968,7 @@ namespace SIT.Common
             string type = segments[0];
             string @namespace = namespaceOverride ?? (segments.Length > 1 ? segments[1] : null);
 
-            return GeneratePurl(type, @namespace, name, version, qualifiers);
+            return BuildPurl(type, @namespace, name, version, qualifiers);
         }
 
         /// <summary>

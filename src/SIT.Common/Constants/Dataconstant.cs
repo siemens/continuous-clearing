@@ -267,6 +267,48 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string PurlIDSuffix = "?arch=source";
 
+        /// <summary>
+        /// Purl qualifier key for architecture.
+        /// </summary>
+        public const string PurlArchQualifierKey = "arch";
+        /// <summary>
+        /// Purl qualifier value indicating a source package.
+        /// </summary>
+        public const string PurlSourceQualifierValue = "source";
+
+        /// <summary>
+        /// Project type key for NPM.
+        /// </summary>
+        public const string NpmProjectType = "NPM";
+        /// <summary>
+        /// Project type key for NuGet.
+        /// </summary>
+        public const string NugetProjectType = "NUGET";
+        /// <summary>
+        /// Project type key for Debian.
+        /// </summary>
+        public const string DebianProjectType = "DEBIAN";
+        /// <summary>
+        /// Project type key for Maven.
+        /// </summary>
+        public const string MavenProjectType = "MAVEN";
+        /// <summary>
+        /// Project type key for Poetry (PyPI).
+        /// </summary>
+        public const string PoetryProjectType = "POETRY";
+        /// <summary>
+        /// Project type key for Conan.
+        /// </summary>
+        public const string ConanProjectType = "CONAN";
+        /// <summary>
+        /// Project type key for Alpine.
+        /// </summary>
+        public const string AlpineProjectType = "ALPINE";
+        /// <summary>
+        /// Project type key for Cargo.
+        /// </summary>
+        public const string CargoProjectType = "CARGO";
+
         #endregion
 
         #region Properties

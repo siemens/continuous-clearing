@@ -72,7 +72,7 @@ namespace SIT.Scan
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             totalComponentsIdentified = componentsForBOM.Count;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()[Dataconstant.NpmProjectType], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
@@ -829,7 +829,7 @@ namespace SIT.Scan
                 name = packageName[(slashIndex + 1)..];
             }
 
-            return CommonHelper.GeneratePurl("NPM", name, version, namespaceOverride: scope);
+            return CommonHelper.GeneratePurlForProjectType(Dataconstant.NpmProjectType, name, version, namespaceOverride: scope);
         }
 
         /// <summary>

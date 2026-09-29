@@ -717,15 +717,12 @@ namespace SIT.Scan
             if (bomList.Components != null)
             {
                 CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                foreach (var component in bomList.Components)
+                foreach (var component in bomList.Components.Where(c => !string.IsNullOrEmpty(c.Name) && !string.IsNullOrEmpty(c.Version)))
                 {
-                    if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
-                    {
-                        component.Purl = CommonHelper.GeneratePurl("NUGET", component.Name, component.Version);
-                    }
+                    component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.NugetProjectType, component.Name, component.Version);
                 }
                 var componentsForBOM = new List<Component>(bomList.Components);
-                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
+                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath); 
             }
 
             if (bomList.Dependencies != null)
@@ -930,7 +927,7 @@ namespace SIT.Scan
                     Type = Component.Classification.Library
                 };
 
-                components.Purl = CommonHelper.GeneratePurl("NUGET", prop.ID, components.Version);
+                components.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.NugetProjectType, prop.ID, components.Version);
                 components.BomRef = components.Purl;
                 components.Description = prop.Filepath;
                 components.Properties = new List<Property>()

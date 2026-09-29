@@ -1357,7 +1357,7 @@ namespace SIT.Scan.UTest
                 .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths, ListofComponentsFromLockFile, ListofDependenciesFromLockFile });
 
             // Assert
-            var expectedPurl = CommonHelper.GeneratePurl("NUGET", "TestComponent", "1.0.0");
+            var expectedPurl = CommonHelper.GeneratePurlForProjectType("NUGET", "TestComponent", "1.0.0");
             Assert.AreEqual(expectedPurl, testBom.Components[0].Purl);
             Assert.AreEqual("original-bom-ref", testBom.Components[0].BomRef);
         }

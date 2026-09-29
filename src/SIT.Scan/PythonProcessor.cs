@@ -35,7 +35,6 @@ namespace SIT.Scan
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-        private const string PoetryProjectType = "POETRY";
         private const string devGroupName = "dev";
         private const string mainGroupName = "main";
 
@@ -185,7 +184,7 @@ namespace SIT.Scan
                 {
                     Name = node["name"].ToString(),
                     Version = node["version"].ToString(),
-                    PurlID = GeneratePypiPurl(node["name"].ToString(), node["version"].ToString(), PoetryProjectType),
+                    PurlID = GeneratePypiPurl(node["name"].ToString(), node["version"].ToString(), Dataconstant.PoetryProjectType),
                     // Support both Poetry 1.x (category) and Poetry 2.x (groups)
                     Isdevdependent = IsDevDependency(node),
                     FoundType = Dataconstant.Discovered,
@@ -338,11 +337,11 @@ namespace SIT.Scan
 
             if (string.IsNullOrEmpty(value))
             {
-                return GeneratePypiPurl(valuePair.Key, "*", PoetryProjectType);
+                return GeneratePypiPurl(valuePair.Key, "*", Dataconstant.PoetryProjectType);
             }
             else
             {
-                return GeneratePypiPurl(valuePair.Key, value, PoetryProjectType);
+                return GeneratePypiPurl(valuePair.Key, value, Dataconstant.PoetryProjectType);
             }
         }
 
@@ -358,8 +357,8 @@ namespace SIT.Scan
         /// <returns>A generated, spec-compliant pypi purl string.</returns>
         private static string GeneratePypiPurl(string name, string version, string projectType)
         {
-            string projectTypeKey = string.IsNullOrWhiteSpace(projectType) ? PoetryProjectType : projectType;
-            return CommonHelper.GeneratePurl(projectTypeKey, name, version);
+            string projectTypeKey = string.IsNullOrWhiteSpace(projectType) ? Dataconstant.PoetryProjectType : projectType;
+            return CommonHelper.GeneratePurlForProjectType(projectTypeKey, name, version);
         }
 
         /// <summary>
@@ -405,11 +404,11 @@ namespace SIT.Scan
                 if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version))
                 {
                     // Always generate a correct purl from name and version; do not reuse the incoming purl.
-                    package.PurlID = GeneratePypiPurl(componentsInfo.Name, componentsInfo.Version, PoetryProjectType);
+                    package.PurlID = GeneratePypiPurl(componentsInfo.Name, componentsInfo.Version, Dataconstant.PoetryProjectType);
                 }
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(package.Name) && !string.IsNullOrEmpty(package.Version) && !string.IsNullOrEmpty(package.PurlID) && package.PurlID.Contains(Dataconstant.PurlCheck()[PoetryProjectType]))
+                if (!string.IsNullOrEmpty(package.Name) && !string.IsNullOrEmpty(package.Version) && !string.IsNullOrEmpty(package.PurlID) && package.PurlID.Contains(Dataconstant.PurlCheck()[Dataconstant.PoetryProjectType]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
