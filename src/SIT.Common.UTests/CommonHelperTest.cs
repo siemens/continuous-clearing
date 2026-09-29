@@ -2248,48 +2248,6 @@ namespace SIT.Common.UTest
         }
 
         [Test]
-        public void IsValidPurl_WithValidMavenPurl_ReturnsTrue()
-        {
-            bool result = CommonHelper.IsValidPurl("pkg:maven/org.apache.commons/commons-lang3@3.12.0");
-
-            Assert.That(result, Is.True);
-        }
-
-        [Test]
-        public void IsValidPurl_WithStrippedTypeJarPurl_ReturnsTrue()
-        {
-            bool result = CommonHelper.IsValidPurl("pkg:maven/org.apache.commons/commons-lang3@3.12.0");
-
-            Assert.That(result, Is.True);
-        }
-
-        [Test]
-        public void IsValidPurl_WithNull_ReturnsFalse()
-        {
-            bool result = CommonHelper.IsValidPurl(null);
-
-            Assert.That(result, Is.False);
-        }
-
-        [Test]
-        public void IsValidPurl_WithEmptyOrWhitespace_ReturnsFalse()
-        {
-            Assert.Multiple(() =>
-            {
-                Assert.That(CommonHelper.IsValidPurl(string.Empty), Is.False);
-                Assert.That(CommonHelper.IsValidPurl("   "), Is.False);
-            });
-        }
-
-        [Test]
-        public void IsValidPurl_WithMalformedPurl_ReturnsFalse()
-        {
-            bool result = CommonHelper.IsValidPurl("not-a-valid-purl");
-
-            Assert.That(result, Is.False);
-        }
-
-        [Test]
         public void RemoveInvalidDependenciesAndReferences_WhenDependenciesNull_ReturnsNull()
         {
             var components = new List<Component> { new Component { BomRef = "ref-1" } };

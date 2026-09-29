@@ -971,31 +971,6 @@ namespace SIT.Common
             return BuildPurl(type, @namespace, name, version, qualifiers);
         }
 
-        /// <summary>
-        /// Validates whether the provided string is a well-formed package-url (purl) by attempting
-        /// to parse it with the packageurl-dotnet library. A valid purl must parse successfully and
-        /// contain a non-empty type and name.
-        /// </summary>
-        /// <param name="purl">The purl string to validate.</param>
-        /// <returns><c>true</c> when the string is a valid purl; otherwise <c>false</c>.</returns>
-        public static bool IsValidPurl(string purl)
-        {
-            if (string.IsNullOrWhiteSpace(purl))
-            {
-                return false;
-            }
-
-            try
-            {
-                PackageURL parsed = new PackageURL(purl);
-                return !string.IsNullOrEmpty(parsed.Type) && !string.IsNullOrEmpty(parsed.Name);
-            }
-            catch (MalformedPackageUrlException)
-            {
-                return false;
-            }
-        }
-
         /// <param name="projectType">The project type to canonicalize.</param>
         /// <returns>The canonicalized project type string.</returns>
         public static string CanonicalizeProjectType(string projectType)
