@@ -201,7 +201,7 @@ namespace SIT.APICommunications
             }
             else if (component.ComponentType.Equals("Python", StringComparison.InvariantCultureIgnoreCase))
             {
-                return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@pypi.normalized.name", component.Name), ("@pypi.version", component.Version) });
+                return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@pypi.normalized.name", CommonHelper.NormalizePypiName(component.Name)), ("@pypi.version", component.Version) });
             }
             else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase) || component.ComponentType.Equals("Choco", StringComparison.InvariantCultureIgnoreCase))
             {

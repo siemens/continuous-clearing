@@ -893,100 +893,80 @@ namespace SIT.Scan.UTest
 
         #endregion
 
-        #region RemoveTypeJarSuffix
+        #region RemapDependencyRef
 
-        private static void InvokeRemoveTypeJarSuffix(Bom bom)
+        private static void InvokeRemapDependencyRef(Dependency dependency, IReadOnlyDictionary<string, string> refMap)
         {
             MethodInfo method = typeof(MavenProcessor).GetMethod(
-                "RemoveTypeJarSuffix",
+                "RemapDependencyRef",
                 BindingFlags.NonPublic | BindingFlags.Static);
-            method.Invoke(null, new object[] { bom });
+            method.Invoke(null, new object[] { dependency, refMap });
         }
 
         [Test]
-        public void RemoveTypeJarSuffix_ValidPurlAfterStrip_StripsJarSuffix()
+        public void RemapDependencyRef_WhenRefInMap_UpdatesRef()
         {
             // Arrange
-            Bom bom = new Bom
+            var dependency = new Dependency
             {
-                Components = new List<Component>
-                {
-                    new Component
-                    {
-                        Group = "org.apache.commons",
-                        Name = "commons-lang3",
-                        Version = "3.12.0",
-                        Purl = "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar",
-                        BomRef = "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar"
-                    }
-                },
-                Dependencies = new List<Dependency>()
+                Ref = "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar"
+            };
+            var refMap = new Dictionary<string, string>
+            {
+                { "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar", "pkg:maven/org.apache.commons/commons-lang3@3.12.0" }
             };
 
             // Act
-            InvokeRemoveTypeJarSuffix(bom);
+            InvokeRemapDependencyRef(dependency, refMap);
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(bom.Components[0].Purl, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
-                Assert.That(bom.Components[0].BomRef, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
-                Assert.That(bom.Components[0].Purl, Does.Not.Contain("type=jar"));
-            });
+            Assert.That(dependency.Ref, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
         }
 
         [Test]
-        public void RemoveTypeJarSuffix_InvalidPurlAfterStrip_RegeneratesFromGroupNameVersion()
-        {
-            // Arrange - a malformed purl that stays invalid after stripping the suffix
-            Bom bom = new Bom
-            {
-                Components = new List<Component>
-                {
-                    new Component
-                    {
-                        Group = "org.apache.commons",
-                        Name = "commons-lang3",
-                        Version = "3.12.0",
-                        Purl = "not-a-valid-purl?type=jar",
-                        BomRef = "not-a-valid-purl?type=jar"
-                    }
-                },
-                Dependencies = new List<Dependency>()
-            };
-
-            // Act
-            InvokeRemoveTypeJarSuffix(bom);
-
-            // Assert - regenerated canonical purl from group/name/version, assigned to both
-            Assert.Multiple(() =>
-            {
-                Assert.That(bom.Components[0].Purl, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
-                Assert.That(bom.Components[0].BomRef, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
-            });
-        }
-
-        [Test]
-        public void RemoveTypeJarSuffix_StripsJarSuffixFromDependencyRefs()
+        public void RemapDependencyRef_WhenRefNotInMap_LeavesRefUnchanged()
         {
             // Arrange
-            Bom bom = new Bom
+            var dependency = new Dependency
             {
-                Components = new List<Component>(),
+                Ref = "pkg:maven/org.apache.commons/commons-lang3@3.12.0"
+            };
+            var refMap = new Dictionary<string, string>();
+
+            // Act
+            InvokeRemapDependencyRef(dependency, refMap);
+
+            // Assert
+            Assert.That(dependency.Ref, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+        }
+
+        [Test]
+        public void RemapDependencyRef_RemapsNestedDependencyRefs()
+        {
+            // Arrange
+            var dependency = new Dependency
+            {
+                Ref = "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar",
                 Dependencies = new List<Dependency>
                 {
-                    new Dependency
-                    {
-                        Ref = "pkg:maven/org.apache.commons/commons-lang3@3.12.0?type=jar"
-                    }
+                    new Dependency { Ref = "pkg:maven/joda-time/joda-time@2.9.2?type=jar" }
                 }
+            };
+            var refMap = new Dictionary<string, string>
+            {
+                { "pkg:maven/org.springframework/gs-maven@0.1.0?type=jar", "pkg:maven/org.springframework/gs-maven@0.1.0" },
+                { "pkg:maven/joda-time/joda-time@2.9.2?type=jar", "pkg:maven/joda-time/joda-time@2.9.2" }
             };
 
             // Act
-            InvokeRemoveTypeJarSuffix(bom);
+            InvokeRemapDependencyRef(dependency, refMap);
 
             // Assert
-            Assert.That(bom.Dependencies[0].Ref, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dependency.Ref, Is.EqualTo("pkg:maven/org.springframework/gs-maven@0.1.0"));
+                Assert.That(dependency.Dependencies[0].Ref, Is.EqualTo("pkg:maven/joda-time/joda-time@2.9.2"));
+            });
         }
 
         #endregion

@@ -2288,6 +2288,75 @@ namespace SIT.Common.UTest
 
             Assert.That(result, Is.False);
         }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_WhenDependenciesNull_ReturnsNull()
+        {
+            var components = new List<Component> { new Component { BomRef = "ref-1" } };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(components, null);
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_WhenComponentsNull_RemovesAllDependencies()
+        {
+            var dependencies = new List<Dependency> { new Dependency { Ref = "ref-1" } };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(null, dependencies);
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_RemovesUnmatchedRefsAndNestedRefs()
+        {
+            var components = new List<Component>
+            {
+                new Component { BomRef = "ref-1" },
+                new Component { BomRef = "ref-2" }
+            };
+            var dependencies = new List<Dependency>
+            {
+                new Dependency
+                {
+                    Ref = "ref-1",
+                    Dependencies = new List<Dependency>
+                    {
+                        new Dependency { Ref = "ref-2" },
+                        new Dependency { Ref = "ref-missing" }
+                    }
+                },
+                new Dependency { Ref = "ref-orphan" }
+            };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(components, dependencies);
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result[0].Ref, Is.EqualTo("ref-1"));
+            Assert.That(result[0].Dependencies.Count, Is.EqualTo(1));
+            Assert.That(result[0].Dependencies[0].Ref, Is.EqualTo("ref-2"));
+        }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_IgnoresComponentsWithNullBomRef()
+        {
+            var components = new List<Component>
+            {
+                new Component { BomRef = null },
+                new Component { BomRef = "ref-1" }
+            };
+            var dependencies = new List<Dependency>
+            {
+                new Dependency { Ref = "ref-1" }
+            };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(components, dependencies);
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result[0].Ref, Is.EqualTo("ref-1"));
+        }
     }
 
 

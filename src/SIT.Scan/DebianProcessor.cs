@@ -411,9 +411,20 @@ namespace SIT.Scan
             Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
             Bom bom = BomHelper.ParseBomFile(filePath, _spdxBomParser, _cycloneDXBomParser, appSettings, ref listUnsupportedComponents);
 
+            var refMap = new Dictionary<string, string>();
             foreach (var componentsInfo in bom.Components)
             {
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version))
+                {
+                    string regeneratedPurl = GetReleaseExternalId(componentsInfo.Name, componentsInfo.Version);
+                    if (!string.IsNullOrEmpty(componentsInfo.BomRef))
+                    {
+                        refMap[componentsInfo.BomRef] = regeneratedPurl;
+                    }
+                    componentsInfo.Purl = regeneratedPurl;
+                    componentsInfo.BomRef = regeneratedPurl;
+                }
                 DebianPackage package = new DebianPackage
                 {
                     Name = componentsInfo.Name,
@@ -434,9 +445,37 @@ namespace SIT.Scan
                     Logger.DebugFormat("ExtractDetailsForJson():InvalidComponent for Debian : Component Details : {0} @ {1} @ {2}", package.Name, package.Version, package.PurlID);
                 }
             }
+
+            foreach (var dependency in bom.Dependencies ?? Enumerable.Empty<Dependency>())
+            {
+                RemapDependencyRef(dependency, refMap);
+            }
+
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
             return bom;
+        }
+
+        /// <summary>
+        /// Recursively remaps a dependency's ref (and nested refs) using the provided
+        /// original-bom-ref to regenerated-purl mapping so the dependency graph stays consistent.
+        /// </summary>
+        /// <param name="dependency">Dependency node to remap.</param>
+        /// <param name="refMap">Map of original bom-ref to regenerated purl.</param>
+        private static void RemapDependencyRef(Dependency dependency, IReadOnlyDictionary<string, string> refMap)
+        {
+            if (!string.IsNullOrEmpty(dependency.Ref) && refMap.TryGetValue(dependency.Ref, out string newRef))
+            {
+                dependency.Ref = newRef;
+            }
+
+            if (dependency.Dependencies != null && dependency.Dependencies.Count != 0)
+            {
+                foreach (var nestedDependency in dependency.Dependencies)
+                {
+                    RemapDependencyRef(nestedDependency, refMap);
+                }
+            }
         }
 
         /// <summary>

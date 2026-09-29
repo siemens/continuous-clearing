@@ -320,6 +320,13 @@ namespace SIT.Scan
                     Logger.DebugFormat("ParsingInputFileForBOM():CycloneDX file detected: {0}", filepath);
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    foreach (var component in bom.Components ?? Enumerable.Empty<Component>())
+                    {
+                        if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
+                        {
+                            component.Purl = CommonHelper.GeneratePurl("CONAN", component.Name, component.Version);
+                        }
+                    }
                     BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
                     LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);

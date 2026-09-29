@@ -717,6 +717,13 @@ namespace SIT.Scan
             if (bomList.Components != null)
             {
                 CycloneDXBomParser.CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+                foreach (var component in bomList.Components)
+                {
+                    if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
+                    {
+                        component.Purl = CommonHelper.GeneratePurl("NUGET", component.Name, component.Version);
+                    }
+                }
                 var componentsForBOM = new List<Component>(bomList.Components);
                 CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
             }

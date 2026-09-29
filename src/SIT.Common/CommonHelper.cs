@@ -55,7 +55,6 @@ namespace SIT.Common
         /// Gets or sets the project summary link.
         /// </summary>
         public static string ProjectSummaryLink { get; set; }
-
         /// <summary>
         /// Gets or sets the default log path.
         /// </summary>
@@ -64,6 +63,23 @@ namespace SIT.Common
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Normalizes a PyPI project name per PEP 503: lower-cased with any runs of
+        /// '.', '_' or '-' collapsed into a single '-'. This ensures names like
+        /// "pyasn1_modules" and "pyasn1-modules" are treated as equal.
+        /// </summary>
+        /// <param name="name">The raw PyPI project name.</param>
+        /// <returns>The normalized name, or the original value when null/empty.</returns>
+        public static string NormalizePypiName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return name;
+            }
+
+            return Regex.Replace(name, "[-_.]+", "-").ToLowerInvariant();
+        }
 
         /// <summary>
         /// Parses JSON safely, treating an empty/whitespace body or malformed content as "no object" rather than
@@ -221,13 +237,21 @@ namespace SIT.Common
         /// <returns>The cleaned list of dependencies.</returns>
         public static List<Dependency> RemoveInvalidDependenciesAndReferences(List<Component> components, List<Dependency> dependencies)
         {
-            var componentBomRefs = new HashSet<string>(components.Select(c => c.BomRef));
+            if (dependencies == null || dependencies.Count == 0)
+            {
+                return dependencies;
+            }
 
-            dependencies.RemoveAll(dep => !componentBomRefs.Contains(dep.Ref));
+            var componentBomRefs = new HashSet<string>(
+                (components ?? new List<Component>())
+                    .Select(c => c.BomRef)
+                    .Where(bomRef => !string.IsNullOrEmpty(bomRef)));
+
+            dependencies.RemoveAll(dep => dep == null || !componentBomRefs.Contains(dep.Ref));
 
             foreach (var dep in dependencies)
             {
-                dep.Dependencies?.RemoveAll(refItem => !componentBomRefs.Contains(refItem.Ref));
+                dep.Dependencies?.RemoveAll(refItem => refItem == null || !componentBomRefs.Contains(refItem.Ref));
             }
 
             return dependencies;

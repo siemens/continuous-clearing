@@ -687,6 +687,13 @@ namespace SIT.Scan
             {
                 bom = RemoveExcludedComponents(appSettings, bom);
                 CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                foreach (var component in bom.Components.Where(c => !string.IsNullOrEmpty(c.Name) && !string.IsNullOrEmpty(c.Version)))
+                {
+                    string packageName = string.IsNullOrEmpty(component.Group)
+                        ? component.Name
+                        : $"{component.Group}/{component.Name}";
+                    component.Purl = GenerateNpmPurl(packageName, component.Version);
+                }
                 AddingIdentifierType(bom.Components, "CycloneDXFile", filepath);
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                 componentsForBOM.AddRange(bom.Components);
