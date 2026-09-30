@@ -277,7 +277,7 @@ namespace SIT.Create
         /// indicate a Maven package, returns "{group}/{name}"; otherwise, returns the component's name.</returns>
         private static string GetPackageName(Component item)
         {
-            if (!string.IsNullOrEmpty(item.Group) && !item.Purl.Contains(Dataconstant.PurlCheck()["MAVEN"]))
+            if (!string.IsNullOrEmpty(item.Group) && !item.Purl.Contains(Dataconstant.PurlCheck()[Dataconstant.MavenProjectType]))
             {
                 return $"{item.Group}/{item.Name}";
             }
@@ -540,7 +540,7 @@ namespace SIT.Create
                 LoggerHelper.WriteComponentStatusMessage("Creating the Component & Release ", item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
-                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey(SourceAttachmentType))
+                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]) && !attachmentUrlList.ContainsKey(SourceAttachmentType))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);
@@ -619,7 +619,7 @@ namespace SIT.Create
                 LoggerHelper.WriteComponentStatusMessage("Creating Release ", item);
                 var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(item);
 
-                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]) && !attachmentUrlList.ContainsKey(SourceAttachmentType))
+                if (item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]) && !attachmentUrlList.ContainsKey(SourceAttachmentType))
                 {
                     item.DownloadUrl = Dataconstant.DownloadUrlNotFound;
                     UpdatedCompareBomData.Add(item);

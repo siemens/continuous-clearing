@@ -4,20 +4,15 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+
 using SIT.APICommunications;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.Common.Model;
 using SIT.Facade.Interfaces;
 using SW360KeycloakService.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using SIT.Common;
 
 namespace SIT.Facade
 {
@@ -354,77 +349,14 @@ namespace SIT.Facade
         /// <summary>
         /// Asynchronously fetches the full SW360 releases dataset (allDetails=true). Pages are fetched one at a time
         /// to learn the total page count, then remaining pages are pulled concurrently in small bounded batches
-        /// (chunks) and merged, instead of one oversized page_entries request.
+        /// (chunks) and merged, instead of one oversized page_entries request. Delegates to the shared, strict
+        /// (typed, fail-fast) <see cref="Sw360PagedApiResponseFetcher"/> so this and the components fetch share one
+        /// merge implementation.
         /// </summary>
         public Task<string> GetAllReleasesJson()
         {
-            return FetchAllReleasesJsonInChunks();
-        }
-
-        private async Task<string> FetchAllReleasesJsonInChunks()
-        {
-            using HttpResponseMessage firstPageResponse = await GetAllReleasesWithAllData(0, ApiConstant.ReleasePageSize);
-            firstPageResponse.EnsureSuccessStatusCode();
-            string firstPageJson = await firstPageResponse.Content.ReadAsStringAsync();
-            if (!CommonHelper.TryParseJObject(firstPageJson, out JObject firstPage))
-            {
-                // A "successful" response with an empty/non-JSON body (e.g. an HTML error page) is treated as empty
-                // instead of letting JsonReaderException crash the process.
-                return firstPageJson;
-            }
-            int totalPages = firstPage["page"]?["totalPages"]?.Value<int>() ?? 1;
-
-            if (totalPages > 1)
-            {
-                using SemaphoreSlim throttle = new(ApiConstant.Sw360LookupMaxConcurrency);
-                var remainingPageTasks = Enumerable.Range(1, totalPages - 1).Select(async page =>
-                {
-                    await throttle.WaitAsync();
-                    try
-                    {
-                        using HttpResponseMessage pageResponse = await GetAllReleasesWithAllData(page, ApiConstant.ReleasePageSize);
-                        pageResponse.EnsureSuccessStatusCode();
-                        string pageJson = await pageResponse.Content.ReadAsStringAsync();
-                        return CommonHelper.TryParseJObject(pageJson, out JObject page2) ? page2 : null;
-                    }
-                    finally
-                    {
-                        throttle.Release();
-                    }
-                });
-
-                JObject[] remainingPages = await Task.WhenAll(remainingPageTasks);
-                MergeEmbeddedPages(firstPage, remainingPages.Where(p => p != null));
-            }
-
-            return firstPage.ToString(Formatting.None);
-        }
-
-        /// <summary>
-        /// Appends every "_embedded" array from each subsequent page onto the matching array on the first page.
-        /// </summary>
-        private static void MergeEmbeddedPages(JObject firstPage, IEnumerable<JObject> remainingPages)
-        {
-            if (firstPage["_embedded"] is not JObject embedded)
-            {
-                return;
-            }
-
-            foreach (JObject page in remainingPages)
-            {
-                if (page["_embedded"] is not JObject pageEmbedded)
-                {
-                    continue;
-                }
-
-                foreach (JProperty property in pageEmbedded.Properties())
-                {
-                    if (embedded[property.Name] is JArray existingArray && property.Value is JArray pageArray)
-                    {
-                        existingArray.Merge(pageArray);
-                    }
-                }
-            }
+            return Sw360PagedApiResponseFetcher.FetchAllPagesStrictAsync<ComponentsRelease, Sw360Releases>(
+                page => GetAllReleasesWithAllData(page, ApiConstant.ReleasePageSize));
         }
         #endregion
     }

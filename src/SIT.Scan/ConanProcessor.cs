@@ -65,7 +65,7 @@ namespace SIT.Scan
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CONAN"], appSettings?.ProjectType);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()[Dataconstant.ConanProjectType], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             var componentsWithMultipleVersions = componentsForBOM.GroupBy(s => s.Name)
@@ -320,6 +320,13 @@ namespace SIT.Scan
                     Logger.DebugFormat("ParsingInputFileForBOM():CycloneDX file detected: {0}", filepath);
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                    foreach (var component in bom.Components ?? Enumerable.Empty<Component>())
+                    {
+                        if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
+                        {
+                            component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, component.Name, component.Version);
+                        }
+                    }
                     BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
                     LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
@@ -463,8 +470,8 @@ namespace SIT.Scan
                 };
 
                 component.Type = Component.Classification.Library;
-                component.Purl = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
-                component.BomRef = $"{ApiConstant.ConanExternalID}{component.Name}@{component.Version}";
+                component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, component.Name, component.Version);
+                component.BomRef = component.Purl;
                 component.Properties = new List<Property>();
                 component.Properties.Add(isdev);
                 component.Properties.Add(siemensDirect);
@@ -515,7 +522,7 @@ namespace SIT.Scan
                     var dependentNode = nodePackages.FirstOrDefault(x => x.Key == dep.Key);
                     if (dependentNode.Value != null && !string.IsNullOrEmpty(dependentNode.Value.Name))
                     {
-                        string depPurl = $"{ApiConstant.ConanExternalID}{dependentNode.Value.Name}@{dependentNode.Value.Version}";
+                        string depPurl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, dependentNode.Value.Name, dependentNode.Value.Version);
                         subDependencies.Add(new Dependency { Ref = depPurl });
                     }
                 }

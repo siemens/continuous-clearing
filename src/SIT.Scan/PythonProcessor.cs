@@ -35,7 +35,6 @@ namespace SIT.Scan
         private readonly ICycloneDXBomParser _cycloneDXBomParser = cycloneDXBomParser;
         private readonly ISpdxBomParser _spdxBomParser = spdxBomParser;
         private static Bom ListUnsupportedComponentsForBom = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-        private const string PoetryProjectType = "POETRY";
         private const string devGroupName = "dev";
         private const string mainGroupName = "main";
 
@@ -70,14 +69,14 @@ namespace SIT.Scan
                 {
                     Logger.DebugFormat("ParsePackageFile():Poetry lock file detected: {0}", config);
                     listofComponents = ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
-                    ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents));
+                    ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents, appSettings.ProjectType));
 
                 }
                 else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.DependencyFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents = ExtractDetailsFromJson(config, appSettings, ref dependencies);
-                    listComponentForBOM.AddRange(FormComponentReleaseExternalID(listofComponents));
+                    listComponentForBOM.AddRange(FormComponentReleaseExternalID(listofComponents, appSettings.ProjectType));
                 }
             }
 
@@ -185,7 +184,7 @@ namespace SIT.Scan
                 {
                     Name = node["name"].ToString(),
                     Version = node["version"].ToString(),
-                    PurlID = Dataconstant.PurlCheck()[PoetryProjectType] + "/" + node["name"].ToString() + "@" + node["version"].ToString(),
+                    PurlID = GeneratePypiPurl(node["name"].ToString(), node["version"].ToString(), Dataconstant.PoetryProjectType),
                     // Support both Poetry 1.x (category) and Poetry 2.x (groups)
                     Isdevdependent = IsDevDependency(node),
                     FoundType = Dataconstant.Discovered,
@@ -338,12 +337,28 @@ namespace SIT.Scan
 
             if (string.IsNullOrEmpty(value))
             {
-                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + valuePair.Key + "@" + "*";
+                return GeneratePypiPurl(valuePair.Key, "*", Dataconstant.PoetryProjectType);
             }
             else
             {
-                return Dataconstant.PurlCheck()[PoetryProjectType] + "/" + valuePair.Key + "@" + value;
+                return GeneratePypiPurl(valuePair.Key, value, Dataconstant.PoetryProjectType);
             }
+        }
+
+        /// <summary>
+        /// Generates a spec-compliant PyPI (Poetry) package-url from a component name and version
+        /// using the packageurl-dotnet library (via the common GeneratePurl helper).
+        /// Per the package-url spec, the pypi type lowercases the name and replaces underscores with
+        /// hyphens (e.g. "MarkupSafe" =&gt; "markupsafe").
+        /// </summary>
+        /// <param name="name">The component name.</param>
+        /// <param name="version">The component version.</param>
+        /// <param name="projectType">The project type used to resolve the purl type.</param>
+        /// <returns>A generated, spec-compliant pypi purl string.</returns>
+        private static string GeneratePypiPurl(string name, string version, string projectType)
+        {
+            string projectTypeKey = string.IsNullOrWhiteSpace(projectType) ? Dataconstant.PoetryProjectType : projectType;
+            return CommonHelper.GeneratePurlForProjectType(projectTypeKey, name, version);
         }
 
         /// <summary>
@@ -386,9 +401,14 @@ namespace SIT.Scan
                     PurlID = componentsInfo.Purl,
                     SpdxComponentDetails = new SpdxComponentInfo(),
                 };
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version))
+                {
+                    // Always generate a correct purl from name and version; do not reuse the incoming purl.
+                    package.PurlID = GeneratePypiPurl(componentsInfo.Name, componentsInfo.Version, Dataconstant.PoetryProjectType);
+                }
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[PoetryProjectType]))
+                if (!string.IsNullOrEmpty(package.Name) && !string.IsNullOrEmpty(package.Version) && !string.IsNullOrEmpty(package.PurlID) && package.PurlID.Contains(Dataconstant.PurlCheck()[Dataconstant.PoetryProjectType]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     PythonPackages.Add(package);
@@ -411,35 +431,21 @@ namespace SIT.Scan
 
 
         /// <summary>
-        /// Gets Release ExternalId
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="version"></param>
-        /// <returns>release id</returns>
-        private static string GetReleaseExternalId(string name, string version)
-        {
-            version = WebUtility.UrlEncode(version);
-            version = version.Replace("%3A", ":");
-
-            return $"{Dataconstant.PurlCheck()[PoetryProjectType]}{Dataconstant.ForwardSlash}{name}@{version}";
-        }
-
-        /// <summary>
         /// Form Component Release ExternalID
         /// </summary>
         /// <param name="listOfComponents"></param>
         /// <returns>list of components</returns>
-        private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
+        private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents, string projectType)
         {
             List<Component> listComponentForBOM = new List<Component>();
 
             foreach (var prop in listOfComponents)
             {
-                string releaseExternalId = GetReleaseExternalId(prop.Name, prop.Version);
+                // Reuse the purl already generated during parsing; no need to regenerate.
                 Component component = CommonHelper.CreateComponentWithProperties(
                     prop.Name,
                     prop.Version,
-                    releaseExternalId
+                    prop.PurlID
                 );
                 AddComponentProperties(prop, component);
                 listComponentForBOM.Add(component);
@@ -499,7 +505,9 @@ namespace SIT.Scan
         private static bool IsInternalPythonComponent(List<AqlResult> aqlResultList, Component component, IBomHelper bomHelper)
         {
             string jfrogcomponentName = bomHelper.GetFullNameOfComponent(component);
-            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogcomponentName) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version)))
+            string normalizedComponentName = CommonHelper.NormalizePypiName(jfrogcomponentName);
+
+            if (aqlResultList.Exists(x => x.Properties.Any(p => p.Key == Dataconstant.PypiNormalizedNameKey && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedComponentName, StringComparison.Ordinal)) && x.Properties.Any(p => p.Key == Dataconstant.PypiVersionKey && p.Value == component.Version)))
             {
                 Logger.DebugFormat("IsInternalPythonComponent(): Component [Name: {0}, Version: {1}] is internal,Found in JFrog repository with full name: {2}.", component.Name, component.Version, jfrogcomponentName);
                 return true;
@@ -517,10 +525,12 @@ namespace SIT.Scan
         /// <returns>component name</returns>
         private static string GetJfrogNameOfPypiComponent(string name, string version, List<AqlResult> aqlResultList)
         {
+            string normalizedName = CommonHelper.NormalizePypiName(name);
 
-
-            string nameVerison = string.Empty;
-            nameVerison = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == version))?.Name ?? string.Empty;
+            string nameVerison = aqlResultList.FirstOrDefault(x =>
+                x.Properties.Any(p => p.Key == Dataconstant.PypiNormalizedNameKey
+                    && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedName, StringComparison.Ordinal))
+                && x.Properties.Any(p => p.Key == Dataconstant.PypiVersionKey && p.Value == version))?.Name ?? string.Empty;
 
             if (string.IsNullOrEmpty(nameVerison)) { nameVerison = Dataconstant.PackageNameNotFoundInJfrog; }
             return nameVerison;
@@ -567,7 +577,8 @@ namespace SIT.Scan
         {
             string repoName = GetArtifactoryRepoName(aqlResultList, component, bomhelper, out string jfrogPackageNameWhlExten, out string jfrogRepoPath);
 
-            var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == component.Name) && x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
+            string normalizedComponentName = CommonHelper.NormalizePypiName(component.Name);
+            var hashes = aqlResultList.FirstOrDefault(x => x.Properties.Any(p => p.Key == Dataconstant.PypiNormalizedNameKey && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedComponentName, StringComparison.Ordinal)) && x.Properties.Any(p => p.Key == Dataconstant.PypiVersionKey && p.Value == component.Version));
 
             Property artifactoryrepo = new() { Name = Dataconstant.Cdx_ArtifactoryRepoName, Value = repoName };
             Property fileNameProperty = new() { Name = Dataconstant.Cdx_Siemensfilename, Value = jfrogPackageNameWhlExten };

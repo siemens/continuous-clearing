@@ -93,7 +93,7 @@ namespace SIT.Scan
             if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
-            }
+            }            
             int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
@@ -103,29 +103,29 @@ namespace SIT.Scan
             ListUnsupportedComponentsForBom.Dependencies = CommonHelper.RemoveInvalidDependenciesAndReferences(ListUnsupportedComponentsForBom.Components, ListUnsupportedComponentsForBom.Dependencies);
             unSupportedBomList.Components = ListUnsupportedComponentsForBom.Components;
             unSupportedBomList.Dependencies = ListUnsupportedComponentsForBom.Dependencies;
-            RemoveTypeJarSuffix(bom);
             Logger.Debug("ParsePackageFile():Completed parsing the package file.\n");
             return bom;
         }
 
         /// <summary>
-        /// Removes the ".jar" type suffix from component references and PURLs in the BOM.
+        /// Generates a canonical Maven purl from the component's group, name and version.
         /// </summary>
-        /// <param name="bom">BOM whose component and dependency references will be normalized.</param>
-        private static void RemoveTypeJarSuffix(Bom bom)
+        /// <param name="group">Maven group id used as the purl namespace.</param>
+        /// <param name="name">Component name.</param>
+        /// <param name="version">Component version.</param>
+        /// <returns>A canonical Maven purl, or null when name or version is missing.</returns>
+        private static string GenerateMavenPurl(string group, string name, string version)
         {
-            const string suffix = Dataconstant.TypeJarSuffix;
-
-            foreach (var component in bom?.Components ?? Enumerable.Empty<Component>())
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(version))
             {
-                component.BomRef = RemoveSuffix(component.BomRef, suffix);
-                component.Purl = RemoveSuffix(component.Purl, suffix);
+                return null;
             }
 
-            foreach (var dependency in bom?.Dependencies ?? Enumerable.Empty<Dependency>())
-            {
-                RemoveTypeJarSuffixFromDependency(dependency);
-            }
+            return CommonHelper.GeneratePurlForProjectType(
+                Dataconstant.MavenProjectType,
+                name,
+                version,
+                namespaceOverride: group);
         }
 
         /// <summary>
@@ -160,12 +160,11 @@ namespace SIT.Scan
             // Log the table
             Logger.Debug(logBuilder.ToString());
         }
-        private static void RemoveTypeJarSuffixFromDependency(Dependency dependency)
+        private static void RemapDependencyRef(Dependency dependency, IReadOnlyDictionary<string, string> refMap)
         {
-            const string suffix = Dataconstant.TypeJarSuffix;
-            if (!string.IsNullOrEmpty(dependency.Ref) && dependency.Ref.EndsWith(suffix))
+            if (!string.IsNullOrEmpty(dependency.Ref) && refMap.TryGetValue(dependency.Ref, out string newRef))
             {
-                dependency.Ref = dependency.Ref[..^suffix.Length];
+                dependency.Ref = newRef;
             }
 
             // Recursively process nested dependencies
@@ -173,7 +172,7 @@ namespace SIT.Scan
             {
                 foreach (var nestedDependency in dependency.Dependencies)
                 {
-                    RemoveTypeJarSuffixFromDependency(nestedDependency);
+                    RemapDependencyRef(nestedDependency, refMap);
                 }
             }
         }
@@ -190,36 +189,74 @@ namespace SIT.Scan
         {
             foreach (string filepath in configFiles.Where(f => !f.EndsWith(FileConstant.SBOMTemplateFileExtension)))
             {
-                Bom bomList;
-                if (filepath.EndsWith(FileConstant.SPDXFileExtension))
+                Bom bomList = filepath.EndsWith(FileConstant.SPDXFileExtension)
+                    ? ProcessSpdxBomFile(filepath, appSettings)
+                    : ProcessCycloneDxBomFile(filepath, appSettings);
+
+                if (bomList == null)
                 {
-                    BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
-                    Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
-                    bomList = _spdxBomParser.ParseSPDXBom(filepath);
-                    IdentifiedMavenComponents(filepath, bomList.Components);
-                    SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
-                    SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
-                    SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
-                    ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
-                    ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
-                }
-                else
-                {
-                    bomList = ParseCycloneDXBom(filepath);
-                    if (bomList?.Components != null)
-                    {
-                        CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
-                    }
-                    else
-                    {
-                        Logger.WarnFormat("No components found in the BoM file : {0}", filepath);
-                        continue;
-                    }
+                    continue;
                 }
 
                 AddComponentsToBom(bomList, componentsForBOM, componentsToBOM, dependenciesForBOM);
                 IdentifiedMavenComponents(filepath, bomList.Components);
             }
+        }
+
+        /// <summary>
+        /// Parses and validates an SPDX BOM file, accumulating unsupported components.
+        /// </summary>
+        /// <param name="filepath">SPDX file path.</param>
+        /// <param name="appSettings">Application settings used for SPDX validation.</param>
+        /// <returns>The parsed BOM.</returns>
+        private Bom ProcessSpdxBomFile(string filepath, CommonAppSettings appSettings)
+        {
+            BomHelper.NamingConventionOfSPDXFile(filepath, appSettings);
+            Bom listUnsupportedComponents = new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() };
+            Bom bomList = _spdxBomParser.ParseSPDXBom(filepath);
+            IdentifiedMavenComponents(filepath, bomList.Components);
+            SpdxSbomHelper.CheckValidComponentsFromSpdxfile(bomList, appSettings.ProjectType, ref listUnsupportedComponents);
+            SpdxSbomHelper.AddSpdxSBomFileNameProperty(ref bomList, filepath);
+            SpdxSbomHelper.AddSpdxPropertysForUnsupportedComponents(listUnsupportedComponents.Components, filepath);
+            ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
+            ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
+            return bomList;
+        }
+
+        /// <summary>
+        /// Parses a CycloneDX BOM file, regenerates purls/bom-refs and remaps dependency refs.
+        /// </summary>
+        /// <param name="filepath">CycloneDX file path.</param>
+        /// <param name="appSettings">Application settings used for project type checks.</param>
+        /// <returns>The parsed BOM, or null when no components are found.</returns>
+        private Bom ProcessCycloneDxBomFile(string filepath, CommonAppSettings appSettings)
+        {
+            Bom bomList = ParseCycloneDXBom(filepath);
+            if (bomList?.Components == null)
+            {
+                Logger.WarnFormat("No components found in the BoM file : {0}", filepath);
+                return null;
+            }
+
+            CheckValidComponentsForProjectType(bomList.Components, appSettings.ProjectType);
+            var refMap = new Dictionary<string, string>();
+            foreach (var component in bomList.Components)
+            {
+                string regeneratedPurl = GenerateMavenPurl(component.Group, component.Name, component.Version);
+                if (!string.IsNullOrEmpty(component.BomRef) && !string.IsNullOrEmpty(regeneratedPurl))
+                {
+                    refMap[component.BomRef] = regeneratedPurl;
+                }
+                component.Purl = regeneratedPurl;
+                component.BomRef = regeneratedPurl;
+            }
+
+            foreach (var dependency in bomList.Dependencies ?? Enumerable.Empty<Dependency>())
+            {
+                RemapDependencyRef(dependency, refMap);
+            }
+
+            return bomList;
         }
 
         /// <summary>
@@ -260,18 +297,6 @@ namespace SIT.Scan
                 listOfTemplateBomfilePaths.Add(filepath);
             }
             return listOfTemplateBomfilePaths;
-        }
-        /// <summary>
-        /// Removes a suffix from a string value if present.
-        /// </summary>
-        /// <param name="value">Input string to process.</param>
-        /// <param name="suffix">Suffix to remove.</param>
-        /// <returns>String without the suffix when present.</returns>
-        private static string RemoveSuffix(string value, string suffix)
-        {
-            return !string.IsNullOrEmpty(value) && value.EndsWith(suffix)
-                ? value[..^suffix.Length]
-                : value;
         }
 
         /// <summary>

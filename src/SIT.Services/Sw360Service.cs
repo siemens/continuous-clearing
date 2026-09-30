@@ -483,7 +483,7 @@ namespace SIT.Services
                 && x.Version?.Trim().ToLowerInvariant() == component?.Version?.Trim().ToLowerInvariant());
 
             // Check for Debian specific version if needed
-            if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+            if (sw360Release == null && component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
             {
                 string debianVersion = $"{component?.Version?.Trim().ToLowerInvariant() ?? string.Empty}.debian";
                 sw360Release = sw360Releases.FirstOrDefault(x =>
