@@ -104,10 +104,13 @@ The workflow runs on:
 ### Pre-release vs. stable behavior
 
 - If GitVersion's `preReleaseTag` output is non-empty (beta/rc), the release
-  is created with `prerelease: true` in GitHub - clearly marked and does
-  **not** replace the "Latest release" pointer.
-- Stable releases (no pre-release tag) are created as drafts and require a
-  maintainer to manually publish them from the **Releases** page.
+  is created with both `draft: true` and `prerelease: true` in GitHub -
+  clearly marked as a pre-release and does **not** replace the
+  "Latest release" pointer, and still requires manual publishing from the
+  **Releases** page.
+- Stable releases (no pre-release tag) are created with `draft: false` and
+  `prerelease: false`, so they are published immediately as the
+  "Latest release".
 - Before creating a release, the workflow checks whether the computed tag
   (`vX.Y.Z`) already exists and skips release creation if so, to avoid
   duplicate/escalating releases.

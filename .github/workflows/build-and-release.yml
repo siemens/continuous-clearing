@@ -39,8 +39,9 @@ jobs:
         shell: pwsh
         run: |
           $json = dotnet-gitversion /config GitVersion.yml | ConvertFrom-Json
-          Write-Host "SemVer: $($json.SemVer) | PreReleaseTag: $($json.PreReleaseTag)"
+          Write-Host "SemVer: $($json.SemVer) | MajorMinorPatch: $($json.MajorMinorPatch) | PreReleaseTag: $($json.PreReleaseTag)"
           echo "semVer=$($json.SemVer)" >> $env:GITHUB_OUTPUT
+          echo "majorMinorPatch=$($json.MajorMinorPatch)" >> $env:GITHUB_OUTPUT
           echo "preReleaseTag=$($json.PreReleaseTag)" >> $env:GITHUB_OUTPUT
 
       - name: Determine Prerelease Flag
