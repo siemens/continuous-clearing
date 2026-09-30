@@ -33,6 +33,14 @@ namespace SIT.Create.Interfaces
         Task<string> GetSourceUrlForNugetPackage(string componentName, string componenVersion);
 
         /// <summary>
+        /// Gets the Source Url and repository commit for a Nuget Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <returns>Components with SourceUrl and SourceRepoCommit populated</returns>
+        Task<Components> GetSourceUrlAndCommitForNugetPackage(string componentName, string componenVersion);
+
+        /// <summary>
         /// Gets the Source URL for NPM Package
         /// </summary>
         /// <param name="componentName"></param>

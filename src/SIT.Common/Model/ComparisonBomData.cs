@@ -57,6 +57,11 @@ namespace SIT.Common.Model
         public string DownloadUrl { get; set; }
 
         /// <summary>
+        /// Gets or sets the source repository commit hash (from the NuGet nuspec repository element).
+        /// </summary>
+        public string SourceRepoCommit { get; set; }
+
+        /// <summary>
         /// Gets or sets the array of patch URLs.
         /// </summary>
         public string[] PatchURls { get; set; }

@@ -54,21 +54,30 @@ namespace SIT.Create
         private string Download(ComparisonBomData component, string downloadPath)
         {
             string downloadedPackageName = string.Empty;
+            string commit = component.SourceRepoCommit?.Trim() ?? string.Empty;
+            bool hasCommit = !string.IsNullOrEmpty(commit);
+
             string taggedVersion = GetCorrectVersion(component);
-            if (string.IsNullOrEmpty(taggedVersion))
+            if (string.IsNullOrEmpty(taggedVersion) && !hasCommit)
             {
                 return string.Empty;
             }
-            if (CheckIfAlreadyDownloaded(component, taggedVersion, out string alreadyDownloadedPath))
+
+            // Prefer the exact commit from the nuspec for a deterministic checkout; fall back to the resolved tag.
+            string fetchRef = hasCommit ? commit : taggedVersion;
+            // Use a stable, human-readable label for file/folder naming.
+            string versionLabel = !string.IsNullOrEmpty(taggedVersion) ? taggedVersion : component.Version;
+
+            if (CheckIfAlreadyDownloaded(component, fetchRef, out string alreadyDownloadedPath))
             {
                 return alreadyDownloadedPath;
             }
 
             string sourceUrl = component.SourceUrl.TrimEndOfString("/");
             string fileName = CommonHelper.GetSubstringOfLastOccurance(sourceUrl, "/");
-            string safeTaggedVersion = SanitizeFileName(taggedVersion);
-            string cloneFolderName = $"{fileName}-{safeTaggedVersion}";
-            string compressedFilePath = $"{downloadPath}{fileName}-{safeTaggedVersion}-{Source}";
+            string safeVersionLabel = SanitizeFileName(versionLabel);
+            string cloneFolderName = $"{fileName}-{safeVersionLabel}";
+            string compressedFilePath = $"{downloadPath}{fileName}-{safeVersionLabel}-{Source}";
             compressedFilePath = $"{compressedFilePath}{FileConstant.TargzFileExtension}";
             downloadPath = $"{downloadPath}{cloneFolderName}/";
 
@@ -81,11 +90,11 @@ namespace SIT.Create
                 LogHandlingHelper.ExceptionErrorHandling("Download", $"MethodName:Download(), Release Name: {component.Name}@{component.Version}, DownloadPath: {downloadPath}", ex, "Unauthorized access occurred while trying to create the download directory.");
                 return downloadedPackageName;
             }
-            Result result = CloneSource(component, downloadPath, taggedVersion, compressedFilePath);
+            Result result = CloneSource(component, downloadPath, fetchRef, hasCommit, compressedFilePath);
 
             Logger.DebugFormat("DownloadSourceCodeUsingGitClone:Release Name : {0}@{1}, stdout:{2}, npm pack stdErr:{3}", component.Name, component.Version, result?.StdOut, result?.StdErr);
-            m_downloadedSourceInfos.Add(new DownloadedSourceInfo() { Name = component.Name, Version = component.Version, DownloadedPath = compressedFilePath, SourceRepoUrl = component.DownloadUrl, TaggedVersion = taggedVersion });
-            component.DownloadUrl = GetSourceRepositoryUrl(component, taggedVersion);
+            m_downloadedSourceInfos.Add(new DownloadedSourceInfo() { Name = component.Name, Version = component.Version, DownloadedPath = compressedFilePath, SourceRepoUrl = component.DownloadUrl, TaggedVersion = fetchRef });
+            component.DownloadUrl = GetSourceRepositoryUrl(component, hasCommit ? commit : taggedVersion);
             return compressedFilePath;
         }
 
@@ -136,13 +145,23 @@ namespace SIT.Create
             string[] taglist = GetTagListFromResult(result);
             string baseVersion = GetBaseVersion(component.Version);
 
+            // Prefer an exact tag match against common conventions: "{version}" or "v{version}".
+            foreach (string item in taglist.Where(x => !string.IsNullOrWhiteSpace(x)))
+            {
+                string tag = item[(item.IndexOf("tags/") + 5)..];
+                if (tag.Equals(component.Version, StringComparison.OrdinalIgnoreCase) ||
+                    tag.Equals($"v{component.Version}", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.DebugFormat("GetCorrectVersion():Exact tag match found -{0}", tag);
+                    return tag;
+                }
+            }
             foreach (string item in taglist.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
                 string tag = item[(item.IndexOf("tags/") + 5)..];
                 Logger.DebugFormat("baseobject - {0},Identifying tag -{1}", item, tag);
 
-                if (tag.Contains(component.Version, StringComparison.OrdinalIgnoreCase) &&
-                tag.Contains(component.Name, StringComparison.OrdinalIgnoreCase))
+                if (tag.Contains(component.Version, StringComparison.OrdinalIgnoreCase))
                 {
                     return tag;
                 }
@@ -156,7 +175,7 @@ namespace SIT.Create
                 {
                     return tag;
                 }
-                else if (tag.Contains(baseVersion))
+                else if (!string.IsNullOrWhiteSpace(baseVersion) && tag.Contains(baseVersion))
                 {
                     return tag;
                 }
@@ -267,13 +286,13 @@ namespace SIT.Create
         /// <param name="taggedVersion"></param>
         /// <param name="compressedFilePath"></param>
         /// <returns>result</returns>
-        private static Result CloneSource(ComparisonBomData component, string downloadPath, string taggedVersion, string compressedFilePath)
+        private static Result CloneSource(ComparisonBomData component, string downloadPath, string fetchRef, bool isCommit, string compressedFilePath)
         {
             const int timeoutInMs = 200 * 60 * 1000;
-            List<string> gitCommands = GetGitCloneCommands(component, taggedVersion, compressedFilePath);
+            List<string> gitCommands = GetGitCloneCommands(component, fetchRef, isCommit, compressedFilePath);
             Result result = null;
 
-            Logger.DebugFormat("CloneSource:Download Path : {0}  Taggedversion:{1}", downloadPath, taggedVersion);
+            Logger.DebugFormat("CloneSource:Download Path : {0}  FetchRef:{1}, IsCommit:{2}", downloadPath, fetchRef, isCommit);
 
             foreach (string command in gitCommands)
             {
@@ -302,15 +321,20 @@ namespace SIT.Create
         /// <param name="taggedVersion"></param>
         /// <param name="compressedFilePath"></param>
         /// <returns>list of commands</returns>
-        private static List<string> GetGitCloneCommands(ComparisonBomData component, string taggedVersion, string compressedFilePath)
+        private static List<string> GetGitCloneCommands(ComparisonBomData component, string fetchRef, bool isCommit, string compressedFilePath)
         {
+            // For a commit SHA, fetch the raw object; for a tag, fetch the tag ref.
+            string fetchCommand = isCommit
+                ? $"fetch --prune --progress --depth=1 origin {fetchRef}"
+                : $"fetch --prune --progress --depth=1 origin refs/tags/{fetchRef}";
+
             return new List<string>()
            {
                $"init .",
                $"remote add origin {component.DownloadUrl}",
                $"config --local --add core.autocrlf false",
                $"config --local --add core.eol lf",
-               $"fetch --prune --progress --depth=1 origin refs/tags/{taggedVersion}",
+               fetchCommand,
                $"archive --format=tar.gz --output={compressedFilePath} FETCH_HEAD"
            };
         }

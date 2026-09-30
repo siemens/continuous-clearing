@@ -39,6 +39,7 @@ namespace SIT.Create
         {
             Logger.DebugFormat("Repository.IdentifyRepoURLForGit(): Start identifying Repo url for git - ComponentName: {0}, URL: {1}", componentName, url);
             string downloadUrl = string.Empty;
+            url = NormalizeGitScheme(url);
             string repoName = GetRepoName(url);
             Logger.DebugFormat("Repository.IdentifyRepoURLForGit(): Repository Name for this component: {0}, Repository Name: {1}", componentName, repoName);
 
@@ -110,6 +111,44 @@ namespace SIT.Create
 
 
             return repoUrl;
+        }
+
+        /// <summary>
+        /// Normalizes git-specific URL schemes (git+https, git+ssh, git://, ssh://,
+        /// and SCP-form git@host:owner/repo) into a plain https-friendly URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns>normalized url</returns>
+        private static string NormalizeGitScheme(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return url;
+            }
+
+            string normalized = url.Trim();
+
+            if (normalized.StartsWith("git+", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = normalized.Substring("git+".Length);
+            }
+
+            // SCP-like syntax: git@github.com:owner/repo.git
+            if (normalized.StartsWith("git@", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = normalized.Substring("git@".Length).Replace(":", "/");
+            }
+
+            if (normalized.StartsWith("git://", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = string.Concat("https://", normalized.AsSpan("git://".Length));
+            }
+            else if (normalized.StartsWith("ssh://", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = string.Concat("https://", normalized.AsSpan("ssh://".Length));
+            }
+
+            return normalized;
         }
     }
 }

@@ -412,6 +412,7 @@ namespace SIT.Create
                     ReleaseExternalId = item.ReleaseExternalId,
                     SourceUrl = item.SourceUrl,
                     DownloadUrl = item.DownloadUrl,
+                    SourceRepoCommit = item.SourceRepoCommit,
                     ComponentStatus = GetComponentAvailabilityStatus(componentsAvailableInSw360, item),
                     ReleaseStatus = IsReleaseAvailable(item.Name, item.Version, item.ReleaseExternalId),
                     AlpineSource = item.AlpineSourceData

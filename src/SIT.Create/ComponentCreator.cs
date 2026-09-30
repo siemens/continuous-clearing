@@ -309,7 +309,9 @@ namespace SIT.Create
                     componentsData.SourceUrl = UrlHelper.Instance.GetSourceUrlForNpmPackage(name, version);
                     break;
                 case "NUGET":
-                    componentsData.SourceUrl = await UrlHelper.Instance.GetSourceUrlForNugetPackage(name, version);
+                    Components nugetComponentData = await UrlHelper.Instance.GetSourceUrlAndCommitForNugetPackage(name, version);
+                    componentsData.SourceUrl = nugetComponentData.SourceUrl;
+                    componentsData.SourceRepoCommit = nugetComponentData.SourceRepoCommit;
                     break;
                 case DebianProjectType:
                     Components debComponentData = await UrlHelper.Instance.GetSourceUrlForDebianPackage(name, version);

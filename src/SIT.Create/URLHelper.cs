@@ -447,14 +447,27 @@ namespace SIT.Create
         /// <returns>string</returns>
         public async Task<string> GetSourceUrlForNugetPackage(string componentName, string componenVersion)
         {
+            var componentData = await GetSourceUrlAndCommitForNugetPackage(componentName, componenVersion);
+            return componentData.SourceUrl;
+        }
+
+        /// <summary>
+        /// Gets the Source Url and repository commit for a Nuget Package
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="componenVersion"></param>
+        /// <returns>Components with SourceUrl and SourceRepoCommit populated</returns>
+        public async Task<Components> GetSourceUrlAndCommitForNugetPackage(string componentName, string componenVersion)
+        {
             Logger.DebugFormat("GetSourceUrlForNugetPackage(): Start identifying sourceUrl for Nuget Package - ComponentName: {0}, Version: {1}", componentName, componenVersion);
             string name = componentName.ToLowerInvariant();
-            string version = componenVersion.ToLowerInvariant();
+            // NuGet flat-container IDs are lowercase, but versions are case-preserving (pre-release labels / build metadata).
+            string version = componenVersion;
             string nuspecURL = $"{CommonAppSettings.SourceURLNugetApi}{name}/{version}/{name}.nuspec";
             Logger.DebugFormat("GetSourceUrlForNugetPackage(): Constructed NuSpec URL: {0}", nuspecURL);
-            var sourceURL = await GetSourceURLFromNuspecFile(nuspecURL, componentName);
-            Logger.DebugFormat("GetSourceUrlForNugetPackage(): Completed to identify sourceUrl for Nuget - ComponentName: {0}, Version: {1}, SourceURL: {2}", componentName, componenVersion, sourceURL);
-            return sourceURL;
+            var (sourceURL, commit) = await GetSourceURLFromNuspecFile(nuspecURL, componentName);
+            Logger.DebugFormat("GetSourceUrlForNugetPackage(): Completed to identify sourceUrl for Nuget - ComponentName: {0}, Version: {1}, SourceURL: {2}, Commit: {3}", componentName, componenVersion, sourceURL, commit);
+            return new Components { SourceUrl = sourceURL, SourceRepoCommit = commit };
         }
 
         /// <summary>
@@ -618,11 +631,12 @@ namespace SIT.Create
         /// <param name="nuspecURL"></param>
         /// <param name="componentName"></param>
         /// <returns>task that represents asynchronous operation</returns>
-        private async Task<string> GetSourceURLFromNuspecFile(string nuspecURL, string componentName)
+        private async Task<(string SourceUrl, string Commit)> GetSourceURLFromNuspecFile(string nuspecURL, string componentName)
         {
             string response;
             string url = string.Empty;
             string githubUrl = string.Empty;
+            string commit = string.Empty;
             try
             {
                 response = await httpClient.GetStringAsync(nuspecURL);
@@ -633,13 +647,14 @@ namespace SIT.Create
                 foreach (XmlNode node in nodeList)
                 {
                     url = node.Attributes["url"]?.Value;
+                    commit = node.Attributes["commit"]?.Value ?? string.Empty;
                 }
                 IRepository repo = new Repository();
                 githubUrl = repo.IdentifyRepoURLForGit(url, componentName);
                 if (githubUrl == string.Empty)
                 {
                     githubUrl = SearchForProjectURLTagInNuspecFile(xmlDoc);
-                    return githubUrl;
+                    return (githubUrl, commit);
                 }
             }
             catch (AggregateException ex)
@@ -651,7 +666,7 @@ namespace SIT.Create
                 Logger.WarnFormat(SrcUrlFailWarnFormat, componentName);
                 LogHandlingHelper.ExceptionErrorHandling("GetSourceURLFromNuspecFile", $"MethodName:GetSourceURLFromNuspecFile(), ComponentName: {componentName}, NuspecURL: {nuspecURL}", ex, "An HTTP request error occurred while trying to fetch the Nuspec file.");
             }
-            return githubUrl;
+            return (githubUrl, commit);
         }
 
         /// <summary>
@@ -669,9 +684,10 @@ namespace SIT.Create
             {
                 url = node.InnerText;
             }
-            if (url.StartsWith("https://github.com"))
+            string normalizedProjectUrl = NormalizeProjectUrl(url);
+            if (normalizedProjectUrl.StartsWith("https://github.com", StringComparison.OrdinalIgnoreCase))
             {
-                return url;
+                return normalizedProjectUrl;
             }
             XmlNodeList projectSourceUrl = xmlDoc.GetElementsByTagName("projectSourceUrl");
             if (projectSourceUrl.Count != 0)
@@ -685,6 +701,44 @@ namespace SIT.Create
             }
 
             return url;
+        }
+
+        /// <summary>
+        /// Normalizes a projectUrl by upgrading scheme, stripping "www.", and removing
+        /// trailing path segments/fragments so a bare repository root is returned.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns>normalized url</returns>
+        private static string NormalizeProjectUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return string.Empty;
+            }
+
+            string normalized = url.Trim();
+            if (normalized.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = string.Concat("https://", normalized.AsSpan("http://".Length));
+            }
+            normalized = normalized.Replace("://www.", "://", StringComparison.OrdinalIgnoreCase);
+
+            int fragmentIndex = normalized.IndexOf('#');
+            if (fragmentIndex >= 0)
+            {
+                normalized = normalized.Substring(0, fragmentIndex);
+            }
+
+            foreach (string marker in new[] { "/tree/", "/blob/" })
+            {
+                int markerIndex = normalized.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+                if (markerIndex >= 0)
+                {
+                    normalized = normalized.Substring(0, markerIndex);
+                }
+            }
+
+            return normalized;
         }
 
         /// <summary>
