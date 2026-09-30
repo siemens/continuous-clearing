@@ -196,73 +196,35 @@ jobs:
       - name: Create Release
         id: create_release
         if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.SEMVER }}
-          release_name: Release v${{ env.SEMVER }}
-          body: |
-            ${{ github.event.head_commit.message }}
-          draft: ${{ env.IS_PRERELEASE == 'true' }}
-          prerelease: ${{ env.IS_PRERELEASE == 'true' }}
+        shell: pwsh
+        run: |
+          $tag = "v${{ env.SEMVER }}"
+          $notesFile = "${{ github.workspace }}/release_notes.txt"
+          Set-Content -Path $notesFile -Value "${{ github.event.head_commit.message }}"
+          $ghArgs = @($tag, "--title", "Release $tag", "--notes-file", $notesFile, "--repo", "${{ github.repository }}")
+          if ("${{ env.IS_PRERELEASE }}" -eq "true") {
+            $ghArgs += "--prerelease"
+          } else {
+            $ghArgs += "--draft"
+          }
+          gh release create @ghArgs
 
       - name: Compress Full Build Output into ZIP
         if: steps.check_tag.outputs.exists == 'false'
         run: |
           powershell -Command "& {Compress-Archive -Path ${{ github.workspace }}/out/* -DestinationPath ${{ github.workspace }}/continuous-clearing-v${{ env.SEMVER }}.zip}"
 
-      - name: Upload Full Build Output ZIP to Release
+      - name: Upload Release Assets
         if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/continuous-clearing-v${{ env.SEMVER }}.zip
-          asset_name: continuous-clearing-v${{ env.SEMVER }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Docker Image(tar) to Release
-        if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./continuous-clearing-v${{ env.SEMVER }}.tar
-          asset_name: continuous-clearing-v${{ env.SEMVER }}.tar
-          asset_content_type: application/x-tar
-
-      - name: Upload NuGet Package to Release
-        if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./continuous-clearing.${{ env.SEMVER }}.nupkg
-          asset_name: continuous-clearing.${{ env.SEMVER }}.nupkg
-          asset_content_type: application/octet-stream
-
-      - name: Upload ReadmeOSS_nupkg file to Release 
-        if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/ReadmeOSS_continuous-clearing_nupkg.html
-          asset_name: ReadmeOSS_continuous-clearing_nupkg.html
-          asset_content_type: text/html
-
-      - name: Upload ReadmeOSS_Docker file to Release
-        if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/ReadmeOSS_continuous-clearing_DockerImage.html
-          asset_name: ReadmeOSS_continuous-clearing_DockerImage.html
-          asset_content_type: text/html
+        run: |
+          gh release upload v${{ env.SEMVER }} `
+            "${{ github.workspace }}/continuous-clearing-v${{ env.SEMVER }}.zip" `
+            "./continuous-clearing-v${{ env.SEMVER }}.tar" `
+            "./continuous-clearing.${{ env.SEMVER }}.nupkg" `
+            "${{ github.workspace }}/ReadmeOSS_continuous-clearing_nupkg.html" `
+            "${{ github.workspace }}/ReadmeOSS_continuous-clearing_DockerImage.html" `
+            --repo "${{ github.repository }}"
