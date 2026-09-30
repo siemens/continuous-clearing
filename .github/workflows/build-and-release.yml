@@ -203,11 +203,9 @@ jobs:
           $tag = "v${{ env.SEMVER }}"
           $notesFile = "${{ github.workspace }}/release_notes.txt"
           Set-Content -Path $notesFile -Value "${{ github.event.head_commit.message }}"
-          $ghArgs = @($tag, "--title", "Release $tag", "--notes-file", $notesFile, "--repo", "${{ github.repository }}")
+          $ghArgs = @($tag, "--title", "Release $tag", "--notes-file", $notesFile, "--repo", "${{ github.repository }}", "--draft")
           if ("${{ env.IS_PRERELEASE }}" -eq "true") {
             $ghArgs += "--prerelease"
-          } else {
-            $ghArgs += "--draft"
           }
           gh release create @ghArgs
 
