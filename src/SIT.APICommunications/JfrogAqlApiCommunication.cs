@@ -9,6 +9,7 @@ using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
+using SIT.Common.Constants;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -234,7 +235,7 @@ namespace SIT.APICommunications
         /// <returns>An HttpResponseMessage containing the PyPI component data.</returns>
         public async Task<HttpResponseMessage> GetPypiComponentDataByRepo(string repoName)
         {
-            return await GetComponentDataByRepo(repoName, "\"repo\", \"path\", \"name\",\"@pypi.normalized.name\",\"@pypi.version\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
+            return await GetComponentDataByRepo(repoName, $"\"repo\", \"path\", \"name\",\"@{Dataconstant.PypiNormalizedNameKey}\",\"@{Dataconstant.PypiVersionKey}\", \"actual_sha1\",\"actual_md5\",\"sha256\"");
         }
 
         /// <summary>
@@ -308,7 +309,7 @@ namespace SIT.APICommunications
             }
             else if (component.ComponentType.Equals("Python", StringComparison.InvariantCultureIgnoreCase))
             {
-                return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ("@pypi.normalized.name", component.Name), ("@pypi.version", component.Version) });
+                return BuildAqlQueryWithFields(component.SrcRepoName, new[] { ($"@{Dataconstant.PypiNormalizedNameKey}", CommonHelper.NormalizePypiName(component.Name)), ($"@{Dataconstant.PypiVersionKey}", component.Version) });
             }
             else if (component.ComponentType.Equals("Nuget", StringComparison.InvariantCultureIgnoreCase) || component.ComponentType.Equals("Choco", StringComparison.InvariantCultureIgnoreCase))
             {

@@ -487,13 +487,13 @@ namespace SIT.Upload.UTest
             };
             AqlProperty pypiNameProperty = new AqlProperty
             {
-                Key = "pypi.normalized.name",
+                Key = Dataconstant.PypiNormalizedNameKey,
                 Value = "pypi component"
             };
 
             AqlProperty pypiVersionProperty = new AqlProperty
             {
-                Key = "pypi.version",
+                Key = Dataconstant.PypiVersionKey,
                 Value = "1.0.0"
             };
             List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };
@@ -905,8 +905,8 @@ namespace SIT.Upload.UTest
             {
                 Properties = new List<AqlProperty>
                 {
-                    new AqlProperty { Key = "pypi.normalized.name", Value = "example-package" },
-                    new AqlProperty { Key = "pypi.version", Value = "1.0.0" }
+                    new AqlProperty { Key = Dataconstant.PypiNormalizedNameKey, Value = "example-package" },
+                    new AqlProperty { Key = Dataconstant.PypiVersionKey, Value = "1.0.0" }
                 }
             }
         };

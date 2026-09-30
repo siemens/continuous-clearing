@@ -780,7 +780,7 @@ namespace SIT.Services
         private static string GetDecodedExternalId(string ReleaseExternalID)
         {
             string releaseID;
-            if (!string.IsNullOrEmpty(ReleaseExternalID) && ReleaseExternalID.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+            if (!string.IsNullOrEmpty(ReleaseExternalID) && ReleaseExternalID.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
             {
                 releaseID = WebUtility.UrlDecode(ReleaseExternalID);
             }

@@ -44,9 +44,6 @@ namespace SIT.Create
         List<Components> componentsAvailableInSw360 = new List<Components>();
         List<Components> DuplicateComponentsByPurlId = new List<Components>();
         private const string SOURCE = "SOURCE";
-        private const string AlpinePackageType = "ALPINE";
-        private const string DebianPackageType = "DEBIAN";
-        private const string NpmDownloaderKey = "NPM";
         private const string CratesDownloadSuffix = "download";
         private readonly IDictionary<string, IPackageDownloader> _packageDownloderList = packageDownloderList;
 
@@ -87,7 +84,7 @@ namespace SIT.Create
             Dictionary<string, string> AttachmentUrlList = new Dictionary<string, string>();
             string localPathforDownload = GetDownloadPathForComponetType(component);
             Logger.DebugFormat("DownloadReleaseAttachmentSource():local path for download release attachment:{0}", localPathforDownload);
-            if (!component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
+            if (!component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.MavenProjectType]))
             {
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -134,28 +131,28 @@ namespace SIT.Create
         private async Task<string> GetAttachmentUrlList(ComparisonBomData component, Dictionary<string, string> AttachmentUrlList, string localPathforDownload)
         {
             string downloadPath = string.Empty;
-            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
+            if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
                 {
-                    downloadPath = await _packageDownloderList[DebianPackageType].DownloadPackage(component, localPathforDownload);
+                    downloadPath = await _packageDownloderList[Dataconstant.DebianProjectType].DownloadPackage(component, localPathforDownload);
                 }
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.PoetryProjectType]))
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
                 downloadPath = ConvertZipToTarGzIfNeeded(downloadPath);
 
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.ConanProjectType]))
             {
                 downloadPath = await GetAttachmentUrlList(component, localPathforDownload);
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.CargoProjectType]))
             {
                 downloadPath = await DownloadCargoSource(component, localPathforDownload);
             }
-            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]))
+            else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]))
             {
                 if (!string.IsNullOrEmpty(component.SourceUrl))
                 {
@@ -220,7 +217,7 @@ namespace SIT.Create
 
             component.SourceUrl = repositoryUrl;
             component.DownloadUrl = repositoryUrl;
-            return await _packageDownloderList[NpmDownloaderKey].DownloadPackage(component, localPathforDownload);
+            return await _packageDownloderList[Dataconstant.NpmProjectType].DownloadPackage(component, localPathforDownload);
         }
 
         private static async Task<string> TryDownloadFromCratesIo(ComparisonBomData component, string localPathforDownload, string repositoryUrl, string cratesDownloadUrl)
@@ -417,11 +414,11 @@ namespace SIT.Create
                     AlpineSource = item.AlpineSourceData
                 };
 
-                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
+                if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
                 {
                     SetDebianUrls(item, releasesInfo, mapper);
                 }
-                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["MAVEN"]))
+                else if (!string.IsNullOrEmpty(item.ReleaseExternalId) && item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.MavenProjectType]))
                 {
                     mapper.DownloadUrl = GetMavenDownloadUrl(mapper, item, releasesInfo);
                 }
@@ -464,10 +461,10 @@ namespace SIT.Create
         /// <returns>boolean value</returns>
         private static bool IsOtherPackageType(Components item)
         {
-            return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["POETRY"]) ||
-                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CONAN"]) ||
-                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]) ||
-                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()["CARGO"]);
+            return item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.PoetryProjectType]) ||
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.ConanProjectType]) ||
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]) ||
+                   item.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.CargoProjectType]);
         }
 
         /// <summary>
@@ -557,7 +554,7 @@ namespace SIT.Create
         /// <returns>component data</returns>
         private static Component FindMatchingComponent(Bom bom, ComparisonBomData comBom)
         {
-            if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()["MAVEN"])))
+            if (!bom.Components.Exists(x => x.BomRef.Contains(Dataconstant.PurlCheck()[Dataconstant.MavenProjectType])))
             {
                 return bom.Components.Find(com =>
                     string.IsNullOrEmpty(com.Group)
@@ -609,11 +606,11 @@ namespace SIT.Create
             string localPathforDownload = string.Empty;
             try
             {
-                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[DebianPackageType]))
+                if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }
-                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[AlpinePackageType]))
+                else if (component.ReleaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]))
                 {
                     localPathforDownload = $"{Directory.GetParent(Directory.GetCurrentDirectory())}/ClearingTool/DownloadedFiles/";
                 }

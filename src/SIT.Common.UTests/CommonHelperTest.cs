@@ -2098,7 +2098,225 @@ namespace SIT.Common.UTest
             Assert.That(bom.Components.Count, Is.EqualTo(1));
             Assert.That(configFiles, Does.Not.Contain(dep), "Dependency file should be removed from the list");
         }
+
+        [Test]
+        public void GeneratePypiPurl_WronglyCasedName_ReturnsLowercasedPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.PoetryProjectType, "Pygments", "2.18.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/pygments@2.18.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_UnderscoreInName_ReturnsHyphenatedPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.PoetryProjectType, "typing_extensions", "4.12.2");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/typing-extensions@4.12.2"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_AlreadyValidName_ReturnsUnchanged()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.PoetryProjectType, "requests", "2.31.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/requests@2.31.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_MixedCaseName_ReturnsLowercasedPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.PoetryProjectType, "Flask", "3.0.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/flask@3.0.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_LowerCaseProjectType_ReturnsPypiPurl()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType("poetry", "Flask", "3.0.0");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/flask@3.0.0"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_VersionWithColon_PreservesColon()
+        {
+            // Act
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.PoetryProjectType, "somepackage", "1:2.3.4");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/somepackage@1:2.3.4"));
+        }
+
+        [Test]
+        public void GeneratePypiPurl_NameAndVersion_NormalizesName()
+        {
+            // Act - manually-added component path (name/version only)
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.PoetryProjectType, "MarkupSafe", "3.0.3");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:pypi/markupsafe@3.0.3"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Nuget_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.NugetProjectType, "Newtonsoft.Json", "13.0.3");
+
+            Assert.That(result, Is.EqualTo("pkg:nuget/Newtonsoft.Json@13.0.3"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Conan_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, "zlib", "1.3.1");
+
+            Assert.That(result, Is.EqualTo("pkg:conan/zlib@1.3.1"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Cargo_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.CargoProjectType, "adler", "1.0.2");
+
+            Assert.That(result, Is.EqualTo("pkg:cargo/adler@1.0.2"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Debian_WithArchQualifier_ReturnsNamespacedPurl()
+        {
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.DebianProjectType, "adduser", "3.118", qualifiers);
+
+            Assert.That(result, Is.EqualTo("pkg:deb/debian/adduser@3.118?arch=source"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Alpine_WithArchQualifier_ReturnsNamespacedPurl()
+        {
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.AlpineProjectType, "apk-tools", "2.12.9-r3", qualifiers);
+
+            Assert.That(result, Is.EqualTo("pkg:apk/alpine/apk-tools@2.12.9-r3?arch=source"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_NpmScoped_UsesNamespaceOverride()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.NpmProjectType, "animations", "12.3.1", namespaceOverride: "@angular");
+
+            Assert.That(result, Is.EqualTo("pkg:npm/%40angular/animations@12.3.1"));
+        }
+
+        [Test]
+        public void GeneratePurl_WithQualifiers_ReturnsCanonicalPurl()
+        {
+            var qualifiers = new SortedDictionary<string, string> { { "arch", "source" } };
+
+            string result = CommonHelper.BuildPurl("deb", "debian", "dash", "0.5.10.2-5", qualifiers);
+
+            Assert.That(result, Is.EqualTo("pkg:deb/debian/dash@0.5.10.2-5?arch=source"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Maven_WithGroupNamespace_ReturnsCanonicalPurl()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.MavenProjectType, "commons-lang3", "3.12.0", namespaceOverride: "org.apache.commons");
+
+            Assert.That(result, Is.EqualTo("pkg:maven/org.apache.commons/commons-lang3@3.12.0"));
+        }
+
+        [Test]
+        public void GeneratePurlForProjectType_Maven_HasNoTypeJarSuffix()
+        {
+            string result = CommonHelper.GeneratePurlForProjectType(Dataconstant.MavenProjectType, "commons-lang3", "3.12.0", namespaceOverride: "org.apache.commons");
+
+            Assert.That(result, Does.Not.Contain("type=jar"));
+        }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_WhenDependenciesNull_ReturnsNull()
+        {
+            var components = new List<Component> { new Component { BomRef = "ref-1" } };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(components, null);
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_WhenComponentsNull_RemovesAllDependencies()
+        {
+            var dependencies = new List<Dependency> { new Dependency { Ref = "ref-1" } };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(null, dependencies);
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_RemovesUnmatchedRefsAndNestedRefs()
+        {
+            var components = new List<Component>
+            {
+                new Component { BomRef = "ref-1" },
+                new Component { BomRef = "ref-2" }
+            };
+            var dependencies = new List<Dependency>
+            {
+                new Dependency
+                {
+                    Ref = "ref-1",
+                    Dependencies = new List<Dependency>
+                    {
+                        new Dependency { Ref = "ref-2" },
+                        new Dependency { Ref = "ref-missing" }
+                    }
+                },
+                new Dependency { Ref = "ref-orphan" }
+            };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(components, dependencies);
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result[0].Ref, Is.EqualTo("ref-1"));
+            Assert.That(result[0].Dependencies.Count, Is.EqualTo(1));
+            Assert.That(result[0].Dependencies[0].Ref, Is.EqualTo("ref-2"));
+        }
+
+        [Test]
+        public void RemoveInvalidDependenciesAndReferences_IgnoresComponentsWithNullBomRef()
+        {
+            var components = new List<Component>
+            {
+                new Component { BomRef = null },
+                new Component { BomRef = "ref-1" }
+            };
+            var dependencies = new List<Dependency>
+            {
+                new Dependency { Ref = "ref-1" }
+            };
+
+            var result = CommonHelper.RemoveInvalidDependenciesAndReferences(components, dependencies);
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result[0].Ref, Is.EqualTo("ref-1"));
+        }
     }
+
 
     public class TestObject
     {

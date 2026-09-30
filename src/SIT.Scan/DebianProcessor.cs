@@ -413,7 +413,7 @@ namespace SIT.Scan
 
             foreach (var componentsInfo in bom.Components)
             {
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;               
                 DebianPackage package = new DebianPackage
                 {
                     Name = componentsInfo.Name,
@@ -423,7 +423,7 @@ namespace SIT.Scan
                 };
                 SetSpdxComponentDetails(filePath, package, componentsInfo);
 
-                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()["DEBIAN"]))
+                if (!string.IsNullOrEmpty(componentsInfo.Name) && !string.IsNullOrEmpty(componentsInfo.Version) && !string.IsNullOrEmpty(componentsInfo.Purl) && componentsInfo.Purl.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
                 {
                     BomCreator.bomKpiData.DebianComponents++;
                     debianPackages.Add(package);
@@ -434,6 +434,7 @@ namespace SIT.Scan
                     Logger.DebugFormat("ExtractDetailsForJson():InvalidComponent for Debian : Component Details : {0} @ {1} @ {2}", package.Name, package.Version, package.PurlID);
                 }
             }
+
             ListUnsupportedComponentsForBom.Components.AddRange(listUnsupportedComponents.Components);
             ListUnsupportedComponentsForBom.Dependencies.AddRange(listUnsupportedComponents.Dependencies);
             return bom;
@@ -460,7 +461,8 @@ namespace SIT.Scan
         /// <returns>release id</returns>
         private static string GetReleaseExternalId(string name, string version)
         {
-            return BomHelper.GetReleaseExternalId(name, version, Dataconstant.PurlCheck()["DEBIAN"]);
+            var qualifiers = new SortedDictionary<string, string> { { Dataconstant.PurlArchQualifierKey, Dataconstant.PurlSourceQualifierValue } };
+            return CommonHelper.GeneratePurlForProjectType(Dataconstant.DebianProjectType, name, version, qualifiers);
         }
 
         /// <summary>
