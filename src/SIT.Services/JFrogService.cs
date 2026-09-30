@@ -53,6 +53,12 @@ namespace SIT.Services
                 string stringData = httpResponseMessage.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
                 var aqlResponse = JsonConvert.DeserializeObject<AqlResponse>(stringData);
                 aqlResult = aqlResponse?.Results ?? new List<AqlResult>();
+
+                // Server truncated results at aql.search.query.max.limit; narrow the query or paginate to retrieve the rest.
+                if (!string.IsNullOrEmpty(aqlResponse?.Range?.Notification))
+                {
+                    LogHandlingHelper.Logger.DebugFormat("AQL query for repo '{0}' hit the server's result limit: {1}", repoName, aqlResponse.Range.Notification);
+                }
             }
             catch (HttpRequestException httpException)
             {

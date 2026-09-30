@@ -1328,6 +1328,41 @@ namespace SIT.Scan.UTest
         }
 
         [Test]
+        public void HandleConfigFile_WhenCycloneDXInput_RegeneratesPurlAndKeepsBomRef()
+        {
+            // Arrange
+            var filepath = "test.cdx.json";
+            var appSettings = new CommonAppSettings { ProjectType = "NUGET" };
+            var listComponentForBOM = new List<Component>();
+            var bom = new Bom { Dependencies = new List<Dependency>() };
+            var listOfTemplateBomfilePaths = new List<string>();
+            List<Component> ListofComponentsFromLockFile = new List<Component>();
+            List<Dependency> ListofDependenciesFromLockFile = new List<Dependency>();
+            var mockCycloneDXBomParser = new Mock<ICycloneDXBomParser>();
+            var testBom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "TestComponent", Version = "1.0.0", Purl = "pkg:nuget/TestComponent", BomRef = "original-bom-ref" }
+                },
+                Dependencies = new List<Dependency>()
+            };
+            mockCycloneDXBomParser.Setup(x => x.ParseCycloneDXBom(filepath)).Returns(testBom);
+
+            var nugetProcessor = new NugetProcessor(mockCycloneDXBomParser.Object, _frameworkPackages.Object, _compositionBuilder.Object, _spdxBomParser, _runtimeIdentifier.Object);
+
+            // Act
+            nugetProcessor.GetType()
+                .GetMethod("HandleConfigFile", BindingFlags.NonPublic | BindingFlags.Instance)
+                .Invoke(nugetProcessor, new object[] { filepath, appSettings, listComponentForBOM, bom, listOfTemplateBomfilePaths, ListofComponentsFromLockFile, ListofDependenciesFromLockFile });
+
+            // Assert
+            var expectedPurl = CommonHelper.GeneratePurlForProjectType("NUGET", "TestComponent", "1.0.0");
+            Assert.AreEqual(expectedPurl, testBom.Components[0].Purl);
+            Assert.AreEqual("original-bom-ref", testBom.Components[0].BomRef);
+        }
+
+        [Test]
         public void HandleConfigFile_WhenSPDXHasNullComponents_DoesNotThrowException()
         {
             // Arrange
