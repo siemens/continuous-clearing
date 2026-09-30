@@ -37,7 +37,7 @@ namespace SIT.Scan
         public CompositionBuilder(ComponentConfig config = null)
         {
             _config = config ?? new ComponentConfig();
-            _basePurl = Dataconstant.PurlCheck()["NUGET"];
+            _basePurl = Dataconstant.PurlCheck()[Dataconstant.NugetProjectType];
         }
         #endregion
 

@@ -290,7 +290,7 @@ namespace SIT.Create
         public static string GetReleaseExternalIdForAlpine(string name, string version)
         {
 
-            return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace SIT.Create
         /// <returns>A string containing the external identifier URL for the specified Alpine Linux package.</returns>
         private static string GetComponentExternalIdForAlpine(string name)
         {
-            return $"{Dataconstant.PurlCheck()["ALPINE"]}{Dataconstant.ForwardSlash}{name}?arch=source";
+            return $"{Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]}{Dataconstant.ForwardSlash}{name}?arch=source";
         }
 
         /// <summary>
@@ -752,7 +752,7 @@ namespace SIT.Create
             version = WebUtility.UrlEncode(version);
             version = version.Replace("%3A", ":");
 
-            return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
+            return $"{Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]}{Dataconstant.ForwardSlash}{name}@{version}?arch=source";
         }
 
         /// <summary>
@@ -762,7 +762,7 @@ namespace SIT.Create
         /// <returns>external id</returns>
         private static string GetComponentExternalId(string name)
         {
-            return $"{Dataconstant.PurlCheck()["DEBIAN"]}{Dataconstant.ForwardSlash}{name}?arch=source";
+            return $"{Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]}{Dataconstant.ForwardSlash}{name}?arch=source";
         }
 
         /// <summary>

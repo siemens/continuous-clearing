@@ -1,11 +1,12 @@
 ﻿using SIT.APICommunications.Model;
+using System.Net;
+using System.Text;
 
 namespace SIT.APICommunications.UTest
 {
     [TestFixture]
     public class JfrogAqlApiCommunicationUTest
     {
-
 
         [Test]
         public void JfrogAqlApiCommunication_CheckConnection_ReturnsInvalidOperationException()
@@ -235,6 +236,119 @@ namespace SIT.APICommunications.UTest
 
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await jfrogApiCommunication.GetCargoComponentDataByRepo(invalidRepoName));
+        }
+
+        [Test]
+        public async Task JfrogAqlApiCommunication_GetInternalComponentDataByRepo_MergesAllPagesWhenFirstPageIsFull()
+        {
+            // Arrange: pagination continues only when a page returns exactly AqlPageSize items ("full"). A full first
+            // page triggers one whole batch of AqlMaxConcurrency follow-up requests; only the last page in that batch
+            // needs to be short to stop pagination after it.
+            int port = GetFreeTcpPort();
+            string prefix = $"http://127.0.0.1:{port}/";
+
+            using HttpListener listener = new HttpListener();
+            listener.Prefixes.Add(prefix);
+            listener.Start();
+
+            string fullPageJson = BuildResultsJson(ApiConstant.AqlPageSize, "full-page-item");
+            string shortPageJson = BuildResultsJson(1, "n2");
+            int totalRequests = 1 + ApiConstant.AqlMaxConcurrency;
+
+            Task serverTask = Task.Run(async () =>
+            {
+                for (int i = 0; i < totalRequests; i++)
+                {
+                    HttpListenerContext context = await listener.GetContextAsync();
+                    using StreamReader reader = new StreamReader(context.Request.InputStream);
+                    string requestBody = await reader.ReadToEndAsync();
+                    bool isFirstPage = requestBody.Contains(".offset(0)");
+                    string json = isFirstPage ? fullPageJson : shortPageJson;
+                    byte[] buffer = Encoding.UTF8.GetBytes(json);
+                    context.Response.ContentType = "application/json";
+                    context.Response.ContentLength64 = buffer.Length;
+                    await context.Response.OutputStream.WriteAsync(buffer);
+                    context.Response.OutputStream.Close();
+                }
+            });
+
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials { Token = "test-token" };
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(prefix.TrimEnd('/'), repoCredentials, 30);
+
+            // Act
+            HttpResponseMessage response = await jfrogApiCommunication.GetInternalComponentDataByRepo("test-repo");
+            await serverTask;
+            listener.Stop();
+
+            // Assert
+            string content = await response.Content.ReadAsStringAsync();
+            Assert.That(response.IsSuccessStatusCode, Is.True);
+            Assert.That(content, Does.Contain("full-page-item"));
+            Assert.That(content, Does.Contain("n2"));
+        }
+
+        [Test]
+        public async Task JfrogAqlApiCommunication_GetInternalComponentDataByRepo_StopsAfterShortFirstPage()
+        {
+            // Arrange: a first page with fewer than AqlPageSize items means no more pages exist, so only one request
+            // should ever be made.
+            int port = GetFreeTcpPort();
+            string prefix = $"http://127.0.0.1:{port}/";
+
+            using HttpListener listener = new HttpListener();
+            listener.Prefixes.Add(prefix);
+            listener.Start();
+
+            string shortPageJson = BuildResultsJson(1, "only-item");
+            int requestCount = 0;
+
+            Task serverTask = Task.Run(async () =>
+            {
+                HttpListenerContext context = await listener.GetContextAsync();
+                Interlocked.Increment(ref requestCount);
+                byte[] buffer = Encoding.UTF8.GetBytes(shortPageJson);
+                context.Response.ContentType = "application/json";
+                context.Response.ContentLength64 = buffer.Length;
+                await context.Response.OutputStream.WriteAsync(buffer);
+                context.Response.OutputStream.Close();
+            });
+
+            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials { Token = "test-token" };
+            JfrogAqlApiCommunication jfrogApiCommunication = new JfrogAqlApiCommunication(prefix.TrimEnd('/'), repoCredentials, 30);
+
+            // Act
+            HttpResponseMessage response = await jfrogApiCommunication.GetInternalComponentDataByRepo("test-repo");
+            await serverTask;
+            listener.Stop();
+
+            // Assert
+            Assert.That(response.IsSuccessStatusCode, Is.True);
+            Assert.That(requestCount, Is.EqualTo(1));
+        }
+
+        private static string BuildResultsJson(int itemCount, string namePrefix)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append("{\"results\":[");
+            for (int i = 0; i < itemCount; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(',');
+                }
+                builder.Append($"{{\"repo\":\"test-repo\",\"path\":\"p{i}\",\"name\":\"{namePrefix}\"}}");
+            }
+            builder.Append("]}");
+            return builder.ToString();
+        }
+
+        private static int GetFreeTcpPort()
+        {
+            System.Net.Sockets.TcpListener tcpListener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
+            tcpListener.Start();
+            int port = ((IPEndPoint)tcpListener.LocalEndpoint).Port;
+            tcpListener.Stop();
+            return port;
         }
     }
 }

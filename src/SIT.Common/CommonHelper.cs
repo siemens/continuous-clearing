@@ -15,10 +15,12 @@ using SIT.Common.Constants;
 using SIT.Common.Model;
 using SW360KeycloakService;
 using SW360KeycloakService.Model;
+using PackageUrl;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -53,7 +55,6 @@ namespace SIT.Common
         /// Gets or sets the project summary link.
         /// </summary>
         public static string ProjectSummaryLink { get; set; }
-
         /// <summary>
         /// Gets or sets the default log path.
         /// </summary>
@@ -62,6 +63,23 @@ namespace SIT.Common
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Normalizes a PyPI project name per PEP 503: lower-cased with any runs of
+        /// '.', '_' or '-' collapsed into a single '-'. This ensures names like
+        /// "pyasn1_modules" and "pyasn1-modules" are treated as equal.
+        /// </summary>
+        /// <param name="name">The raw PyPI project name.</param>
+        /// <returns>The normalized name, or the original value when null/empty.</returns>
+        public static string NormalizePypiName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return name;
+            }
+
+            return Regex.Replace(name, "[-_.]+", "-").ToLowerInvariant();
+        }
 
         /// <summary>
         /// Parses JSON safely, treating an empty/whitespace body or malformed content as "no object" rather than
@@ -219,13 +237,21 @@ namespace SIT.Common
         /// <returns>The cleaned list of dependencies.</returns>
         public static List<Dependency> RemoveInvalidDependenciesAndReferences(List<Component> components, List<Dependency> dependencies)
         {
-            var componentBomRefs = new HashSet<string>(components.Select(c => c.BomRef));
+            if (dependencies == null || dependencies.Count == 0)
+            {
+                return dependencies;
+            }
 
-            dependencies.RemoveAll(dep => !componentBomRefs.Contains(dep.Ref));
+            var componentBomRefs = new HashSet<string>(
+                (components ?? new List<Component>())
+                    .Select(c => c.BomRef)
+                    .Where(bomRef => !string.IsNullOrEmpty(bomRef)));
+
+            dependencies.RemoveAll(dep => dep == null || !componentBomRefs.Contains(dep.Ref));
 
             foreach (var dep in dependencies)
             {
-                dep.Dependencies?.RemoveAll(refItem => !componentBomRefs.Contains(refItem.Ref));
+                dep.Dependencies?.RemoveAll(refItem => refItem == null || !componentBomRefs.Contains(refItem.Ref));
             }
 
             return dependencies;
@@ -259,7 +285,7 @@ namespace SIT.Common
         {
             if (suffixToRemove != null && input.EndsWith(suffixToRemove, comparisonType))
             {
-                return input.Substring(0, input.Length - suffixToRemove.Length);
+                return input[..^suffixToRemove.Length];
             }
 
             return input;
@@ -904,8 +930,47 @@ namespace SIT.Common
         }
 
         /// <summary>
-        /// Canonicalizes the project type string to standardized format.
+        /// Generates a spec-compliant package-url (purl) using the packageurl-dotnet library.
+        /// The library canonicalizes the output per the package-url spec (e.g. ecosystem-specific
+        /// name normalization and qualifier encoding/sorting).
         /// </summary>
+        /// <param name="type">The purl type (e.g. "npm", "nuget", "deb", "apk", "pypi").</param>
+        /// <param name="namespace">The purl namespace (e.g. "debian", "alpine", npm scope); may be null.</param>
+        /// <param name="name">The component name.</param>
+        /// <param name="version">The component version.</param>
+        /// <param name="qualifiers">Optional purl qualifiers (e.g. arch=source); may be null.</param>
+        /// <returns>A generated, spec-compliant purl string.</returns>
+        public static string BuildPurl(string type, string @namespace, string name, string version, SortedDictionary<string, string> qualifiers = null)
+        {
+            PackageURL purl = new PackageURL(type, @namespace, name, version, qualifiers, null);
+            return purl.ToString();        }
+
+        /// <summary>
+        /// Generates a spec-compliant package-url (purl) for a given project type key
+        /// (as defined in <see cref="Dataconstant.PurlCheck"/>) using the packageurl-dotnet library.
+        /// The prefix is split into the purl type and namespace (e.g. "pkg:deb/debian" =&gt; type "deb",
+        /// namespace "debian"). An optional npm-style scope can be supplied to override the namespace.
+        /// </summary>
+        /// <param name="projectTypeKey">The project type key (e.g. "NPM", "NUGET", "DEBIAN", "ALPINE").</param>
+        /// <param name="name">The component name.</param>
+        /// <param name="version">The component version.</param>
+        /// <param name="qualifiers">Optional purl qualifiers (e.g. arch=source); may be null.</param>
+        /// <param name="namespaceOverride">Optional namespace/scope to use instead of the prefix-derived namespace.</param>
+        /// <returns>A generated, spec-compliant purl string.</returns>
+        public static string GeneratePurlForProjectType(string projectTypeKey, string name, string version, SortedDictionary<string, string> qualifiers = null, string namespaceOverride = null)
+        {
+            string key = projectTypeKey?.Trim().ToUpperInvariant();
+            string prefix = Dataconstant.PurlCheck()[key];
+
+            // The prefix is of the form "pkg:<type>[/<namespace>]"; strip the scheme then split.
+            string typeAndNamespace = prefix[(prefix.IndexOf(':') + 1)..];
+            string[] segments = typeAndNamespace.Split('/', 2);
+            string type = segments[0];
+            string @namespace = namespaceOverride ?? (segments.Length > 1 ? segments[1] : null);
+
+            return BuildPurl(type, @namespace, name, version, qualifiers);
+        }
+
         /// <param name="projectType">The project type to canonicalize.</param>
         /// <returns>The canonicalized project type string.</returns>
         public static string CanonicalizeProjectType(string projectType)

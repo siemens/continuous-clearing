@@ -62,7 +62,7 @@ namespace SIT.Scan
             ParsingInputFileForBOM(appSettings, ref bom);
             componentsForBOM = bom.Components;
 
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["CARGO"], appSettings?.ProjectType);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()[Dataconstant.CargoProjectType], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
 
             bom.Components = componentsForBOM;
@@ -406,6 +406,13 @@ namespace SIT.Scan
             Logger.DebugFormat("ParsingInputFileForBOM():CycloneDX file detected: {0}", filepath);
             bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
             CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+            foreach (var component in bom.Components ?? Enumerable.Empty<Component>())
+            {
+                if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
+                {
+                    component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.CargoProjectType, component.Name, component.Version);
+                }
+            }
             BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
             LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
             if (bom.Components != null)
@@ -553,7 +560,7 @@ namespace SIT.Scan
 
                 string name = pkg.Name;
                 string version = pkg.Version;
-                string purl = Dataconstant.PurlCheck()["CARGO"] + "/" + name + "@" + version;
+                string purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.CargoProjectType, name, version);
                 string id = pkg.Id;
 
                 var component = CommonHelper.CreateComponentWithProperties(name, version, purl);
