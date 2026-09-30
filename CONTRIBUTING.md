@@ -1,4 +1,4 @@
-# Contributing
+﻿# Contributing
 
 When contributing to this repository, first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. Make sure a pull request is made after every changes before merging to master.
 
@@ -39,3 +39,94 @@ The simplest way to run tests:
 
 
 
+
+## Release Process
+
+Releases are automated via the `Build & Release` GitHub Actions workflow
+(`.github/workflows/build-and-release.yml`). Version numbers are computed
+automatically by **GitVersion** based on branch/tag naming, using the rules
+defined in [`GitVersion.yml`](GitVersion.yml).
+
+### Versioning rules (GitVersion.yml)
+
+| Branch / Tag pattern         | GitVersion tag | Example version   | Release type       |
+|-------------------------------|----------------|--------------------|----------------------|
+| `main` / `master`             | (none)         | `2.5.0`            | Stable               |
+| `beta/*` or `beta-*`          | `beta`         | `2.5.0-beta.1`     | Pre-release (beta)   |
+| `release/*` or `release-*`    | `rc`           | `2.5.0-rc.1`       | Pre-release (RC)     |
+
+### Bumping the version manually
+
+GitVersion (`mode: Mainline`) auto-increments the version based on commit
+history since the last version tag. If you need to force a specific bump
+(major/minor/patch) for an actual release, use one of the following:
+
+1. **Commit message bump (recommended)** - Add a `+semver:` tag anywhere in
+   your commit message and GitVersion will apply it when computing the next
+   version:
+   ```
+   git commit -m "Add new feature +semver: minor"
+   ```
+   Supported keywords: `+semver: major` / `+semver: breaking`,
+   `+semver: minor` / `+semver: feature`, `+semver: patch` / `+semver: fix`,
+   `+semver: none` / `+semver: skip` (no bump).
+
+2. **`next-version` in `GitVersion.yml`** - Set a floor version so all
+   subsequent builds compute from at least that version:
+   ```yaml
+   next-version: 3.0.0
+   ```
+   Useful for a deliberate, one-time major/minor bump; revert or update
+   this value after the release if no longer needed.
+
+3. **Base tag on `master`** - Push a tag (e.g. `v3.0.0`) on `master` to set
+   a new baseline that GitVersion will increment from for subsequent builds.
+
+### How releases are triggered
+
+The workflow runs on:
+- Push to `main` (stable release)
+- Push to `beta/**` or `release/**` branches (pre-release)
+- Manual `workflow_dispatch` with an optional `ref` input (branch or tag),
+  allowing a maintainer to trigger a build/release from any approved ref
+  without depending on Power Branch details - useful for hotfixes.
+
+> Note: Pushing a git tag does **not** trigger this workflow. Tags are only
+> created as a result of the `release` job (via `actions/create-release`)
+> once a release is published.
+
+> **Important:** Only create and push a `release/*` or `beta/*` branch when
+> you actually intend to cut a pre-release. Because pushing these branches
+> immediately triggers a tag and pre-release, avoid using these prefixes
+> for regular feature/work-in-progress branches - use them exclusively for
+> preparing a beta or RC pre-release.
+
+### Pre-release vs. stable behavior
+
+- If GitVersion's `preReleaseTag` output is non-empty (beta/rc), the release
+  is created with both `draft: true` and `prerelease: true` in GitHub -
+  clearly marked as a pre-release and does **not** replace the
+  "Latest release" pointer, and still requires manual publishing from the
+  **Releases** page.
+- Stable releases (no pre-release tag) are created with `draft: false` and
+  `prerelease: false`, so they are published immediately as the
+  "Latest release".
+- Before creating a release, the workflow checks whether the computed tag
+  (`vX.Y.Z`) already exists and skips release creation if so, to avoid
+  duplicate/escalating releases.
+
+### Creating a hotfix release
+
+1. Use **Actions -> Build & Release -> Run workflow** and supply the approved
+   branch or tag name in the `ref` input.
+
+No dependency on Power Branch details is required.
+
+### Contributor checklist for release-related changes
+
+If your change affects branch naming, versioning, or the release workflow:
+- Update [`GitVersion.yml`](GitVersion.yml) and this section together.
+- Update `.github/workflows/build-and-release.yml` and document any new
+  triggers, jobs, or release-type behavior here.
+- Verify the change with a test run (PR or manual `workflow_dispatch`)
+  before merging to `main`.
