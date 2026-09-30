@@ -524,8 +524,7 @@ namespace SIT.Create
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
 
-            // Build the "npm view name& version repository.url" call by passing every token
-            // through ArgumentList instead of concatenating it into a shell command string. 
+            // Build the "npm view name& version repository.url" call by passing every token through ArgumentList instead of concatenating it into a shell command string. 
             string packageSpec = $"{componentName}@{version}";
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
