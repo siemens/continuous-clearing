@@ -84,7 +84,9 @@ namespace SIT.Common
                 {
                     if ((await awaitingTask.ConfigureAwait(false)) != processCompletionTask)
                     {
-                        process.Kill();
+                        process.Kill(true);
+                        // Ensure the process has fully exited before reading its exit code
+                        await process.WaitForExitAsync().ConfigureAwait(false);
                     }
                     result.ExitCode = process.ExitCode;
                 }
@@ -92,6 +94,12 @@ namespace SIT.Common
                 {
                     LogHandlingHelper.ExceptionErrorHandling("AggregateException", "RunAsync()", ex, "");
                     Logger.ErrorFormat("Exception in RunAsync method(). {0}", ex.Message);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    LogHandlingHelper.ExceptionErrorHandling("InvalidOperationException", "RunAsync()", ex, "");
+                    Logger.ErrorFormat("Exception in RunAsync method(). {0}", ex.Message);
+                    
                 }
 
                 // Read stdout/stderr

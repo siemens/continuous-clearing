@@ -5,29 +5,30 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-namespace SIT.APICommunications.Model.AQL
+namespace SIT.APICommunications.Model
 {
     /// <summary>
-    /// The AqlResponse model class
+    /// Pagination metadata ("page") returned by SW360 list endpoints.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    public class AqlResponse
+    public class PageInfo
     {
         #region Properties
 
         /// <summary>
-        /// Gets or sets the list of AQL query results.
+        /// Gets or sets the total number of pages available for the request.
         /// </summary>
-        [JsonProperty("results")]
-        public IList<AqlResult> Results { get; set; }
+        [JsonProperty("totalPages")]
+        public int TotalPages { get; set; }
 
         /// <summary>
-        /// Gets or sets the range metadata, including a notification when the server's hard result limit is reached.
+        /// Captures any additional page fields (e.g. size, totalElements, number) so they round-trip unchanged.
         /// </summary>
-        [JsonProperty("range")]
-        public AqlRange Range { get; set; }
+        [JsonExtensionData]
+        public IDictionary<string, JToken> ExtensionData { get; set; }
 
         #endregion Properties
     }

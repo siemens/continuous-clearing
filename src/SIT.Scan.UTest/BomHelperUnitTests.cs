@@ -384,13 +384,13 @@ namespace SIT.Scan.UTest
             };
             AqlProperty pypiNameProperty = new AqlProperty
             {
-                Key = "pypi.normalized.name",
+                Key = Dataconstant.PypiNormalizedNameKey,
                 Value = "Test"
             };
 
             AqlProperty pypiVersionProperty = new AqlProperty
             {
-                Key = "pypi.version",
+                Key = Dataconstant.PypiVersionKey,
                 Value = "1"
             };
             List<AqlProperty> propertys = new List<AqlProperty> { pypiNameProperty, pypiVersionProperty };

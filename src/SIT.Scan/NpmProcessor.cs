@@ -72,7 +72,7 @@ namespace SIT.Scan
             ParsingInputFileForBOM(appSettings, ref componentsForBOM, ref bom, ref dependencies, ref ListofComponentsFromLockFile, ref ListofDependenciesFromLockFile);
             totalComponentsIdentified = componentsForBOM.Count;
             totalUnsupportedComponentsIdentified = ListUnsupportedComponentsForBom.Components.Count;
-            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()["NPM"], appSettings?.ProjectType);
+            componentsForBOM = BomHelper.GetExcludedComponentsList(componentsForBOM, Dataconstant.PurlCheck()[Dataconstant.NpmProjectType], appSettings?.ProjectType);
             componentsForBOM = componentsForBOM.Distinct(new ComponentEqualityComparer()).ToList();
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();
             BomCreator.bomKpiData.DuplicateComponents = totalComponentsIdentified - componentsForBOM.Count;
@@ -282,7 +282,6 @@ namespace SIT.Scan
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
                 string packageName = GetPackageName(properties, prop);
                 string bomrefName = packageName;
-                string componentName = packageName.StartsWith('@') ? packageName.Replace("@", "%40") : packageName;
 
                 SetComponentGroupAndName(components, packageName);
 
@@ -290,7 +289,7 @@ namespace SIT.Scan
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
                 components.Manufacturer.BomRef = BuildResolvedDependencies(prop.Value[Dependencies], componentList, prop.Name);
-                components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.Purl = GenerateNpmPurl(packageName, components.Version);
                 components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
 
                 CheckAndAddToBundleComponents(bundledComponents, prop, components);
@@ -464,7 +463,6 @@ namespace SIT.Scan
 
                 GetBundledComponents(prop.Value[Dependencies], ref bundledComponents);
                 string bomrefName = prop.Name;
-                string componentName = prop.Name.StartsWith('@') ? prop.Name.Replace("@", "%40") : prop.Name;
                 string folderPath = CommonHelper.TrimEndOfString(filepath, $"\\{FileConstant.PackageLockFileName}");
 
                 if (prop.Name.Contains('@'))
@@ -481,7 +479,7 @@ namespace SIT.Scan
                 components.Description = folderPath;
                 components.Version = Convert.ToString(properties[Version]);
                 components.Manufacturer.BomRef = prop.Value[Requires]?.ToString();
-                components.Purl = $"{ApiConstant.NPMExternalID}{componentName}@{components.Version}";
+                components.Purl = GenerateNpmPurl(prop.Name, components.Version);
                 components.BomRef = $"{ApiConstant.NPMExternalID}{bomrefName}@{components.Version}";
                 components.Type = Component.Classification.Library;
                 string isDirect = GetIsDirect(directDependenciesList, prop);
@@ -689,6 +687,13 @@ namespace SIT.Scan
             {
                 bom = RemoveExcludedComponents(appSettings, bom);
                 CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
+                foreach (var component in bom.Components.Where(c => !string.IsNullOrEmpty(c.Name) && !string.IsNullOrEmpty(c.Version)))
+                {
+                    string packageName = string.IsNullOrEmpty(component.Group)
+                        ? component.Name
+                        : $"{component.Group}/{component.Name}";
+                    component.Purl = GenerateNpmPurl(packageName, component.Version);
+                }
                 AddingIdentifierType(bom.Components, "CycloneDXFile", filepath);
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += bom.Components.Count;
                 componentsForBOM.AddRange(bom.Components);
@@ -803,6 +808,28 @@ namespace SIT.Scan
             }
             dependencies.AddRange(dependencyList);
             Logger.Debug("GetdependencyDetails(): Completed dependency extraction process.");
+        }
+
+        /// <summary>
+        /// Generates a spec-compliant npm purl using the packageurl-dotnet library. Scoped packages
+        /// (e.g. "@angular/animations") are split into namespace ("@angular") and name ("animations"),
+        /// which the library canonicalizes (encoding the scope "@" as "%40").
+        /// </summary>
+        /// <param name="packageName">The npm package name, possibly scoped.</param>
+        /// <param name="version">The component version.</param>
+        /// <returns>A generated, spec-compliant npm purl string.</returns>
+        private static string GenerateNpmPurl(string packageName, string version)
+        {
+            string scope = null;
+            string name = packageName;
+            if (packageName.StartsWith('@') && packageName.Contains('/'))
+            {
+                int slashIndex = packageName.IndexOf('/');
+                scope = packageName[..slashIndex];
+                name = packageName[(slashIndex + 1)..];
+            }
+
+            return CommonHelper.GeneratePurlForProjectType(Dataconstant.NpmProjectType, name, version, namespaceOverride: scope);
         }
 
         /// <summary>

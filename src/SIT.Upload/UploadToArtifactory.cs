@@ -690,9 +690,10 @@ namespace SIT.Upload
             string jfrogpackageName = GetFullNameOfComponent(component);
             if (component.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
+                string normalizedPackageName = CommonHelper.NormalizePypiName(jfrogpackageName);
                 return aqlResultList.Find(x => x.Properties != null &&
-                                      x.Properties.Any(p => p.Key == "pypi.normalized.name" && p.Value == jfrogpackageName) &&
-                                      x.Properties.Any(p => p.Key == "pypi.version" && p.Value == component.Version));
+                                      x.Properties.Any(p => p.Key == Dataconstant.PypiNormalizedNameKey && string.Equals(CommonHelper.NormalizePypiName(p.Value), normalizedPackageName, StringComparison.Ordinal)) &&
+                                      x.Properties.Any(p => p.Key == Dataconstant.PypiVersionKey && p.Value == component.Version));
             }
             else if (component.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
