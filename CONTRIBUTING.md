@@ -55,6 +55,33 @@ defined in [`GitVersion.yml`](GitVersion.yml).
 | `beta/*` or `beta-*`          | `beta`         | `2.5.0-beta.1`     | Pre-release (beta)   |
 | `release/*` or `release-*`    | `rc`           | `2.5.0-rc.1`       | Pre-release (RC)     |
 
+### Bumping the version manually
+
+GitVersion (`mode: Mainline`) auto-increments the version based on commit
+history since the last version tag. If you need to force a specific bump
+(major/minor/patch) for an actual release, use one of the following:
+
+1. **Commit message bump (recommended)** - Add a `+semver:` tag anywhere in
+   your commit message and GitVersion will apply it when computing the next
+   version:
+   ```
+   git commit -m "Add new feature +semver: minor"
+   ```
+   Supported keywords: `+semver: major` / `+semver: breaking`,
+   `+semver: minor` / `+semver: feature`, `+semver: patch` / `+semver: fix`,
+   `+semver: none` / `+semver: skip` (no bump).
+
+2. **`next-version` in `GitVersion.yml`** - Set a floor version so all
+   subsequent builds compute from at least that version:
+   ```yaml
+   next-version: 3.0.0
+   ```
+   Useful for a deliberate, one-time major/minor bump; revert or update
+   this value after the release if no longer needed.
+
+3. **Base tag on `master`** - Push a tag (e.g. `v3.0.0`) on `master` to set
+   a new baseline that GitVersion will increment from for subsequent builds.
+
 ### How releases are triggered
 
 The workflow runs on:

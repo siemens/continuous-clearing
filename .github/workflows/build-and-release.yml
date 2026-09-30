@@ -32,16 +32,16 @@ jobs:
           fetch-depth: 0
 
       - name: Setup GitVersion
-        uses: gittools/actions/gitversion/setup@51d325634925d7d9ce0a7efc2c586c0bc2b9eee6 # v3.2.1
-        with:
-          versionSpec: '5.12.0'
+        run: dotnet tool install --global GitVersion.Tool --version 5.12.0
 
       - name: Determine Version
         id: gitversion
-        uses: gittools/actions/gitversion/execute@51d325634925d7d9ce0a7efc2c586c0bc2b9eee6 # v3.2.1
-        with:
-          configFilePath: GitVersion.yml
-          disableCache: true
+        shell: pwsh
+        run: |
+          $json = dotnet-gitversion /config GitVersion.yml | ConvertFrom-Json
+          Write-Host "SemVer: $($json.SemVer) | PreReleaseTag: $($json.PreReleaseTag)"
+          echo "semVer=$($json.SemVer)" >> $env:GITHUB_OUTPUT
+          echo "preReleaseTag=$($json.PreReleaseTag)" >> $env:GITHUB_OUTPUT
 
       - name: Determine Prerelease Flag
         id: set_prerelease
