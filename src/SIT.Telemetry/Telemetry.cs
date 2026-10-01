@@ -88,6 +88,37 @@ namespace SIT.Telemetry
         }
 
         /// <summary>
+        /// Tracks a numeric metric value with optional dimensions/properties.
+        /// </summary>
+        /// <param name="metricName">The name of the metric to track.</param>
+        /// <param name="value">The numeric value of the metric.</param>
+        /// <param name="properties">Optional dictionary of dimensions to include with the metric.</param>
+        public void TrackMetric(string metricName, double value, Dictionary<string, string>? properties = null)
+        {
+            _telemetryProvider.TrackMetric(metricName, value, properties);
+        }
+
+        /// <summary>
+        /// Resolves the correlation Run Id used to link all pipeline stages (Scan, Build, Create, Upload, Validate, Archive)
+        /// belonging to the same execution. If the environment variable is not set, a new Run Id is generated and
+        /// persisted to the current process environment so downstream child processes inherit it.
+        /// </summary>
+        /// <param name="environmentVariableName">The name of the environment variable used to store the Run Id.</param>
+        /// <returns>The resolved Run Id.</returns>
+        public static string ResolveRunId(string environmentVariableName)
+        {
+            string runId = Environment.GetEnvironmentVariable(environmentVariableName);
+
+            if (string.IsNullOrWhiteSpace(runId))
+            {
+                runId = Guid.NewGuid().ToString();
+                Environment.SetEnvironmentVariable(environmentVariableName, runId);
+            }
+
+            return runId;
+        }
+
+        /// <summary>
         /// Tracks the execution time of the application and stops the stopwatch.
         /// </summary>
         public void TrackExecutionTime()

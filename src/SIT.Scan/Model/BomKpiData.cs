@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using SIT.Common.Constants;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -104,6 +105,7 @@ namespace SIT.Scan.Model
         /// Time taken by the BOM creator, in seconds.
         /// </summary>
         [DisplayName(@"Time taken by BoM Creator")]
+        [MetricName(TelemetryConstant.MetricStageDuration)]
         public double TimeTakenByBomCreator { get; set; }
 
         /// <summary>

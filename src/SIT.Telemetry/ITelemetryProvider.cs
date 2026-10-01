@@ -25,6 +25,14 @@ namespace SIT.Telemetry
         void TrackException(Exception ex, Dictionary<string, string>? properties = null);
 
         /// <summary>
+        /// Tracks a numeric metric value with optional dimensions/properties.
+        /// </summary>
+        /// <param name="metricName">The name of the metric to track.</param>
+        /// <param name="value">The numeric value of the metric.</param>
+        /// <param name="properties">Optional dictionary of dimensions to include with the metric.</param>
+        void TrackMetric(string metricName, double value, Dictionary<string, string>? properties = null);
+
+        /// <summary>
         /// Flushes the telemetry provider to ensure all telemetry data is sent.
         /// </summary>
         void Flush();

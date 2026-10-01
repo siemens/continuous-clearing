@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
 
+using SIT.Common.Constants;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -56,6 +57,7 @@ namespace SIT.Create.Model
         /// Gets or sets the time taken by the component creator in seconds.
         /// </summary>
         [DisplayName(@"Time taken by ComponentCreator")]
+        [MetricName(TelemetryConstant.MetricStageDuration)]
         public double TimeTakenByComponentCreator { get; set; }
 
         /// <summary>

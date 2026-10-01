@@ -35,7 +35,12 @@ namespace SIT.Telemetry
             }
 
             var aiConfig = TelemetryConfiguration.CreateDefault();
-            aiConfig.ConnectionString = $"InstrumentationKey={ConnectionString}";
+
+            // Accept either a bare instrumentation key (GUID) or a full Application Insights
+            // connection string (e.g. "InstrumentationKey=...;IngestionEndpoint=...").
+            aiConfig.ConnectionString = ConnectionString.Contains("=", StringComparison.OrdinalIgnoreCase)
+                ? ConnectionString
+                : $"InstrumentationKey={ConnectionString}";
 
             _telemetryClient = new TelemetryClient(aiConfig);
         }
@@ -70,6 +75,27 @@ namespace SIT.Telemetry
             }
 
             _telemetryClient.TrackException(exceptionTelemetry);
+        }
+
+        /// <summary>
+        /// Tracks a numeric metric value with optional dimensions/properties.
+        /// </summary>
+        /// <param name="metricName">The name of the metric to track.</param>
+        /// <param name="value">The numeric value of the metric.</param>
+        /// <param name="properties">Optional dictionary of dimensions to include with the metric.</param>
+        public void TrackMetric(string metricName, double value, Dictionary<string, string>? properties = null)
+        {
+            var metricTelemetry = new MetricTelemetry(metricName, value);
+
+            if (properties != null)
+            {
+                foreach (var property in properties)
+                {
+                    metricTelemetry.Properties[property.Key] = property.Value;
+                }
+            }
+
+            _telemetryClient.TrackMetric(metricTelemetry);
         }
 
         /// <summary>

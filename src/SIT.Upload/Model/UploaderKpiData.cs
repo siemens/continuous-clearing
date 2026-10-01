@@ -4,6 +4,7 @@
 //  SPDX-License-Identifier: MIT
 //---------------------------------------------------------------------------------------------------------------------
 
+using SIT.Common.Constants;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -27,6 +28,7 @@ namespace SIT.Upload.Model
         public int PackagesToBeUploaded { get; set; }
 
         [DisplayName(@"Packages Copied to Siparty Repo")]
+        [MetricName("sit.components.cleared_total")]
         public int PackagesUploadedToJfrog { get; set; }
 
         [DisplayName(@"Packages Not Copied to Siparty Repo")]
@@ -39,6 +41,7 @@ namespace SIT.Upload.Model
         public int PackagesNotUploadedDueToError { get; set; }
 
         [DisplayName(@"Time taken by Artifactory Uploader")]
+        [MetricName(TelemetryConstant.MetricStageDuration)]
         public double TimeTakenByArtifactoryUploader { get; set; }
 
         [DisplayName(@"Packages Copied to Siparty DevDep Repo")]
