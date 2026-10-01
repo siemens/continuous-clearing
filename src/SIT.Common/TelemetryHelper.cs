@@ -41,7 +41,11 @@ namespace SIT.Common
 
             telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
                 {
-                { "ConnectionString", appSettings?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty }
+                { "ConnectionString", appSettings?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty },
+                { "Product", "SBOM" },
+                { "Application", "ContinuousClearing" },
+                { "Component", TelemetryConstant.ToolName },
+                { "Organization", "Siemens" }
             });
         }
 
