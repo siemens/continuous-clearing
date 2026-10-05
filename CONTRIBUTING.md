@@ -47,6 +47,20 @@ Releases are automated via the `Build & Release` GitHub Actions workflow
 automatically by **GitVersion** based on branch/tag naming, using the rules
 defined in [`GitVersion.yml`](GitVersion.yml).
 
+### Versioning is fully automatic - no manual steps or stale versions
+
+None of the `.csproj` files contain a hardcoded `<Version>` element anymore,
+and `src/Directory.Build.props` only defines a harmless `0.0.0-dev` fallback
+for local/dev builds. Contributors never need to remember to bump a version
+anywhere, and there is no checked-in version number that can go stale.
+
+The real version is computed live by GitVersion in the `version` job of the
+CI workflow and passed into `dotnet build`/`dotnet pack`/the Docker tag via
+MSBuild properties (`-p:Version`, `-p:AssemblyVersion`, `-p:FileVersion`,
+`-p:InformationalVersion`), so every CI-built DLL, NuGet package, and Docker
+image always carries the correct version derived from Git history according
+to the rules in [`GitVersion.yml`](GitVersion.yml).
+
 ### Versioning rules (GitVersion.yml)
 
 | Branch / Tag pattern         | GitVersion tag | Example version   | Release type       |
@@ -57,21 +71,25 @@ defined in [`GitVersion.yml`](GitVersion.yml).
 
 ### Bumping the version manually
 
-GitVersion (`mode: Mainline`) auto-increments the version based on commit
-history since the last version tag. If you need to force a specific bump
-(major/minor/patch) for an actual release, use one of the following:
+`master` and `beta` are configured with `increment: None` in
+[`GitVersion.yml`](GitVersion.yml), so **ordinary commits never change the
+version** - this avoids every routine commit silently bumping the patch
+version and causing version drift/collisions between beta and stable builds.
 
-1. **Commit message bump (recommended)** - Add a `+semver:` tag anywhere in
-   your commit message and GitVersion will apply it when computing the next
-   version:
-   ```
-   git commit -m "Add new feature +semver: minor"
-   ```
-   Supported keywords: `+semver: major` / `+semver: breaking`,
-   `+semver: minor` / `+semver: feature`, `+semver: patch` / `+semver: fix`,
-   `+semver: none` / `+semver: skip` (no bump).
+**To cut a real release, no commit message convention is required.**
+Trigger the workflow manually and pick the bump type:
 
-2. **`next-version` in `GitVersion.yml`** - Set a floor version so all
+1. Go to **Actions -> Build & Release -> Run workflow**.
+2. Set `version-bump` to `patch`, `minor`, or `major` (leave as `none` for a
+   normal build/pre-release with no version change).
+3. Optionally set `ref` to the branch/tag you want to release from.
+4. Run the workflow - GitVersion will compute the new version using the
+   selected bump on top of the last tag, build/pack/tag Docker with that
+   version, and create a draft release.
+
+Alternative ways to bump (only needed in special cases):
+
+1. **`next-version` in `GitVersion.yml`** - Set a floor version so all
    subsequent builds compute from at least that version:
    ```yaml
    next-version: 3.0.0
@@ -103,17 +121,24 @@ The workflow runs on:
 
 ### Pre-release vs. stable behavior
 
-- If GitVersion's `preReleaseTag` output is non-empty (beta/rc), the release
-  is created with both `draft: true` and `prerelease: true` in GitHub -
-  clearly marked as a pre-release and does **not** replace the
-  "Latest release" pointer, and still requires manual publishing from the
-  **Releases** page.
-- Stable releases (no pre-release tag) are created with `draft: false` and
-  `prerelease: false`, so they are published immediately as the
-  "Latest release".
+- Every release created by this workflow - stable or pre-release - is
+  always created as a **draft** (`--draft` is always passed to
+  `gh release create`). A release is never auto-published, so you can
+  review the generated notes/assets and decide when to make it public;
+  this also means it never silently overwrites the "Latest release"
+  pointer before you are ready.
+- If GitVersion's `preReleaseTag` output is non-empty (beta/rc), the draft
+  release is additionally marked `prerelease: true`, clearly flagging it
+  as a pre-release once published.
+- Stable releases (no pre-release tag) are created as a plain draft
+  (`prerelease: false`); publishing it from the **Releases** page is what
+  makes it the new "Latest release".
 - Before creating a release, the workflow checks whether the computed tag
   (`vX.Y.Z`) already exists and skips release creation if so, to avoid
   duplicate/escalating releases.
+- **After a release is reviewed and ready to go live, publish the draft
+  manually from the GitHub Releases page** (or via `gh release edit <tag>
+  --draft=false`). This manual step is required for every release.
 
 ### Creating a hotfix release
 

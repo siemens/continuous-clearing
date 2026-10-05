@@ -3,10 +3,12 @@ branches:
    master:
       regex: ^master$|^main$
       source-branches: []
+      increment: None
    beta:
       regex: ^beta[/-]
       tag: beta
       source-branches: [master]
+      increment: None
    release:
       regex: ^release[/-]
       tag: rc

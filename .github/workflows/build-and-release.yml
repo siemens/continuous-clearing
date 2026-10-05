@@ -15,6 +15,16 @@ on:
         description: 'Branch or tag to release from'
         required: false
         default: ''
+      version-bump:
+        description: 'Force a version bump for this run (overrides GitVersion increment: None)'
+        required: false
+        type: choice
+        default: 'none'
+        options:
+          - none
+          - patch
+          - minor
+          - major
 
 jobs:
 
@@ -38,7 +48,18 @@ jobs:
         id: gitversion
         shell: pwsh
         run: |
-          $json = dotnet-gitversion /config GitVersion.yml | ConvertFrom-Json
+          # Normal runs (push/PR) never bump: GitVersion.yml has increment: None on
+          # master/beta, so ordinary commits keep the same version. To cut a real
+          # release, trigger this workflow manually via workflow_dispatch and pick
+          # a 'version-bump' value (patch/minor/major) - no commit message
+          # convention (+semver:) is required.
+          $bump = "${{ github.event.inputs.version-bump }}"
+          $overrideArgs = @()
+          if ($bump -and $bump -ne "none") {
+            Write-Host "Forcing version bump: $bump"
+            $overrideArgs = @("/overrideconfig", "increment=$bump")
+          }
+          $json = dotnet-gitversion /config GitVersion.yml @overrideArgs | ConvertFrom-Json
           Write-Host "SemVer: $($json.SemVer) | MajorMinorPatch: $($json.MajorMinorPatch) | PreReleaseTag: $($json.PreReleaseTag)"
           echo "semVer=$($json.SemVer)" >> $env:GITHUB_OUTPUT
           echo "majorMinorPatch=$($json.MajorMinorPatch)" >> $env:GITHUB_OUTPUT
@@ -69,6 +90,12 @@ jobs:
         run: dotnet restore src\ContinuousClearingTool.sln
 
       - name: Build
+        # Version/AssemblyVersion/FileVersion/InformationalVersion are passed in
+        # explicitly here (computed by GitVersion in the `version` job above) so
+        # that every CI-built DLL/NuGet package/Docker image always carries the
+        # live, correct version. None of the .csproj files hardcode a <Version>
+        # (see src/Directory.Build.props), so there is no stale version to forget
+        # to update - local/dev builds simply fall back to "0.0.0-dev".
         run: >
           dotnet build src\ContinuousClearingTool.sln
           -p:Version=${{ env.SEMVER }}
