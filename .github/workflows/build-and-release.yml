@@ -9,6 +9,7 @@ on:
       - main
       - 'beta/**'
       - 'release/**'
+      - 'feature/release-workflow-testing'
   workflow_dispatch:
     inputs:
       ref:
