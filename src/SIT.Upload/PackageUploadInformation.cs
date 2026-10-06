@@ -254,10 +254,14 @@ namespace SIT.Upload
         /// <param name="filepath">The file path for storing package information.</param>
         private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages, string name, string filepath)
         {
-            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
             if (packages?.Count > 0)
             {
-                content.AppendLine($"[yellow]Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}[/]\n");
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]Report not in Approved state[/]");
+                }
+                content.AppendLine();
                 DisplayErrorForUnknownPackages(packages, name, filepath);
             }
         }
