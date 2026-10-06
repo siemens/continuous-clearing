@@ -65,8 +65,11 @@ namespace SIT.Create
 
             // Prefer the exact commit from the nuspec for a deterministic checkout; fall back to the resolved tag.
             string fetchRef = hasCommit ? commit : taggedVersion;
-            // Use a stable, human-readable label for file/folder naming.
-            string versionLabel = !string.IsNullOrEmpty(taggedVersion) ? taggedVersion : component.Version;
+            // Use a stable, human-readable label for file/folder naming. When the checkout is pinned to an
+            // exact commit, the package version is authoritative; otherwise fall back to the resolved tag.
+            string versionLabel = (!hasCommit && !string.IsNullOrEmpty(taggedVersion))
+                ? taggedVersion
+                : component.Version;
 
             if (CheckIfAlreadyDownloaded(component, fetchRef, out string alreadyDownloadedPath))
             {
@@ -114,6 +117,40 @@ namespace SIT.Create
                 return $"{repoUrl}/tree/{encodedTag}";
             }
             return component.DownloadUrl;
+        }
+
+        /// <summary>
+        /// Gets the git clone remote URL. Derives it from the component SourceUrl so it stays a
+        /// valid clone target even when DownloadUrl holds a display form such as "/tree/{commit}".
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns>clone remote url</returns>
+        private static string GetCloneRemoteUrl(ComparisonBomData component)
+        {
+            string baseUrl = !string.IsNullOrEmpty(component.SourceUrl) ? component.SourceUrl : component.DownloadUrl;
+            if (string.IsNullOrEmpty(baseUrl))
+            {
+                return component.DownloadUrl;
+            }
+
+            // Strip any display suffix (e.g. "/tree/{commit}" or "/blob/{commit}") to get the bare repo URL.
+            foreach (string marker in new[] { "/tree/", "/blob/" })
+            {
+                int markerIndex = baseUrl.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+                if (markerIndex >= 0)
+                {
+                    baseUrl = baseUrl.Substring(0, markerIndex);
+                    break;
+                }
+            }
+
+            baseUrl = baseUrl.TrimEnd('/');
+            if (!baseUrl.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
+            {
+                baseUrl = $"{baseUrl}.git";
+            }
+
+            return baseUrl;
         }
 
         /// <summary>
@@ -258,7 +295,7 @@ namespace SIT.Create
         private static Result ListTagsOfComponent(ComparisonBomData component)
         {
             Logger.DebugFormat("ListTagsOfComponent():Start git process for identifying list of tags for this component , Name-{0},version-{1}", component.Name, component.Version);
-            string gitCommand = $"ls-remote --tags {component.DownloadUrl}";
+            string gitCommand = $"ls-remote --tags {GetCloneRemoteUrl(component)}";
             Logger.DebugFormat("ListTagsOfComponent():{0}@{1} --> {2}", component.Name, component.Version, gitCommand);
 
             Process p = new Process();
@@ -331,7 +368,7 @@ namespace SIT.Create
             return new List<string>()
            {
                $"init .",
-               $"remote add origin {component.DownloadUrl}",
+               $"remote add origin {GetCloneRemoteUrl(component)}",
                $"config --local --add core.autocrlf false",
                $"config --local --add core.eol lf",
                fetchCommand,

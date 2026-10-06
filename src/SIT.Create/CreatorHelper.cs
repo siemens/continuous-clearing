@@ -917,8 +917,32 @@ namespace SIT.Create
 
             if (mapper.ReleaseStatus.Equals(Dataconstant.Available))
             {
-                return !string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl) ? releasesInfo.SourceCodeDownloadUrl : repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
+                return !string.IsNullOrEmpty(releasesInfo?.SourceCodeDownloadUrl) ? releasesInfo.SourceCodeDownloadUrl : ResolveSourceDownloadUrl(mapper, item, repo);
             }
+            return ResolveSourceDownloadUrl(mapper, item, repo);
+        }
+
+        /// <summary>
+        /// Resolves the source code download URL. When a repository commit is available for a GitHub
+        /// source it returns the deterministic "/tree/{commit}" form (matching the downloaded path),
+        /// otherwise it falls back to the ".git" clone URL.
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="item"></param>
+        /// <param name="repo"></param>
+        /// <returns>source code download url</returns>
+        private static string ResolveSourceDownloadUrl(ComparisonBomData mapper, Components item, IRepository repo)
+        {
+            string commit = mapper.SourceRepoCommit?.Trim() ?? string.Empty;
+            if (!string.IsNullOrEmpty(commit)
+                && !string.IsNullOrEmpty(mapper.SourceUrl)
+                && mapper.SourceUrl.Contains("github.com", StringComparison.OrdinalIgnoreCase))
+            {
+                string repoUrl = mapper.SourceUrl.TrimEnd('/');
+                string encodedCommit = Uri.EscapeDataString(commit);
+                return $"{repoUrl}/tree/{encodedCommit}";
+            }
+
             return repo.FormGitCloneUrl(mapper.SourceUrl, item.Name, item.Version);
         }
 
