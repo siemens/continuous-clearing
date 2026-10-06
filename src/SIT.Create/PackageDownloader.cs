@@ -46,7 +46,7 @@ namespace SIT.Create
         }
 
         /// <summary>
-        /// donwload
+        /// download
         /// </summary>
         /// <param name="component"></param>
         /// <param name="downloadPath"></param>

@@ -126,6 +126,7 @@ namespace SIT.Create
                         componentsData.ReleaseExternalId = item.Purl;
                         Components component = await GetSourceUrl(componentsData.Name, componentsData.Version, componentsData.ProjectType, item.BomRef);
                         componentsData.SourceUrl = component.SourceUrl;
+                        componentsData.SourceRepoCommit = component.SourceRepoCommit;
 
                         if (componentsData.ProjectType.Equals("ALPINE", StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -879,7 +880,7 @@ namespace SIT.Create
                     }
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
-                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;                    
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                     releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);
                 }
                 else
