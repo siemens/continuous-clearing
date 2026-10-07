@@ -60,12 +60,7 @@ namespace SIT.SBOMSigningVerification.Helpers
 
         }
 
-        public void ReadSBOMFile(string sbomFilePath, out bool isValid)
-        {
-            ReadSBOMFile(sbomFilePath, out isValid, out _);
-        }
-
-        public void ReadSBOMFile(string sbomFilePath, out bool isValid, out string verifiedContent)
+        public (bool IsValid, string VerifiedContent) ReadSBOMFile(string sbomFilePath)
         {
             if (string.IsNullOrEmpty(sbomFilePath))
             {
@@ -82,7 +77,6 @@ namespace SIT.SBOMSigningVerification.Helpers
             // Read the file exactly once. The bytes verified below are the same bytes
             // returned via verifiedContent so callers never need a second disk read.
             string sbomContent = File.ReadAllText(sbomFilePath);
-            verifiedContent = sbomContent;
             Signature? signature = signatureHelper.ExtractSignature(sbomContent);
             if (signature == null || string.IsNullOrEmpty(signature.Value))
             {
@@ -90,7 +84,8 @@ namespace SIT.SBOMSigningVerification.Helpers
                 throw new ArgumentException(errorMsg);
             }
             string originalSbom = signatureHelper.RemoveSignature(sbomContent);
-            isValid = certificateHelper.VerifySignature(originalSbom, signature.Value);
+            bool isValid = certificateHelper.VerifySignature(originalSbom, signature.Value);
+            return (isValid, sbomContent);
         }
 
         private static string AddPropertyToJson(string jsonString, string propertyName, string propertyValue)

@@ -154,7 +154,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(true);
 
             // Act
-            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid);
+            var (isValid, _) = _jsonFileHelper.ReadSBOMFile(sbomFilePath);
 
             // Assert
             Assert.That(isValid, Is.True);
@@ -179,7 +179,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(false);
 
             // Act
-            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid);
+            var (isValid, _) = _jsonFileHelper.ReadSBOMFile(sbomFilePath);
 
             // Assert
             Assert.That(isValid, Is.False);
@@ -197,7 +197,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns((Signature)null);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+            Assert.Throws<ArgumentException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath));
         }
 
         [Test]
@@ -214,7 +214,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(signature);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+            Assert.Throws<ArgumentException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath));
         }
 
         [Test]
@@ -231,21 +231,21 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(signature);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+            Assert.Throws<ArgumentException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath));
         }
 
         [Test]
         public void ReadSBOMFile_WithNullFilePath_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => _jsonFileHelper.ReadSBOMFile(null, out bool isValid));
+            Assert.Throws<ArgumentNullException>(() => _jsonFileHelper.ReadSBOMFile(null));
         }
 
         [Test]
         public void ReadSBOMFile_WithEmptyFilePath_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => _jsonFileHelper.ReadSBOMFile("", out bool isValid));
+            Assert.Throws<ArgumentNullException>(() => _jsonFileHelper.ReadSBOMFile(""));
         }
 
         [Test]
@@ -255,7 +255,7 @@ namespace SIT.SBOMSigningVerification.UTest
             string nonExistentPath = Path.Combine(_tempDirectory, "nonexistent.json");
 
             // Act & Assert
-            Assert.Throws<FileNotFoundException>(() => _jsonFileHelper.ReadSBOMFile(nonExistentPath, out bool isValid));
+            Assert.Throws<FileNotFoundException>(() => _jsonFileHelper.ReadSBOMFile(nonExistentPath));
         }
 
         [Test]
@@ -316,7 +316,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Throws<JsonException>();
 
             // Act & Assert
-            Assert.Throws<JsonException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+            Assert.Throws<JsonException>(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath));
         }
 
         [Test]
@@ -377,7 +377,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(true);
 
             // Act
-            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid);
+            var (isValid, _) = _jsonFileHelper.ReadSBOMFile(sbomFilePath);
 
             // Assert
             Assert.That(isValid, Is.True);
@@ -507,7 +507,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(true);
 
             // Act
-            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid);
+            _jsonFileHelper.ReadSBOMFile(sbomFilePath);
 
             // Assert
             _mockCertificateHelper.Verify(x => x.VerifySignature(cleanedSbom, "sig123"), Times.Once);
@@ -532,7 +532,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(true);
 
             // Act
-            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out _);
+            _jsonFileHelper.ReadSBOMFile(sbomFilePath);
 
             // Assert - Verify ExtractSignature was called with the file content
             _mockSignatureHelper.Verify(x => x.ExtractSignature(sbomContent), Times.Once);
@@ -581,7 +581,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(true);
 
             // Act & Assert
-            Assert.DoesNotThrow(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+            Assert.DoesNotThrow(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath));
         }
 
         [Test]
@@ -627,7 +627,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(true);
 
             // Act
-            _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid);
+            var (isValid, _) = _jsonFileHelper.ReadSBOMFile(sbomFilePath);
 
             // Assert
             Assert.That(isValid, Is.True);
@@ -675,7 +675,7 @@ namespace SIT.SBOMSigningVerification.UTest
                 .Returns(true);
 
             // Act & Assert
-            Assert.DoesNotThrow(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath, out bool isValid));
+            Assert.DoesNotThrow(() => _jsonFileHelper.ReadSBOMFile(sbomFilePath));
         }
 
         [Test]

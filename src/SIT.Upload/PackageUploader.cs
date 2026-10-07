@@ -45,7 +45,7 @@ namespace SIT.Upload
         /// window between signature verification and upload.
         /// </param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings, string verifiedBomContent = null)
+        public static async Task UploadPackageToArtifactory(CommonAppSettings appSettings, string? verifiedBomContent)
         {
             Logger.Debug($"UploadPackageToArtifactory():Upload package to artifactory process has started");
             //Reading the CycloneBOM data

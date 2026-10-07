@@ -59,7 +59,7 @@ namespace SIT.Common
             else if ((int)sbomSigningAppSettings.Operation == (int)OperationType.Validate)
 
             {
-                jsonFileHelper.ReadSBOMFile(sbomSigningAppSettings.BomFilePath, out bool isValid);
+                (bool isValid, _) = jsonFileHelper.ReadSBOMFile(sbomSigningAppSettings.BomFilePath);
                 return isValid.ToString();
             }
 
@@ -167,7 +167,7 @@ namespace SIT.Common
                 var signatureHelper = new SignatureHelper();
                 var jsonFileHelper = new JsonFileHelper(sbomSigningAppSettings, certificateHelper, signatureHelper);
 
-                jsonFileHelper.ReadSBOMFile(bomFilePath, out bool isValid, out string verifiedContent);
+                (bool isValid, string verifiedContent) = jsonFileHelper.ReadSBOMFile(bomFilePath);
 
                 if (isValid)
                 {
@@ -178,25 +178,14 @@ namespace SIT.Common
                 Logger.Error("SBOM signature verification failed ");
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex) when (ex is InvalidOperationException ||
+            ex is FileNotFoundException ||
+            ex is ArgumentNullException)
             {
                 string errorMsg = $"SBOM Verification failed: {ex.Message}";
                 Logger.ErrorFormat(errorMsg);
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            catch (FileNotFoundException ex)
-            {
-                string errorMsg = $"SBOM Verification failed: {ex.Message}";
-                Logger.ErrorFormat(errorMsg);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-            catch (ArgumentNullException ex)
-            {
-                string errorMsg = $"SBOM Verification failed: {ex.Message}";
-                Logger.ErrorFormat(errorMsg);
-                environmentHelper.CallEnvironmentExit(-1);
-            }
-
             return null;
         }
     }
