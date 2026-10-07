@@ -120,7 +120,7 @@ namespace SIT.Create
             if (appSettings.Telemetry.Enable)
             {
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreateAppData, TelemetryConstant.CreateKpiData, CreatorStopWatch?.Elapsed);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreateAppData, TelemetryConstant.CreateKpiData, TelemetryConstant.SITCreateComponent, CreatorStopWatch?.Elapsed);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of SIT Create execution: {DateTime.Now}\n", null);
 

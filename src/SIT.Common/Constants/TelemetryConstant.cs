@@ -12,21 +12,29 @@ namespace SIT.Common.Constants
     {
         #region Fields
         /// <summary>
-        /// The name of the tool.
+        /// The name of the tool. Used as the standardized "Application" attribute.
         /// </summary>
         public const string ToolName = "CATool";
         /// <summary>
-        /// Telemetry key for SIT Scan execution.
+        /// The standardized "Product" attribute for all SIT telemetry events.
         /// </summary>
-        public const string SITScan = "SITScanExecution";
+        public const string Product = "SBOM";
         /// <summary>
-        /// Telemetry key for SIT Create execution.
+        /// The standardized "Organization" attribute for all SIT telemetry events.
         /// </summary>
-        public const string SITCreate = "SITCreateExecution";
+        public const string Organization = "Siemens";
         /// <summary>
-        /// Telemetry key for SIT Upload execution.
+        /// The standardized "Component" attribute for SIT Scan telemetry events.
         /// </summary>
-        public const string SITUpload = "SITUploadExecution";
+        public const string SITScanComponent = "SITScan";
+        /// <summary>
+        /// The standardized "Component" attribute for SIT Create telemetry events.
+        /// </summary>
+        public const string SITCreateComponent = "SITCreate";
+        /// <summary>
+        /// The standardized "Component" attribute for SIT Upload telemetry events.
+        /// </summary>
+        public const string SITUploadComponent = "SITUpload";
         /// <summary>
         /// Telemetry key for SIT Scan KPI data.
         /// </summary>

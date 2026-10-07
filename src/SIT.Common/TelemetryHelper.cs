@@ -22,7 +22,7 @@ namespace SIT.Common
         #region Fields
 
         private readonly ILog Logger;
-        private readonly SIT.Telemetry.Telemetry telemetry_;
+        private SIT.Telemetry.Telemetry telemetry_;
         private readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         private readonly CommonAppSettings appSettings_;
 
@@ -38,11 +38,6 @@ namespace SIT.Common
         {
             Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
             appSettings_ = appSettings ?? new CommonAppSettings();
-
-            telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
-                {
-                { "ConnectionString", appSettings?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty }
-            });
         }
 
         #endregion
@@ -57,13 +52,25 @@ namespace SIT.Common
         /// <param name="kpiData">The KPI data to track.</param>
         /// <param name="appDataEventName">The telemetry event name used for the application/context event.</param>
         /// <param name="kpiEventName">The telemetry event name used for the KPI data event.</param>
+        /// <param name="component">The standardized "Component" attribute identifying the SIT tool (e.g. Scan, Create, Upload).</param>
         /// <param name="timeTaken">Total time taken by the tool to complete execution.</param>
-        public void StartTelemetry<T>(string catoolVersion, T kpiData, string appDataEventName, string kpiEventName, TimeSpan? timeTaken = null)
+        public void StartTelemetry<T>(string catoolVersion, T kpiData, string appDataEventName, string kpiEventName, string component, TimeSpan? timeTaken = null)
         {
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             LoggerHelper.WriteTelemetryMessage(TelemetryConstant.StartLogMessage);
             try
             {
+                telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
+                {
+                    { "ConnectionString", appSettings_?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty },
+                    { "Product", TelemetryConstant.Product },
+                    { "Application", TelemetryConstant.ToolName },
+                    { "Component", component },
+                    { "Environment", appSettings_?.Telemetry?.Environment ?? string.Empty },
+                    { "Version", catoolVersion ?? string.Empty },
+                    { "Organization", TelemetryConstant.Organization }
+                });
+
                 InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, appDataEventName
                                                     , appSettings_, timeTaken);
                 TrackKpiDataTelemetry(kpiEventName, kpiData);
@@ -77,7 +84,7 @@ namespace SIT.Common
             }
             finally
             {
-                telemetry_.Flush(); // Ensure telemetry is sent before application exits
+                telemetry_?.Flush(); // Ensure telemetry is sent before application exits
             }
         }
 
@@ -138,7 +145,7 @@ namespace SIT.Common
             { "Stack Trace", ex.StackTrace }
         };
 
-            telemetry_.TrackException(ex, exceptionData);
+            telemetry_?.TrackException(ex, exceptionData);
         }
 
         #endregion

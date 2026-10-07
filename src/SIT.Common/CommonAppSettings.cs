@@ -84,6 +84,7 @@ namespace SIT.Common
     {
         public bool Enable { get; set; } = true;
         public string ApplicationInsightsConnectionString { get; set; }
+        public string Environment { get; set; }
     }
     [ExcludeFromCodeCoverage]
     public class SW360
