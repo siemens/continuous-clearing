@@ -60,7 +60,7 @@ namespace SIT.Upload
         /// content consumed is the same content whose signature was verified (TOCTOU protection).
         /// </param>
         /// <returns>A Bom object containing the components.</returns>
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string? verifiedBomContent)
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string? verifiedBomContent = null)
         {
             Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
             Bom componentsToBoms = null;

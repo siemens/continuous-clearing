@@ -37,7 +37,7 @@ namespace SIT.Upload.UTest
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             //Act
-            Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object, null);
+            Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
             // Assert
             Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components");
         }
@@ -185,7 +185,7 @@ namespace SIT.Upload.UTest
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             // Act
-            var result = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object, null);
+            var result = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
 
             // Assert
             Assert.IsNull(result, "Expected null when the file does not exist.");
@@ -200,7 +200,7 @@ namespace SIT.Upload.UTest
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
             //Act && Assert
-            Assert.Throws<System.Text.Json.JsonException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object, null));
+            Assert.Throws<System.Text.Json.JsonException>(() => PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object));
         }
 
 
@@ -213,7 +213,7 @@ namespace SIT.Upload.UTest
             string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
-            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object, null);
+            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {
                 new ComponentsToArtifactory()
@@ -244,7 +244,7 @@ namespace SIT.Upload.UTest
             string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
             Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
             environmentHelperMock.Setup(x => x.CallEnvironmentExit(-1));
-            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object, null);
+            Bom bom = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object);
             List<ComponentsToArtifactory> components = new List<ComponentsToArtifactory>()
             {
                 new ComponentsToArtifactory()
