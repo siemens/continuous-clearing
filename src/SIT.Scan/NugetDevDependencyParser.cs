@@ -270,10 +270,10 @@ namespace SIT.Scan
             bool isTestProject;
             string csprojFilePath = "";
             string dirName = Path.GetDirectoryName(filePath);
-            if (dirName.Contains("obj"))
+            if (!string.IsNullOrEmpty(dirName) && Path.GetFileName(dirName).Equals("obj", StringComparison.OrdinalIgnoreCase))
             {
-                dirName = dirName.Replace("obj", "");
-                string[] filePaths = Directory.GetFiles(dirName, "*.csproj");
+                dirName = Directory.GetParent(dirName)?.FullName;
+                string[] filePaths = !string.IsNullOrEmpty(dirName) && Directory.Exists(dirName) ? Directory.GetFiles(dirName, "*.csproj") : Array.Empty<string>();
                 csprojFilePath = filePaths.Length > 0 ? filePaths[0] : "";
             }
             if (!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
