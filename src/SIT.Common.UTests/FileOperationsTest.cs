@@ -106,8 +106,7 @@ namespace SIT.Common.UTest
             string fullPath = Path.Combine(tempDir, $"{projectName}_{fileName}");
 
             // Pre-create the target file and mark it read-only so File.WriteAllText throws
-            // UnauthorizedAccessException. WriteContentToReportNotApprovedFile is used because
-            // it writes directly without a backup step, giving a clean trigger path.
+            // UnauthorizedAccessException, giving a clean trigger path for the failure branch.
             File.WriteAllText(fullPath, "existing content");
             File.SetAttributes(fullPath, FileAttributes.ReadOnly);
 
@@ -116,7 +115,7 @@ namespace SIT.Common.UTest
             try
             {
                 //Act
-                string result = fileOperations.WriteContentToReportNotApprovedFile(
+                string result = fileOperations.WriteContentToFile(
                     "new data", tempDir, fileName, projectName);
 
                 //Assert

@@ -165,10 +165,6 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string multipleversionsFileName = "Multipleversions.json";
         /// <summary>
-        /// File name for Artifactory report not approved.
-        /// </summary>
-        public const string artifactoryReportNotApproved = "ReportNotApproved.json";
-        /// <summary>
         /// Basic SBOM name.
         /// </summary>
         public const string basicSBOMName = "ContinuousClearing";
