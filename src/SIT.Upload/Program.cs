@@ -80,7 +80,7 @@ namespace SIT.Upload
             {
                 environmentHelper.CallEnvironmentExit(-1);
             }
-            string verifiedBomContent = null;
+            string? verifiedBomContent = null;
             if (appSettings.SbomSigning.SBOMSignVerify)
             {
                 // Verify signature and capture the exact verified content so the upload consumes

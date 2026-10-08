@@ -139,6 +139,56 @@ namespace SIT.Create.UTest
         }
 
         [Test]
+        public async Task DownloadReleaseAttachmentSource_ForMavenPackage_WithUnsafeComponentName_SkipsMvnDownloadAndReturnsEmpty()
+        {
+            // Arrange - a component name containing shell metacharacters must be rejected by
+            // the maven coordinate validation, so the mvn download is skipped entirely and no
+            // process is started.
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "bad;name",
+                Version = "1.0.0",
+                Group = "com.example",
+                ReleaseExternalId = "pkg:maven/com.example/bad;name@1.0.0"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList, Is.Empty);
+        }
+
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForMavenPackage_WithUnsafeVersion_SkipsMvnDownloadAndReturnsEmpty()
+        {
+            // Arrange - a version containing shell metacharacters must be rejected
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "example",
+                Version = "1.0.0 & calc.exe",
+                Group = "com.example",
+                ReleaseExternalId = "pkg:maven/com.example/example@1.0.0"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList, Is.Empty);
+        }
+
+        [Test]
         public void Test_WriteCreatorKpiDataToConsole()
         {
             var mock = new Mock<ICreatorHelper>();

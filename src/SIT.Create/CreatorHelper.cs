@@ -274,6 +274,7 @@ namespace SIT.Create
         /// </summary>
         /// <param name="component"></param>
         /// <returns>task that returns asynchronous operation</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "S4036:Make sure the PATH used to find this command includes only what you intend", Justification = "mvn/cmd.exe are resolved from a controlled CI environment PATH; command injection is already mitigated by maven coordinate validation.")]
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
             string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
@@ -330,7 +331,7 @@ namespace SIT.Create
         }
 
         /// <summary>
-        /// Validates that a maven coordinate token (group id, artifact id or version) only contains
+        /// Validates that a maven coordinate token
         /// characters allowed in valid maven coordinates. This prevents shell command injection when
         /// the coordinate is passed to the "mvn" command line via cmd.exe on Windows.
         /// </summary>

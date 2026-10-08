@@ -364,5 +364,107 @@ namespace SIT.Create.UTest
             Assert.DoesNotThrow(() => urlHelper.Dispose(), "Dispose should not throw when called multiple times.");
         }
 
+        #region GetAlpineDistro Tests
+
+        [TestCase("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-3.16.2", "3.16-stable")]
+        [TestCase("pkg:apk/alpine/busybox@1.35.0-r29?distro=alpine-3.17.3", "3.17-stable")]
+        public void GetAlpineDistro_WithValidBomRef_ReturnsStableBranchName(string bomRef, string expected)
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro(bomRef);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void GetAlpineDistro_WithNullOrWhiteSpaceBomRef_ReturnsEmptyString(string bomRef)
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro(bomRef);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithoutDistroKeyword_ReturnsEmptyString()
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithTooFewVersionSegments_ReturnsEmptyString()
+        {
+            // Act - after splitting on "distro" there is no "-" separated version part
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithShortVersionSegment_ReturnsEmptyString()
+        {
+            // Act - version segment has fewer than 2 characters
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-1");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithNonNumericVersionSegment_ReturnsEmptyString()
+        {
+            // Act - resulting distro value fails the stable branch name regex, e.g. "0.-stable"
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-0.1x");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        #endregion
+
+        #region CheckoutDistro Tests
+
+        [Test]
+        public void CheckoutDistro_WithUnsafeDistroValue_SkipsGitCheckoutWithoutThrowing()
+        {
+            // Arrange - an invalid distro value (potential command injection) combined with a
+            // non-existent working directory. If the method attempted to start "git" it would
+            // throw since the working directory does not exist, so DoesNotThrow proves the
+            // unsafe value was rejected before any process was started.
+            string unsafeDistro = "--upload-pack=touch /tmp/pwned;";
+            string nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            var method = typeof(UrlHelper).GetMethod("CheckoutDistro",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { unsafeDistro, nonExistentPath }));
+        }
+
+        [Test]
+        public void CheckoutDistro_WithEmptyDistroValue_SkipsGitCheckoutWithoutThrowing()
+        {
+            // Arrange
+            string nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            var method = typeof(UrlHelper).GetMethod("CheckoutDistro",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { string.Empty, nonExistentPath }));
+        }
+
+        #endregion
+
     }
 }
+
