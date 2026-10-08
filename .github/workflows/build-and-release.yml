@@ -30,6 +30,8 @@ jobs:
 
   version:
     runs-on: windows-latest
+    env:
+      VERSION_BUMP: ${{ github.event.inputs.version-bump || 'none' }}
     outputs:
       semVer: ${{ steps.gitversion.outputs.semVer }}
       majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
@@ -51,9 +53,9 @@ jobs:
           # Normal runs (push/PR) never bump: GitVersion.yml has increment: None on
           # master/beta, so ordinary commits keep the same version. To cut a real
           # release, trigger this workflow manually via workflow_dispatch and pick
-          # a 'version-bump' value (patch/minor/major) - no commit message
+          # a VERSION_BUMP value (patch/minor/major) - no commit message
           # convention (+semver:) is required.
-          $bump = "${{ github.event.inputs.version-bump }}"
+          $bump = "$env:VERSION_BUMP"
           $overrideArgs = @()
           if ($bump -and $bump -ne "none") {
             Write-Host "Forcing version bump: $bump"
