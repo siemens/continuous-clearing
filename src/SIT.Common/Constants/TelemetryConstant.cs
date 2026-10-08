@@ -67,6 +67,13 @@ namespace SIT.Common.Constants
         /// The log message displayed when telemetry tracking starts.
         /// </summary>
         public const string StartLogMessage = "Telemetry tracking is now active for this execution. To turn off telemetry, use the command-line option --Telemetry:Enable false or adjust the settings in your appsettings file.";
+        /// <summary>
+        /// Environment variable name used to share a single pipeline Run/Correlation ID across the separate
+        /// SIT Scan, Create and Upload processes. KPI: enables "Pipeline Completion Rate" and "Retry/Re-run Rate"
+        /// dashboards in Grafana by letting events from all stages of the same pipeline execution be joined on this ID.
+        /// A CI/orchestrator script should set this variable once before invoking Scan/Create/Upload sequentially.
+        /// </summary>
+        public const string PipelineRunIdEnvironmentVariable = "SIT_PIPELINE_RUN_ID";
         #endregion
 
         #region Properties
