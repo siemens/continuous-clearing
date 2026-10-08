@@ -61,17 +61,6 @@ namespace SIT.Common.Interface
         public string WriteContentToCycloneDXFile<T>(T dataToWrite, string filePath, string fileNameWithExtension);
 
         /// <summary>
-        /// Writes the given content to a report file for not approved items.
-        /// </summary>
-        /// <typeparam name="T">The type of data to write.</typeparam>
-        /// <param name="dataToWrite">The data to write.</param>
-        /// <param name="folderPath">The folder path to save the file.</param>
-        /// <param name="fileNameWithExtension">The file name with extension.</param>
-        /// <param name="name">The name associated with the report.</param>
-        /// <returns>The path to the written report file.</returns>
-        public string WriteContentToReportNotApprovedFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string name);
-
-        /// <summary>
         /// Writes the given content to a file for multiple versions in the specified folder.
         /// </summary>
         /// <typeparam name="T">The type of data to write.</typeparam>

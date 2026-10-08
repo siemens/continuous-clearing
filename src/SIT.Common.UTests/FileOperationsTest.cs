@@ -96,39 +96,7 @@ namespace SIT.Common.UTest
             Assert.AreEqual(null, comparisonData.Components);
         }
 
-        [Test]
-        public void ExecuteFileOperation_WhenActionThrowsUnauthorizedAccessException_ReturnsFailure()
-        {
-            //Arrange
-            string tempDir = Path.GetTempPath();
-            string projectName = "ROProject";
-            string fileName = "ro_exec_test.txt";
-            string fullPath = Path.Combine(tempDir, $"{projectName}_{fileName}");
-
-            // Pre-create the target file and mark it read-only so File.WriteAllText throws
-            // UnauthorizedAccessException. WriteContentToReportNotApprovedFile is used because
-            // it writes directly without a backup step, giving a clean trigger path.
-            File.WriteAllText(fullPath, "existing content");
-            File.SetAttributes(fullPath, FileAttributes.ReadOnly);
-
-            var fileOperations = new FileOperations();
-
-            try
-            {
-                //Act
-                string result = fileOperations.WriteContentToReportNotApprovedFile(
-                    "new data", tempDir, fileName, projectName);
-
-                //Assert
-                Assert.AreEqual("failure", result);
-            }
-            finally
-            {
-                File.SetAttributes(fullPath, FileAttributes.Normal);
-                File.Delete(fullPath);
-            }
-        }
-
+        
         [Test]
         public void ExecuteFileOperation_WhenActionThrowsSecurityException_ReturnsFailure()
         {
