@@ -66,7 +66,7 @@ namespace SIT.Create
             bom = cycloneDXBomParser.ParseCycloneDXBom(bomFilePath);
             // Log the components in a tabular format
             LogHandlingHelper.ListOfBomFileComponents(bomFilePath, bom?.Components ?? new List<Component>());
-            TotalComponentsFromPackageIdentifier = bom != null ? bom.Components.Count : 0;
+            TotalComponentsFromPackageIdentifier = bom?.Components?.Count ?? 0;
             ListofBomComponents = await GetListOfBomData(bom?.Components ?? new List<Component>(), appSettings);
 
             // Removing Duplicates
@@ -112,7 +112,7 @@ namespace SIT.Create
                             ProjectType = componentsData.ProjectType
                         });
                     }
-                    else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true")
+                    else if (isInternalComponent || (componentsData.IsDev == "true" && appSettings.SW360.IgnoreDevDependency) || componentsData.ExcludeComponent == "true" || IsUnsupportedComponent(item))
                     {
                         LogSkippedComponent(item, componentsData, appSettings, isInternalComponent);
                     }
@@ -171,7 +171,30 @@ namespace SIT.Create
             if (componentsData.ExcludeComponent == "true")
             {
                 Logger.DebugFormat("{0}-{1} skipped (component marked as excluded).", item.Name, item.Version);
+                return;
             }
+            if (IsUnsupportedComponent(item))
+            {
+                Logger.DebugFormat("{0}-{1} skipped (unsupported package - invalid or unrecognized purl id).", item.Name, item.Version);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the component is an unsupported package based on its Purl id.
+        /// A component is considered unsupported when its Purl is empty or does not match
+        /// any of the supported ecosystem Purl prefixes.
+        /// </summary>
+        /// <param name="item">The component to check.</param>
+        /// <returns>True if the component is unsupported; otherwise, false.</returns>
+        private static bool IsUnsupportedComponent(Component item)
+        {
+            if (string.IsNullOrEmpty(item?.Purl))
+            {
+                return true;
+            }
+
+            var purlIds = Dataconstant.PurlCheck();
+            return !purlIds.Values.Any(purlPrefix => item.Purl.Contains(purlPrefix, StringComparison.OrdinalIgnoreCase));
         }
         private void UpdateToLocalBomFile(Components componentsData, string currName, string currVersion)
         {
@@ -912,9 +935,9 @@ namespace SIT.Create
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
 
             if (releasesInfo.AdditionalData != null &&
-                releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
-                !string.IsNullOrEmpty(appSettings?.SW360?.Fossology?.URL) &&
-                fossologyUrl.Contains(appSettings.SW360.Fossology.URL))
+    releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
+    !string.IsNullOrEmpty(appSettings?.SW360?.Fossology?.URL) &&
+    fossologyUrl.Contains(appSettings.SW360.Fossology.URL))
             {
                 item.FossologyLink = fossologyUrl;
                 item.FossologyUploadId = uploadId;
