@@ -967,7 +967,7 @@ namespace SIT.Upload.UTest
         }
 
         [Test]
-        public void WarningMessageForNoPackages_WhenSpectreConsoleEnabled_DoesNotLog()
+        public void DisplayErrorForUnknownPackages_WhenSpectreConsoleEnabled_DoesNotLog()
         {
             var originalValue = SIT.Common.LoggerFactory.UseSpectreConsole;
             try
@@ -975,9 +975,9 @@ namespace SIT.Upload.UTest
                 SIT.Common.LoggerFactory.UseSpectreConsole = true;
 
                 var method = typeof(PackageUploadInformation).GetMethod(
-                    "WarningMessageForNoPackages",
+                    "DisplayErrorForUnknownPackages",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-                Assert.IsNotNull(method, "WarningMessageForNoPackages method not found via reflection.");
+                Assert.IsNotNull(method, "DisplayErrorForUnknownPackages method not found via reflection.");
 
                 var packages = new List<ComponentsToArtifactory>
                 {
@@ -998,7 +998,7 @@ namespace SIT.Upload.UTest
         }
 
         [Test]
-        public void WarningMessageForNoPackages_WithNullList_DoesNotLog()
+        public void DisplayErrorForUnknownPackages_WithNullList_DoesNotLog()
         {
             var originalValue = SIT.Common.LoggerFactory.UseSpectreConsole;
             try
@@ -1006,9 +1006,9 @@ namespace SIT.Upload.UTest
                 SIT.Common.LoggerFactory.UseSpectreConsole = false;
 
                 var method = typeof(PackageUploadInformation).GetMethod(
-                    "WarningMessageForNoPackages",
+                    "DisplayErrorForUnknownPackages",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-                Assert.IsNotNull(method, "WarningMessageForNoPackages method not found via reflection.");
+                Assert.IsNotNull(method, "DisplayErrorForUnknownPackages method not found via reflection.");
 
                 // Act
                 method.Invoke(null, new object[] { null });
@@ -1024,7 +1024,7 @@ namespace SIT.Upload.UTest
         }
 
         [Test]
-        public void WarningMessageForNoPackages_WithEmptyList_DoesNotLog()
+        public void DisplayErrorForUnknownPackages_WithEmptyList_DoesNotLog()
         {
             var originalValue = SIT.Common.LoggerFactory.UseSpectreConsole;
             try
@@ -1032,9 +1032,9 @@ namespace SIT.Upload.UTest
                 SIT.Common.LoggerFactory.UseSpectreConsole = false;
 
                 var method = typeof(PackageUploadInformation).GetMethod(
-                    "WarningMessageForNoPackages",
+                    "DisplayErrorForUnknownPackages",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-                Assert.IsNotNull(method, "WarningMessageForNoPackages method not found via reflection.");
+                Assert.IsNotNull(method, "DisplayErrorForUnknownPackages method not found via reflection.");
 
                 // Act
                 method.Invoke(null, new object[] { new List<ComponentsToArtifactory>() });
@@ -1050,7 +1050,7 @@ namespace SIT.Upload.UTest
         }
 
         [Test]
-        public void WarningMessageForNoPackages_WithPackagesAndLoggerMode_LogsWarnPerPackage()
+        public void DisplayErrorForUnknownPackages_WithPackagesAndLoggerMode_LogsWarnPerPackage()
         {
             var originalValue = SIT.Common.LoggerFactory.UseSpectreConsole;
             try
@@ -1058,9 +1058,9 @@ namespace SIT.Upload.UTest
                 SIT.Common.LoggerFactory.UseSpectreConsole = false;
 
                 var method = typeof(PackageUploadInformation).GetMethod(
-                    "WarningMessageForNoPackages",
+                    "DisplayErrorForUnknownPackages",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-                Assert.IsNotNull(method, "WarningMessageForNoPackages method not found via reflection.");
+                Assert.IsNotNull(method, "DisplayErrorForUnknownPackages method not found via reflection.");
 
                 var packages = new List<ComponentsToArtifactory>
                 {
@@ -1107,5 +1107,6 @@ namespace SIT.Upload.UTest
         }
     }
 }
+
 
 

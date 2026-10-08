@@ -254,7 +254,7 @@ namespace SIT.Upload
                 content.AppendLine();
                 foreach (var package in packages)
                 {
-                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]Report not in Approved state[/]");
+                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]is not in report approved state.[/]");
                 }
                 content.AppendLine();
             }
@@ -371,7 +371,7 @@ namespace SIT.Upload
             string filePath)
         {
             Logger.InfoFormat("\n{0}:\n", name);
-            WarningMessageForNoPackages(lists.UnknownPackages);
+            DisplayErrorForUnknownPackages(lists.UnknownPackages);
             DisplayErrorForJfrogFoundPackages(lists.JfrogFoundPackages);
             DisplayErrorForJfrogPackages(lists.JfrogNotFoundPackages);
             DisplayOptionalDevDepPackages(lists.OptionalDevDepPackages);
@@ -490,7 +490,7 @@ namespace SIT.Upload
         /// Displays a warning listing the packages whose report is not in Approved state.
         /// </summary>
         /// <param name="unknownPackages">List of packages whose report is not in Approved state.</param>
-        private static void WarningMessageForNoPackages(List<ComponentsToArtifactory> unknownPackages)
+        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages)
         {
             if (LoggerFactory.UseSpectreConsole || unknownPackages == null || unknownPackages.Count == 0)
             {
@@ -499,7 +499,7 @@ namespace SIT.Upload
 
             foreach (var package in unknownPackages)
             {
-                Logger.WarnFormat("{0}-{1} Report not in Approved state", package.Name, package.Version);
+                Logger.WarnFormat("{0}-{1} is not in report approved state", package.Name, package.Version);
             }
             Logger.Info("\n");
         }
