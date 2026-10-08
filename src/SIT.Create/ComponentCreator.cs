@@ -935,9 +935,9 @@ namespace SIT.Create
                 .FirstOrDefault(step => step.StepName == "01_upload")?.ProcessStepIdInTool;
 
             if (releasesInfo.AdditionalData != null &&
-    releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
-    !string.IsNullOrEmpty(appSettings?.SW360?.Fossology?.URL) &&
-    fossologyUrl.Contains(appSettings.SW360.Fossology.URL))
+                releasesInfo.AdditionalData.TryGetValue(ApiConstant.AdditionalDataFossologyURL, out string fossologyUrl) &&
+                !string.IsNullOrEmpty(appSettings?.SW360?.Fossology?.URL) &&
+                fossologyUrl.Contains(appSettings.SW360.Fossology.URL))
             {
                 item.FossologyLink = fossologyUrl;
                 item.FossologyUploadId = uploadId;
