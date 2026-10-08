@@ -84,7 +84,7 @@ jobs:
             $Project = $_
             Write-Host "Running tests for: $($Project.Name)"
             Push-Location $Project.DirectoryName
-            dotnet add package coverlet.msbuild --version 3.2.0
+            dotnet add package coverlet.msbuild --version 6.0.2
             dotnet test --no-build --configuration Release --logger trx `
               /p:CollectCoverage=true /p:CoverletOutputFormat=opencover `
               /p:CoverletOutput=$CoverageReport/$($Project.BaseName).xml
@@ -197,7 +197,7 @@ jobs:
             
             # Ensure necessary packages are installed
             dotnet add package Microsoft.NET.Test.Sdk --version 17.8.0
-            dotnet add package coverlet.msbuild --version 3.2.0
+            dotnet add package coverlet.msbuild --version 6.0.2
 
             # Run tests with coverage
             dotnet test --no-build --configuration Release --logger trx \
