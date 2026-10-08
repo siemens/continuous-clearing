@@ -499,7 +499,7 @@ namespace SIT.Upload
 
             foreach (var package in unknownPackages)
             {
-                Logger.WarnFormat("{0}-{1} is not in report approved state", package.Name, package.Version);
+                Logger.WarnFormat("{0}-{1} is not in report approved state.", package.Name, package.Version);
             }
             Logger.Info("\n");
         }

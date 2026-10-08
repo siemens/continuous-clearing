@@ -937,7 +937,7 @@ namespace SIT.Upload.UTest
             var result = content.ToString();
             StringAssert.Contains("[white]PkgA[/]", result);
             StringAssert.Contains("[cyan]1.0.0[/]", result);
-            StringAssert.Contains("[yellow]Report not in Approved state[/]", result);
+            StringAssert.Contains("[yellow]is not in report approved state.[/]", result);
         }
 
         [Test]
@@ -962,7 +962,7 @@ namespace SIT.Upload.UTest
             var result = content.ToString();
             StringAssert.Contains("[white]PkgA[/]", result);
             StringAssert.Contains("[white]PkgB[/]", result);
-            var occurrences = result.Split(new[] { "Report not in Approved state" }, System.StringSplitOptions.None).Length - 1;
+            var occurrences = result.Split(new[] { "is not in report approved state." }, System.StringSplitOptions.None).Length - 1;
             Assert.AreEqual(2, occurrences);
         }
 
@@ -1075,7 +1075,7 @@ namespace SIT.Upload.UTest
                 var warnEvents = System.Array.FindAll(
                     _memoryAppender.GetEvents(),
                     e => e.Level == Level.Warn &&
-                         e.RenderedMessage.Contains("Report not in Approved state"));
+                         e.RenderedMessage.Contains("is not in report approved state."));
                 Assert.AreEqual(2, warnEvents.Length);
                 StringAssert.Contains("PkgA-1.0.0", warnEvents[0].RenderedMessage);
                 StringAssert.Contains("PkgB-2.0.0", warnEvents[1].RenderedMessage);
