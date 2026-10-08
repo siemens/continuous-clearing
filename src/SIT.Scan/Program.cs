@@ -127,6 +127,10 @@ namespace SIT.Scan
             Logger.Debug($"====================<<<<< SIT Scan >>>>>====================");
             CommonAppSettings appSettings = _settingsManager.ReadConfiguration<CommonAppSettings>(args, FileConstant.appSettingFileName, environmentHelper);
             Log4Net.AppendVerboseValue(appSettings);
+            // Diagnostic: confirm whether SW360.ProjectID actually bound from the pipeline configuration at runtime,
+            // to distinguish a binding/mapping gap from a genuine missing pipeline variable.
+            Logger.DebugFormat("ReadConfiguration(): Bound SW360.ProjectID='{0}' (SW360 section present: {1})",
+                appSettings.SW360?.ProjectID ?? "<null>", appSettings.SW360 != null);
             appSettings.ProjectType = CommonHelper.CanonicalizeProjectType(appSettings.ProjectType);
             ProjectReleases projectReleases = new ProjectReleases();
             string _ = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
@@ -141,11 +145,39 @@ namespace SIT.Scan
             if (appSettings.IsTestMode)
                 Logger.Logger.Log(null, Level.Alert, $"SIT Scan is running in dry run mode \n", null);
 
+            // Create the telemetry helper early (if enabled) so dependency health (SW360/Artifactory) can be
+            // reported during this run, in addition to the final app-data/KPI events sent via StartTelemetry.
+            TelemetryHelper telemetryHelper = appSettings.Telemetry?.Enable == true ? new TelemetryHelper(appSettings) : null;
+            telemetryHelper?.EnsureInitialized(caToolInformation.CatoolVersion, TelemetryConstant.SITScanComponent);
+
             // Validate application settings
             if (appSettings.SW360 != null && !appSettings.IsTestMode)
             {
                 CommonHelper.DisplayTokenExpiryWarning(appSettings);
-                await ValidateAppsettingsFile(appSettings, projectReleases);
+                // KPI: "Infrastructure Availability" - report whether the SW360 dependency call succeeded or failed.
+                Stopwatch sw360Stopwatch = Stopwatch.StartNew();
+                bool sw360Success = true;
+                try
+                {
+                    await ValidateAppsettingsFile(appSettings, projectReleases);
+                }
+                catch
+                {
+                    sw360Success = false;
+                    throw;
+                }
+                finally
+                {
+                    sw360Stopwatch.Stop();
+                    telemetryHelper?.TrackDependencyCall("SW360", sw360Success, sw360Stopwatch.Elapsed, TelemetryConstant.SITScanComponent);
+                }
+            }
+
+            // KPI: "Error Rate by Stage" / per-project grouping - flag runs with a missing SW360 Project ID
+            // so these telemetry events (which cannot be grouped by project) are identifiable in logs.
+            if (appSettings.Telemetry?.Enable == true && string.IsNullOrWhiteSpace(appSettings.SW360?.ProjectID))
+            {
+                Logger.Warn("SW360 Project ID is not configured; telemetry events for this run will have an empty SW360 Project ID and cannot be grouped per-project.");
             }
 
             var listParameters = new ListofPerametersForCli
@@ -161,14 +193,18 @@ namespace SIT.Scan
             _bomCreator.BomHelper = new BomHelper();
 
             //Validating JFrog Settings
-            if (await _bomCreator.CheckJFrogConnection(appSettings))
+            // KPI: "Infrastructure Availability" - report whether the Artifactory dependency call succeeded or failed.
+            Stopwatch jfrogStopwatch = Stopwatch.StartNew();
+            bool jfrogConnected = await _bomCreator.CheckJFrogConnection(appSettings);
+            jfrogStopwatch.Stop();
+            telemetryHelper?.TrackDependencyCall("Artifactory", jfrogConnected, jfrogStopwatch.Elapsed, TelemetryConstant.SITScanComponent);
+            if (jfrogConnected)
             {
                 await _bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases, caToolInformation);
             }
 
             if (appSettings.Telemetry?.Enable == true)
             {
-                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
                 telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, BomCreator.bomKpiData, TelemetryConstant.ScanAppData, TelemetryConstant.ScanKpiData, TelemetryConstant.SITScanComponent, BomStopWatch?.Elapsed);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of SIT Scan execution : {DateTime.Now}\n", null);

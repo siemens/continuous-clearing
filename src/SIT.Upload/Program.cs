@@ -75,7 +75,17 @@ namespace SIT.Upload
             };
             IJfrogAqlApiCommunication jfrogAqlApiCommunication = new JfrogAqlApiCommunication(appSettings.Jfrog.URL, artifactoryCredentials, appSettings.TimeOut);
             ArtifactoryValidator artifactoryValidator = new(jfrogAqlApiCommunication);
+
+            // Create the telemetry helper early (if enabled) so dependency health (Artifactory) can be
+            // reported during this run, in addition to the final app-data/KPI events sent via StartTelemetry.
+            TelemetryHelper telemetryHelper = appSettings.Telemetry?.Enable == true ? new TelemetryHelper(appSettings) : null;
+            telemetryHelper?.EnsureInitialized(caToolInformation.CatoolVersion, TelemetryConstant.SITUploadComponent);
+
+            // KPI: "Infrastructure Availability" - report whether the Artifactory dependency call succeeded or failed.
+            Stopwatch jfrogStopwatch = Stopwatch.StartNew();
             var isValid = await artifactoryValidator.ValidateArtifactoryCredentials();
+            jfrogStopwatch.Stop();
+            telemetryHelper?.TrackDependencyCall("Artifactory", isValid != -1, jfrogStopwatch.Elapsed, TelemetryConstant.SITUploadComponent);
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);
@@ -93,7 +103,6 @@ namespace SIT.Upload
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry.Enable)
             {
-                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
                 telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, PackageUploader.uploaderKpiData, TelemetryConstant.UploadAppData, TelemetryConstant.UploadKpiData, TelemetryConstant.SITUploadComponent, UploaderStopWatch?.Elapsed);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of SIT Upload execution : {DateTime.Now}\n", null);

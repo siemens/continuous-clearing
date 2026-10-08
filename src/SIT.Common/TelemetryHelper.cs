@@ -70,16 +70,7 @@ namespace SIT.Common
             LoggerHelper.WriteTelemetryMessage(TelemetryConstant.StartLogMessage);
             try
             {
-                telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
-                {
-                    { "ConnectionString", appSettings_?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty },
-                    { "Product", TelemetryConstant.Product },
-                    { "Application", TelemetryConstant.ToolName },
-                    { "Component", component },
-                    { "Environment", appSettings_?.Telemetry?.Environment ?? string.Empty },
-                    { "Version", catoolVersion ?? string.Empty },
-                    { "Organization", TelemetryConstant.Organization }
-                });
+                EnsureInitialized(catoolVersion, component);
 
                 InitializeAndTrackEvent(TelemetryConstant.ToolName, catoolVersion, appDataEventName
                                                     , appSettings_, timeTaken);
@@ -101,6 +92,60 @@ namespace SIT.Common
         }
 
         /// <summary>
+        /// Initializes the underlying telemetry client if it hasn't been created yet. Safe to call multiple
+        /// times (idempotent) and is used both by <see cref="StartTelemetry{T}"/> and by callers that need to
+        /// report dependency health (<see cref="TrackDependencyCall"/>) earlier in the tool's execution,
+        /// before the final app-data/KPI events are sent.
+        /// </summary>
+        /// <param name="catoolVersion">The CA tool version.</param>
+        /// <param name="component">The standardized "Component" attribute identifying the SIT tool (e.g. Scan, Create, Upload).</param>
+        public void EnsureInitialized(string catoolVersion, string component)
+        {
+            if (telemetry_ != null)
+            {
+                return;
+            }
+
+            telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
+            {
+                { "ConnectionString", appSettings_?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty },
+                { "Product", TelemetryConstant.Product },
+                { "Application", TelemetryConstant.ToolName },
+                { "Component", component },
+                { "Environment", appSettings_?.Telemetry?.Environment ?? string.Empty },
+                { "Version", catoolVersion ?? string.Empty },
+                { "Organization", TelemetryConstant.Organization }
+            });
+        }
+
+        /// <summary>
+        /// Tracks the success/failure and latency of an outbound call to a dependent service
+        /// (e.g. SW360, Artifactory). KPI: "Infrastructure Availability" - lets Grafana distinguish
+        /// SIT-side failures from failures caused by an unavailable/slow dependency.
+        /// </summary>
+        /// <param name="serviceName">The dependent service name (e.g. "SW360", "Artifactory").</param>
+        /// <param name="success">Whether the call succeeded.</param>
+        /// <param name="duration">How long the call took.</param>
+        /// <param name="component">The standardized "Component" attribute identifying the SIT tool (e.g. Scan, Create, Upload).</param>
+        public void TrackDependencyCall(string serviceName, bool success, TimeSpan duration, string component)
+        {
+            if (telemetry_ == null)
+            {
+                // Telemetry not initialized (e.g. disabled) - no-op so callers don't need to guard themselves.
+                return;
+            }
+
+            telemetry_.TrackCustomEvent(TelemetryConstant.DependencyHealthEvent, new Dictionary<string, string>
+            {
+                { "Service", serviceName ?? string.Empty },
+                { "Success", success.ToString() },
+                { "Duration Seconds", duration.TotalSeconds.ToString("0.##", CultureInfo.InvariantCulture) },
+                { "Component", component ?? string.Empty },
+                { "Run Id", runId_ }
+            });
+        }
+
+        /// <summary>
         /// Initializes telemetry and tracks a custom event with application details.
         /// </summary>
         /// <param name="toolName">The name of the tool.</param>
@@ -118,7 +163,9 @@ namespace SIT.Common
                 { "SW360 Project Name", appSettings?.SW360?.ProjectName },
                 { "SW360 Project ID", appSettings?.SW360?.ProjectID },
                 { "SBOM File Name", Path.GetFileName(FileOperations.CatoolBomFilePath ?? string.Empty) },
-                { "Project Type", appSettings?.ProjectType },
+                // KPI: "Ecosystem Coverage" - normalize casing (e.g. "npm"/"Npm"/"NPM") so Grafana groups
+                // all events for the same ecosystem together instead of fragmenting by raw input casing.
+                { "Project Type", appSettings?.ProjectType?.ToUpperInvariant() ?? string.Empty },
                 { "Hashed User ID", HashUtility.GetHashString(Environment.UserName) },
                 { "Start Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
                 { "Time Taken For Completion", timeTaken.HasValue ? $"{timeTaken.Value.TotalSeconds:0.##} seconds" : string.Empty },

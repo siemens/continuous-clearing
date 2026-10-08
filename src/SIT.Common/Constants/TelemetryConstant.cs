@@ -74,6 +74,12 @@ namespace SIT.Common.Constants
         /// A CI/orchestrator script should set this variable once before invoking Scan/Create/Upload sequentially.
         /// </summary>
         public const string PipelineRunIdEnvironmentVariable = "SIT_PIPELINE_RUN_ID";
+        /// <summary>
+        /// Telemetry event name for dependency/infrastructure health checks (e.g. SW360, Artifactory).
+        /// KPI: "Infrastructure Availability" - tracks success/failure and latency of outbound calls to
+        /// dependent services so Grafana can surface whether failures originate from SIT or from a dependency.
+        /// </summary>
+        public const string DependencyHealthEvent = "DependencyHealth";
         #endregion
 
         #region Properties
