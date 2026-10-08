@@ -47,20 +47,6 @@ Releases are automated via the `Build & Release` GitHub Actions workflow
 automatically by **GitVersion** based on branch/tag naming, using the rules
 defined in [`GitVersion.yml`](GitVersion.yml).
 
-### Versioning is fully automatic - no manual steps or stale versions
-
-None of the `.csproj` files contain a hardcoded `<Version>` element anymore,
-and `src/Directory.Build.props` only defines a harmless `0.0.0-dev` fallback
-for local/dev builds. Contributors never need to remember to bump a version
-anywhere, and there is no checked-in version number that can go stale.
-
-The real version is computed live by GitVersion in the `version` job of the
-CI workflow and passed into `dotnet build`/`dotnet pack`/the Docker tag via
-MSBuild properties (`-p:Version`, `-p:AssemblyVersion`, `-p:FileVersion`,
-`-p:InformationalVersion`), so every CI-built DLL, NuGet package, and Docker
-image always carries the correct version derived from Git history according
-to the rules in [`GitVersion.yml`](GitVersion.yml).
-
 ### Versioning rules (GitVersion.yml)
 
 | Branch / Tag pattern         | GitVersion tag | Example version   | Release type       |
