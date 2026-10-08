@@ -194,6 +194,23 @@ namespace SIT.Scan.UTest
         }
 
         [Test]
+        public void ParseJsonInContainer_DoesNotThrowForNestedObjAssetFile()
+        {
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            string csprojPath = Path.Combine(tempDir, "test.csproj");
+            File.WriteAllText(csprojPath, "<Project Sdk=\"Microsoft.NET.Sdk\"><ItemGroup><ProjectCapability Include=\"TestContainer\" /></ItemGroup></Project>");
+            string fakeJson = Path.Combine(tempDir, "obj", "Release", "net10.0", "WorkerExtensions", "obj", "project.assets.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(fakeJson));
+            File.WriteAllText(fakeJson, "{}\n");
+            var container = new Container();
+            var method = typeof(NugetDevDependencyParser).GetMethod("ParseJsonInContainer", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { fakeJson, container }));
+            Assert.AreEqual("project.assets.json", container.Name);
+            Directory.Delete(tempDir, true);
+        }
+
+        [Test]
         public void GetFileHash_ReturnsNullIfFileNotExists()
         {
             var method = typeof(NugetDevDependencyParser).GetMethod("GetFileHash", BindingFlags.NonPublic | BindingFlags.Static);
