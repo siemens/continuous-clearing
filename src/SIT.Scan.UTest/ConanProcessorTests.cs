@@ -6,6 +6,7 @@
 
 using CycloneDX.Models;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
@@ -15,7 +16,9 @@ using SIT.Common.Model;
 using SIT.Scan.Interface;
 using SIT.Scan.Model;
 using SIT.Services.Interface;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -459,6 +462,339 @@ namespace SIT.Scan.UTest
 
         #endregion
 
+        #region ParseDepJson / GetPackagesForBom / GetDependencyDetails Tests
+
+        [Test]
+        public void ParseDepJson_WithValidJson_ReturnsComponentsAndDependencies()
+        {
+            var depJson = new ConanDepJson
+            {
+                Graph = new ConanGraph
+                {
+                    Nodes = new Dictionary<string, ConanPackage>
+                    {
+                        ["0"] = new ConanPackage
+                        {
+                            Name = "", // root consumer node, skipped
+                            Dependencies = new Dictionary<string, ConanDependency>
+                            {
+                                ["1"] = new ConanDependency { Direct = true }
+                            }
+                        },
+                        ["1"] = new ConanPackage
+                        {
+                            Name = "boost",
+                            Version = "1.75.0",
+                            Context = "host",
+                            Dependencies = new Dictionary<string, ConanDependency>
+                            {
+                                ["2"] = new ConanDependency { Direct = false }
+                            }
+                        },
+                        ["2"] = new ConanPackage
+                        {
+                            Name = "zlib",
+                            Version = "1.2.11",
+                            Context = "build"
+                        }
+                    }
+                }
+            };
+            string json = JsonConvert.SerializeObject(depJson);
+            string filePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"conan-depjson-{Guid.NewGuid()}.json");
+            System.IO.File.WriteAllText(filePath, json);
+            try
+            {
+                var dependencies = new List<Dependency>();
+                var method = typeof(ConanProcessor).GetMethod("ParseDepJson", BindingFlags.NonPublic | BindingFlags.Static);
+
+                var result = (List<Component>)method.Invoke(null, new object[] { filePath, dependencies });
+
+                Assert.That(result, Has.Count.EqualTo(2));
+                var boost = result.First(c => c.Name == "boost");
+                Assert.That(boost.Properties.First(p => p.Name == Dataconstant.Cdx_SiemensDirect).Value, Is.EqualTo("true"));
+                var zlib = result.First(c => c.Name == "zlib");
+                Assert.That(zlib.Properties.First(p => p.Name == Dataconstant.Cdx_IsDevelopment).Value, Is.EqualTo("true"));
+                Assert.That(dependencies, Has.Count.GreaterThan(0));
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void ParseDepJson_WithNullNodes_ReturnsEmptyList()
+        {
+            var depJson = new ConanDepJson { Graph = new ConanGraph { Nodes = null } };
+            string json = JsonConvert.SerializeObject(depJson);
+            string filePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"conan-depjson-nullnodes-{Guid.NewGuid()}.json");
+            System.IO.File.WriteAllText(filePath, json);
+            try
+            {
+                var dependencies = new List<Dependency>();
+                var method = typeof(ConanProcessor).GetMethod("ParseDepJson", BindingFlags.NonPublic | BindingFlags.Static);
+
+                var result = (List<Component>)method.Invoke(null, new object[] { filePath, dependencies });
+
+                Assert.That(result, Is.Empty);
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void ParseDepJson_WithMalformedJson_ReturnsEmptyListAndDoesNotThrow()
+        {
+            string filePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"conan-depjson-malformed-{Guid.NewGuid()}.json");
+            System.IO.File.WriteAllText(filePath, "{ not valid json ");
+            try
+            {
+                var dependencies = new List<Dependency>();
+                var method = typeof(ConanProcessor).GetMethod("ParseDepJson", BindingFlags.NonPublic | BindingFlags.Static);
+
+                List<Component> result = null;
+                Assert.DoesNotThrow(() => result = (List<Component>)method.Invoke(null, new object[] { filePath, dependencies }));
+                Assert.That(result, Is.Empty);
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void IsDevDependency_WithBuildContext_ReturnsTrueAndIncrementsCounter()
+        {
+            var package = new ConanPackage { Context = "build" };
+            int noOfDevDependent = 0;
+
+            bool result = ConanProcessor.IsDevDependency(package, ref noOfDevDependent);
+
+            Assert.That(result, Is.True);
+            Assert.That(noOfDevDependent, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void IsDevDependency_WithHostContext_ReturnsFalse()
+        {
+            var package = new ConanPackage { Context = "host" };
+            int noOfDevDependent = 0;
+
+            bool result = ConanProcessor.IsDevDependency(package, ref noOfDevDependent);
+
+            Assert.That(result, Is.False);
+            Assert.That(noOfDevDependent, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetDependencyDetails_WithDependencies_PopulatesDependencyList()
+        {
+            var compA = new Component { Name = "boost", Version = "1.75.0", Purl = "pkg:conan/boost@1.75.0" };
+            var componentsForBOM = new List<Component> { compA };
+            var nodePackages = new List<KeyValuePair<string, ConanPackage>>
+            {
+                new("1", new ConanPackage
+                {
+                    Name = "boost",
+                    Version = "1.75.0",
+                    Dependencies = new Dictionary<string, ConanDependency> { ["2"] = new ConanDependency() }
+                }),
+                new("2", new ConanPackage { Name = "zlib", Version = "1.2.11" })
+            };
+            var dependencies = new List<Dependency>();
+            var method = typeof(ConanProcessor).GetMethod("GetDependencyDetails", BindingFlags.NonPublic | BindingFlags.Static);
+
+            method.Invoke(null, new object[] { componentsForBOM, nodePackages, dependencies });
+
+            Assert.That(dependencies, Has.Count.EqualTo(1));
+            Assert.That(dependencies[0].Ref, Is.EqualTo("pkg:conan/boost@1.75.0"));
+            Assert.That(dependencies[0].Dependencies[0].Ref, Does.Contain("zlib"));
+        }
+
+        [Test]
+        public void GetDependencyDetails_WithNoDependencies_LeavesDependencyListEmpty()
+        {
+            var compA = new Component { Name = "boost", Version = "1.75.0", Purl = "pkg:conan/boost@1.75.0" };
+            var componentsForBOM = new List<Component> { compA };
+            var nodePackages = new List<KeyValuePair<string, ConanPackage>>
+            {
+                new("1", new ConanPackage { Name = "boost", Version = "1.75.0", Dependencies = new Dictionary<string, ConanDependency>() })
+            };
+            var dependencies = new List<Dependency>();
+            var method = typeof(ConanProcessor).GetMethod("GetDependencyDetails", BindingFlags.NonPublic | BindingFlags.Static);
+
+            method.Invoke(null, new object[] { componentsForBOM, nodePackages, dependencies });
+
+            Assert.That(dependencies, Is.Empty);
+        }
+
+        #endregion
+
+        #region AddingIdentifierType / IsInternalConanComponent Tests
+
+        [Test]
+        public void AddingIdentifierType_WithPackageFileSource_SetsDiscoveredProperty()
+        {
+            var components = new List<Component> { new Component { Name = "boost", Version = "1.75.0", Properties = new List<Property>() } };
+            var method = typeof(ConanProcessor).GetMethod("AddingIdentifierType", BindingFlags.NonPublic | BindingFlags.Static);
+
+            method.Invoke(null, new object[] { components, "PackageFile" });
+
+            Assert.That(components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IdentifierType).Value, Is.EqualTo(Dataconstant.Discovered));
+        }
+
+        [Test]
+        public void AddingIdentifierType_WithOtherSource_SetsManuallyAddedProperty()
+        {
+            var components = new List<Component> { new Component { Name = "boost", Version = "1.75.0", Properties = new List<Property>() } };
+            var method = typeof(ConanProcessor).GetMethod("AddingIdentifierType", BindingFlags.NonPublic | BindingFlags.Static);
+
+            method.Invoke(null, new object[] { components, "Manual" });
+
+            Assert.That(components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IdentifierType).Value, Is.EqualTo(Dataconstant.ManullayAdded));
+            Assert.That(components[0].Properties.First(p => p.Name == Dataconstant.Cdx_IsDevelopment).Value, Is.EqualTo("false"));
+        }
+
+        [Test]
+        public void IsInternalConanComponent_WithMatch_ReturnsTrue()
+        {
+            var aqlResultList = new List<AqlResult> { new AqlResult { Path = "boost/1.75.0/stable" } };
+            var component = new Component { Name = "boost", Version = "1.75.0" };
+            var method = typeof(ConanProcessor).GetMethod("IsInternalConanComponent", BindingFlags.NonPublic | BindingFlags.Static);
+
+            var result = (bool)method.Invoke(null, new object[] { aqlResultList, component });
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void IsInternalConanComponent_WithNoMatch_ReturnsFalse()
+        {
+            var aqlResultList = new List<AqlResult> { new AqlResult { Path = "zlib/1.2.11/stable" } };
+            var component = new Component { Name = "boost", Version = "1.75.0" };
+            var method = typeof(ConanProcessor).GetMethod("IsInternalConanComponent", BindingFlags.NonPublic | BindingFlags.Static);
+
+            var result = (bool)method.Invoke(null, new object[] { aqlResultList, component });
+
+            Assert.That(result, Is.False);
+        }
+
+        #endregion
+
+        #region UpdateComponentDetails / GetComponentHashes Tests
+
+        [Test]
+        public void UpdateComponentDetails_WithMatchingHashes_SetsComponentHashes()
+        {
+            var component = new Component { Name = "boost", Version = "1.75.0", Purl = "pkg:conan/boost@1.75.0" };
+            var appSettings = CreateTestAppSettings();
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CONAN" };
+            var aqlResultList = new List<AqlResult>
+            {
+                new AqlResult { Path = "boost/1.75.0", Repo = "repo1", Name = "boost.tgz", MD5 = "md5", SHA1 = "sha1", SHA256 = "sha256" }
+            };
+            var method = typeof(ConanProcessor).GetMethod("UpdateComponentDetails", BindingFlags.NonPublic | BindingFlags.Static);
+
+            var result = (Component)method.Invoke(null, new object[] { component, aqlResultList, appSettings, projectType });
+
+            Assert.That(result.Hashes, Is.Not.Null);
+            Assert.That(result.Hashes, Has.Count.EqualTo(3));
+            Assert.That(result.Description, Is.Null);
+        }
+
+        [Test]
+        public void UpdateComponentDetails_WithNoMatchingHashes_LeavesHashesNull()
+        {
+            var component = new Component { Name = "boost", Version = "1.75.0", Purl = "pkg:conan/boost@1.75.0" };
+            var appSettings = CreateTestAppSettings();
+            var projectType = new Property { Name = Dataconstant.Cdx_ProjectType, Value = "CONAN" };
+            var aqlResultList = new List<AqlResult>();
+            var method = typeof(ConanProcessor).GetMethod("UpdateComponentDetails", BindingFlags.NonPublic | BindingFlags.Static);
+
+            var result = (Component)method.Invoke(null, new object[] { component, aqlResultList, appSettings, projectType });
+
+            Assert.That(result.Hashes, Is.Null);
+        }
+
+        [Test]
+        public void GetComponentHashes_ReturnsThreeHashAlgorithms()
+        {
+            var aqlResult = new AqlResult { MD5 = "md5val", SHA1 = "sha1val", SHA256 = "sha256val" };
+            var method = typeof(ConanProcessor).GetMethod("GetComponentHashes", BindingFlags.NonPublic | BindingFlags.Static);
+
+            var result = (List<Hash>)method.Invoke(null, new object[] { aqlResult });
+
+            Assert.That(result, Has.Count.EqualTo(3));
+            Assert.That(result.Any(h => h.Alg == Hash.HashAlgorithm.MD5 && h.Content == "md5val"), Is.True);
+            Assert.That(result.Any(h => h.Alg == Hash.HashAlgorithm.SHA_1 && h.Content == "sha1val"), Is.True);
+            Assert.That(result.Any(h => h.Alg == Hash.HashAlgorithm.SHA_256 && h.Content == "sha256val"), Is.True);
+        }
+
+        #endregion
+
+        #region CreateFileForMultipleVersions Tests
+
+        [Test]
+        public void CreateFileForMultipleVersions_WhenFileDoesNotExist_CreatesNewFile()
+        {
+            string outputFolder = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"conan-multiversion-{Guid.NewGuid()}");
+            System.IO.Directory.CreateDirectory(outputFolder);
+            try
+            {
+                var appSettings = CreateTestAppSettings();
+                appSettings.Directory = new Directory { OutputFolder = outputFolder };
+                appSettings.SW360 = new SW360 { ProjectName = "TestProject" };
+                var components = new List<Component>
+                {
+                    new Component { Name = "boost", Version = "1.75.0", Description = "" },
+                    new Component { Name = "boost", Version = "1.76.0", Description = "" }
+                };
+
+                Assert.DoesNotThrow(() => ConanProcessor.CreateFileForMultipleVersions(components, appSettings));
+
+                string expectedFilePath = System.IO.Path.Combine(outputFolder, $"{appSettings.SW360.ProjectName}_{FileConstant.multipleversionsFileName}");
+                Assert.That(System.IO.File.Exists(expectedFilePath), Is.True);
+            }
+            finally
+            {
+                System.IO.Directory.Delete(outputFolder, true);
+            }
+        }
+
+        [Test]
+        public void CreateFileForMultipleVersions_WhenFileAlreadyExists_UpdatesExistingFile()
+        {
+            string outputFolder = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"conan-multiversion-existing-{Guid.NewGuid()}");
+            System.IO.Directory.CreateDirectory(outputFolder);
+            try
+            {
+                var appSettings = CreateTestAppSettings();
+                appSettings.Directory = new Directory { OutputFolder = outputFolder };
+                appSettings.SW360 = new SW360 { ProjectName = "TestProject" };
+                var components = new List<Component>
+                {
+                    new Component { Name = "boost", Version = "1.75.0", Description = "" }
+                };
+                ConanProcessor.CreateFileForMultipleVersions(components, appSettings);
+
+                var componentsSecondRun = new List<Component>
+                {
+                    new Component { Name = "zlib", Version = "1.2.11", Description = "" }
+                };
+
+                Assert.DoesNotThrow(() => ConanProcessor.CreateFileForMultipleVersions(componentsSecondRun, appSettings));
+            }
+            finally
+            {
+                System.IO.Directory.Delete(outputFolder, true);
+            }
+        }
+
+        #endregion
+
         private static CommonAppSettings CreateTestAppSettings()
         {
             return new CommonAppSettings
@@ -476,3 +812,4 @@ namespace SIT.Scan.UTest
         }
     }
 }
+

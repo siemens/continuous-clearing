@@ -6,6 +6,7 @@
 		<AssemblyName>SIT.Upload</AssemblyName>
 		<RootNamespace>SIT.Upload</RootNamespace>
 		<Version>11.1.6</Version>
+		<Nullable>enable</Nullable>
 		<NoWarn>$(NoWarn);NETSDK1206</NoWarn>
 	</PropertyGroup>
 

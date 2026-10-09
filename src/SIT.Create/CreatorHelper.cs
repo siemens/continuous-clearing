@@ -26,6 +26,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
@@ -274,6 +275,7 @@ namespace SIT.Create
         /// </summary>
         /// <param name="component"></param>
         /// <returns>task that returns asynchronous operation</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "S4036:Make sure the PATH used to find this command includes only what you intend", Justification = "mvn/cmd.exe are resolved from a controlled CI environment PATH; command injection is already mitigated by maven coordinate validation.")]
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
             string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
@@ -285,21 +287,65 @@ namespace SIT.Create
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             Logger.DebugFormat("DownloadDependencyList(): Start - ComponentName: {0}, Version: {1}, Group: {2}", component.Name, component.Version, component.Group);
+
+            // Build the maven-dependency-plugin:copy call by passing every token through
+            // ArgumentList instead of concatenating it into a shell command string. This way the
+            // maven coordinates (group/name/version) are delivered to the process as discrete,
+            // already separated arguments and are never interpreted by a shell (/bin/bash -c or
+            // cmd /c), which permanently removes the command-injection vector while still running mvn.
+            string artifact = $"-Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources";
+            string outputDirectory = $"-DoutputDirectory={localPathforDownload}";
+            const string mavenGoal = "org.apache.maven.plugins:maven-dependency-plugin:copy";
+
             if (isWindows)
             {
-                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                p.StartInfo.Arguments = $"/c mvn org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-                Logger.DebugFormat("DownloadDependencyList(): Windows OS detected. Command: {0}", p.StartInfo.Arguments);
+                // On Windows mvn is a batch script (mvn.cmd) that can only be launched via cmd.exe.
+                // cmd.exe does not honour the standard argv escaping used by ArgumentList, so the
+                // maven coordinates are additionally validated against the strict maven character
+                // set to ensure no cmd metacharacters can ever reach the shell. Legitimate maven
+                // components always satisfy this, so real components continue to be processed.
+                if (!IsValidMavenCoordinate(component.Group) || !IsValidMavenCoordinate(component.Name) || !IsValidMavenCoordinate(component.Version))
+                {
+                    Logger.WarnFormat("DownloadDependencyList(): Skipping mvn download for unsafe component coordinates - ComponentName: {0}, Version: {1}, Group: {2}", component.Name, component.Version, component.Group);
+                    return;
+                }
+
+                p.StartInfo.FileName = "cmd.exe";
+                p.StartInfo.ArgumentList.Add("/c");
+                p.StartInfo.ArgumentList.Add("mvn");
+                p.StartInfo.ArgumentList.Add(mavenGoal);
+                p.StartInfo.ArgumentList.Add(artifact);
+                p.StartInfo.ArgumentList.Add(outputDirectory);
+                Logger.DebugFormat("DownloadDependencyList(): Windows OS detected. Artifact: {0}", artifact);
             }
             else
             {
-                p.StartInfo.FileName = Path.Combine(@"mvn");
-                p.StartInfo.Arguments = $"org.apache.maven.plugins:maven-dependency-plugin:copy -Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources -DoutputDirectory={localPathforDownload}";
-                Logger.DebugFormat("DownloadDependencyList(): Non-Windows OS detected. Command: {0}", p.StartInfo.Arguments);
+                p.StartInfo.FileName = "mvn";
+                p.StartInfo.ArgumentList.Add(mavenGoal);
+                p.StartInfo.ArgumentList.Add(artifact);
+                p.StartInfo.ArgumentList.Add(outputDirectory);
+                Logger.DebugFormat("DownloadDependencyList(): Non-Windows OS detected. Artifact: {0}", artifact);
             }
 
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
             await processResult;
+        }
+
+        /// <summary>
+        /// Validates that a maven coordinate token
+        /// characters allowed in valid maven coordinates. This prevents shell command injection when
+        /// the coordinate is passed to the "mvn" command line via cmd.exe on Windows.
+        /// </summary>
+        private static bool IsValidMavenCoordinate(string coordinate)
+        {
+            if (string.IsNullOrWhiteSpace(coordinate) || coordinate.Length > 256)
+            {
+                return false;
+            }
+
+            // Maven group/artifact/version characters only (letters, digits, dot, hyphen,
+            // underscore) - no whitespace or shell metacharacters are permitted.
+            return CreatorHelperRegex.MavenCoordinateRegex().IsMatch(coordinate);
         }
 
         /// <summary>
@@ -1045,5 +1091,17 @@ namespace SIT.Create
 
         }
 
+    }
+
+    /// <summary>
+    /// Holds source-generated regular expressions used by <see cref="CreatorHelper"/>.
+    /// Kept in a separate class because the GeneratedRegex source generator does not
+    /// support types declared with a primary constructor.
+    /// </summary>
+    internal static partial class CreatorHelperRegex
+    {
+        // Matches valid Maven coordinate characters (letters, digits, '.', '_', '-'); 5s timeout guards against pathological input.
+        [GeneratedRegex("^[a-zA-Z0-9._-]+$", RegexOptions.None, 5000)]
+        internal static partial Regex MavenCoordinateRegex();
     }
 }

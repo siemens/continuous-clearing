@@ -14,6 +14,8 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -111,6 +113,134 @@ namespace SIT.Create.UTest
 
             Assert.That(sourceUrl, Is.EqualTo("https://github.com/angular/angular-cli/"));
         }
+
+        [Test]
+        [TestCase("invalid package;name", "1.0.0")]
+        [TestCase("valid-package", "1.0.0; rm -rf /")]
+        [TestCase("Invalid_Upper$Case", "1.0.0")]
+        [TestCase(null, "1.0.0")]
+        [TestCase("", "1.0.0")]
+        [TestCase("   ", "1.0.0")]
+        [TestCase("valid-package", null)]
+        [TestCase("valid-package", "")]
+        [TestCase("valid-package", "   ")]
+        [TestCase("@scope/package", "1.0.0&echo injected")]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithUnsafeComponentNameOrVersion_ReturnsEmptyString(string componentName, string version)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage(componentName, version);
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithComponentNameExceedingMaxLength_ReturnsEmptyString()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+            string componentName = new string('a', 215);
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage(componentName, "1.0.0");
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithComponentVersionExceedingMaxLength_ReturnsEmptyString()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+            string version = new string('1', 257);
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage("valid-package", version);
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase(" ", false)]
+        [TestCase("\t\r\n", false)]
+        [TestCase("package", true)]
+        [TestCase("0", true)]
+        [TestCase("package-name_1.2~next", true)]
+        [TestCase("@scope/package", true)]
+        [TestCase("@scope-name_1.2~next/package-name_1.2~next", true)]
+        [TestCase("Package", false)]
+        [TestCase("@Scope/package", false)]
+        [TestCase("@scope/", false)]
+        [TestCase("@/package", false)]
+        [TestCase("@scope/package/extra", false)]
+        [TestCase("-package", false)]
+        [TestCase(".package", false)]
+        [TestCase("package name", false)]
+        [TestCase("package;echo", false)]
+        [TestCase("package&echo", false)]
+        [TestCase("package|echo", false)]
+        [TestCase("package$variable", false)]
+        public void IsValidNpmComponentName_ValidatesPackageName(string componentName, bool expected)
+        {
+            var method = typeof(UrlHelper).GetMethod("IsValidNpmComponentName", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+
+            var result = (bool)method.Invoke(null, new object[] { componentName });
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(213, true)]
+        [TestCase(214, true)]
+        [TestCase(215, false)]
+        public void IsValidNpmComponentName_EnforcesLengthBoundary(int length, bool expected)
+        {
+            IsValidNpmComponentName_ValidatesPackageName(new string('a', length), expected);
+        }
+
+        [TestCase(214, true)]
+        [TestCase(215, false)]
+        public void IsValidNpmComponentName_LengthLimitIncludesScope(int length, bool expected)
+        {
+            const string scope = "@scope/";
+
+            IsValidNpmComponentName_ValidatesPackageName(scope + new string('a', length - scope.Length), expected);
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnUnsupportedOperatingSystem_ThrowsForMissingExecutable()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Assert.Ignore("The unsupported-OS branch requires a runner other than Windows or Linux.");
+            }
+
+            var exception = Assert.Throws<AggregateException>(() => _urlHelper.GetSourceUrlForNpmPackage("valid-package", "1.0.0"));
+
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
+        }
+
         [Test]
         public async Task GetSourceUrlForCargoPackage_ValidPackage_ReturnsDownloadUrl()
         {
@@ -364,5 +494,107 @@ namespace SIT.Create.UTest
             Assert.DoesNotThrow(() => urlHelper.Dispose(), "Dispose should not throw when called multiple times.");
         }
 
+        #region GetAlpineDistro Tests
+
+        [TestCase("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-3.16.2", "3.16-stable")]
+        [TestCase("pkg:apk/alpine/busybox@1.35.0-r29?distro=alpine-3.17.3", "3.17-stable")]
+        public void GetAlpineDistro_WithValidBomRef_ReturnsStableBranchName(string bomRef, string expected)
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro(bomRef);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void GetAlpineDistro_WithNullOrWhiteSpaceBomRef_ReturnsEmptyString(string bomRef)
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro(bomRef);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithoutDistroKeyword_ReturnsEmptyString()
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithTooFewVersionSegments_ReturnsEmptyString()
+        {
+            // Act - after splitting on "distro" there is no "-" separated version part
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithShortVersionSegment_ReturnsEmptyString()
+        {
+            // Act - version segment has fewer than 2 characters
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-1");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithNonNumericVersionSegment_ReturnsEmptyString()
+        {
+            // Act - resulting distro value fails the stable branch name regex, e.g. "0.-stable"
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-0.1x");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        #endregion
+
+        #region CheckoutDistro Tests
+
+        [Test]
+        public void CheckoutDistro_WithUnsafeDistroValue_SkipsGitCheckoutWithoutThrowing()
+        {
+            // Arrange - an invalid distro value (potential command injection) combined with a
+            // non-existent working directory. If the method attempted to start "git" it would
+            // throw since the working directory does not exist, so DoesNotThrow proves the
+            // unsafe value was rejected before any process was started.
+            string unsafeDistro = "--upload-pack=touch /tmp/pwned;";
+            string nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            var method = typeof(UrlHelper).GetMethod("CheckoutDistro",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { unsafeDistro, nonExistentPath }));
+        }
+
+        [Test]
+        public void CheckoutDistro_WithEmptyDistroValue_SkipsGitCheckoutWithoutThrowing()
+        {
+            // Arrange
+            string nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            var method = typeof(UrlHelper).GetMethod("CheckoutDistro",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { string.Empty, nonExistentPath }));
+        }
+
+        #endregion
+
     }
 }
+

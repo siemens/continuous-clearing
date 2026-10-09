@@ -98,12 +98,49 @@ namespace SIT.Create
         /// <returns>distro</returns>
         public static string GetAlpineDistro(string bomRef)
         {
+            if (string.IsNullOrWhiteSpace(bomRef))
+            {
+                return string.Empty;
+            }
 
             string[] getDistro = bomRef.Split("distro");
+            if (getDistro.Length < 2)
+            {
+                return string.Empty;
+            }
+
             string[] getDestroVersion = getDistro[1].Split("-");
+            if (getDestroVersion.Length < 2 || getDestroVersion[1].Length < 2)
+            {
+                return string.Empty;
+            }
+
             var output = getDestroVersion[1][..^2];
             var distro = output + "-stable";
+
+            // The distro value is derived from an untrusted bom-ref and is later passed to
+            // "git checkout". Only accept well-formed Alpine stable branch names (e.g. "3.19-stable")
+            // so that no value containing an option prefix ("-"/"--") or shell/argument
+            // metacharacters can ever reach the git command line.
+            if (!IsValidAlpineDistro(distro))
+            {
+                Logger.WarnFormat("GetAlpineDistro(): Ignoring unsafe distro value derived from bomRef: {0}", distro);
+                return string.Empty;
+            }
+
             return distro;
+        }
+
+        /// <summary>
+        /// Validates that an Alpine distro string is a well-formed stable branch name. This
+        /// guarantees the value begins with a digit and contains only safe characters, which
+        /// prevents argument/command injection when it is passed to "git checkout".
+        /// </summary>
+        /// <param name="distro">The distro branch name to validate.</param>
+        /// <returns>True when the value is a valid Alpine stable branch name; otherwise false.</returns>
+        private static bool IsValidAlpineDistro(string distro)
+        {
+            return !string.IsNullOrWhiteSpace(distro) && AlpineDistroRegex().IsMatch(distro);
         }
 
         /// <summary>
@@ -369,6 +406,15 @@ namespace SIT.Create
         /// <param name="fullPath"></param>
         private static void CheckoutDistro(string alpineDistro, string fullPath)
         {
+            // Defense in depth: even though the value is validated when produced, re-validate here
+            // and skip the checkout entirely if it is empty or unsafe, so this method can never
+            // forward an attacker-controlled option/argument to git.
+            if (!IsValidAlpineDistro(alpineDistro))
+            {
+                Logger.WarnFormat("CheckoutDistro(): Skipping git checkout for unsafe or empty distro value: {0}", alpineDistro);
+                return;
+            }
+
             Logger.DebugFormat("CheckoutDistro(): Start checkout github repo - AlpineDistro: {0}, FullPath: {1}", alpineDistro, fullPath);
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
@@ -377,7 +423,10 @@ namespace SIT.Create
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.FileName = Path.Combine(@"git");
-            p.StartInfo.Arguments = $"checkout" + " " + alpineDistro;
+            // Pass the branch name as a discrete argument via ArgumentList instead of concatenating
+            // it into the command line, so it is never subject to shell/quoting interpretation.
+            p.StartInfo.ArgumentList.Add("checkout");
+            p.StartInfo.ArgumentList.Add(alpineDistro);
             p.StartInfo.WorkingDirectory = fullPath;
 
             p.Start();
@@ -463,11 +512,10 @@ namespace SIT.Create
         /// <param name="componentName"></param>
         /// <param name="version"></param>
         /// <returns>string</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "S4036:Make sure the PATH used to find this command includes only what you intend", Justification = "npm/cmd.exe are resolved from a controlled CI environment PATH; component name/version are validated and passed via ArgumentList.")]
         public string GetSourceUrlForNpmPackage(string componentName, string version)
         {
             Logger.DebugFormat("GetSourceUrlForNpmPackage(): Start identifying sourceUrl for Npm Package - ComponentName: {0}, Version: {1}", componentName, version);
-
-            string npmViewCommandToGetUrl = String.Empty;
 
             Process p = new Process();
             p.StartInfo.RedirectStandardError = true;
@@ -476,25 +524,43 @@ namespace SIT.Create
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
 
+            // Build the "npm view name& version repository.url" call by passing every token through ArgumentList instead of concatenating it into a shell command string. 
+            string packageSpec = $"{componentName}@{version}";
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                npmViewCommandToGetUrl = $"-c \" npm view {componentName}@{version} repository.url --registry https://registry.npmjs.org/ \"";
-                p.StartInfo.FileName = FileConstant.DockerCMDTool;
-                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Linux OS detected. Command: {0}", npmViewCommandToGetUrl);
+                p.StartInfo.FileName = FileConstant.NpmCLITool;
+                p.StartInfo.ArgumentList.Add("view");
+                p.StartInfo.ArgumentList.Add(packageSpec);
+                p.StartInfo.ArgumentList.Add("repository.url");
+                p.StartInfo.ArgumentList.Add("--registry");
+                p.StartInfo.ArgumentList.Add("https://registry.npmjs.org/");
+                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Linux OS detected. Executing npm view for package: {0}", packageSpec);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                npmViewCommandToGetUrl = $"/c npm view {componentName}@{version} repository.url --registry https://registry.npmjs.org/";
-                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
-                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Windows OS detected. Command: {0}", npmViewCommandToGetUrl);
+                // On Windows npm is a batch script (npm.cmd) that can only be launched via cmd.exe.
+                if (!IsValidNpmComponentName(componentName) || !IsValidNpmComponentVersion(version))
+                {
+                    Logger.WarnFormat("GetSourceUrlForNpmPackage(): Skipping npm view for unsafe component name/version - ComponentName: {0}, Version: {1}", componentName, version);
+                    return string.Empty;
+                }
+
+                p.StartInfo.FileName = "cmd.exe";
+                p.StartInfo.ArgumentList.Add("/c");
+                p.StartInfo.ArgumentList.Add("npm");
+                p.StartInfo.ArgumentList.Add("view");
+                p.StartInfo.ArgumentList.Add(packageSpec);
+                p.StartInfo.ArgumentList.Add("repository.url");
+                p.StartInfo.ArgumentList.Add("--registry");
+                p.StartInfo.ArgumentList.Add("https://registry.npmjs.org/");
+                Logger.DebugFormat("GetSourceUrlForNpmPackage(): Windows OS detected. Executing npm view for package: {0}", packageSpec);
             }
             else
             {
                 Logger.Debug("GetSourceUrlForNpmPackage(): OS not recognized. Unable to determine the command to execute.");
             }
 
-
-            p.StartInfo.Arguments = npmViewCommandToGetUrl;
             var processResult = ProcessAsyncHelper.RunAsync(p.StartInfo);
             Result result = processResult?.Result;
             string sourceUrl = result?.StdOut?.TrimEnd();
@@ -507,8 +573,42 @@ namespace SIT.Create
 
             return githubUrl;
         }
+
         /// <summary>
-        /// Gets the Source URL for CARGO Packages
+        /// Validates that an npm component name only contains characters allowed in a valid
+        /// npm package name. This prevents shell command injection when the name is passed to
+        /// the "npm view" command line.
+        /// </summary>
+        private static bool IsValidNpmComponentName(string componentName)
+        {
+            if (string.IsNullOrWhiteSpace(componentName) || componentName.Length > 214)
+            {
+                return false;
+            }
+
+            // Optional scope (@scope/) followed by the package name. Allowed characters are
+            // limited to the npm package name character set (lowercase letters, digits and
+            // a small set of safe symbols) - no shell metacharacters are permitted.
+            return NpmComponentNameRegex().IsMatch(componentName);
+        }
+
+        /// <summary>
+        /// Validates that an npm component version only contains characters allowed in a
+        /// semantic version string. This prevents shell command injection when the version is
+        /// passed to the "npm view" command line.
+        /// </summary>
+        private static bool IsValidNpmComponentVersion(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version) || version.Length > 256)
+            {
+                return false;
+            }
+
+            // Semantic version characters only (digits, letters, dot, hyphen, plus) - no
+            // whitespace or shell metacharacters are permitted.
+            return NpmComponentVersionRegex().IsMatch(version);
+        }
+
         /// </summary>
         /// <param name="componentName"></param>
         /// <param name="componentVersion"></param>
@@ -626,7 +726,7 @@ namespace SIT.Create
             try
             {
                 response = await httpClient.GetStringAsync(nuspecURL);
-                XmlDocument xmlDoc = new XmlDocument();
+                XmlDocument xmlDoc = new XmlDocument() { XmlResolver = null };
                 xmlDoc.LoadXml(response);
 
                 XmlNodeList nodeList = xmlDoc.GetElementsByTagName("repository");
@@ -1126,5 +1226,17 @@ namespace SIT.Create
         private static partial Regex AlpineComponentVersionRegex();
         [GeneratedRegex(@"\=")]
         private static partial Regex AlpinePackagelineRegex();
+
+        // Matches valid npm semantic version characters (digits, letters, '.', '-', '+'); 5s timeout guards against pathological input.
+        [GeneratedRegex(@"^[a-zA-Z0-9.\-+]+$", RegexOptions.None, 5000)]
+        private static partial Regex NpmComponentVersionRegex();
+
+        // Matches a well-formed Alpine stable branch name (e.g. 'v3.18-stable'); 5s timeout guards against pathological input.
+        [GeneratedRegex(@"^v?\d+\.\d+-stable$", RegexOptions.None, 5000)]
+        private static partial Regex AlpineDistroRegex();
+
+        // Matches a valid npm package name with optional @scope/ prefix; 5s timeout guards against pathological input.
+        [GeneratedRegex(@"^(@[a-z0-9][a-z0-9-._~]*\/)?[a-z0-9][a-z0-9-._~]*$", RegexOptions.None, 5000)]
+        private static partial Regex NpmComponentNameRegex();
     }
 }

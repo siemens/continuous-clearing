@@ -141,6 +141,10 @@ namespace SIT.Common.Constants
         /// </summary>
         public static readonly string DockerCMDTool = Path.Combine(@"/bin/bash");
         /// <summary>
+        /// npm CLI executable name (resolved from PATH). Used to invoke npm directly without a shell.
+        /// </summary>
+        public static readonly string NpmCLITool = "npm";
+        /// <summary>
         /// File name for package.json.
         /// </summary>
         public const string PackageJsonFileName = "package.json";

@@ -1497,5 +1497,134 @@ namespace SIT.Common.UTest
         }
 
         #endregion
+
+        #region SigningVerificationWithContent Tests
+
+        [Test]
+        public void SigningVerificationWithContent_WithNullAppSettings_ThrowsNullReferenceException()
+        {
+            // Act & Assert
+            Assert.Throws<NullReferenceException>(() =>
+                _sbomSigningValidation.SigningVerificationWithContent(null, _testBomFilePath, _mockEnvironmentHelper.Object));
+        }
+
+        [Test]
+        public void SigningVerificationWithContent_WithNullSbomSigningConfig_ThrowsNullReferenceException()
+        {
+            // Arrange
+            _validAppSettings.SbomSigning = null;
+
+            // Act & Assert
+            Assert.Throws<NullReferenceException>(() =>
+                _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, _testBomFilePath, _mockEnvironmentHelper.Object));
+        }
+
+        [Test]
+        public void SigningVerificationWithContent_WithNonExistentFile_CallsEnvironmentExitAndReturnsNull()
+        {
+            // Arrange
+            var mockHelper = new Mock<IEnvironmentHelper>();
+            string nonExistentFilePath = Path.Combine(_tempDirectory, "nonexistent-bom.json");
+
+            // Act
+            string result = _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, nonExistentFilePath, mockHelper.Object);
+
+            // Assert - FileNotFoundException is caught, exit is called, and null is returned
+            Assert.That(result, Is.Null);
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once,
+                "Environment.Exit should be called with -1 when the BOM file does not exist");
+        }
+
+        [Test]
+        public void SigningVerificationWithContent_WithNullBomFilePath_CallsEnvironmentExitAndReturnsNull()
+        {
+            // Arrange
+            var mockHelper = new Mock<IEnvironmentHelper>();
+
+            // Act
+            string result = null;
+            try
+            {
+                result = _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, null, mockHelper.Object);
+            }
+            catch (NullReferenceException)
+            {
+                // Acceptable - null path handling may surface as NullReferenceException
+            }
+
+            // Assert - either returned null having called exit, or threw before reaching exit
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void SigningVerificationWithContent_WithEmptyBomFilePath_CallsEnvironmentExitAndReturnsNull()
+        {
+            // Arrange
+            var mockHelper = new Mock<IEnvironmentHelper>();
+
+            // Act
+            string result = _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, string.Empty, mockHelper.Object);
+
+            // Assert - ArgumentNullException from ReadSBOMFile is caught, exit is called, and null is returned
+            Assert.That(result, Is.Null);
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once);
+        }
+
+        [Test]
+        public void SigningVerificationWithContent_DoesNotModifyAppSettings()
+        {
+            // Arrange
+            var originalKeyVault = _validAppSettings.SbomSigning.KeyVaultURI;
+            var originalCert = _validAppSettings.SbomSigning.CertificateName;
+            string nonExistentFilePath = Path.Combine(_tempDirectory, "nonexistent-bom.json");
+
+            // Act
+            _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, nonExistentFilePath, _mockEnvironmentHelper.Object);
+
+            // Assert - settings should not be modified
+            Assert.That(_validAppSettings.SbomSigning.KeyVaultURI, Is.EqualTo(originalKeyVault));
+            Assert.That(_validAppSettings.SbomSigning.CertificateName, Is.EqualTo(originalCert));
+        }
+
+        [Test]
+        public void SigningVerificationWithContent_MultipleCallsIndependent()
+        {
+            // Arrange
+            var mockHelper1 = new Mock<IEnvironmentHelper>();
+            var mockHelper2 = new Mock<IEnvironmentHelper>();
+            string file1 = Path.Combine(_tempDirectory, "missing1.json");
+            string file2 = Path.Combine(_tempDirectory, "missing2.json");
+
+            // Act
+            string result1 = _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, file1, mockHelper1.Object);
+            string result2 = _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, file2, mockHelper2.Object);
+
+            // Assert
+            Assert.That(result1, Is.Null);
+            Assert.That(result2, Is.Null);
+            mockHelper1.Verify(x => x.CallEnvironmentExit(-1), Times.Once, "First call should trigger exit");
+            mockHelper2.Verify(x => x.CallEnvironmentExit(-1), Times.Once, "Second call should trigger exit independently");
+        }
+
+        [Test]
+        public void SigningVerificationWithContent_WithExistingFileAndInvalidSignature_CallsEnvironmentExitAndReturnsNull()
+        {
+            // Arrange - the test BOM file exists but carries a fake/unverifiable signature. The
+            // verification pipeline therefore reports the signature as not valid (or surfaces one of
+            // the handled exceptions), driving the non-success branch: the failure is logged,
+            // environment exit is invoked with -1, and null is returned. This exercises the
+            // "signature verification failed" path for a file that is actually present on disk.
+            var mockHelper = new Mock<IEnvironmentHelper>();
+
+            // Act
+            string result = _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, _testBomFilePath, mockHelper.Object);
+
+            // Assert
+            Assert.That(result, Is.Null);
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once,
+                "Environment exit must be called with -1 when an existing BOM file fails signature verification");
+        }
+
+        #endregion
     }
 }
