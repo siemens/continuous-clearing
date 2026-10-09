@@ -1002,5 +1002,198 @@ namespace SIT.Services.UTest
             // Assert
             Assert.IsFalse(result);
         }
+
+        [Test]
+        public async Task UpdatePurlIdForExistingComponent_WhenPurlAlreadyExists_SkipsUpdateAndReturnsTrue()
+        {
+            // Arrange
+            ComponentPurlId componentPurlId = new ComponentPurlId
+            {
+                ExternalIds = new Dictionary<string, string>() { { "package-url", "pkg:npm/%40angular/common" } }
+            };
+            string externalIDResponse = JsonConvert.SerializeObject(componentPurlId);
+            Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApiCommMock.Setup(x => x.GetReleaseOfComponentById(It.IsAny<string>())).ReturnsAsync(externalIDResponse);
+            ComparisonBomData comparisonBomData = new ComparisonBomData
+            {
+                ComponentExternalId = "pkg:npm/%40angular/common"
+            };
+
+            // Act
+            var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
+            var actual = await sw360CreatorService.UpdatePurlIdForExistingComponent(comparisonBomData, "kjsdiwejjefojffwoje");
+
+            // Assert
+            Assert.That(actual, Is.True);
+            sw360ApiCommMock.Verify(x => x.UpdateComponent(It.IsAny<string>(), It.IsAny<HttpContent>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdatePurlIdForExistingRelease_WhenPurlAlreadyExists_SkipsUpdateAndReturnsTrue()
+        {
+            // Arrange
+            ComparisonBomData comparisonBomData = new ComparisonBomData
+            {
+                ReleaseExternalId = "pkg:npm/%40angular/common/10.0.2"
+            };
+            ReleasesInfo releasesInfo = new ReleasesInfo
+            {
+                ExternalIds = new Dictionary<string, string>() { { "package-url", "pkg:npm/%40angular/common/10.0.2" } }
+            };
+            Mock<ISW360ApicommunicationFacade> sw360ApiCommMock = new Mock<ISW360ApicommunicationFacade>();
+
+            // Act
+            var sw360CreatorService = new Sw360CreatorService(sw360ApiCommMock.Object);
+            var actual = await sw360CreatorService.UpdatePurlIdForExistingRelease(comparisonBomData, "kjsdiwejjefojffwoje", releasesInfo);
+
+            // Assert
+            Assert.That(actual, Is.True);
+            sw360ApiCommMock.Verify(x => x.UpdateRelease(It.IsAny<string>(), It.IsAny<HttpContent>()), Times.Never);
+        }
+
+        [Test]
+        public void GetDecodedExternalId_WithDebianPurl_ReturnsUrlDecodedValue()
+        {
+            // Arrange
+            string encoded = "pkg:deb/debian/name@1.0%2Bdfsg-1";
+            var method = typeof(Sw360CreatorService).GetMethod("GetDecodedExternalId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var result = (string)method.Invoke(null, new object[] { encoded });
+
+            // Assert
+            Assert.That(result, Is.EqualTo("pkg:deb/debian/name@1.0+dfsg-1"));
+        }
+
+        [Test]
+        public void GetDecodedExternalId_WithNonDebianPurl_ReturnsUnchanged()
+        {
+            // Arrange
+            string purl = "pkg:npm/%40angular/common";
+            var method = typeof(Sw360CreatorService).GetMethod("GetDecodedExternalId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act
+            var result = (string)method.Invoke(null, new object[] { purl });
+
+            // Assert
+            Assert.That(result, Is.EqualTo(purl));
+        }
+
+        [Test]
+        public void GetDecodedExternalId_WithNullOrEmpty_ReturnsUnchanged()
+        {
+            var method = typeof(Sw360CreatorService).GetMethod("GetDecodedExternalId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { string.Empty });
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceDownloadUrl_WhenDownloadUrlNotFound_ReturnsEmptyString()
+        {
+            var componentInfo = new ComparisonBomData { DownloadUrl = Dataconstant.DownloadUrlNotFound };
+            var attachmentUrlList = new Dictionary<string, string> { { "SOURCE", "file.tar.gz" } };
+            var method = typeof(Sw360CreatorService).GetMethod("GetSourceDownloadUrl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { componentInfo, attachmentUrlList });
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceDownloadUrl_WhenSourceKeyMissing_ReturnsEmptyString()
+        {
+            var componentInfo = new ComparisonBomData { DownloadUrl = "https://example.com/file.tar.gz" };
+            var attachmentUrlList = new Dictionary<string, string>();
+            var method = typeof(Sw360CreatorService).GetMethod("GetSourceDownloadUrl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { componentInfo, attachmentUrlList });
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceDownloadUrl_WhenValid_ReturnsDownloadUrl()
+        {
+            var componentInfo = new ComparisonBomData { DownloadUrl = "https://example.com/file.tar.gz" };
+            var attachmentUrlList = new Dictionary<string, string> { { "SOURCE", "file.tar.gz" } };
+            var method = typeof(Sw360CreatorService).GetMethod("GetSourceDownloadUrl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { componentInfo, attachmentUrlList });
+
+            Assert.That(result, Is.EqualTo("https://example.com/file.tar.gz"));
+        }
+
+        [Test]
+        public void GetPackageDownloadUrl_WhenBinaryKeyMissing_ReturnsEmptyString()
+        {
+            var componentInfo = new ComparisonBomData { PackageUrl = "https://example.com/file.jar" };
+            var attachmentUrlList = new Dictionary<string, string>();
+            var method = typeof(Sw360CreatorService).GetMethod("GetPackageDownloadUrl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { componentInfo, attachmentUrlList });
+
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetPackageDownloadUrl_WhenValid_ReturnsPackageUrl()
+        {
+            var componentInfo = new ComparisonBomData { PackageUrl = "https://example.com/file.jar" };
+            var attachmentUrlList = new Dictionary<string, string> { { "BINARY", "file.jar" } };
+            var method = typeof(Sw360CreatorService).GetMethod("GetPackageDownloadUrl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { componentInfo, attachmentUrlList });
+
+            Assert.That(result, Is.EqualTo("https://example.com/file.jar"));
+        }
+
+        [Test]
+        public void GetReleaseIdFromResponse_WhenMatchFound_ReturnsExtractedId()
+        {
+            var releaseIdOfComponent = new ReleaseIdOfComponent
+            {
+                Embedded = new ReleaseEmbedded
+                {
+                    Sw360Releases = new List<Sw360Releases>
+                    {
+                        new Sw360Releases
+                        {
+                            Name = "boost",
+                            Version = "1.75.0",
+                            Links = new Links { Self = new Self { Href = "http://localhost/releases/abc123" } }
+                        }
+                    }
+                }
+            };
+            string responseBody = JsonConvert.SerializeObject(releaseIdOfComponent);
+            var method = typeof(Sw360CreatorService).GetMethod("GetReleaseIdFromResponse", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { "boost", "1.75.0", "originalId", responseBody });
+
+            Assert.That(result, Is.EqualTo("abc123"));
+        }
+
+        [Test]
+        public void GetReleaseIdFromResponse_WhenNoMatch_ReturnsOriginalReleaseId()
+        {
+            var releaseIdOfComponent = new ReleaseIdOfComponent
+            {
+                Embedded = new ReleaseEmbedded
+                {
+                    Sw360Releases = new List<Sw360Releases>
+                    {
+                        new Sw360Releases { Name = "zlib", Version = "1.2.11", Links = new Links { Self = new Self { Href = "http://localhost/releases/zyx789" } } }
+                    }
+                }
+            };
+            string responseBody = JsonConvert.SerializeObject(releaseIdOfComponent);
+            var method = typeof(Sw360CreatorService).GetMethod("GetReleaseIdFromResponse", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (string)method.Invoke(null, new object[] { "boost", "1.75.0", "originalId", responseBody });
+
+            Assert.That(result, Is.EqualTo("originalId"));
+        }
     }
 }

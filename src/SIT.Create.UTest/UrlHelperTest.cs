@@ -14,6 +14,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -111,6 +112,66 @@ namespace SIT.Create.UTest
 
             Assert.That(sourceUrl, Is.EqualTo("https://github.com/angular/angular-cli/"));
         }
+
+        [Test]
+        [TestCase("invalid package;name", "1.0.0")]
+        [TestCase("valid-package", "1.0.0; rm -rf /")]
+        [TestCase("Invalid_Upper$Case", "1.0.0")]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithUnsafeComponentNameOrVersion_ReturnsEmptyString(string componentName, string version)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage(componentName, version);
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithComponentNameExceedingMaxLength_ReturnsEmptyString()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+            string componentName = new string('a', 215);
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage(componentName, "1.0.0");
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithComponentVersionExceedingMaxLength_ReturnsEmptyString()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+            string version = new string('1', 257);
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage("valid-package", version);
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
         [Test]
         public async Task GetSourceUrlForCargoPackage_ValidPackage_ReturnsDownloadUrl()
         {

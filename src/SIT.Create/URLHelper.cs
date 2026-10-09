@@ -140,8 +140,7 @@ namespace SIT.Create
         /// <returns>True when the value is a valid Alpine stable branch name; otherwise false.</returns>
         private static bool IsValidAlpineDistro(string distro)
         {
-            return !string.IsNullOrWhiteSpace(distro)
-                && Regex.IsMatch(distro, @"^v?\d+\.\d+-stable$");
+            return !string.IsNullOrWhiteSpace(distro) && AlpineDistroRegex().IsMatch(distro);
         }
 
         /// <summary>
@@ -590,9 +589,7 @@ namespace SIT.Create
             // Optional scope (@scope/) followed by the package name. Allowed characters are
             // limited to the npm package name character set (lowercase letters, digits and
             // a small set of safe symbols) - no shell metacharacters are permitted.
-            return Regex.IsMatch(
-                componentName,
-                @"^(@[a-z0-9][a-z0-9-._~]*\/)?[a-z0-9][a-z0-9-._~]*$");
+            return NpmComponentNameRegex().IsMatch(componentName);
         }
 
         /// <summary>
@@ -609,7 +606,7 @@ namespace SIT.Create
 
             // Semantic version characters only (digits, letters, dot, hyphen, plus) - no
             // whitespace or shell metacharacters are permitted.
-            return Regex.IsMatch(version, @"^[a-zA-Z0-9.\-+]+$");
+            return NpmComponentVersionRegex().IsMatch(version);
         }
 
         /// </summary>
@@ -1229,5 +1226,17 @@ namespace SIT.Create
         private static partial Regex AlpineComponentVersionRegex();
         [GeneratedRegex(@"\=")]
         private static partial Regex AlpinePackagelineRegex();
+
+        // Matches valid npm semantic version characters (digits, letters, '.', '-', '+'); 5s timeout guards against pathological input.
+        [GeneratedRegex(@"^[a-zA-Z0-9.\-+]+$", RegexOptions.None, 5000)]
+        private static partial Regex NpmComponentVersionRegex();
+
+        // Matches a well-formed Alpine stable branch name (e.g. 'v3.18-stable'); 5s timeout guards against pathological input.
+        [GeneratedRegex(@"^v?\d+\.\d+-stable$", RegexOptions.None, 5000)]
+        private static partial Regex AlpineDistroRegex();
+
+        // Matches a valid npm package name with optional @scope/ prefix; 5s timeout guards against pathological input.
+        [GeneratedRegex(@"^(@[a-z0-9][a-z0-9-._~]*\/)?[a-z0-9][a-z0-9-._~]*$", RegexOptions.None, 5000)]
+        private static partial Regex NpmComponentNameRegex();
     }
 }

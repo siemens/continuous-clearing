@@ -26,6 +26,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Directory = System.IO.Directory;
@@ -344,7 +345,7 @@ namespace SIT.Create
 
             // Maven group/artifact/version characters only (letters, digits, dot, hyphen,
             // underscore) - no whitespace or shell metacharacters are permitted.
-            return System.Text.RegularExpressions.Regex.IsMatch(coordinate, @"^[a-zA-Z0-9._-]+$");
+            return CreatorHelperRegex.MavenCoordinateRegex().IsMatch(coordinate);
         }
 
         /// <summary>
@@ -1090,5 +1091,17 @@ namespace SIT.Create
 
         }
 
+    }
+
+    /// <summary>
+    /// Holds source-generated regular expressions used by <see cref="CreatorHelper"/>.
+    /// Kept in a separate class because the GeneratedRegex source generator does not
+    /// support types declared with a primary constructor.
+    /// </summary>
+    internal static partial class CreatorHelperRegex
+    {
+        // Matches valid Maven coordinate characters (letters, digits, '.', '_', '-'); 5s timeout guards against pathological input.
+        [GeneratedRegex("^[a-zA-Z0-9._-]+$", RegexOptions.None, 5000)]
+        internal static partial Regex MavenCoordinateRegex();
     }
 }

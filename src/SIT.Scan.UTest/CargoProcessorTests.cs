@@ -6,6 +6,7 @@
 
 using CycloneDX.Models;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
@@ -408,6 +409,368 @@ namespace SIT.Scan.UTest
             var components = new List<Component>();
             var dependencies = new List<Dependency>();
             Assert.DoesNotThrow(() => method.Invoke(null, new object[] { "invalid_path.json", components, dependencies }));
+        }
+
+        [Test]
+        public void AddSourceUrlExternalReference_WithRepository_AddsExternalReference()
+        {
+            var component = new Component { Name = "Comp", Version = "1.0" };
+            var pkg = new CargoPackageDetails.Package { Repository = "https://example.com/repo" };
+            var method = typeof(CargoProcessor).GetMethod("AddSourceUrlExternalReference", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { component, pkg });
+
+            Assert.That(component.ExternalReferences, Is.Not.Null);
+            Assert.That(component.ExternalReferences[0].Url, Is.EqualTo("https://example.com/repo"));
+            Assert.That(component.ExternalReferences[0].Type, Is.EqualTo(ExternalReference.ExternalReferenceType.Distribution));
+        }
+
+        [Test]
+        public void AddSourceUrlExternalReference_WithoutRepository_DoesNotAddExternalReference()
+        {
+            var component = new Component { Name = "Comp", Version = "1.0" };
+            var pkg = new CargoPackageDetails.Package { Repository = "   " };
+            var method = typeof(CargoProcessor).GetMethod("AddSourceUrlExternalReference", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { component, pkg });
+
+            Assert.That(component.ExternalReferences, Is.Null);
+        }
+
+        [Test]
+        public void ParseCargoPackagesExcluding_ExcludesWorkspaceMembersAndPopulatesMaps()
+        {
+            var packageDetails = new CargoPackageDetails
+            {
+                Packages = new List<CargoPackageDetails.Package>
+                {
+                    new CargoPackageDetails.Package { Id = "id1", Name = "CompA", Version = "1.0", Repository = "https://repo/a" },
+                    new CargoPackageDetails.Package { Id = "id2", Name = "CompB", Version = "2.0" }
+                }
+            };
+            var components = new List<Component>();
+            var idToComponent = new Dictionary<string, Component>();
+            var idToPurl = new Dictionary<string, string>();
+            var excludeIds = new List<string> { "id2" };
+            var method = typeof(CargoProcessor).GetMethod("ParseCargoPackagesExcluding", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { packageDetails, components, idToComponent, idToPurl, excludeIds });
+
+            Assert.That(components, Has.Count.EqualTo(1));
+            Assert.That(components[0].Name, Is.EqualTo("CompA"));
+            Assert.That(idToComponent.ContainsKey("id1"), Is.True);
+            Assert.That(idToComponent.ContainsKey("id2"), Is.False);
+        }
+
+        [Test]
+        public void ParseCargoPackagesExcluding_WithNullPackages_DoesNotThrow()
+        {
+            var packageDetails = new CargoPackageDetails { Packages = null };
+            var components = new List<Component>();
+            var idToComponent = new Dictionary<string, Component>();
+            var idToPurl = new Dictionary<string, string>();
+            var excludeIds = new List<string>();
+            var method = typeof(CargoProcessor).GetMethod("ParseCargoPackagesExcluding", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { packageDetails, components, idToComponent, idToPurl, excludeIds }));
+            Assert.That(components, Is.Empty);
+        }
+
+        [Test]
+        public void IsValidDep_WithNullDep_ReturnsFalse()
+        {
+            var idToPurl = new Dictionary<string, string>();
+            var method = typeof(CargoProcessor).GetMethod("IsValidDep", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var parameters = new object[] { null, idToPurl, null };
+
+            var result = (bool)method.Invoke(null, parameters);
+
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void IsValidDep_WithUnresolvedPkg_ReturnsFalse()
+        {
+            var dep = new CargoPackageDetails.Dep { Pkg = "unknown-id" };
+            var idToPurl = new Dictionary<string, string>();
+            var method = typeof(CargoProcessor).GetMethod("IsValidDep", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var parameters = new object[] { dep, idToPurl, null };
+
+            var result = (bool)method.Invoke(null, parameters);
+
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void IsValidDep_WithResolvablePkg_ReturnsTrueAndOutputsPurl()
+        {
+            var dep = new CargoPackageDetails.Dep { Pkg = "id1" };
+            var idToPurl = new Dictionary<string, string> { { "id1", "pkg:cargo/CompA@1.0" } };
+            var method = typeof(CargoProcessor).GetMethod("IsValidDep", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var parameters = new object[] { dep, idToPurl, null };
+
+            var result = (bool)method.Invoke(null, parameters);
+
+            Assert.That(result, Is.True);
+            Assert.That(parameters[2], Is.EqualTo("pkg:cargo/CompA@1.0"));
+        }
+
+        [Test]
+        public void GetOrCreateKindList_WhenKeyMissing_CreatesNewList()
+        {
+            var purlToDevDependencyKinds = new Dictionary<string, List<string>>();
+            var method = typeof(CargoProcessor).GetMethod("GetOrCreateKindList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (List<string>)method.Invoke(null, new object[] { "pkg:cargo/CompA@1.0", purlToDevDependencyKinds });
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(purlToDevDependencyKinds.ContainsKey("pkg:cargo/CompA@1.0"), Is.True);
+        }
+
+        [Test]
+        public void GetOrCreateKindList_WhenKeyExists_ReturnsExistingList()
+        {
+            var existingList = new List<string> { "dev" };
+            var purlToDevDependencyKinds = new Dictionary<string, List<string>> { { "pkg:cargo/CompA@1.0", existingList } };
+            var method = typeof(CargoProcessor).GetMethod("GetOrCreateKindList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            var result = (List<string>)method.Invoke(null, new object[] { "pkg:cargo/CompA@1.0", purlToDevDependencyKinds });
+
+            Assert.That(result, Is.SameAs(existingList));
+        }
+
+        [Test]
+        public void AddDepKinds_WithDepKinds_AddsEachKind()
+        {
+            var dep = new CargoPackageDetails.Dep
+            {
+                DepKinds = new List<CargoPackageDetails.DepKind>
+                {
+                    new CargoPackageDetails.DepKind { Kind = "dev" },
+                    new CargoPackageDetails.DepKind { Kind = "build" }
+                }
+            };
+            var dependencyKindList = new List<string>();
+            var method = typeof(CargoProcessor).GetMethod("AddDepKinds", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { dep, dependencyKindList });
+
+            Assert.That(dependencyKindList, Is.EquivalentTo(new[] { "dev", "build" }));
+        }
+
+        [Test]
+        public void AddDepKinds_WithoutDepKinds_AddsNull()
+        {
+            var dep = new CargoPackageDetails.Dep { DepKinds = null };
+            var dependencyKindList = new List<string>();
+            var method = typeof(CargoProcessor).GetMethod("AddDepKinds", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { dep, dependencyKindList });
+
+            Assert.That(dependencyKindList, Has.Count.EqualTo(1));
+            Assert.That(dependencyKindList[0], Is.Null);
+        }
+
+        [Test]
+        public void ProcessNodeDeps_WithNullDeps_DoesNotThrow()
+        {
+            var node = new CargoPackageDetails.Node { Deps = null };
+            var idToPurl = new Dictionary<string, string>();
+            var purlToDevDependencyKinds = new Dictionary<string, List<string>>();
+            var method = typeof(CargoProcessor).GetMethod("ProcessNodeDeps", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { node, idToPurl, purlToDevDependencyKinds }));
+        }
+
+        [Test]
+        public void ProcessNodeDeps_WithValidDeps_PopulatesKindsByPurl()
+        {
+            var node = new CargoPackageDetails.Node
+            {
+                Deps = new List<CargoPackageDetails.Dep>
+                {
+                    new CargoPackageDetails.Dep
+                    {
+                        Pkg = "id1",
+                        DepKinds = new List<CargoPackageDetails.DepKind> { new CargoPackageDetails.DepKind { Kind = "dev" } }
+                    }
+                }
+            };
+            var idToPurl = new Dictionary<string, string> { { "id1", "pkg:cargo/CompA@1.0" } };
+            var purlToDevDependencyKinds = new Dictionary<string, List<string>>();
+            var method = typeof(CargoProcessor).GetMethod("ProcessNodeDeps", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { node, idToPurl, purlToDevDependencyKinds });
+
+            Assert.That(purlToDevDependencyKinds["pkg:cargo/CompA@1.0"], Is.EquivalentTo(new[] { "dev" }));
+        }
+
+        [Test]
+        public void AddCycloneDXDependencyExcluding_WithValidParent_AddsDependencyWithSubDeps()
+        {
+            var compA = new Component { Name = "CompA", Version = "1.0", Purl = "pkg:cargo/CompA@1.0" };
+            var compB = new Component { Name = "CompB", Version = "1.0", Purl = "pkg:cargo/CompB@1.0" };
+            var idToComponent = new Dictionary<string, Component> { { "idA", compA }, { "idB", compB } };
+            var node = new CargoPackageDetails.Node { Id = "idA", Dependencies = new List<string> { "idB" } };
+            var dependencies = new List<Dependency>();
+            var excludeIds = new List<string>();
+            var method = typeof(CargoProcessor).GetMethod("AddCycloneDXDependencyExcluding", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { node, idToComponent, "idA", dependencies, excludeIds });
+
+            Assert.That(dependencies, Has.Count.EqualTo(1));
+            Assert.That(dependencies[0].Ref, Is.EqualTo("pkg:cargo/CompA@1.0"));
+            Assert.That(dependencies[0].Dependencies[0].Ref, Is.EqualTo("pkg:cargo/CompB@1.0"));
+        }
+
+        [Test]
+        public void AddCycloneDXDependencyExcluding_WithUnknownParent_DoesNotAddDependency()
+        {
+            var idToComponent = new Dictionary<string, Component>();
+            var node = new CargoPackageDetails.Node { Id = "idA", Dependencies = new List<string>() };
+            var dependencies = new List<Dependency>();
+            var excludeIds = new List<string>();
+            var method = typeof(CargoProcessor).GetMethod("AddCycloneDXDependencyExcluding", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { node, idToComponent, "idA", dependencies, excludeIds });
+
+            Assert.That(dependencies, Is.Empty);
+        }
+
+        [Test]
+        public void AnalyzeCargoDependencyKindsExcluding_WithNullNodes_DoesNotThrow()
+        {
+            var packageDetails = new CargoPackageDetails { ResolveInfo = new CargoPackageDetails.Resolve { Nodes = null } };
+            var idToPurl = new Dictionary<string, string>();
+            var purlToDevDependencyKinds = new Dictionary<string, List<string>>();
+            var idToComponent = new Dictionary<string, Component>();
+            var dependencies = new List<Dependency>();
+            var excludeIds = new List<string>();
+            var method = typeof(CargoProcessor).GetMethod("AnalyzeCargoDependencyKindsExcluding", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { packageDetails, idToPurl, purlToDevDependencyKinds, idToComponent, dependencies, excludeIds }));
+        }
+
+        [Test]
+        public void MarkCargoDevelopmentProperties_WithDevKind_MarksComponentAndIncrementsKpi()
+        {
+            BomCreator.bomKpiData.DevDependentComponents = 0;
+            var component = new Component { Name = "CompA", Version = "1.0", Purl = "pkg:cargo/CompA@1.0", Properties = new List<Property>() };
+            var components = new List<Component> { component };
+            var purlToDevKinds = new Dictionary<string, List<string>> { { "pkg:cargo/CompA@1.0", new List<string> { "dev" } } };
+            var method = typeof(CargoProcessor).GetMethod("MarkCargoDevelopmentProperties", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { components, purlToDevKinds });
+
+            Assert.That(component.Properties.First(p => p.Name == Dataconstant.Cdx_IsDevelopment).Value, Is.EqualTo("true"));
+            Assert.That(BomCreator.bomKpiData.DevDependentComponents, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void MarkCargoDevelopmentProperties_WithNullKind_IsNotDevelopment()
+        {
+            var component = new Component { Name = "CompA", Version = "1.0", Purl = "pkg:cargo/CompA@1.0", Properties = new List<Property>() };
+            var components = new List<Component> { component };
+            var purlToDevKinds = new Dictionary<string, List<string>> { { "pkg:cargo/CompA@1.0", new List<string> { null } } };
+            var method = typeof(CargoProcessor).GetMethod("MarkCargoDevelopmentProperties", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { components, purlToDevKinds });
+
+            Assert.That(component.Properties.First(p => p.Name == Dataconstant.Cdx_IsDevelopment).Value, Is.EqualTo("false"));
+        }
+
+        [Test]
+        public void MarkCargoDevelopmentProperties_WithUnknownPurl_IsNotDevelopment()
+        {
+            var component = new Component { Name = "CompA", Version = "1.0", Purl = "pkg:cargo/CompA@1.0", Properties = new List<Property>() };
+            var components = new List<Component> { component };
+            var purlToDevKinds = new Dictionary<string, List<string>>();
+            var method = typeof(CargoProcessor).GetMethod("MarkCargoDevelopmentProperties", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { components, purlToDevKinds });
+
+            Assert.That(component.Properties.First(p => p.Name == Dataconstant.Cdx_IsDevelopment).Value, Is.EqualTo("false"));
+        }
+
+        [Test]
+        public void AddDirectDependencyProperty_WithRootDependencies_MarksDirectComponents()
+        {
+            var packageDetails = new CargoPackageDetails
+            {
+                ResolveInfo = new CargoPackageDetails.Resolve
+                {
+                    Root = "root-id",
+                    Nodes = new List<CargoPackageDetails.Node>
+                    {
+                        new CargoPackageDetails.Node { Id = "root-id", Dependencies = new List<string> { "id1" } }
+                    }
+                }
+            };
+            var compA = new Component { Name = "CompA", Version = "1.0", Purl = "pkg:cargo/CompA@1.0", Properties = new List<Property>() };
+            var compB = new Component { Name = "CompB", Version = "1.0", Purl = "pkg:cargo/CompB@1.0", Properties = new List<Property>() };
+            var components = new List<Component> { compA, compB };
+            var idToPurl = new Dictionary<string, string> { { "id1", "pkg:cargo/CompA@1.0" } };
+
+            CargoProcessor.AddDirectDependencyProperty(packageDetails, components, idToPurl);
+
+            Assert.That(compA.Properties.First(p => p.Name == Dataconstant.Cdx_SiemensDirect).Value, Is.EqualTo("true"));
+            Assert.That(compB.Properties.First(p => p.Name == Dataconstant.Cdx_SiemensDirect).Value, Is.EqualTo("false"));
+        }
+
+        [Test]
+        public void AddDirectDependencyProperty_WithNoRoot_MarksAllComponentsAsIndirect()
+        {
+            var packageDetails = new CargoPackageDetails { ResolveInfo = null };
+            var compA = new Component { Name = "CompA", Version = "1.0", Purl = "pkg:cargo/CompA@1.0", Properties = new List<Property>() };
+            var components = new List<Component> { compA };
+            var idToPurl = new Dictionary<string, string>();
+
+            CargoProcessor.AddDirectDependencyProperty(packageDetails, components, idToPurl);
+
+            Assert.That(compA.Properties.First(p => p.Name == Dataconstant.Cdx_SiemensDirect).Value, Is.EqualTo("false"));
+        }
+
+        [Test]
+        public void GetPackagesFromCargoMetadataJson_WithValidJson_PopulatesComponentsAndDependencies()
+        {
+            string json = JsonConvert.SerializeObject(new CargoPackageDetails
+            {
+                Packages = new List<CargoPackageDetails.Package>
+                {
+                    new CargoPackageDetails.Package { Id = "id1", Name = "CompA", Version = "1.0" }
+                },
+                ResolveInfo = new CargoPackageDetails.Resolve
+                {
+                    Root = "id1",
+                    Nodes = new List<CargoPackageDetails.Node>
+                    {
+                        new CargoPackageDetails.Node { Id = "id1", Dependencies = new List<string>() }
+                    }
+                }
+            });
+            string filePath = System.IO.Path.Combine(TestFolder, "valid-metadata.json");
+            System.IO.File.WriteAllText(filePath, json);
+            var components = new List<Component>();
+            var dependencies = new List<Dependency>();
+            var method = typeof(CargoProcessor).GetMethod("GetPackagesFromCargoMetadataJson", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { filePath, components, dependencies });
+
+            Assert.That(components, Has.Count.EqualTo(1));
+            Assert.That(components[0].Name, Is.EqualTo("CompA"));
+        }
+
+        [Test]
+        public void GetPackagesFromCargoMetadataJson_WithMalformedJson_DoesNotThrow()
+        {
+            string filePath = System.IO.Path.Combine(TestFolder, "malformed-metadata.json");
+            System.IO.File.WriteAllText(filePath, "{ this is not valid json ");
+            var components = new List<Component>();
+            var dependencies = new List<Dependency>();
+            var method = typeof(CargoProcessor).GetMethod("GetPackagesFromCargoMetadataJson", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { filePath, components, dependencies }));
+            Assert.That(components, Is.Empty);
         }
 
         private static CommonAppSettings CreateTestAppSettings()
