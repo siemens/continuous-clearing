@@ -14,6 +14,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -117,6 +118,13 @@ namespace SIT.Create.UTest
         [TestCase("invalid package;name", "1.0.0")]
         [TestCase("valid-package", "1.0.0; rm -rf /")]
         [TestCase("Invalid_Upper$Case", "1.0.0")]
+        [TestCase(null, "1.0.0")]
+        [TestCase("", "1.0.0")]
+        [TestCase("   ", "1.0.0")]
+        [TestCase("valid-package", null)]
+        [TestCase("valid-package", "")]
+        [TestCase("valid-package", "   ")]
+        [TestCase("@scope/package", "1.0.0&echo injected")]
         public void GetSourceUrlForNpmPackage_OnWindows_WithUnsafeComponentNameOrVersion_ReturnsEmptyString(string componentName, string version)
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -170,6 +178,67 @@ namespace SIT.Create.UTest
 
             // Assert
             Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase(" ", false)]
+        [TestCase("\t\r\n", false)]
+        [TestCase("package", true)]
+        [TestCase("0", true)]
+        [TestCase("package-name_1.2~next", true)]
+        [TestCase("@scope/package", true)]
+        [TestCase("@scope-name_1.2~next/package-name_1.2~next", true)]
+        [TestCase("Package", false)]
+        [TestCase("@Scope/package", false)]
+        [TestCase("@scope/", false)]
+        [TestCase("@/package", false)]
+        [TestCase("@scope/package/extra", false)]
+        [TestCase("-package", false)]
+        [TestCase(".package", false)]
+        [TestCase("package name", false)]
+        [TestCase("package;echo", false)]
+        [TestCase("package&echo", false)]
+        [TestCase("package|echo", false)]
+        [TestCase("package$variable", false)]
+        public void IsValidNpmComponentName_ValidatesPackageName(string componentName, bool expected)
+        {
+            var method = typeof(UrlHelper).GetMethod("IsValidNpmComponentName", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+
+            var result = (bool)method.Invoke(null, new object[] { componentName });
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(213, true)]
+        [TestCase(214, true)]
+        [TestCase(215, false)]
+        public void IsValidNpmComponentName_EnforcesLengthBoundary(int length, bool expected)
+        {
+            IsValidNpmComponentName_ValidatesPackageName(new string('a', length), expected);
+        }
+
+        [TestCase(214, true)]
+        [TestCase(215, false)]
+        public void IsValidNpmComponentName_LengthLimitIncludesScope(int length, bool expected)
+        {
+            const string scope = "@scope/";
+
+            IsValidNpmComponentName_ValidatesPackageName(scope + new string('a', length - scope.Length), expected);
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnUnsupportedOperatingSystem_ThrowsForMissingExecutable()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Assert.Ignore("The unsupported-OS branch requires a runner other than Windows or Linux.");
+            }
+
+            var exception = Assert.Throws<AggregateException>(() => _urlHelper.GetSourceUrlForNpmPackage("valid-package", "1.0.0"));
+
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
         }
 
         [Test]

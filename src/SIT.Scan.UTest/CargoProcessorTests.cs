@@ -773,6 +773,251 @@ namespace SIT.Scan.UTest
             Assert.That(components, Is.Empty);
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ParsePackageFile_WithCycloneDxInput_DeduplicatesComponentsAndRemovesOrphanDependencies(bool hasDependencies)
+        {
+            var appSettings = CreateTestAppSettings();
+            appSettings.Directory = new SIT.Common.Directory { InputFolder = System.IO.Path.GetFullPath(TestFolder) };
+            appSettings.SW360 = new SW360 { IgnoreDevDependency = false };
+            appSettings.Cargo.Include = new[] { "cargo-coverage.cdx.json" };
+            string filePath = System.IO.Path.Combine(TestFolder, "cargo-coverage.cdx.json");
+            System.IO.File.WriteAllText(filePath, "{}");
+            var parsedBom = new Bom
+            {
+                Components = new List<Component>
+                {
+                    new Component { Name = "serde", Version = "1.0", Purl = "pkg:cargo/serde@1.0" },
+                    new Component { Name = "serde", Version = "1.0", Purl = "pkg:cargo/serde@1.0" }
+                },
+                Dependencies = hasDependencies ? new List<Dependency>
+                {
+                    new Dependency { Ref = "pkg:cargo/serde@1.0" },
+                    new Dependency { Ref = "pkg:cargo/missing@1.0" }
+                } : null
+            };
+            _mockCycloneDxBomParser.Setup(parser => parser.ParseCycloneDXBom(It.IsAny<string>())).Returns(parsedBom);
+            var unsupportedField = typeof(CargoProcessor).GetField("ListUnsupportedComponentsForBom", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var previousUnsupported = unsupportedField.GetValue(null);
+            unsupportedField.SetValue(null, new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() });
+            var unsupportedBom = new Bom();
+            try
+            {
+                var result = _cargoProcessor.ParsePackageFile(appSettings, ref unsupportedBom);
+
+                Assert.That(result.Components, Has.Count.EqualTo(1));
+                Assert.That(result.Components[0].Purl, Is.EqualTo("pkg:cargo/serde@1.0"));
+                Assert.That(result.Dependencies.Any(dependency => dependency.Ref == "pkg:cargo/missing@1.0"), Is.False);
+                Assert.That(unsupportedBom.Components, Is.Empty);
+                _mockCycloneDxBomParser.Verify(parser => parser.ParseCycloneDXBom(It.IsAny<string>()), Times.Once);
+            }
+            finally
+            {
+                unsupportedField.SetValue(null, previousUnsupported);
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [TestCase("metadata.json")]
+        [TestCase("cargo-coverage.spdx.sbom.json")]
+        [TestCase("cargo-coverage.CATemplate.cdx.json")]
+        [TestCase("dummy.cargo")]
+        public void ParsePackageFile_DispatchesInputFiles(string fileName)
+        {
+            var appSettings = CreateTestAppSettings();
+            appSettings.Directory = new SIT.Common.Directory { InputFolder = System.IO.Path.GetFullPath(TestFolder) };
+            appSettings.SW360 = new SW360 { IgnoreDevDependency = false };
+            appSettings.Cargo.Include = new[] { fileName };
+            var component = new Component { Name = "serde", Version = "1.0", Purl = "pkg:cargo/serde@1.0" };
+            var parsedBom = new Bom
+            {
+                Components = new List<Component> { component },
+                Dependencies = new List<Dependency> { new Dependency { Ref = component.Purl } }
+            };
+            _mockSpdxBomParser.Setup(parser => parser.ParseSPDXBom(It.IsAny<string>())).Returns(parsedBom);
+            _mockCycloneDxBomParser.Setup(parser => parser.ParseCycloneDXBom(It.IsAny<string>())).Returns(parsedBom);
+            string filePath = System.IO.Path.Combine(TestFolder, fileName);
+            string previousContent = System.IO.File.Exists(filePath) ? System.IO.File.ReadAllText(filePath) : null;
+            System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(new CargoPackageDetails
+            {
+                Packages = new List<CargoPackageDetails.Package>
+                {
+                    new CargoPackageDetails.Package { Id = "serde", Name = "serde", Version = "1.0" }
+                }
+            }));
+            var unsupportedField = typeof(CargoProcessor).GetField("ListUnsupportedComponentsForBom", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var previousUnsupported = unsupportedField.GetValue(null);
+            unsupportedField.SetValue(null, new Bom { Components = new List<Component>(), Dependencies = new List<Dependency>() });
+            var unsupportedBom = new Bom();
+            try
+            {
+                var result = _cargoProcessor.ParsePackageFile(appSettings, ref unsupportedBom);
+
+                Assert.That(result.Components, Is.Not.Null);
+                if (fileName == "metadata.json" || fileName.EndsWith(".spdx.sbom.json"))
+                {
+                    Assert.That(result.Components, Has.Count.EqualTo(1));
+                    Assert.That(result.Components[0].Name, Is.EqualTo("serde"));
+                }
+            }
+            finally
+            {
+                unsupportedField.SetValue(null, previousUnsupported);
+                if (previousContent == null)
+                    System.IO.File.Delete(filePath);
+                else
+                    System.IO.File.WriteAllText(filePath, previousContent);
+            }
+        }
+
+        [TestCase("null")]
+        [TestCase("{}")]
+        public void GetPackagesFromCargoMetadataJson_WithMissingPackageData_ReturnsEmptyComponents(string json)
+        {
+            string filePath = System.IO.Path.Combine(TestFolder, "valid-metadata.json");
+            var components = new List<Component>();
+            var dependencies = new List<Dependency>();
+            System.IO.File.WriteAllText(filePath, json);
+            try
+            {
+                var method = typeof(CargoProcessor).GetMethod("GetPackagesFromCargoMetadataJson", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                method.Invoke(null, new object[] { filePath, components, dependencies });
+
+                Assert.That(components, Is.Empty);
+                Assert.That(dependencies, Is.Empty);
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [TestCase("dev-repo")]
+        [TestCase("repo1")]
+        [TestCase("release-repo")]
+        public async Task GetJfrogRepoDetailsOfAComponent_WithMatchingCrate_SetsRepositoryPathAndHashes(string repoName)
+        {
+            var appSettings = CreateTestAppSettings();
+            appSettings.Cargo.Artifactory.InternalRepos = Array.Empty<string>();
+            var component = new Component { Name = "serde", Version = "1.0", Purl = "pkg:cargo/serde@1.0" };
+            var entry = new AqlResult
+            {
+                Name = "serde-1.0.crate", Repo = repoName, Path = ".",
+                MD5 = "md5", SHA1 = "sha1", SHA256 = "sha256",
+                Properties = new List<AqlProperty>
+                {
+                    new AqlProperty { Key = "crate.name", Value = "serde" },
+                    new AqlProperty { Key = "crate.version", Value = "1.0" }
+                }
+            };
+            _mockBomHelper.Setup(helper => helper.GetCargoListOfComponentsFromRepo(It.IsAny<string[]>(), _mockJFrogService.Object))
+                .ReturnsAsync(new List<AqlResult> { entry });
+
+            var result = await _cargoProcessor.GetJfrogRepoDetailsOfAComponent(new List<Component> { component }, appSettings, _mockJFrogService.Object, _mockBomHelper.Object);
+
+            Assert.That(result[0].Properties.First(property => property.Name == Dataconstant.Cdx_JfrogRepoPath).Value, Is.EqualTo(repoName + "/serde-1.0.crate"));
+            Assert.That(result[0].Hashes, Has.Count.EqualTo(3));
+        }
+
+        [Test]
+        public void GetArtifactoryRepoName_WithQualifiedNameFallback_ReportsUnmatchedRepository()
+        {
+            var component = new Component { Name = "serde", Version = "1.0" };
+            _mockBomHelper.Setup(helper => helper.GetFullNameOfComponent(component)).Returns("scope/serde");
+            var entries = new List<AqlResult>
+            {
+                new AqlResult
+                {
+                    Name = "scoped-serde-1.0.crate", Repo = Dataconstant.NotFoundInJFrog,
+                    Properties = new List<AqlProperty>
+                    {
+                        new AqlProperty { Key = "crate.name", Value = "scope/serde" },
+                        new AqlProperty { Key = "crate.version", Value = "1.0" }
+                    }
+                }
+            };
+            var method = typeof(CargoProcessor).GetMethod("GetArtifactoryRepoName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            var arguments = new object[] { entries, component, _mockBomHelper.Object, null, null };
+
+            var result = (string)method.Invoke(null, arguments);
+
+            Assert.That(result, Is.EqualTo(Dataconstant.NotFoundInJFrog));
+            Assert.That(arguments[3], Is.EqualTo("scoped-serde-1.0.crate"));
+        }
+
+        [Test]
+        public void ProcessNodeDeps_WithInvalidDependencies_SkipsUnresolvableEntries()
+        {
+            var node = new CargoPackageDetails.Node
+            {
+                Deps = new List<CargoPackageDetails.Dep>
+                {
+                    null,
+                    new CargoPackageDetails.Dep { Pkg = "" },
+                    new CargoPackageDetails.Dep { Pkg = "missing" }
+                }
+            };
+            var kinds = new Dictionary<string, List<string>>();
+            var method = typeof(CargoProcessor).GetMethod("ProcessNodeDeps", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { node, new Dictionary<string, string>(), kinds });
+
+            Assert.That(kinds, Is.Empty);
+        }
+
+        [TestCase("build", "true")]
+        [TestCase("DEV", "true")]
+        [TestCase("normal", "false")]
+        [TestCase(null, "false")]
+        public void MarkCargoDevelopmentProperties_UsesDependencyKind(string kind, string expected)
+        {
+            var component = new Component { Name = "serde", Version = "1.0", Purl = "pkg:cargo/serde@1.0", Properties = new List<Property>() };
+            var kinds = new Dictionary<string, List<string>> { { component.Purl, new List<string> { kind } } };
+            var method = typeof(CargoProcessor).GetMethod("MarkCargoDevelopmentProperties", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { new List<Component> { component }, kinds });
+
+            Assert.That(component.Properties.Single(property => property.Name == Dataconstant.Cdx_IsDevelopment).Value, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void AddDirectDependencyProperty_WithMissingRootAndUnmappedDependency_MarksIndirect()
+        {
+            var component = new Component { Purl = "pkg:cargo/serde@1.0" };
+            var details = new CargoPackageDetails
+            {
+                ResolveInfo = new CargoPackageDetails.Resolve
+                {
+                    Root = "root", Nodes = new List<CargoPackageDetails.Node>
+                    {
+                        new CargoPackageDetails.Node { Id = "root", Dependencies = new List<string> { "missing" } }
+                    }
+                }
+            };
+            var components = new List<Component> { component };
+
+            CargoProcessor.AddDirectDependencyProperty(details, components, new Dictionary<string, string>());
+            details.ResolveInfo.Root = "unknown";
+            CargoProcessor.AddDirectDependencyProperty(details, components, new Dictionary<string, string>());
+            details.ResolveInfo.Nodes = null;
+            CargoProcessor.AddDirectDependencyProperty(details, components, new Dictionary<string, string>());
+
+            Assert.That(component.Properties.Single(property => property.Name == Dataconstant.Cdx_SiemensDirect).Value, Is.EqualTo("false"));
+        }
+
+        [Test]
+        public void UpdateCargoKpiDataBasedOnRepo_WithNullThirdPartyRepos_DoesNotIncrementCounter()
+        {
+            var settings = CreateTestAppSettings();
+            settings.Cargo.Artifactory.ThirdPartyRepos = null;
+            var previousCount = BomCreator.bomKpiData.ThirdPartyRepoComponents;
+            var method = typeof(CargoProcessor).GetMethod("UpdateCargoKpiDataBasedOnRepo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            method.Invoke(null, new object[] { "unrelated-repo", settings });
+
+            Assert.That(BomCreator.bomKpiData.ThirdPartyRepoComponents, Is.EqualTo(previousCount));
+        }
+
         private static CommonAppSettings CreateTestAppSettings()
         {
             return new CommonAppSettings

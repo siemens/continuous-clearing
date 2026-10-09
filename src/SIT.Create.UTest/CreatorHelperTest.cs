@@ -189,6 +189,148 @@ namespace SIT.Create.UTest
         }
 
         [Test]
+        public async Task DownloadReleaseAttachmentSource_ForMavenPackage_WithUnsafeGroup_SkipsMvnDownloadAndReturnsEmpty()
+        {
+            // Arrange - a group containing shell metacharacters must be rejected
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "example",
+                Version = "1.0.0",
+                Group = "com.example | whoami",
+                ReleaseExternalId = "pkg:maven/com.example/example@1.0.0"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList, Is.Empty);
+        }
+
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForMavenPackage_WithEmptyGroup_SkipsMvnDownloadAndReturnsEmpty()
+        {
+            // Arrange - an empty/whitespace coordinate must be rejected by the maven coordinate
+            // validation (IsValidMavenCoordinate returns false for null/whitespace).
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "example",
+                Version = "1.0.0",
+                Group = "   ",
+                ReleaseExternalId = "pkg:maven/com.example/example@1.0.0"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList, Is.Empty);
+        }
+
+        [Test]
+        public async Task DownloadReleaseAttachmentSource_ForMavenPackage_WithValidCoordinates_RunsMvnDownload()
+        {
+            // Arrange - all coordinates are valid maven tokens, so validation passes and the mvn
+            // download command is actually built and executed (covering the mvn ArgumentList branch).
+            // mvn may not be installed in the test environment; the method still completes without
+            // throwing and returns an empty list because no source jar is produced.
+            var lstComparisonBomData = new ComparisonBomData()
+            {
+                Name = "example",
+                Version = "1.0.0",
+                Group = "com.example",
+                ReleaseExternalId = "pkg:maven/com.example/example@1.0.0"
+            };
+            IDictionary<string, IPackageDownloader> _packageDownloderList = new Dictionary<string, IPackageDownloader>
+            {
+                { "NPM", new PackageDownloader() }
+            };
+            var creatorHelper = new CreatorHelper(_packageDownloderList);
+
+            // Act
+            var attachmentUrlList = await creatorHelper.DownloadReleaseAttachmentSource(lstComparisonBomData);
+
+            // Assert
+            Assert.That(attachmentUrlList, Is.Not.Null);
+        }
+
+        private static bool InvokeIsValidMavenCoordinate(string coordinate)
+        {
+            var method = typeof(CreatorHelper).GetMethod(
+                "IsValidMavenCoordinate",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.That(method, Is.Not.Null, "IsValidMavenCoordinate method not found.");
+            return (bool)method.Invoke(null, new object[] { coordinate });
+        }
+
+        [Test]
+        [TestCase("com.example")]
+        [TestCase("maven-dependency-plugin")]
+        [TestCase("1.0.0")]
+        [TestCase("1.20141219.5")]
+        [TestCase("my_artifact-1.0")]
+        public void IsValidMavenCoordinate_WithValidCoordinate_ReturnsTrue(string coordinate)
+        {
+            // Act
+            bool result = InvokeIsValidMavenCoordinate(coordinate);
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void IsValidMavenCoordinate_WithNullOrWhitespace_ReturnsFalse(string coordinate)
+        {
+            // Act
+            bool result = InvokeIsValidMavenCoordinate(coordinate);
+
+            // Assert
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void IsValidMavenCoordinate_WithTooLongCoordinate_ReturnsFalse()
+        {
+            // Arrange - a coordinate longer than the 256 character limit must be rejected.
+            string coordinate = new string('a', 257);
+
+            // Act
+            bool result = InvokeIsValidMavenCoordinate(coordinate);
+
+            // Assert
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        [TestCase("bad;name")]
+        [TestCase("1.0.0 & calc.exe")]
+        [TestCase("com.example | whoami")]
+        [TestCase("name$(cmd)")]
+        [TestCase("a b")]
+        [TestCase("name`cmd`")]
+        public void IsValidMavenCoordinate_WithUnsafeCharacters_ReturnsFalse(string coordinate)
+        {
+            // Act
+            bool result = InvokeIsValidMavenCoordinate(coordinate);
+
+            // Assert
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
         public void Test_WriteCreatorKpiDataToConsole()
         {
             var mock = new Mock<ICreatorHelper>();

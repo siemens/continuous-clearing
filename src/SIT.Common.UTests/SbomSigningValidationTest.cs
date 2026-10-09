@@ -1606,6 +1606,25 @@ namespace SIT.Common.UTest
             mockHelper2.Verify(x => x.CallEnvironmentExit(-1), Times.Once, "Second call should trigger exit independently");
         }
 
+        [Test]
+        public void SigningVerificationWithContent_WithExistingFileAndInvalidSignature_CallsEnvironmentExitAndReturnsNull()
+        {
+            // Arrange - the test BOM file exists but carries a fake/unverifiable signature. The
+            // verification pipeline therefore reports the signature as not valid (or surfaces one of
+            // the handled exceptions), driving the non-success branch: the failure is logged,
+            // environment exit is invoked with -1, and null is returned. This exercises the
+            // "signature verification failed" path for a file that is actually present on disk.
+            var mockHelper = new Mock<IEnvironmentHelper>();
+
+            // Act
+            string result = _sbomSigningValidation.SigningVerificationWithContent(_validAppSettings, _testBomFilePath, mockHelper.Object);
+
+            // Assert
+            Assert.That(result, Is.Null);
+            mockHelper.Verify(x => x.CallEnvironmentExit(-1), Times.Once,
+                "Environment exit must be called with -1 when an existing BOM file fails signature verification");
+        }
+
         #endregion
     }
 }
