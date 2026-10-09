@@ -254,5 +254,168 @@ namespace SIT.Services.UTest
             // Assert
             Assert.That(actual.Count, Is.GreaterThan(0));
         }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_ValidProjectId_AddsKeyAndReturnsTrue()
+        {
+            // Arrange
+            ProjectReleases projectReleases = new ProjectReleases();
+            HttpResponseMessage getResponse = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            getResponse.Content = new ObjectContent<ProjectReleases>(projectReleases, new JsonMediaTypeFormatter(), "application/json");
+            HttpResponseMessage patchResponse = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+
+            HttpContent capturedContent = null;
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(getResponse);
+            sw360ApicommunicationFacadeMck.Setup(x => x.UpdateProject(It.IsAny<string>(), It.IsAny<HttpContent>()))
+                .Callback<string, HttpContent>((_, content) => capturedContent = content)
+                .ReturnsAsync(patchResponse);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "2026-10-08T00:00:00.0000000Z");
+
+            // Assert
+            Assert.That(actual, Is.True);
+            string body = await capturedContent.ReadAsStringAsync();
+            Assert.That(body, Does.Contain("SITCreateLastSyncAt"));
+        }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_ProjectNotFound_ReturnsFalse()
+        {
+            // Arrange
+            HttpResponseMessage getResponse = new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(getResponse);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "value");
+
+            // Assert
+            Assert.That(actual, Is.False);
+            sw360ApicommunicationFacadeMck.Verify(x => x.UpdateProject(It.IsAny<string>(), It.IsAny<HttpContent>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_HttpRequestException_ReturnsFalse()
+        {
+            // Arrange
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).Throws<HttpRequestException>();
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "value");
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_NullGetResponse_ReturnsFalse()
+        {
+            // Arrange
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync((HttpResponseMessage)null);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "value");
+
+            // Assert
+            Assert.That(actual, Is.False);
+            sw360ApicommunicationFacadeMck.Verify(x => x.UpdateProject(It.IsAny<string>(), It.IsAny<HttpContent>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_ExistingAdditionalData_PreservesEntriesAndReturnsTrue()
+        {
+            // Arrange
+            ProjectReleases projectReleases = new ProjectReleases
+            {
+                AdditionalData = new Dictionary<string, string> { { "existingKey", "existingValue" } }
+            };
+            HttpResponseMessage getResponse = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            getResponse.Content = new ObjectContent<ProjectReleases>(projectReleases, new JsonMediaTypeFormatter(), "application/json");
+            HttpResponseMessage patchResponse = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+
+            HttpContent capturedContent = null;
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(getResponse);
+            sw360ApicommunicationFacadeMck.Setup(x => x.UpdateProject(It.IsAny<string>(), It.IsAny<HttpContent>()))
+                .Callback<string, HttpContent>((_, content) => capturedContent = content)
+                .ReturnsAsync(patchResponse);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "2026-10-08T00:00:00");
+
+            // Assert
+            Assert.That(actual, Is.True);
+            string body = await capturedContent.ReadAsStringAsync();
+            Assert.That(body, Does.Contain("existingKey"));
+            Assert.That(body, Does.Contain("SITCreateLastSyncAt"));
+        }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_PatchFails_ReturnsFalse()
+        {
+            // Arrange
+            ProjectReleases projectReleases = new ProjectReleases();
+            HttpResponseMessage getResponse = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            getResponse.Content = new ObjectContent<ProjectReleases>(projectReleases, new JsonMediaTypeFormatter(), "application/json");
+            HttpResponseMessage patchResponse = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest)
+            {
+                Content = new StringContent("{\"message\":\"Unauthorized user or empty commit message passed.\"}", Encoding.UTF8, "application/json")
+            };
+
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(getResponse);
+            sw360ApicommunicationFacadeMck.Setup(x => x.UpdateProject(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync(patchResponse);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "value");
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_NullPatchResponse_ReturnsFalse()
+        {
+            // Arrange
+            ProjectReleases projectReleases = new ProjectReleases();
+            HttpResponseMessage getResponse = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            getResponse.Content = new ObjectContent<ProjectReleases>(projectReleases, new JsonMediaTypeFormatter(), "application/json");
+
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).ReturnsAsync(getResponse);
+            sw360ApicommunicationFacadeMck.Setup(x => x.UpdateProject(It.IsAny<string>(), It.IsAny<HttpContent>())).ReturnsAsync((HttpResponseMessage)null);
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "value");
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public async Task UpdateProjectAdditionalData_AggregateException_ReturnsFalse()
+        {
+            // Arrange
+            Mock<ISW360ApicommunicationFacade> sw360ApicommunicationFacadeMck = new Mock<ISW360ApicommunicationFacade>();
+            sw360ApicommunicationFacadeMck.Setup(x => x.GetProjectById(It.IsAny<string>())).Throws<AggregateException>();
+            ISw360ProjectService sw360ProjectService = new Sw360ProjectService(sw360ApicommunicationFacadeMck.Object);
+
+            // Act
+            bool actual = await sw360ProjectService.UpdateProjectAdditionalData("projectId", "SITCreateLastSyncAt", "value");
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
     }
 }

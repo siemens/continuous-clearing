@@ -409,6 +409,10 @@ namespace SIT.Create
             // Notify user about manual steps required for Choco packages
             LoggerHelper.WriteChocoManualStepsNotification(ListofChocoComponents.ToList());
 
+            // Record when SIT.Create last synced the project in SW360 project additionalData
+            await sw360ProjectService.UpdateProjectAdditionalData(appSettings.SW360.ProjectID,
+                ApiConstant.SITCretelastsync, DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss"));
+
             Logger.Debug("CreateComponentInSw360():Create component process completed");
         }
 

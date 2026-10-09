@@ -32,7 +32,7 @@ namespace SIT.Common
     /// <summary>
     /// Common Helper class
     /// </summary>
-    public static class CommonHelper
+    public static partial class CommonHelper
     {
         #region Fields
 
@@ -78,7 +78,7 @@ namespace SIT.Common
                 return name;
             }
 
-            return Regex.Replace(name, "[-_.]+", "-").ToLowerInvariant();
+            return PypiNameSeparatorRegex().Replace(name, "-").ToLowerInvariant();
         }
 
         /// <summary>
@@ -272,6 +272,29 @@ namespace SIT.Common
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Extracts the human-readable "message" from an SW360 error response body, falling back to the raw content.
+        /// </summary>
+        /// <param name="content">The SW360 error response content.</param>
+        /// <returns>The extracted message or the raw content if it cannot be parsed.</returns>
+        public static string ExtractSw360Message(string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return "No response content returned by SW360.";
+            }
+
+            try
+            {
+                var message = JObject.Parse(content)["message"]?.ToString();
+                return string.IsNullOrWhiteSpace(message) ? content : message;
+            }
+            catch (JsonException)
+            {
+                return content;
+            }
         }
 
         /// <summary>
@@ -836,6 +859,10 @@ namespace SIT.Common
         {
             return "^" + Regex.Escape(wildcard).Replace("\\*", ".*") + "$";
         }
+
+        // Matches runs of PEP 503 separators ('.', '_', '-'); 5s timeout guards against pathological input.
+        [GeneratedRegex("[-_.]+", RegexOptions.None, 5000)]
+        private static partial Regex PypiNameSeparatorRegex();
 
         /// <summary>
         /// Adds excluded component property based on PURL matching.

@@ -320,13 +320,7 @@ namespace SIT.Scan
                     Logger.DebugFormat("ParsingInputFileForBOM():CycloneDX file detected: {0}", filepath);
                     bom = _cycloneDXBomParser.ParseCycloneDXBom(filepath);
                     CheckValidComponentsForProjectType(bom.Components, appSettings.ProjectType);
-                    foreach (var component in bom.Components ?? Enumerable.Empty<Component>())
-                    {
-                        if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
-                        {
-                            component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, component.Name, component.Version);
-                        }
-                    }
+                    GenerateConanPurlsForComponents(bom.Components);
                     BomHelper.GetDetailsforManuallyAddedComp(bom.Components);
                     componentsForBOM.AddRange(bom.Components);
                     LogHandlingHelper.IdentifierInputFileComponents(filepath, bom.Components);
@@ -354,6 +348,21 @@ namespace SIT.Scan
             bom = BomHelper.RemoveExcludedComponents(appSettings, bom);
             bom.Dependencies = bom.Dependencies?.GroupBy(x => new { x.Ref }).Select(y => y.First()).ToList();
             Logger.Debug("ParsingInputFileForBOM():Completed parsing of input files for BOM.");
+        }
+
+        /// <summary>
+        /// Regenerates the Conan purl for each component that has a name and version.
+        /// </summary>
+        /// <param name="components">The components to update.</param>
+        private static void GenerateConanPurlsForComponents(List<Component> components)
+        {
+            foreach (var component in components ?? Enumerable.Empty<Component>())
+            {
+                if (!string.IsNullOrEmpty(component.Name) && !string.IsNullOrEmpty(component.Version))
+                {
+                    component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.ConanProjectType, component.Name, component.Version);
+                }
+            }
         }
 
         /// <summary>
