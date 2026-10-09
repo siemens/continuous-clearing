@@ -371,8 +371,11 @@ namespace SIT.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     await LogHandlingHelper.HttpResponseErrorHandling("Error occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", response, "");
+                    string errorContent = response.Content != null ? await response.Content.ReadAsStringAsync() : string.Empty;
+                    string sw360Message = CommonHelper.ExtractSw360Message(errorContent);
                     Environment.ExitCode = -1;
-                    Logger.ErrorFormat("LinkReleasesToProject() : Linking releases to project Id {0} is failed.", sw360ProjectId);
+                    Logger.ErrorFormat("Failed to link releases to SW360 project '{0}'. Reason: {1}", sw360ProjectId, sw360Message);
+                    Logger.DebugFormat("LinkReleasesToProject() : Linking releases to project Id {0} is failed.", sw360ProjectId);
                     return false;
                 }
                 return true;
@@ -380,14 +383,14 @@ namespace SIT.Services
             catch (HttpRequestException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("HttpRequestException occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An HTTP request error occurred while linking releases to the project.");
-                Logger.Error("LinkReleasesToProject():", ex);
+                Logger.ErrorFormat("Linking releases to project Id {0} failed.", sw360ProjectId);
                 Environment.ExitCode = -1;
                 return false;
             }
             catch (AggregateException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("AggregateException occurred while LinkReleasesToProject", $"MethodName:LinkReleasesToProject(), ProjectId: {sw360ProjectId}", ex, "An aggregate exception occurred while linking releases to the project.");
-                Logger.Error("LinkReleasesToProject():", ex);
+                Logger.ErrorFormat("Linking releases to project Id {0} failed.", sw360ProjectId);
                 Environment.ExitCode = -1;
                 return false;
             }
