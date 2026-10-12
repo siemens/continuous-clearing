@@ -14,6 +14,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Telemetry.Uploader;
 
 namespace SIT.Common
 {
@@ -106,15 +107,15 @@ namespace SIT.Common
                 return;
             }
 
-            telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new Dictionary<string, string>
+            telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new TelemetryOptions
             {
-                { "ConnectionString", appSettings_?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty },
-                { "Product", TelemetryConstant.Product },
-                { "Application", TelemetryConstant.ToolName },
-                { "Component", component },
-                { "Environment", appSettings_?.Telemetry?.Environment ?? string.Empty },
-                { "Version", catoolVersion ?? string.Empty },
-                { "Organization", TelemetryConstant.Organization }
+                ConnectionString = appSettings_?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty,
+                Product = TelemetryConstant.Product,
+                Application = TelemetryConstant.ToolName,
+                Component = component,
+                Environment = appSettings_?.Telemetry?.Environment ?? string.Empty,
+                Version = catoolVersion ?? string.Empty,
+                Organization = TelemetryConstant.Organization
             });
         }
 

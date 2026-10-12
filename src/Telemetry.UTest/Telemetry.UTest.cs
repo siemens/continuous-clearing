@@ -3,7 +3,7 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-using System.Collections.Generic;
+using Telemetry.Uploader;
 
 namespace SIT.Telemetry.UTest
 {
@@ -11,14 +11,14 @@ namespace SIT.Telemetry.UTest
     public class TelemetryTests
     {
         private SIT.Telemetry.Telemetry _telemetry;
-        private Dictionary<string, string> configuration;
+        private TelemetryOptions configuration;
 
         [SetUp]
         public void SetUp()
         {
-            configuration = new Dictionary<string, string>
+            configuration = new TelemetryOptions
             {
-                { "ConnectionString", "InstrumentationKey=00000000-0000-0000-0000-000000000000" }
+                ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
             };
             _telemetry = new SIT.Telemetry.Telemetry("ApplicationInsights", configuration);
         }
@@ -78,7 +78,7 @@ namespace SIT.Telemetry.UTest
         [Test]
         public void Constructor_ShouldThrowException_WhenConnectionStringMissing()
         {
-            var emptyConfiguration = new Dictionary<string, string>();
+            var emptyConfiguration = new TelemetryOptions();
             Assert.Throws<InvalidOperationException>(() => new SIT.Telemetry.Telemetry("ApplicationInsights", emptyConfiguration));
         }
 

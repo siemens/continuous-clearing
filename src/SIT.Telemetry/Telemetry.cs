@@ -24,43 +24,37 @@ namespace SIT.Telemetry
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="Telemetry"/> class.
+        /// Initializes a new instance of the <see cref="Telemetry"/> class using strongly-typed options.
+        /// Using <see cref="TelemetryOptions"/> directly (instead of a loosely-typed dictionary) gives
+        /// compile-time safety and IntelliSense discoverability for callers, including other repositories
+        /// that already reference the <c>Telemetry.Uploader</c> SDK.
         /// </summary>
         /// <param name="telemetryType">The type of telemetry provider to use. Only "ApplicationInsights" is supported.</param>
-        /// <param name="configuration">The configuration dictionary containing connection string and standard telemetry metadata.</param>
+        /// <param name="options">The telemetry configuration (connection string and standard metadata).</param>
         /// <exception cref="NotSupportedException">Thrown when the telemetry type is not supported.</exception>
-        /// <exception cref="ArgumentNullException">Thrown when the configuration is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="options"/> is null.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the Application Insights connection string is missing or invalid.</exception>
-        public Telemetry(string telemetryType, Dictionary<string, string> configuration)
+        public Telemetry(string telemetryType, TelemetryOptions options)
         {
             if (!string.Equals(telemetryType, "ApplicationInsights", StringComparison.OrdinalIgnoreCase))
             {
                 throw new NotSupportedException($"Telemetry type '{telemetryType}' is not supported.");
             }
 
-            if (configuration == null)
+            if (options == null)
             {
-                throw new ArgumentNullException(nameof(configuration), "Configuration cannot be null.");
+                throw new ArgumentNullException(nameof(options), "Options cannot be null.");
             }
 
-            var connectionString = configuration.GetValueOrDefault("ConnectionString")
-                                 ?? Environment.GetEnvironmentVariable("TELEMETRY_CONNECTION_STRING");
+            if (string.IsNullOrEmpty(options.ConnectionString))
+            {
+                options.ConnectionString = Environment.GetEnvironmentVariable("TELEMETRY_CONNECTION_STRING");
+            }
 
-            if (string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrEmpty(options.ConnectionString))
             {
                 throw new InvalidOperationException("Application Insights Instrumentation Key is missing or invalid.");
             }
-
-            var options = new TelemetryOptions
-            {
-                ConnectionString = connectionString,
-                Product = configuration.GetValueOrDefault("Product") ?? string.Empty,
-                Application = configuration.GetValueOrDefault("Application") ?? string.Empty,
-                Component = configuration.GetValueOrDefault("Component") ?? string.Empty,
-                Environment = configuration.GetValueOrDefault("Environment") ?? string.Empty,
-                Version = configuration.GetValueOrDefault("Version") ?? string.Empty,
-                Organization = configuration.GetValueOrDefault("Organization") ?? string.Empty
-            };
 
             _telemetryService = new ApplicationInsightsTelemetryService(options);
         }
