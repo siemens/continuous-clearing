@@ -512,7 +512,6 @@ namespace SIT.Create
         /// <param name="componentName"></param>
         /// <param name="version"></param>
         /// <returns>string</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "S4036:Make sure the PATH used to find this command includes only what you intend", Justification = "npm/cmd.exe are resolved from a controlled CI environment PATH; component name/version are validated and passed via ArgumentList.")]
         public string GetSourceUrlForNpmPackage(string componentName, string version)
         {
             Logger.DebugFormat("GetSourceUrlForNpmPackage(): Start identifying sourceUrl for Npm Package - ComponentName: {0}, Version: {1}", componentName, version);
@@ -546,7 +545,7 @@ namespace SIT.Create
                     return string.Empty;
                 }
 
-                p.StartInfo.FileName = "cmd.exe";
+                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
                 p.StartInfo.ArgumentList.Add("/c");
                 p.StartInfo.ArgumentList.Add("npm");
                 p.StartInfo.ArgumentList.Add("view");

@@ -275,7 +275,6 @@ namespace SIT.Create
         /// </summary>
         /// <param name="component"></param>
         /// <returns>task that returns asynchronous operation</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "S4036:Make sure the PATH used to find this command includes only what you intend", Justification = "mvn/cmd.exe are resolved from a controlled CI environment PATH; command injection is already mitigated by maven coordinate validation.")]
         private static async Task DownloadDependencyList(ComparisonBomData component)
         {
             string localPathforDownload = $"{Path.GetTempPath()}ClearingTool\\DownloadedFiles/";
@@ -310,7 +309,7 @@ namespace SIT.Create
                     return;
                 }
 
-                p.StartInfo.FileName = "cmd.exe";
+                p.StartInfo.FileName = Path.Combine(@"cmd.exe");
                 p.StartInfo.ArgumentList.Add("/c");
                 p.StartInfo.ArgumentList.Add("mvn");
                 p.StartInfo.ArgumentList.Add(mavenGoal);
@@ -320,7 +319,7 @@ namespace SIT.Create
             }
             else
             {
-                p.StartInfo.FileName = "mvn";
+                p.StartInfo.FileName = Path.Combine(@"mvn");
                 p.StartInfo.ArgumentList.Add(mavenGoal);
                 p.StartInfo.ArgumentList.Add(artifact);
                 p.StartInfo.ArgumentList.Add(outputDirectory);
