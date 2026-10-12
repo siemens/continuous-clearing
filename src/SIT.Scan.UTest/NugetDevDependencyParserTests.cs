@@ -194,7 +194,7 @@ namespace SIT.Scan.UTest
         }
 
         [Test]
-        public void ParseJsonInContainer_DoesNotThrowForNestedObjAssetFile()
+        public void ParseJsonInContainer_ReturnsTrueForNestedObjAssetFile()
         {
             string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempDir);
@@ -205,8 +205,9 @@ namespace SIT.Scan.UTest
             File.WriteAllText(fakeJson, "{}\n");
             var container = new Container();
             var method = typeof(NugetDevDependencyParser).GetMethod("ParseJsonInContainer", BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { fakeJson, container }));
-            Assert.AreEqual("project.assets.json", container.Name);
+            bool result = (bool)method.Invoke(null, new object[] { fakeJson, container });
+            Assert.IsTrue(result);
+            Assert.AreEqual("test.csproj", container.Name);
             Directory.Delete(tempDir, true);
         }
 

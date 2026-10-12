@@ -272,9 +272,18 @@ namespace SIT.Scan
             string dirName = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(dirName) && Path.GetFileName(dirName).Equals("obj", StringComparison.OrdinalIgnoreCase))
             {
-                dirName = Directory.GetParent(dirName)?.FullName;
-                string[] filePaths = !string.IsNullOrEmpty(dirName) && Directory.Exists(dirName) ? Directory.GetFiles(dirName, "*.csproj") : Array.Empty<string>();
-                csprojFilePath = filePaths.Length > 0 ? filePaths[0] : "";
+                DirectoryInfo projectDirectory = Directory.GetParent(dirName);
+                while (projectDirectory != null)
+                {
+                    string[] filePaths = Directory.GetFiles(projectDirectory.FullName, "*.csproj");
+                    if (filePaths.Length > 0)
+                    {
+                        csprojFilePath = filePaths[0];
+                        break;
+                    }
+
+                    projectDirectory = projectDirectory.Parent;
+                }
             }
             if (!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
             {
