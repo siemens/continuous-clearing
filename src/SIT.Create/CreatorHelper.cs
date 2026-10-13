@@ -294,7 +294,7 @@ namespace SIT.Create
             // cmd /c), which permanently removes the command-injection vector while still running mvn.
             string artifact = $"-Dartifact={component.Group}:{component.Name}:{component.Version}:jar:sources";
             string outputDirectory = $"-DoutputDirectory={localPathforDownload}";
-            const string mavenGoal = "org.apache.maven.plugins:maven-dependency-plugin:copy";
+            const string mavenplugin = "org.apache.maven.plugins:maven-dependency-plugin:copy";
 
             if (isWindows)
             {
@@ -312,7 +312,7 @@ namespace SIT.Create
                 p.StartInfo.FileName = Path.Combine(@"cmd.exe");
                 p.StartInfo.ArgumentList.Add("/c");
                 p.StartInfo.ArgumentList.Add("mvn");
-                p.StartInfo.ArgumentList.Add(mavenGoal);
+                p.StartInfo.ArgumentList.Add(mavenplugin);
                 p.StartInfo.ArgumentList.Add(artifact);
                 p.StartInfo.ArgumentList.Add(outputDirectory);
                 Logger.DebugFormat("DownloadDependencyList(): Windows OS detected. Artifact: {0}", artifact);
@@ -320,7 +320,7 @@ namespace SIT.Create
             else
             {
                 p.StartInfo.FileName = Path.Combine(@"mvn");
-                p.StartInfo.ArgumentList.Add(mavenGoal);
+                p.StartInfo.ArgumentList.Add(mavenplugin);
                 p.StartInfo.ArgumentList.Add(artifact);
                 p.StartInfo.ArgumentList.Add(outputDirectory);
                 Logger.DebugFormat("DownloadDependencyList(): Non-Windows OS detected. Artifact: {0}", artifact);
