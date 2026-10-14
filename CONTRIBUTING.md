@@ -66,7 +66,7 @@ version and causing version drift/collisions between beta and stable builds.
 Trigger the workflow manually and pick the bump type:
 
 1. Go to **Actions -> Build & Release -> Run workflow**.
-2. Set `version-bump` to `patch`, `minor`, or `major` (leave as `none` for a
+2. Set `release-bump` to `patch`, `minor`, or `major` (leave as `none` for a
    normal build/pre-release with no version change).
 3. Optionally set `ref` to the branch/tag you want to release from.
 4. Run the workflow - GitVersion will compute the new version using the
