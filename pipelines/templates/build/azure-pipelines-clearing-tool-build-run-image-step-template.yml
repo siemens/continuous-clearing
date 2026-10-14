@@ -9,7 +9,10 @@ parameters:
   - name: sw360Url
     type: string
     default: ''
-  - name: sw360Token
+  - name: sw360ClientId
+    type: string
+    default: ''
+  - name: sw360ClientSecret
     type: string
     default: ''
   - name: sw360ProjectId
@@ -133,9 +136,9 @@ steps:
             "--ProjectType", "${{ project.projectType }}",
             "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
             "--SW360:ProjectId", "${{ parameters.sw360ProjectId }}",
-            "--SW360:AuthTokenType", "Token",
             "--SW360:URL", "${{ parameters.sw360Url }}",
-            "--SW360:Token", "${{ parameters.sw360Token }}",
+            "--SW360:Keycloak:ClientId", "${{ parameters.sw360ClientId }}",
+            "--SW360:Keycloak:ClientSecret", "${{ parameters.sw360ClientSecret }}",
             "--SW360:Fossology:URL", "${{ parameters.fossologyUrl }}",
             "--JFrog:URL", "${{ parameters.JfrogUrl }}",
             "--Jfrog:Token", "${{ parameters.JfrogToken }}",
@@ -192,9 +195,9 @@ steps:
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
-          --SW360:AuthTokenType "Token" `
           --SW360:URL "${{ parameters.sw360Url }}" `
-          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Keycloak:ClientId "${{ parameters.sw360ClientId }}" `
+          --SW360:Keycloak:ClientSecret "${{ parameters.sw360ClientSecret }}" `
           --SW360:Fossology:URL "${{ parameters.fossologyUrl }}" `
           --SbomSigning:SBOMSignVerify "${{ parameters.SBOMSignVerify }}" `
           --SbomSigning:KeyVaultUri "${{ parameters.keyVaultUri }}" `
@@ -225,9 +228,9 @@ steps:
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
           --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
-          --SW360:AuthTokenType "Token" `
           --SW360:URL "${{ parameters.sw360Url }}" `
-          --SW360:Token "${{ parameters.sw360Token }}" `
+          --SW360:Keycloak:ClientId "${{ parameters.sw360ClientId }}" `
+          --SW360:Keycloak:ClientSecret "${{ parameters.sw360ClientSecret }}" `
           --JFrog:URL "${{ parameters.JfrogUrl }}" `
           --JFrog:Token "${{ parameters.JfrogToken }}" `
           --JFrog:DryRun "${{ parameters.JfrogDryRun }}" `
