@@ -71,6 +71,9 @@ jobs:
         parameters:
           dockerRegistry: $(JFROG_DOCKER_REGISTRY)
           sw360DockerImage: $(SW360_DOCKER_IMAGE)
+          sw360CouchdbImage: $(SW360_COUCHDB_IMAGE)
+          sw360CouchdbNouveauImage: $(SW360_COUCHDB_NOUVEAU_IMAGE)
+          sw360PostgresImage: $(SW360_POSTGRES_IMAGE)
           fossologyDockerImage: $(FOSSOLOGY_DOCKER_IMAGE)
           sw360Port: $(SW360_PORT)
           fossologyPort: $(FOSSOLOGY_PORT)
