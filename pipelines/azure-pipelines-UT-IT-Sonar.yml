@@ -159,13 +159,15 @@ jobs:
               --arg email "$(JFROG_USER_EMAIL)" \
               --arg apiKey "$(JFROG_TOKEN)" \
               --arg jfrog "$(JFROG_URL)" \
-              --arg authToken "$(SW360_TOKEN)" \
+              --arg clientId "$(SW360_CLIENT_ID)" \
+              --arg clientSecret "$(SW360_CLIENT_SECRET)" \
               '.Fossologyurl = $fossy |
                 .SW360URL = $sw360 |
                 .ArtifactoryUploadUser = $email |
                 .ArtifactoryUploadApiKey = $apiKey |
                 .JFrogApi = $jfrog |
-                .SW360AuthTokenValue = $authToken' "$JSON_FILE" > temp.json && mv temp.json "$JSON_FILE"
+                .KeycloakClientId = $clientId |
+                .KeycloakClientSecret = $clientSecret' "$JSON_FILE" > temp.json && mv temp.json "$JSON_FILE"
 
             echo "Updated Integration Test Configuration:"
             cat "$JSON_FILE"

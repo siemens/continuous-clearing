@@ -65,22 +65,29 @@ namespace TestUtilities
 
                 var testParam = new TestParam();
 
-                if (!string.IsNullOrWhiteSpace(testParam.KeycloakClientId) &&
-                    !string.IsNullOrWhiteSpace(testParam.KeycloakClientSecret))
+                if (string.IsNullOrWhiteSpace(testParam.KeycloakClientId) ||
+                    string.IsNullOrWhiteSpace(testParam.KeycloakClientSecret))
                 {
-                    var settings = new TokenServiceSettings
-                    {
-                        SW360BaseUrl = testParam.SW360URL,
-                        ClientId = testParam.KeycloakClientId,
-                        ClientSecret = testParam.KeycloakClientSecret
-                    };
-
-                    using var tokenService = new KeycloakTokenCacheService(settings);
-                    s_tokenValue = tokenService.GetOrRefreshTokenAsync().GetAwaiter().GetResult();
-                    s_tokenType = string.IsNullOrWhiteSpace(settings.KeyCloakTokenType)
-                        ? "Bearer"
-                        : settings.KeyCloakTokenType;
+                    throw new InvalidOperationException(
+                        "Integration tests require Keycloak credentials. 'KeycloakClientId' and " +
+                        "'KeycloakClientSecret' are missing from appSettingsSW360IntegrationTest.json. " +
+                        "Ensure the pipeline variables SW360_CLIENT_ID and SW360_CLIENT_SECRET are set in " +
+                        "the variable group and written into the test config by the 'Update Integration " +
+                        "Test Configuration' step.");
                 }
+
+                var settings = new TokenServiceSettings
+                {
+                    SW360BaseUrl = testParam.SW360URL,
+                    ClientId = testParam.KeycloakClientId,
+                    ClientSecret = testParam.KeycloakClientSecret
+                };
+
+                using var tokenService = new KeycloakTokenCacheService(settings);
+                s_tokenValue = tokenService.GetOrRefreshTokenAsync().GetAwaiter().GetResult();
+                s_tokenType = string.IsNullOrWhiteSpace(settings.KeyCloakTokenType)
+                    ? "Bearer"
+                    : settings.KeyCloakTokenType;
 
                 s_initialized = true;
             }
