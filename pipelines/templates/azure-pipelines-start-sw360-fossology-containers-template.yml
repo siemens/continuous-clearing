@@ -11,6 +11,29 @@ parameters:
   - name: sw360DockerImage
     type: string
 
+  # new decoupled backend image no longer bundles CouchDB; a separate CouchDB container is required
+  - name: sw360CouchdbImage
+    type: string
+    default: ""
+
+  # Nouveau is CouchDB's Lucene-based search sidecar; required for luceneSearch=true REST queries
+  - name: sw360CouchdbNouveauImage
+    type: string
+    default: ""
+
+  # Keycloak backs JWT/OAuth login for integration tests that need a Bearer token (not just the static Token header)
+  - name: sw360KeycloakImage
+    type: string
+    default: ""
+
+  - name: sw360PostgresImage
+    type: string
+    default: ""
+
+  - name: keycloakPort
+    type: string
+    default: "8083"
+
   - name: fossologyDockerImage
     type: string
 
@@ -22,8 +45,12 @@ parameters:
 
   - name: sw360Url
     type: string
-    
-  - name: sw360Token
+
+  - name: sw360ClientId
+    type: string
+    default: ""
+
+  - name: sw360ClientSecret
     type: string
 
 steps:
@@ -34,16 +61,122 @@ steps:
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
 
   - script: |
-      docker rm -f sw360 fossology 2>/dev/null || true
+      docker rm -f sw360 sw360-couchdb couchdb-nouveau postgres keycloak fossology 2>/dev/null || true
+      docker network rm sw360net 2>/dev/null || true
       docker container prune -f
       docker image prune -af
       free -h
     displayName: "Clean up stale Docker state before starting containers"
 
   - script: |
+      echo "Creating shared network for sw360 backend and CouchDB..."
+      docker network create sw360net
+    displayName: "Create sw360 Docker network"
+
+  - script: |
+      echo "Starting CouchDB Nouveau (Lucene search) sidecar..."
+      # container name MUST be 'couchdb-nouveau' (hyphen) - this is the hostname CouchDB's
+      # nouveau.ini 'url' setting resolves via Docker DNS; a mismatched name (e.g. underscore)
+      # causes the search backend to be unreachable and luceneSearch=true API calls silently
+      # return 204 No Content instead of an error.
+      CONTAINER_ID=$(docker run -dit --name couchdb-nouveau --network sw360net ${{ parameters.sw360CouchdbNouveauImage }})
+
+      if [ -z "$CONTAINER_ID" ]; then
+          echo "Failed to start CouchDB Nouveau container!"
+          exit 1
+      fi
+
+      echo "CouchDB Nouveau Container ID: $CONTAINER_ID"
+    displayName: "Start CouchDB Nouveau Container"
+
+  - script: |
+      echo "Writing nouveau.ini so CouchDB knows where to find the Nouveau search sidecar..."
+      mkdir -p $(Build.SourcesDirectory)/couchdb-config
+      cat > $(Build.SourcesDirectory)/couchdb-config/nouveau.ini <<'EOF'
+      [nouveau]
+      enable = true
+      url = http://couchdb-nouveau:5987
+      EOF
+    displayName: "Write CouchDB Nouveau config"
+
+  - script: |
+      echo "Starting CouchDB container..."
+      CONTAINER_ID=$(docker run -dit --name sw360-couchdb --network sw360net \
+        -e COUCHDB_USER=sw360 -e COUCHDB_PASSWORD=sw360fossie \
+        -v $(Build.SourcesDirectory)/couchdb-config/nouveau.ini:/opt/couchdb/etc/local.d/nouveau.ini \
+        -p 5985:5984 ${{ parameters.sw360CouchdbImage }})
+
+      if [ -z "$CONTAINER_ID" ]; then
+          echo "Failed to start CouchDB container!"
+          exit 1
+      fi
+
+      echo "CouchDB Container ID: $CONTAINER_ID"
+    displayName: "Start CouchDB Container"
+
+  - script: |
+      echo "Starting Postgres container (Keycloak's database)..."
+      CONTAINER_ID=$(docker run -dit --name postgres --network sw360net \
+        -e POSTGRES_DB=keycloak \
+        -e POSTGRES_USER=keycloak \
+        -e POSTGRES_PASSWORD=mysecretpassword \
+        ${{ parameters.sw360PostgresImage }})
+
+      if [ -z "$CONTAINER_ID" ]; then
+          echo "Failed to start Postgres container!"
+          exit 1
+      fi
+
+      echo "Postgres Container ID: $CONTAINER_ID"
+    displayName: "Start Postgres Container"
+
+  - script: |
+      echo "Starting Keycloak container..."
+      # KC_HOSTNAME is the externally-reachable URL (published port) so the 'iss' claim in
+      # issued tokens matches what test clients requesting a token will see; the sw360 backend
+      # fetches JWKS keys internally via the container network instead (see JWK_SET_URI below).
+      CONTAINER_ID=$(docker run -dit --name keycloak --network sw360net -p ${{ parameters.keycloakPort }}:8080 \
+        -e KC_DB=postgres \
+        -e KC_DB_URL=jdbc:postgresql://postgres/keycloak \
+        -e KC_DB_USERNAME=keycloak \
+        -e KC_DB_PASSWORD=mysecretpassword \
+        -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+        -e KC_BOOTSTRAP_ADMIN_PASSWORD=keycloaksecret \
+        -e KC_HOSTNAME=http://localhost:${{ parameters.keycloakPort }} \
+        -e KC_HTTP_ENABLED=true \
+        -e KC_PROXY_HEADERS=xforwarded \
+        -e KC_HOSTNAME_STRICT=false \
+        -e COUCHDB_URL=http://sw360-couchdb:5984 \
+        -e COUCHDB_USER=sw360 \
+        -e COUCHDB_PASSWORD=sw360fossie \
+        -e COUCHDB_ADMIN_EMAIL=setup@sw360.org \
+        -e COUCHDB_ADMIN_PASSWORD=sw360fossie \
+        ${{ parameters.sw360KeycloakImage }})
+
+      if [ -z "$CONTAINER_ID" ]; then
+          echo "Failed to start Keycloak container!"
+          exit 1
+      fi
+
+      echo "Keycloak Container ID: $CONTAINER_ID"
+    displayName: "Start Keycloak Container"
+
+  - script: |
       echo "Starting a new sw360 container..."
       # container memory must exceed the image's JVM -Xmx6g to avoid OOM kills
-      CONTAINER_ID=$(docker run -dit --name sw360 --memory=7g -p ${{ parameters.sw360Port }}:8080 -p 5985:5984 -p 5435:5432 --add-host=host.docker.internal:host-gateway ${{ parameters.sw360DockerImage }})
+      # SPRING_DATA_REST_MAX_PAGE_SIZE enables the new pagination support (ghcr.io/eclipse-sw360/sw360)
+      # these two must be set explicitly: the entrypoint renders them blank (not the Thrift library default) when unset, crashing resource.war with NumberFormatException
+      CONTAINER_ID=$(docker run -dit --name sw360 --network sw360net --memory=5g -p ${{ parameters.sw360Port }}:8080 \
+        -e COUCHDB_URL=http://sw360-couchdb:5984 \
+        -e COUCHDB_USER=sw360 -e COUCHDB_PASSWORD=sw360fossie \
+        -e SW360_SECURITY_HTTP_BASIC_ENABLED=true \
+        -e SW360_SECURITY_JWT_ISSUERS_0_ISSUER_URI=http://localhost:${{ parameters.keycloakPort }}/realms/sw360 \
+        -e SW360_SECURITY_JWT_ISSUERS_0_JWK_SET_URI=http://keycloak:8080/realms/sw360/protocol/openid-connect/certs \
+        -e SPRING_DATA_REST_MAX_PAGE_SIZE=1000 \
+        -e SW360_CORS_ALLOWED_ORIGIN=* \
+        -e BACKEND_THRIFT_MAX_MESSAGE_SIZE=104857600 \
+        -e BACKEND_THRIFT_MAX_FRAME_SIZE=16384000 \
+        --add-host=host.docker.internal:host-gateway ${{ parameters.sw360DockerImage }})
 
       if [ -z "$CONTAINER_ID" ]; then
           echo "Failed to start sw360 container!"
@@ -68,24 +201,49 @@ steps:
       docker ps -a
       docker inspect sw360 --format 'OOMKilled={{.State.OOMKilled}} Status={{.State.Status}} ExitCode={{.State.ExitCode}} StartedAt={{.State.StartedAt}}'
       echo "Container resource usage:"
-      docker stats sw360 --no-stream
+      docker stats sw360 sw360-couchdb couchdb-nouveau postgres keycloak fossology --no-stream
       echo "Container logs:"
       docker logs sw360 --tail 200
+      echo "CouchDB logs:"
+      docker logs sw360-couchdb --tail 100
+      echo "CouchDB Nouveau logs:"
+      docker logs couchdb-nouveau --tail 100
+      echo "Keycloak logs:"
+      docker logs keycloak --tail 100
     displayName: "Debug sw360 container state"
 
   - script: |
       echo "Waiting for sw360 API to be available..."
+      sudo apt-get update && sudo apt-get install -y jq
 
       URL="${{ parameters.sw360Url }}/resource/api/projects"
-      AUTH_TOKEN="${{ parameters.sw360Token }}"
+      TOKEN_URL="http://localhost:${{ parameters.keycloakPort }}/realms/sw360/protocol/openid-connect/token"
+      CLIENT_ID="${{ parameters.sw360ClientId }}"
+      CLIENT_SECRET="${{ parameters.sw360ClientSecret }}"
       MAX_RETRIES=60
       RETRY_INTERVAL=10
 
       for i in $(seq 1 $MAX_RETRIES); do
+          echo "Attempt $i: Requesting Keycloak Bearer token..."
+
+          TOKEN_RESPONSE=$(curl --silent --show-error \
+            -X POST "$TOKEN_URL" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "grant_type=client_credentials" \
+            -d "client_id=$CLIENT_ID" \
+            -d "client_secret=$CLIENT_SECRET")
+          AUTH_TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token // empty')
+
+          if [ -z "$AUTH_TOKEN" ]; then
+              echo "Keycloak not ready yet or token request failed. Response: $TOKEN_RESPONSE"
+              sleep $RETRY_INTERVAL
+              continue
+          fi
+
           echo "Attempt $i: Checking sw360 API..."
 
           RESPONSE=$(curl --silent --show-error --fail --location --write-out "\nHTTP_STATUS:%{http_code}" \
-            --header "Authorization: Token $AUTH_TOKEN" \
+            --header "Authorization: Bearer $AUTH_TOKEN" \
             --header "Accept: application/hal+json" \
             "$URL" || echo "HTTP_STATUS:000")
 
@@ -112,3 +270,10 @@ steps:
       echo "ERROR: sw360 API did not become ready in time."
       exit 1
     displayName: "Wait for sw360 API to be ready"
+
+  - script: |
+      echo "Final container memory usage (once sw360 is confirmed healthy):"
+      docker stats sw360 sw360-couchdb couchdb-nouveau postgres keycloak fossology --no-stream
+      echo "Host memory:"
+      free -h
+    displayName: "Report final container memory usage"
