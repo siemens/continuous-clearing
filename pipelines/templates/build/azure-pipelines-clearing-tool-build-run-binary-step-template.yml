@@ -121,13 +121,14 @@ steps:
       inputs:
         targetType: 'inline'
         script: |
+          $sw360ProjectId = (Get-Content "$(Build.SourcesDirectory)/sw360-resolved-project-id.txt" -Raw).Trim()
           $args = @(
             "--Directory:InputFolder", "${{ project.inputFolder }}",
             "--Directory:OutputFolder", "${{ parameters.outputFolder }}/sbom",
             "--Directory:LogFolder", "${{ parameters.outputFolder }}/logs",
             "--ProjectType", "${{ project.projectType }}",
             "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
-            "--SW360:ProjectID", "${{ parameters.sw360ProjectId }}",
+            "--SW360:ProjectID", "$sw360ProjectId",
             "--SW360:URL", "${{ parameters.sw360Url }}",
             "--SW360:Keycloak:ClientId", "${{ parameters.sw360ClientId }}",
             "--SW360:Keycloak:ClientSecret", "${{ parameters.sw360ClientSecret }}",
@@ -166,11 +167,12 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
+        $sw360ProjectId = (Get-Content "$(Build.SourcesDirectory)/sw360-resolved-project-id.txt" -Raw).Trim()
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net10.0/SIT.Create.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
-          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:ProjectID "$sw360ProjectId" `
           --SW360:URL "${{ parameters.sw360Url }}" `
           --SW360:Keycloak:ClientId "${{ parameters.sw360ClientId }}" `
           --SW360:Keycloak:ClientSecret "${{ parameters.sw360ClientSecret }}" `
@@ -190,11 +192,12 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
+        $sw360ProjectId = (Get-Content "$(Build.SourcesDirectory)/sw360-resolved-project-id.txt" -Raw).Trim()
         dotnet $(Build.SourcesDirectory)/continuous-clearing/out/net10.0/SIT.Upload.dll `
           --Directory:OutputFolder "${{ parameters.outputFolder }}/sbom" `
           --Directory:LogFolder "${{ parameters.outputFolder }}/logs" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
-          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:ProjectID "$sw360ProjectId" `
           --SW360:URL "${{ parameters.sw360Url }}" `
           --SW360:Keycloak:ClientId "${{ parameters.sw360ClientId }}" `
           --SW360:Keycloak:ClientSecret "${{ parameters.sw360ClientSecret }}" `

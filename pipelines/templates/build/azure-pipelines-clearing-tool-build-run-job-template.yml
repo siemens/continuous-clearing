@@ -78,6 +78,14 @@ jobs:
           sw360ClientId: ${{ parameters.sw360ClientId }}
           sw360ClientSecret: ${{ parameters.sw360ClientSecret }}
 
+      - template: azure-pipelines-resolve-sw360-project-id-step-template.yml
+        parameters:
+          sw360Url: ${{ parameters.sw360Url }}
+          sw360ClientId: ${{ parameters.sw360ClientId }}
+          sw360ClientSecret: ${{ parameters.sw360ClientSecret }}
+          sw360ProjectId: ${{ parameters.sw360ProjectId }}
+          sw360ProjectName: ${{ parameters.sw360ProjectName }}
+
       - template: ${{ parameters.templatePath }}
         parameters:
           sw360Url: ${{ parameters.sw360Url }}

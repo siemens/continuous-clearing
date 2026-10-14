@@ -129,13 +129,14 @@ steps:
           $settingsFileName = [System.IO.Path]::GetFileName($settingsFileHostPath)
           $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)
 
+          $sw360ProjectId = (Get-Content "$(Build.SourcesDirectory)/sw360-resolved-project-id.txt" -Raw).Trim()
 
           $args = @(
             "--Directory:InputFolder", "/mnt/Input",
             "--Directory:OutputFolder", "/mnt/Output",
             "--ProjectType", "${{ project.projectType }}",
             "--SW360:ProjectName", "${{ parameters.sw360ProjectName }}",
-            "--SW360:ProjectId", "${{ parameters.sw360ProjectId }}",
+            "--SW360:ProjectId", "$sw360ProjectId",
             "--SW360:URL", "${{ parameters.sw360Url }}",
             "--SW360:Keycloak:ClientId", "${{ parameters.sw360ClientId }}",
             "--SW360:Keycloak:ClientSecret", "${{ parameters.sw360ClientSecret }}",
@@ -186,6 +187,8 @@ steps:
         $settingsFileName = [System.IO.Path]::GetFileName($settingsFileHostPath)
         $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)
 
+        $sw360ProjectId = (Get-Content "$(Build.SourcesDirectory)/sw360-resolved-project-id.txt" -Raw).Trim()
+
         docker run --rm --network="host" `
           -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
@@ -194,7 +197,7 @@ steps:
           ca-tool dotnet SIT.Create.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
-          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:ProjectID "$sw360ProjectId" `
           --SW360:URL "${{ parameters.sw360Url }}" `
           --SW360:Keycloak:ClientId "${{ parameters.sw360ClientId }}" `
           --SW360:Keycloak:ClientSecret "${{ parameters.sw360ClientSecret }}" `
@@ -219,6 +222,8 @@ steps:
         $settingsFileName = [System.IO.Path]::GetFileName($settingsFileHostPath)
         $settingsDir = [System.IO.Path]::GetDirectoryName($settingsFileHostPath)        
 
+        $sw360ProjectId = (Get-Content "$(Build.SourcesDirectory)/sw360-resolved-project-id.txt" -Raw).Trim()
+
         docker run --rm --network="host" `
           -v "${{ parameters.outputFolder }}/sbom:/mnt/Output" `
           -v "${{ parameters.outputFolder }}/logs:/var/log" `
@@ -227,7 +232,7 @@ steps:
           ca-tool dotnet SIT.Upload.dll `
           --Directory:OutputFolder "/mnt/Output" `
           --SW360:ProjectName "${{ parameters.sw360ProjectName }}" `
-          --SW360:ProjectID "${{ parameters.sw360ProjectId }}" `
+          --SW360:ProjectID "$sw360ProjectId" `
           --SW360:URL "${{ parameters.sw360Url }}" `
           --SW360:Keycloak:ClientId "${{ parameters.sw360ClientId }}" `
           --SW360:Keycloak:ClientSecret "${{ parameters.sw360ClientSecret }}" `
