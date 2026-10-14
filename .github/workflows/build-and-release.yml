@@ -9,6 +9,7 @@ on:
       - main
       - 'beta/**'
       - 'release/**'
+      - beta/beta_version_test
   # Manual trigger for cutting a release from any branch/tag.
   # - release-bump: controls the version calculation -
   #     'none'  -> no override, use GitVersion as computed (default)
@@ -19,12 +20,12 @@ on:
         description: 'Branch or tag to release from'
         required: false
         type: string
-        default: ''
+        default: 'beta/beta_version_test'
       release-bump:
         description: 'Bump keyword or explicit version to use (e.g. 12.3.0). Leave empty/none for no override.'
         required: false
         type: string
-        default: 'none'
+        default: '12.0.0'
 
 jobs:
 
