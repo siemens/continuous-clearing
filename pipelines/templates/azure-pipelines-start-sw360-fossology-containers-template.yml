@@ -135,7 +135,7 @@ steps:
       # SPRING_DATA_REST_MAX_PAGE_SIZE enables the new pagination support (ghcr.io/eclipse-sw360/sw360)
       # these two must be set explicitly: the entrypoint renders them blank (not the Thrift library default) when unset, crashing resource.war with NumberFormatException
       CONTAINER_ID=$(docker run -dit --name sw360 --network sw360net --memory=7g \
-        -p ${{ parameters.sw360Port }}:8080 -p ${{ parameters.keycloakPort }}:8083 \
+        -p 80:80 -p ${{ parameters.sw360Port }}:8080 -p ${{ parameters.keycloakPort }}:8083 \
         -e COUCHDB_URL=http://sw360-couchdb:5984 \
         -e COUCHDB_USER=sw360 -e COUCHDB_PASSWORD=sw360fossie \
         -e COUCHDB_ADMIN_EMAIL=setup@sw360.org -e COUCHDB_ADMIN_PASSWORD=sw360fossie \
@@ -145,15 +145,19 @@ steps:
         -e KC_DB_PASSWORD=mysecretpassword \
         -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
         -e KC_BOOTSTRAP_ADMIN_PASSWORD=keycloaksecret \
-        -e KC_HOSTNAME=http://localhost:${{ parameters.keycloakPort }} \
+        -e KC_HOSTNAME=http://localhost/kc \
         -e KC_HTTP_ENABLED=true \
         -e KC_HTTP_PORT=8083 \
+        -e KC_HTTP_RELATIVE_PATH=/kc \
         -e KC_PROXY_HEADERS=xforwarded \
         -e KC_HOSTNAME_STRICT=false \
-        -e ENABLE_FRONTEND=false \
         -e SW360_SECURITY_HTTP_BASIC_ENABLED=true \
-        -e SW360_SECURITY_JWT_ISSUERS_0_ISSUER_URI=http://localhost:${{ parameters.keycloakPort }}/realms/sw360 \
-        -e SW360_SECURITY_JWT_ISSUERS_0_JWK_SET_URI=http://127.0.0.1:8083/realms/sw360/protocol/openid-connect/certs \
+        -e SW360_SECURITY_JWT_ISSUERS_0_ISSUER_URI=http://localhost/authorization \
+        -e SW360_SECURITY_JWT_ISSUERS_1_ISSUER_URI=http://localhost/kc/realms/sw360 \
+        -e SW360_SECURITY_JWT_ISSUERS_1_JWK_SET_URI=http://127.0.0.1:8083/kc/realms/sw360/protocol/openid-connect/certs \
+        -e SW360_API_URL=http://127.0.0.1:8080 \
+        -e NEXTAUTH_URL=http://localhost -e NEXTAUTH_SECRET=testsecret \
+        -e NEXT_PUBLIC_SW360_AUTH_PROVIDER=sw360basic \
         -e SPRING_DATA_REST_MAX_PAGE_SIZE=1000 \
         -e SW360_CORS_ALLOWED_ORIGIN=* \
         -e BACKEND_THRIFT_MAX_MESSAGE_SIZE=104857600 \
@@ -197,7 +201,7 @@ steps:
       sudo apt-get update && sudo apt-get install -y jq
 
       URL="${{ parameters.sw360Url }}/resource/api/projects"
-      TOKEN_URL="http://localhost:${{ parameters.keycloakPort }}/realms/sw360/protocol/openid-connect/token"
+      TOKEN_URL="http://localhost/kc/realms/sw360/protocol/openid-connect/token"
       CLIENT_ID="${{ parameters.sw360ClientId }}"
       CLIENT_SECRET="${{ parameters.sw360ClientSecret }}"
       MAX_RETRIES=60
@@ -212,7 +216,7 @@ steps:
             -d "grant_type=client_credentials" \
             -d "client_id=$CLIENT_ID" \
             -d "client_secret=$CLIENT_SECRET")
-          AUTH_TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token // empty')
+          AUTH_TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token // empty' 2>/dev/null)
 
           if [ -z "$AUTH_TOKEN" ]; then
               echo "Keycloak not ready yet or token request failed. Response: $TOKEN_RESPONSE"
