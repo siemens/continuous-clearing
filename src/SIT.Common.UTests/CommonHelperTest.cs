@@ -364,6 +364,47 @@ namespace SIT.Common.UTest
             Assert.AreEqual(first.CatoolRunningLocation, second.CatoolRunningLocation);
         }
 
+        [Test]
+        public void SetToolVersionforlinkreleases_WhenToolVersionProvided_SetsCommonHelperToolVersion()
+        {
+            // Arrange
+            CommonHelper.ToolVersion = null;
+            var settings = new CommonAppSettings { ToolVersion = "11.0.6" };
+
+            // Act
+            CommonHelper.SetToolVersionforlinkreleases(settings);
+
+            // Assert
+            Assert.AreEqual(":v11.0.6", CommonHelper.ToolVersion);
+        }
+
+        [Test]
+        public void SetToolVersionforlinkreleases_WhenToolVersionEmpty_FallsBackToAssemblyVersion()
+        {
+            // Arrange
+            CommonHelper.ToolVersion = "1.2.3";
+            var settings = new CommonAppSettings { ToolVersion = string.Empty };
+            string expected = $":v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
+
+            // Act
+            CommonHelper.SetToolVersionforlinkreleases(settings);
+
+            // Assert
+            Assert.AreEqual(expected, CommonHelper.ToolVersion);
+        }
+
+        [Test]
+        public void SetToolVersionforlinkreleases_WhenAppSettingsNull_FallsBackToAssemblyVersion()
+        {
+            // Arrange
+            CommonHelper.ToolVersion = "4.5.6";
+            string expected = $":v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => CommonHelper.SetToolVersionforlinkreleases(null));
+            Assert.AreEqual(expected, CommonHelper.ToolVersion);
+        }
+
         #region ValidateKeycloakCredentials
 
         private static CommonAppSettings BuildAppSettingsWithSw360(string clientId, string clientSecret, string token)

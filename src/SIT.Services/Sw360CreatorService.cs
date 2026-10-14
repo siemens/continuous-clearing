@@ -359,9 +359,9 @@ namespace SIT.Services
                                             releaseLinked => releaseLinked.ReleaseId,
                                             releaseLinked => new AddLinkedRelease()
                                             {
-                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.LinkedByCAToolReleaseRelationContained
+                                                ReleaseRelation = string.IsNullOrEmpty(releaseLinked.Relation) ? Dataconstant.ReleaseRelationContained
                                                                     : releaseLinked.Relation,
-                                                Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : Dataconstant.LinkedByCATool
+                                                Comment = manuallyLinkedReleases.Exists(r => r.ReleaseId == releaseLinked.ReleaseId) ? releaseLinked.Comment : $"{Dataconstant.LinkedByCATool}{CommonHelper.ToolVersion}"
                                             });
 
                 StringContent content = new StringContent(JsonConvert.SerializeObject(linkedReleasesDict), Encoding.UTF8, ApplicationJson);

@@ -121,19 +121,15 @@ namespace SIT.Common.Constants
         /// <summary>
         /// Linked by CA Tool.
         /// </summary>
-        public const string LinkedByCATool = "Linked by CA Tool";
-        /// <summary>
-        /// Linked by CA Tool release relation: UNKNOWN.
-        /// </summary>
-        public const string LinkedByCAToolReleaseRelation = "UNKNOWN";
+        public const string LinkedByCATool = "Linked By SITCreate";       
         /// <summary>
         /// Linked by CA Tool release relation: CONTAINED.
         /// </summary>
-        public const string LinkedByCAToolReleaseRelationContained = "CONTAINED";
+        public const string ReleaseRelationContained = "CONTAINED";
         /// <summary>
         /// Release attachment comment.
         /// </summary>
-        public const string ReleaseAttachmentComment = "Attached by CA Tool";
+        public const string ReleaseAttachmentComment = "Attached By SIT Create";
         /// <summary>
         /// Forward slash character.
         /// </summary>

@@ -59,6 +59,8 @@ namespace SIT.Common
         /// Gets or sets the default log path.
         /// </summary>
         public static string DefaultLogPath { get; set; }
+        public static string ToolVersion { get; set; }
+        public static string CatoolVersion { get; set; }
         public static bool DependencyFileNotFound { get; set; } = true;
         #endregion Properties
 
@@ -127,9 +129,20 @@ namespace SIT.Common
             CatoolInfo catoolInfo = new CatoolInfo();
             Assembly entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
             var versionFromProj = entryAssembly.GetName().Version;
-            catoolInfo.CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
+            catoolInfo.CatoolVersion = CatoolVersion = $"{versionFromProj.Major}.{versionFromProj.Minor}.{versionFromProj.Build}";
             catoolInfo.CatoolRunningLocation = Path.GetDirectoryName(entryAssembly.Location);
             return catoolInfo;
+        }
+
+        /// <summary>
+        /// Sets the global tool version from application settings when provided;
+        /// otherwise falls back to the assembly version from the entry project.
+        /// </summary>
+        /// <param name="appSettings">The application settings containing the configured tool version.</param>
+        public static void SetToolVersionforlinkreleases(CommonAppSettings appSettings)
+        {
+            string version = string.IsNullOrEmpty(appSettings?.ToolVersion) ? CatoolVersion : appSettings.ToolVersion;
+            ToolVersion = $":v{version}";
         }
 
         /// <summary>
