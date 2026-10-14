@@ -9,27 +9,29 @@ on:
       - main
       - 'beta/**'
       - 'release/**'
+  # Manual trigger for cutting a release from any branch/tag.
+  # - release-bump: controls the version calculation -
+  #     'none'  -> no override, use GitVersion as computed (default)
+  #     explicit SemVer (e.g. '12.3.0' or '12.3.0-beta.1') -> bypass GitVersion and use this version directly
   workflow_dispatch:
     inputs:
       ref:
         description: 'Branch or tag to release from'
         required: false
+        type: string
         default: ''
-      version-bump:
-        description: 'Force a version bump for this run (overrides GitVersion increment: None)'
+      release-bump:
+        description: 'Bump keyword or explicit version to use (e.g. 12.3.0). Leave empty/none for no override.'
         required: false
-        type: choice
+        type: string
         default: 'none'
-        options:
-          - none
-          - patch
-          - minor
-          - major
 
 jobs:
 
   version:
     runs-on: windows-latest
+    env:
+      VERSION_BUMP: ${{ github.event.inputs.release-bump || 'none' }}
     outputs:
       semVer: ${{ steps.gitversion.outputs.semVer }}
       majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
@@ -48,22 +50,39 @@ jobs:
         id: gitversion
         shell: pwsh
         run: |
-          # Normal runs (push/PR) never bump: GitVersion.yml has increment: None on
-          # master/beta, so ordinary commits keep the same version. To cut a real
-          # release, trigger this workflow manually via workflow_dispatch and pick
-          # a 'version-bump' value (patch/minor/major) - no commit message
-          # convention (+semver:) is required.
-          $bump = "${{ github.event.inputs.version-bump }}"
+          $bump = "$env:VERSION_BUMP".Trim()
+          $explicitVersion = $null
           $overrideArgs = @()
+
           if ($bump -and $bump -ne "none") {
-            Write-Host "Forcing version bump: $bump"
-            $overrideArgs = @("/overrideconfig", "increment=$bump")
+            if ($bump -match '^\d+\.\d+\.\d+(-.+)?$') {
+              Write-Host "Using explicit version: $bump"
+              $explicitVersion = $bump
+            } elseif ($bump -in @("patch", "minor", "major")) {
+              Write-Host "Forcing version bump: $bump"
+              $overrideArgs = @("/overrideconfig", "increment=$bump")
+            } else {
+              Write-Error "Invalid release-bump value '$bump'. Use 'patch', 'minor', 'major', or an explicit version like 12.3.0."
+              exit 1
+            }
           }
-          $json = dotnet-gitversion /config GitVersion.yml @overrideArgs | ConvertFrom-Json
-          Write-Host "SemVer: $($json.SemVer) | MajorMinorPatch: $($json.MajorMinorPatch) | PreReleaseTag: $($json.PreReleaseTag)"
-          echo "semVer=$($json.SemVer)" >> $env:GITHUB_OUTPUT
-          echo "majorMinorPatch=$($json.MajorMinorPatch)" >> $env:GITHUB_OUTPUT
-          echo "preReleaseTag=$($json.PreReleaseTag)" >> $env:GITHUB_OUTPUT
+
+          if ($explicitVersion) {
+            $semVer = $explicitVersion
+            $parts = $explicitVersion -split '-', 2
+            $majorMinorPatch = $parts[0]
+            $preReleaseTag = if ($parts.Length -gt 1) { $parts[1] } else { "" }
+            Write-Host "SemVer: $semVer | MajorMinorPatch: $majorMinorPatch | PreReleaseTag: $preReleaseTag"
+            echo "semVer=$semVer" >> $env:GITHUB_OUTPUT
+            echo "majorMinorPatch=$majorMinorPatch" >> $env:GITHUB_OUTPUT
+            echo "preReleaseTag=$preReleaseTag" >> $env:GITHUB_OUTPUT
+          } else {
+            $json = dotnet-gitversion /config GitVersion.yml @overrideArgs | ConvertFrom-Json
+            Write-Host "SemVer: $($json.SemVer) | MajorMinorPatch: $($json.MajorMinorPatch) | PreReleaseTag: $($json.PreReleaseTag)"
+            echo "semVer=$($json.SemVer)" >> $env:GITHUB_OUTPUT
+            echo "majorMinorPatch=$($json.MajorMinorPatch)" >> $env:GITHUB_OUTPUT
+            echo "preReleaseTag=$($json.PreReleaseTag)" >> $env:GITHUB_OUTPUT
+          }
 
       - name: Determine Prerelease Flag
         id: set_prerelease
