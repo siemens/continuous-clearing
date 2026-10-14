@@ -7,6 +7,7 @@
 
 using SW360KeycloakService;
 using SW360KeycloakService.Model;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities
@@ -68,7 +69,7 @@ namespace TestUtilities
                 if (string.IsNullOrWhiteSpace(testParam.KeycloakClientId) ||
                     string.IsNullOrWhiteSpace(testParam.KeycloakClientSecret))
                 {
-                    throw new InvalidOperationException(
+                    throw new System.InvalidOperationException(
                         "Integration tests require Keycloak credentials. 'KeycloakClientId' and " +
                         "'KeycloakClientSecret' are missing from appSettingsSW360IntegrationTest.json. " +
                         "Ensure the pipeline variables SW360_CLIENT_ID and SW360_CLIENT_SECRET are set in " +
