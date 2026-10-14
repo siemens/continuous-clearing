@@ -20,12 +20,6 @@ parameters:
   - name: sw360CouchdbNouveauImage
     type: string
     default: ""
-
-  # Keycloak backs JWT/OAuth login for integration tests that need a Bearer token (not just the static Token header)
-  - name: sw360KeycloakImage
-    type: string
-    default: ""
-
   - name: sw360PostgresImage
     type: string
     default: ""
@@ -61,7 +55,7 @@ steps:
     displayName: "Docker login to ${{ parameters.dockerRegistry }}"
 
   - script: |
-      docker rm -f sw360 sw360-couchdb couchdb-nouveau postgres keycloak fossology 2>/dev/null || true
+      docker rm -f sw360 sw360-couchdb couchdb-nouveau postgres fossology 2>/dev/null || true
       docker network rm sw360net 2>/dev/null || true
       docker container prune -f
       docker image prune -af
@@ -131,11 +125,20 @@ steps:
     displayName: "Start Postgres Container"
 
   - script: |
-      echo "Starting Keycloak container..."
-      # KC_HOSTNAME is the externally-reachable URL (published port) so the 'iss' claim in
-      # issued tokens matches what test clients requesting a token will see; the sw360 backend
-      # fetches JWKS keys internally via the container network instead (see JWK_SET_URI below).
-      CONTAINER_ID=$(docker run -dit --name keycloak --network sw360net -p ${{ parameters.keycloakPort }}:8080 \
+      echo "Starting a new sw360 container..."
+      # sw360DockerImage is sw360-clearing:latest, which bundles backend+frontend+nginx+Keycloak
+      # together via supervisord. Keycloak runs on keycloakPort inside this same container
+      # (no separate keycloak container needed); KC_HTTP_RELATIVE_PATH is left unset so Keycloak
+      # serves at its own root path when reached directly (bypassing the bundled nginx), matching
+      # the plain (no /kc prefix) TOKEN_URL/JWT issuer URIs used below.
+      # container memory must exceed the image's JVM -Xmx6g to avoid OOM kills
+      # SPRING_DATA_REST_MAX_PAGE_SIZE enables the new pagination support (ghcr.io/eclipse-sw360/sw360)
+      # these two must be set explicitly: the entrypoint renders them blank (not the Thrift library default) when unset, crashing resource.war with NumberFormatException
+      CONTAINER_ID=$(docker run -dit --name sw360 --network sw360net --memory=7g \
+        -p ${{ parameters.sw360Port }}:8080 -p ${{ parameters.keycloakPort }}:8083 \
+        -e COUCHDB_URL=http://sw360-couchdb:5984 \
+        -e COUCHDB_USER=sw360 -e COUCHDB_PASSWORD=sw360fossie \
+        -e COUCHDB_ADMIN_EMAIL=setup@sw360.org -e COUCHDB_ADMIN_PASSWORD=sw360fossie \
         -e KC_DB=postgres \
         -e KC_DB_URL=jdbc:postgresql://postgres/keycloak \
         -e KC_DB_USERNAME=keycloak \
@@ -144,34 +147,13 @@ steps:
         -e KC_BOOTSTRAP_ADMIN_PASSWORD=keycloaksecret \
         -e KC_HOSTNAME=http://localhost:${{ parameters.keycloakPort }} \
         -e KC_HTTP_ENABLED=true \
+        -e KC_HTTP_PORT=8083 \
         -e KC_PROXY_HEADERS=xforwarded \
         -e KC_HOSTNAME_STRICT=false \
-        -e COUCHDB_URL=http://sw360-couchdb:5984 \
-        -e COUCHDB_USER=sw360 \
-        -e COUCHDB_PASSWORD=sw360fossie \
-        -e COUCHDB_ADMIN_EMAIL=setup@sw360.org \
-        -e COUCHDB_ADMIN_PASSWORD=sw360fossie \
-        ${{ parameters.sw360KeycloakImage }})
-
-      if [ -z "$CONTAINER_ID" ]; then
-          echo "Failed to start Keycloak container!"
-          exit 1
-      fi
-
-      echo "Keycloak Container ID: $CONTAINER_ID"
-    displayName: "Start Keycloak Container"
-
-  - script: |
-      echo "Starting a new sw360 container..."
-      # container memory must exceed the image's JVM -Xmx6g to avoid OOM kills
-      # SPRING_DATA_REST_MAX_PAGE_SIZE enables the new pagination support (ghcr.io/eclipse-sw360/sw360)
-      # these two must be set explicitly: the entrypoint renders them blank (not the Thrift library default) when unset, crashing resource.war with NumberFormatException
-      CONTAINER_ID=$(docker run -dit --name sw360 --network sw360net --memory=5g -p ${{ parameters.sw360Port }}:8080 \
-        -e COUCHDB_URL=http://sw360-couchdb:5984 \
-        -e COUCHDB_USER=sw360 -e COUCHDB_PASSWORD=sw360fossie \
+        -e ENABLE_FRONTEND=false \
         -e SW360_SECURITY_HTTP_BASIC_ENABLED=true \
         -e SW360_SECURITY_JWT_ISSUERS_0_ISSUER_URI=http://localhost:${{ parameters.keycloakPort }}/realms/sw360 \
-        -e SW360_SECURITY_JWT_ISSUERS_0_JWK_SET_URI=http://keycloak:8080/realms/sw360/protocol/openid-connect/certs \
+        -e SW360_SECURITY_JWT_ISSUERS_0_JWK_SET_URI=http://127.0.0.1:8083/realms/sw360/protocol/openid-connect/certs \
         -e SPRING_DATA_REST_MAX_PAGE_SIZE=1000 \
         -e SW360_CORS_ALLOWED_ORIGIN=* \
         -e BACKEND_THRIFT_MAX_MESSAGE_SIZE=104857600 \
@@ -201,15 +183,13 @@ steps:
       docker ps -a
       docker inspect sw360 --format 'OOMKilled={{.State.OOMKilled}} Status={{.State.Status}} ExitCode={{.State.ExitCode}} StartedAt={{.State.StartedAt}}'
       echo "Container resource usage:"
-      docker stats sw360 sw360-couchdb couchdb-nouveau postgres keycloak fossology --no-stream
+      docker stats sw360 sw360-couchdb couchdb-nouveau postgres fossology --no-stream
       echo "Container logs:"
       docker logs sw360 --tail 200
       echo "CouchDB logs:"
       docker logs sw360-couchdb --tail 100
       echo "CouchDB Nouveau logs:"
       docker logs couchdb-nouveau --tail 100
-      echo "Keycloak logs:"
-      docker logs keycloak --tail 100
     displayName: "Debug sw360 container state"
 
   - script: |
@@ -273,7 +253,7 @@ steps:
 
   - script: |
       echo "Final container memory usage (once sw360 is confirmed healthy):"
-      docker stats sw360 sw360-couchdb couchdb-nouveau postgres keycloak fossology --no-stream
+      docker stats sw360 sw360-couchdb couchdb-nouveau postgres fossology --no-stream
       echo "Host memory:"
       free -h
     displayName: "Report final container memory usage"
