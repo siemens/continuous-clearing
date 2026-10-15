@@ -118,7 +118,7 @@ jobs:
     name: "managed-pipeline-agents"
     demands:
       - ImageOverride -equals ubuntu-latest
-
+     
   steps:
     - checkout: self
 
@@ -126,11 +126,15 @@ jobs:
       parameters:
         dockerRegistry: $(JFROG_DOCKER_REGISTRY)
         sw360DockerImage: $(SW360_DOCKER_IMAGE)
+        sw360CouchdbImage: $(SW360_COUCHDB_IMAGE)
+        sw360CouchdbNouveauImage: $(SW360_COUCHDB_NOUVEAU_IMAGE)
+        sw360PostgresImage: $(SW360_POSTGRES_IMAGE)
         fossologyDockerImage: $(FOSSOLOGY_DOCKER_IMAGE)
         sw360Port: $(SW360_PORT)
         fossologyPort: $(FOSSOLOGY_PORT)
         sw360Url: $(SW360_URL)
-        sw360Token: $(SW360_TOKEN)
+        sw360ClientId: $(SW360_CLIENT_ID)
+        sw360ClientSecret: $(SW360_CLIENT_SECRET)
     
     - script: |
         set -e  # Exit on error
@@ -155,13 +159,15 @@ jobs:
               --arg email "$(JFROG_USER_EMAIL)" \
               --arg apiKey "$(JFROG_TOKEN)" \
               --arg jfrog "$(JFROG_URL)" \
-              --arg authToken "$(SW360_TOKEN)" \
+              --arg clientId "$(SW360_CLIENT_ID)" \
+              --arg clientSecret "$(SW360_CLIENT_SECRET)" \
               '.Fossologyurl = $fossy |
                 .SW360URL = $sw360 |
                 .ArtifactoryUploadUser = $email |
                 .ArtifactoryUploadApiKey = $apiKey |
                 .JFrogApi = $jfrog |
-                .SW360AuthTokenValue = $authToken' "$JSON_FILE" > temp.json && mv temp.json "$JSON_FILE"
+                .KeycloakClientId = $clientId |
+                .KeycloakClientSecret = $clientSecret' "$JSON_FILE" > temp.json && mv temp.json "$JSON_FILE"
 
             echo "Updated Integration Test Configuration:"
             cat "$JSON_FILE"
