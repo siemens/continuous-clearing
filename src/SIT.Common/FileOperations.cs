@@ -271,30 +271,6 @@ namespace SIT.Common
         }
 
         /// <summary>
-        /// Writes the content to a report file for not approved items.
-        /// </summary>
-        /// <typeparam name="T">The type of data to write.</typeparam>
-        /// <param name="dataToWrite">The data to write to the file.</param>
-        /// <param name="folderPath">The folder path where the file will be written.</param>
-        /// <param name="fileNameWithExtension">The file name with extension.</param>
-        /// <param name="name">The name to prefix the file name.</param>
-        /// <returns>"success" if the operation succeeded; otherwise, "failure".</returns>
-        public string WriteContentToReportNotApprovedFile<T>(T dataToWrite, string folderPath, string fileNameWithExtension, string name)
-        {
-            return ExecuteFileOperation("Write content to Report Not Approved File", nameof(WriteContentToReportNotApprovedFile), $"FolderPath: {folderPath}, FileName: {fileNameWithExtension}", () =>
-            {
-                Logger.DebugFormat("WriteContentToReportNotApprovedFile(): Starting to write content to Report Not Approved file. FolderPath: {0}, FileName: {1}, Name: {2}", folderPath, fileNameWithExtension, name);
-                string jsonString = JsonConvert.SerializeObject(dataToWrite, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                string fileName = $"{name}_{fileNameWithExtension}";
-
-                string filePath = Path.Combine(folderPath, fileName);
-                Logger.DebugFormat(LogMessage, filePath);
-                File.WriteAllText(filePath, jsonString);
-                Logger.Debug("WriteContentToReportNotApprovedFile():Content successfully written to the file.");
-            });
-        }
-
-        /// <summary>
         /// Writes the content to a file for tracking multiple versions.
         /// </summary>
         /// <typeparam name="T">The type of data to write.</typeparam>
