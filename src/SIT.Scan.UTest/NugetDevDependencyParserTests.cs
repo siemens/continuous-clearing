@@ -171,7 +171,7 @@ namespace SIT.Scan.UTest
         {
             var container = new Container();
             var method = typeof(NugetDevDependencyParser).GetMethod("ParseJsonInContainer", BindingFlags.NonPublic | BindingFlags.Static);
-            bool result = (bool)method.Invoke(null, new object[] { "nonexistent.json", container });
+            bool result = (bool)method.Invoke(null, new object[] { "nonexistent.json", null, container });
             Assert.IsFalse(result);
         }
 
@@ -187,7 +187,25 @@ namespace SIT.Scan.UTest
             File.WriteAllText(fakeJson, "{}\n");
             var container = new Container();
             var method = typeof(NugetDevDependencyParser).GetMethod("ParseJsonInContainer", BindingFlags.NonPublic | BindingFlags.Static);
-            bool result = (bool)method.Invoke(null, new object[] { fakeJson, container });
+            bool result = (bool)method.Invoke(null, new object[] { fakeJson, null, container });
+            Assert.IsTrue(result);
+            Assert.AreEqual("test.csproj", container.Name);
+            Directory.Delete(tempDir, true);
+        }
+
+        [Test]
+        public void ParseJsonInContainer_UsesRestoreProjectPathIfPresent()
+        {
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            string csprojPath = Path.Combine(tempDir, "test.csproj");
+            File.WriteAllText(csprojPath, "<Project Sdk=\"Microsoft.NET.Sdk\"><ItemGroup><ProjectCapability Include=\"TestContainer\" /></ItemGroup></Project>");
+            string fakeJson = Path.Combine(tempDir, "obj", "project.assets.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(fakeJson));
+            File.WriteAllText(fakeJson, "{}\n");
+            var container = new Container();
+            var method = typeof(NugetDevDependencyParser).GetMethod("ParseJsonInContainer", BindingFlags.NonPublic | BindingFlags.Static);
+            bool result = (bool)method.Invoke(null, new object[] { fakeJson, csprojPath, container });
             Assert.IsTrue(result);
             Assert.AreEqual("test.csproj", container.Name);
             Directory.Delete(tempDir, true);
@@ -205,7 +223,7 @@ namespace SIT.Scan.UTest
             File.WriteAllText(fakeJson, "{}\n");
             var container = new Container();
             var method = typeof(NugetDevDependencyParser).GetMethod("ParseJsonInContainer", BindingFlags.NonPublic | BindingFlags.Static);
-            bool result = (bool)method.Invoke(null, new object[] { fakeJson, container });
+            bool result = (bool)method.Invoke(null, new object[] { fakeJson, null, container });
             Assert.IsTrue(result);
             Assert.AreEqual("test.csproj", container.Name);
             Directory.Delete(tempDir, true);
