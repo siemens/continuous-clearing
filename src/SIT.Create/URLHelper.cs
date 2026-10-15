@@ -376,7 +376,8 @@ namespace SIT.Create
             }
             else
             {
-                Logger.DebugFormat("CloneSource(): Executing Git command: {0}", gitCommands[1]);
+                string cloneCommand = gitCommands[^1];
+                Logger.DebugFormat("CloneSource(): Executing Git command: {0}", cloneCommand);
                 Process p = new Process();
                 p.StartInfo.RedirectStandardError = true;
                 p.StartInfo.RedirectStandardOutput = true;
@@ -384,7 +385,7 @@ namespace SIT.Create
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.CreateNoWindow = true;
                 p.StartInfo.FileName = Path.Combine(@"git");
-                p.StartInfo.Arguments = gitCommands[1];
+                p.StartInfo.Arguments = cloneCommand;
                 p.StartInfo.WorkingDirectory = localPathforSourceRepo;
 
                 p.Start();
@@ -449,6 +450,7 @@ namespace SIT.Create
             return new List<string>()
            {
                $"config --global core.protectNTFS false",
+               $"config --global init.defaultBranch main",
                $"clone" +" "+ CommonAppSettings.AlpineAportsGitURL,
            };
         }
