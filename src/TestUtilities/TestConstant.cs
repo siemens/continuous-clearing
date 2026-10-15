@@ -21,11 +21,8 @@ namespace TestUtilities
         public static readonly string JfrogApiNuget = $"{s_testParamObjnuget.JfrogApi}/api/storage/{s_testParamObjnuget.ThirdPartyDestinationRepoName}";
         public static readonly string JfrogApiCargo = $"{s_testParamObjcargo.JfrogApi}/api/storage/{s_testParamObjcargo.ThirdPartyDestinationRepoName}";
 
-
-
-        public static readonly string TestSw360TokenType = s_testParamObj.SW360AuthTokenType;
-        public static readonly string TestSw360TokenValue = s_testParamObj.SW360AuthTokenValue;
-
+        public static readonly string TestSw360TokenType = TestAuthHelper.TokenType;
+        public static readonly string TestSw360TokenValue = TestAuthHelper.TokenValue;
 
         public const string componentNameUrl = "?name=";
         public const string PackageFilePath = "--Directory:InputFolder";
@@ -35,7 +32,8 @@ namespace TestUtilities
         public const string SW360URL = "--SW360:URL";
         public const string FossologyURL = "--SW360:Fossology:URL";
         public const string EnableFossologyTrigger = "--SW360:Fossology:EnableTrigger";
-        public const string SW360AuthTokenType = "--SW360:AuthTokenType";
+        public const string KeycloakClientId = "--SW360:Keycloak:ClientId";
+        public const string KeycloakClientSecret = "--SW360:Keycloak:ClientSecret";
         public const string SW360ProjectName = "--SW360:ProjectName";
         public const string SW360ProjectID = "--SW360:ProjectID";
         public const string ProjectType = "--ProjectType";
