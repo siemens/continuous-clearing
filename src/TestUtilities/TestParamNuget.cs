@@ -16,8 +16,8 @@ namespace TestUtilities
         static readonly IConfiguration s_Config =
       new ConfigurationBuilder().AddJsonFile(@"appSettingsSW360IntegrationTest.json", true, true).Build();
 
-        public string SW360AuthTokenType { get; set; }
-        public string SW360AuthTokenValue { get; set; }
+        public string KeycloakClientId { get; set; }
+        public string KeycloakClientSecret { get; set; }
         public string SW360URL { get; set; }
         public string FossUrl { get; set; }
         public string SW360ProjectName { get; set; }
@@ -37,8 +37,8 @@ namespace TestUtilities
         public string SBOMSignVerify { get; set; }
         public TestParamNuget()
         {
-            SW360AuthTokenType = s_Config["SW360AuthTokenType"];
-            SW360AuthTokenValue = s_Config["SW360AuthTokenValue"];
+            KeycloakClientId = s_Config["KeycloakClientId"];
+            KeycloakClientSecret = s_Config["KeycloakClientSecret"];
             SW360URL = s_Config["SW360URL"];
             FossUrl = s_Config["FossologyURL"];
             SW360ProjectName = s_Config["SW360ProjectName"];
