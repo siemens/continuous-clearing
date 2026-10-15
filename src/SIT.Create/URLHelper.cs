@@ -124,7 +124,7 @@ namespace SIT.Create
             // metacharacters can ever reach the git command line.
             if (!IsValidAlpineDistro(distro))
             {
-                Logger.DebugFormat("GetAlpineDistro(): Ignoring unsafe distro value derived from bomRef: {0}", distro);
+                Logger.WarnFormat("GetAlpineDistro(): Ignoring unsafe distro value derived from bomRef: {0}", distro);
                 return string.Empty;
             }
 
@@ -411,7 +411,7 @@ namespace SIT.Create
             // forward an attacker-controlled option/argument to git.
             if (!IsValidAlpineDistro(alpineDistro))
             {
-                Logger.DebugFormat("CheckoutDistro(): Skipping git checkout for unsafe or empty distro value: {0}", alpineDistro);
+                Logger.WarnFormat("CheckoutDistro(): Skipping git checkout for unsafe or empty distro value: {0}", alpineDistro);
                 return;
             }
 
@@ -449,7 +449,6 @@ namespace SIT.Create
             return new List<string>()
            {
                $"config --global core.protectNTFS false",
-               $"config --global init.defaultBranch main",
                $"clone" +" "+ CommonAppSettings.AlpineAportsGitURL,
            };
         }
