@@ -117,7 +117,6 @@ steps:
 
   - ${{ each project in parameters.projectDefinitions }}:
     - task: PowerShell@2
-      continueOnError: true
       displayName: 'Run SIT.Scan for ${{ project.projectType }}'
       inputs:
         targetType: 'inline'
@@ -214,7 +213,6 @@ steps:
           --settingsfilepath "${{ parameters.appSettingsPath }}"
 
   - task: PublishBuildArtifacts@1
-    condition: always()
     displayName: 'Publish SBOM Artifacts'
     inputs:
       PathtoPublish: '${{ parameters.outputFolder }}/sbom'
@@ -222,7 +220,6 @@ steps:
       publishLocation: 'Container'
 
   - task: PublishBuildArtifacts@1
-    condition: always()
     displayName: 'Publish Logs Artifacts'
     inputs:
       PathtoPublish: '${{ parameters.outputFolder }}/logs'
