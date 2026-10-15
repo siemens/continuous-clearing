@@ -39,8 +39,8 @@ namespace SW360IntegrationTest.Nuget
                 TestHelper.RunSITScanExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
@@ -63,9 +63,9 @@ namespace SW360IntegrationTest.Nuget
 
             int value = TestHelper.RunSITCreateExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.ProjectType,"NUGET",
@@ -127,8 +127,7 @@ namespace SW360IntegrationTest.Nuget
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedcomponentType = "OSS";
             string expectedname = "System.Memory";
             //url formation for retrieving component details
@@ -152,8 +151,7 @@ namespace SW360IntegrationTest.Nuget
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedname = "System.Memory";
             string expectedversion = "4.5.4";
             string expectedexternalid = "pkg:nuget/System.Memory@4.5.4";

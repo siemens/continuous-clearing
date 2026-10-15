@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Siemens AG">
 //   Copyright (C) Siemens AG 2023. All rights reserved. 
 // </copyright>
@@ -39,8 +39,8 @@ namespace SW360IntegrationTest.Maven
                 TestHelper.RunSITScanExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
@@ -62,9 +62,9 @@ namespace SW360IntegrationTest.Maven
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunSITCreateExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.FossologyURL, testParameters.FossUrl,
@@ -121,8 +121,7 @@ namespace SW360IntegrationTest.Maven
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedcomponentType = "OSS";
             string expectedname = "joda-time";
             //url formation for retrieving component details
@@ -146,8 +145,7 @@ namespace SW360IntegrationTest.Maven
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedname = "joda-time";
             string expectedversion = "2.9.2";
             string expectedclearingState = "NEW_CLEARING";
