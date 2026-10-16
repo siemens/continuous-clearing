@@ -142,7 +142,7 @@ namespace SIT.Common
         public static void SetToolVersionforlinkreleases(CommonAppSettings appSettings)
         {
             string version = string.IsNullOrEmpty(appSettings?.ToolVersion) ? CatoolVersion : appSettings.ToolVersion;
-            ToolVersion = $":v{version}";
+            ToolVersion = $": v{version}";
         }
 
         /// <summary>
