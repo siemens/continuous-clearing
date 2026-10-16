@@ -7,7 +7,6 @@
 
 using SW360KeycloakService;
 using SW360KeycloakService.Model;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestUtilities

@@ -96,7 +96,7 @@ namespace SIT.Common.UTest
             Assert.AreEqual(null, comparisonData.Components);
         }
 
-        
+
         [Test]
         public void ExecuteFileOperation_WhenActionThrowsSecurityException_ReturnsFailure()
         {

@@ -902,8 +902,12 @@ namespace SIT.Scan.UTest
             var component = new Component { Name = "serde", Version = "1.0", Purl = "pkg:cargo/serde@1.0" };
             var entry = new AqlResult
             {
-                Name = "serde-1.0.crate", Repo = repoName, Path = ".",
-                MD5 = "md5", SHA1 = "sha1", SHA256 = "sha256",
+                Name = "serde-1.0.crate",
+                Repo = repoName,
+                Path = ".",
+                MD5 = "md5",
+                SHA1 = "sha1",
+                SHA256 = "sha256",
                 Properties = new List<AqlProperty>
                 {
                     new AqlProperty { Key = "crate.name", Value = "serde" },
@@ -988,7 +992,8 @@ namespace SIT.Scan.UTest
             {
                 ResolveInfo = new CargoPackageDetails.Resolve
                 {
-                    Root = "root", Nodes = new List<CargoPackageDetails.Node>
+                    Root = "root",
+                    Nodes = new List<CargoPackageDetails.Node>
                     {
                         new CargoPackageDetails.Node { Id = "root", Dependencies = new List<string> { "missing" } }
                     }

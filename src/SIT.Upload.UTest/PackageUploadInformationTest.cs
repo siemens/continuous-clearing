@@ -7,14 +7,10 @@
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
-using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.Common;
-using SIT.Common.Constants;
-using SIT.Common.Interface;
 using SIT.Upload.Model;
 using System.Collections.Generic;
 using System.IO;

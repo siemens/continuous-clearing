@@ -6,10 +6,8 @@
 
 using Moq;
 using Moq.Protected;
-using Newtonsoft.Json.Linq;
 using SIT.APICommunications.Model;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 

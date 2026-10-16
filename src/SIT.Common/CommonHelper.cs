@@ -11,16 +11,15 @@ using log4net;
 using log4net.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PackageUrl;
 using SIT.Common.Constants;
 using SIT.Common.Model;
 using SW360KeycloakService;
 using SW360KeycloakService.Model;
-using PackageUrl;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -983,7 +982,8 @@ namespace SIT.Common
         public static string BuildPurl(string type, string @namespace, string name, string version, SortedDictionary<string, string> qualifiers = null)
         {
             PackageURL purl = new PackageURL(type, @namespace, name, version, qualifiers, null);
-            return purl.ToString();        }
+            return purl.ToString();
+        }
 
         /// <summary>
         /// Generates a spec-compliant package-url (purl) for a given project type key
