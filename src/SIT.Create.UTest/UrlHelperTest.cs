@@ -9,11 +9,15 @@ using Moq;
 using Moq.Protected;
 using NUnit.Framework;
 using SIT.Common;
+using SIT.Common.Constants;
 using SIT.Create.Interfaces;
+using SIT.Create.Model;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -111,6 +115,134 @@ namespace SIT.Create.UTest
 
             Assert.That(sourceUrl, Is.EqualTo("https://github.com/angular/angular-cli/"));
         }
+
+        [Test]
+        [TestCase("invalid package;name", "1.0.0")]
+        [TestCase("valid-package", "1.0.0; rm -rf /")]
+        [TestCase("Invalid_Upper$Case", "1.0.0")]
+        [TestCase(null, "1.0.0")]
+        [TestCase("", "1.0.0")]
+        [TestCase("   ", "1.0.0")]
+        [TestCase("valid-package", null)]
+        [TestCase("valid-package", "")]
+        [TestCase("valid-package", "   ")]
+        [TestCase("@scope/package", "1.0.0&echo injected")]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithUnsafeComponentNameOrVersion_ReturnsEmptyString(string componentName, string version)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage(componentName, version);
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithComponentNameExceedingMaxLength_ReturnsEmptyString()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+            string componentName = new string('a', 215);
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage(componentName, "1.0.0");
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnWindows_WithComponentVersionExceedingMaxLength_ReturnsEmptyString()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Assert.Ignore("This test validates the Windows-only cmd.exe code path.");
+            }
+
+            // Arrange
+            IUrlHelper urlHelper = new UrlHelper();
+            string version = new string('1', 257);
+
+            // Act
+            string sourceUrl = urlHelper.GetSourceUrlForNpmPackage("valid-package", version);
+
+            // Assert
+            Assert.That(sourceUrl, Is.EqualTo(string.Empty));
+        }
+
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase(" ", false)]
+        [TestCase("\t\r\n", false)]
+        [TestCase("package", true)]
+        [TestCase("0", true)]
+        [TestCase("package-name_1.2~next", true)]
+        [TestCase("@scope/package", true)]
+        [TestCase("@scope-name_1.2~next/package-name_1.2~next", true)]
+        [TestCase("Package", false)]
+        [TestCase("@Scope/package", false)]
+        [TestCase("@scope/", false)]
+        [TestCase("@/package", false)]
+        [TestCase("@scope/package/extra", false)]
+        [TestCase("-package", false)]
+        [TestCase(".package", false)]
+        [TestCase("package name", false)]
+        [TestCase("package;echo", false)]
+        [TestCase("package&echo", false)]
+        [TestCase("package|echo", false)]
+        [TestCase("package$variable", false)]
+        public void IsValidNpmComponentName_ValidatesPackageName(string componentName, bool expected)
+        {
+            var method = typeof(UrlHelper).GetMethod("IsValidNpmComponentName", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+
+            var result = (bool)method.Invoke(null, new object[] { componentName });
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(213, true)]
+        [TestCase(214, true)]
+        [TestCase(215, false)]
+        public void IsValidNpmComponentName_EnforcesLengthBoundary(int length, bool expected)
+        {
+            IsValidNpmComponentName_ValidatesPackageName(new string('a', length), expected);
+        }
+
+        [TestCase(214, true)]
+        [TestCase(215, false)]
+        public void IsValidNpmComponentName_LengthLimitIncludesScope(int length, bool expected)
+        {
+            const string scope = "@scope/";
+
+            IsValidNpmComponentName_ValidatesPackageName(scope + new string('a', length - scope.Length), expected);
+        }
+
+        [Test]
+        public void GetSourceUrlForNpmPackage_OnUnsupportedOperatingSystem_ThrowsForMissingExecutable()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Assert.Ignore("The unsupported-OS branch requires a runner other than Windows or Linux.");
+            }
+
+            var exception = Assert.Throws<AggregateException>(() => _urlHelper.GetSourceUrlForNpmPackage("valid-package", "1.0.0"));
+
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
+        }
+
         [Test]
         public async Task GetSourceUrlForCargoPackage_ValidPackage_ReturnsDownloadUrl()
         {
@@ -364,5 +496,394 @@ namespace SIT.Create.UTest
             Assert.DoesNotThrow(() => urlHelper.Dispose(), "Dispose should not throw when called multiple times.");
         }
 
+        #region GetAlpineDistro Tests
+
+        [TestCase("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-3.16.2", "3.16-stable")]
+        [TestCase("pkg:apk/alpine/busybox@1.35.0-r29?distro=alpine-3.17.3", "3.17-stable")]
+        public void GetAlpineDistro_WithValidBomRef_ReturnsStableBranchName(string bomRef, string expected)
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro(bomRef);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void GetAlpineDistro_WithNullOrWhiteSpaceBomRef_ReturnsEmptyString(string bomRef)
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro(bomRef);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithoutDistroKeyword_ReturnsEmptyString()
+        {
+            // Act
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithTooFewVersionSegments_ReturnsEmptyString()
+        {
+            // Act - after splitting on "distro" there is no "-" separated version part
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithShortVersionSegment_ReturnsEmptyString()
+        {
+            // Act - version segment has fewer than 2 characters
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-1");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void GetAlpineDistro_WithNonNumericVersionSegment_ReturnsEmptyString()
+        {
+            // Act - resulting distro value fails the stable branch name regex, e.g. "0.-stable"
+            string result = UrlHelper.GetAlpineDistro("pkg:apk/alpine/apk-tools@2.12.9-r3?distro=alpine-0.1x");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(string.Empty));
+        }
+
+        #endregion
+
+        #region CheckoutDistro Tests
+
+        [Test]
+        public void CheckoutDistro_WithUnsafeDistroValue_SkipsGitCheckoutWithoutThrowing()
+        {
+            // Arrange - an invalid distro value (potential command injection) combined with a
+            // non-existent working directory. If the method attempted to start "git" it would
+            // throw since the working directory does not exist, so DoesNotThrow proves the
+            // unsafe value was rejected before any process was started.
+            string unsafeDistro = "--upload-pack=touch /tmp/pwned;";
+            string nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            var method = typeof(UrlHelper).GetMethod("CheckoutDistro",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { unsafeDistro, nonExistentPath }));
+        }
+
+        [Test]
+        public void CheckoutDistro_WithEmptyDistroValue_SkipsGitCheckoutWithoutThrowing()
+        {
+            // Arrange
+            string nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            var method = typeof(UrlHelper).GetMethod("CheckoutDistro",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { string.Empty, nonExistentPath }));
+        }
+
+        #endregion
+
+        #region GetReleaseExternalIdForAlpine / GetComponentExternalIdForAlpine Tests
+
+        [Test]
+        public void GetReleaseExternalIdForAlpine_ReturnsExpectedExternalId()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]}{Dataconstant.ForwardSlash}zlib@1.2.11?arch=source";
+
+            // Act
+            string result = UrlHelper.GetReleaseExternalIdForAlpine("zlib", "1.2.11");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetComponentExternalIdForAlpine_ReturnsExpectedExternalId()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]}{Dataconstant.ForwardSlash}zlib?arch=source";
+            var method = typeof(UrlHelper).GetMethod("GetComponentExternalIdForAlpine", BindingFlags.NonPublic | BindingFlags.Static);
+
+            // Act
+            string result = (string)method.Invoke(null, new object[] { "zlib" });
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        #endregion
+
+        #region GetDownloadPathForAlpineRepo Tests
+
+        [Test]
+        public void GetDownloadPathForAlpineRepo_ReturnsExistingDirectoryPath()
+        {
+            // Act
+            string result = UrlHelper.GetDownloadPathForAlpineRepo();
+
+            // Assert
+            Assert.That(result, Is.Not.Null.And.Not.Empty);
+            Assert.That(System.IO.Directory.Exists(result), Is.True);
+        }
+
+        #endregion
+
+        #region GetReleaseExternalId / GetComponentExternalId Tests
+
+        [Test]
+        public void GetReleaseExternalId_WithVersionContainingColon_EncodesVersionCorrectly()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]}{Dataconstant.ForwardSlash}adduser@3.118:debian10?arch=source";
+
+            // Act
+            string result = UrlHelper.GetReleaseExternalId("adduser", "3.118:debian10");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetComponentExternalId_ReturnsExpectedExternalId()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]}{Dataconstant.ForwardSlash}adduser?arch=source";
+            var method = typeof(UrlHelper).GetMethod("GetComponentExternalId", BindingFlags.NonPublic | BindingFlags.Static);
+
+            // Act
+            string result = (string)method.Invoke(null, new object[] { "adduser" });
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        #endregion
+
+        #region SearchForProjectURLTagInNuspecFile Tests
+
+        private static string InvokeSearchForProjectURLTagInNuspecFile(System.Xml.XmlDocument xmlDoc)
+        {
+            var method = typeof(UrlHelper).GetMethod("SearchForProjectURLTagInNuspecFile", BindingFlags.NonPublic | BindingFlags.Static);
+            return (string)method.Invoke(null, new object[] { xmlDoc });
+        }
+
+        [Test]
+        public void SearchForProjectURLTagInNuspecFile_WithGithubProjectUrl_ReturnsProjectUrl()
+        {
+            // Arrange
+            var xmlDoc = new System.Xml.XmlDocument();
+            xmlDoc.LoadXml("<package><metadata><projectUrl>https://github.com/example/repo</projectUrl></metadata></package>");
+
+            // Act
+            string result = InvokeSearchForProjectURLTagInNuspecFile(xmlDoc);
+
+            // Assert
+            Assert.That(result, Is.EqualTo("https://github.com/example/repo"));
+        }
+
+        [Test]
+        public void SearchForProjectURLTagInNuspecFile_WithNonGithubProjectUrlAndSourceUrl_ReturnsProjectSourceUrl()
+        {
+            // Arrange
+            var xmlDoc = new System.Xml.XmlDocument();
+            xmlDoc.LoadXml("<package><metadata><projectUrl>https://example.com/repo</projectUrl><projectSourceUrl>https://example.com/source</projectSourceUrl></metadata></package>");
+
+            // Act
+            string result = InvokeSearchForProjectURLTagInNuspecFile(xmlDoc);
+
+            // Assert
+            Assert.That(result, Is.EqualTo("https://example.com/source"));
+        }
+
+        [Test]
+        public void SearchForProjectURLTagInNuspecFile_WithNoProjectUrlTags_ReturnsEmptyString()
+        {
+            // Arrange
+            var xmlDoc = new System.Xml.XmlDocument();
+            xmlDoc.LoadXml("<package><metadata></metadata></package>");
+
+            // Act
+            string result = InvokeSearchForProjectURLTagInNuspecFile(xmlDoc);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        #endregion
+
+        #region GetCorrectFileExtension Tests
+
+        [Test]
+        public void GetCorrectFileExtension_WithForwardSlash_ReturnsFileNameAfterLastSlash()
+        {
+            // Act
+            string result = UrlHelper.GetCorrectFileExtension("https://example.com/path/to/file.tar.gz");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("file.tar.gz"));
+        }
+
+        [Test]
+        public void GetCorrectFileExtension_WithoutForwardSlash_ReturnsEmptyString()
+        {
+            // Act
+            string result = UrlHelper.GetCorrectFileExtension("file.tar.gz");
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        #endregion
+
+        #region GetSourceURLFromPyPiResponse Tests
+
+        private static string InvokeGetSourceURLFromPyPiResponse(string response)
+        {
+            var method = typeof(UrlHelper).GetMethod("GetSourceURLFromPyPiResponse", BindingFlags.NonPublic | BindingFlags.Static);
+            return (string)method.Invoke(null, new object[] { response });
+        }
+
+        [Test]
+        public void GetSourceURLFromPyPiResponse_WithValidTarGzUrl_ReturnsSourceUrl()
+        {
+            // Arrange
+            string response = "{\"urls\":[{\"url\":\"https://files.pythonhosted.org/packages/example-1.0.tar.gz\"},{\"url\":\"https://files.pythonhosted.org/packages/example-1.0-py3-none-any.whl\"}]}";
+
+            // Act
+            string result = InvokeGetSourceURLFromPyPiResponse(response);
+
+            // Assert
+            Assert.That(result, Is.EqualTo("https://files.pythonhosted.org/packages/example-1.0.tar.gz"));
+        }
+
+        [Test]
+        public void GetSourceURLFromPyPiResponse_WithNoMatchingExtension_ReturnsEmptyString()
+        {
+            // Arrange
+            string response = "{\"urls\":[{\"url\":\"https://files.pythonhosted.org/packages/example-1.0-py3-none-any.whl\"}]}";
+
+            // Act
+            string result = InvokeGetSourceURLFromPyPiResponse(response);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void GetSourceURLFromPyPiResponse_WithInvalidJson_ReturnsEmptyStringWithoutThrowing()
+        {
+            // Arrange
+            string response = "not-a-valid-json";
+
+            // Act
+            string result = null;
+            Assert.DoesNotThrow(() => result = InvokeGetSourceURLFromPyPiResponse(response));
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        #endregion
+
+        #region GetProperSourceURL Tests
+
+        private static DebianPackage InvokeGetProperSourceURL(DebianPackage sourceURLDetails, System.Collections.Generic.List<string> urls)
+        {
+            var method = typeof(UrlHelper).GetMethod("GetProperSourceURL", BindingFlags.NonPublic | BindingFlags.Static);
+            return (DebianPackage)method.Invoke(null, new object[] { sourceURLDetails, urls });
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithOrigTarGzFile_SetsSourceAndDownloadUrlToOrigFile()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/adduser_3.118.orig.tar.gz",
+                "https://example.com/adduser_3.118.dsc"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.SourceUrl, Is.EqualTo("https://example.com/adduser_3.118.orig.tar.gz"));
+            Assert.That(result.DownloadUrl, Is.EqualTo("https://example.com/adduser_3.118.orig.tar.gz"));
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithMoreThanTwoUrls_PopulatesPatchURLs()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/adduser_3.118.dsc",
+                "https://example.com/adduser_3.118.orig.tar.gz",
+                "https://example.com/adduser_3.118.debian.tar.xz"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.PatchURLs, Is.EqualTo(urls.ToArray()));
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithoutOrigFile_FallsBackToDscFile()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/adduser_3.118.dsc"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.SourceUrl, Is.EqualTo("https://example.com/adduser_3.118.dsc"));
+            Assert.That(result.DownloadUrl, Is.EqualTo("https://example.com/adduser_3.118.dsc"));
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithNoRecognizedFile_FallsBackToFirstUrl()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/unknown-file.bin"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.SourceUrl, Is.EqualTo("https://example.com/unknown-file.bin"));
+            Assert.That(result.DownloadUrl, Is.EqualTo("https://example.com/unknown-file.bin"));
+        }
+
+        #endregion
+
     }
 }
+

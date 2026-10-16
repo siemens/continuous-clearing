@@ -93,6 +93,68 @@ namespace SIT.Upload.UTest
             Assert.That(3, Is.EqualTo(PackageUploader.uploaderKpiData.PackagesNotUploadedDueToError), "Checks for no of components not uploaded due to error");
         }
 
+        [Test]
+        public async Task UploadPackageToArtifactory_GivenVerifiedBomContent_UsesContentInsteadOfReadingFile()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string testFilesFolder = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles"));
+            string verifiedBomContent = System.IO.File.ReadAllText(Path.Combine(testFilesFolder, "Test_Bom.cdx.json"));
+
+            CommonAppSettings commonAppSettings = new CommonAppSettings();
+            commonAppSettings.Directory = new SIT.Common.Directory()
+            {
+                OutputFolder = testFilesFolder
+            };
+
+            commonAppSettings.Jfrog = new Jfrog()
+            {
+                URL = UTParams.JFrogURL,
+                DryRun = false,
+            };
+
+            commonAppSettings.Npm = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "npm -test" }
+                    }
+                }
+            };
+            commonAppSettings.Conan = new Config()
+            {
+                Artifactory = new Artifactory()
+                {
+                    ThirdPartyRepos = new List<ThirdPartyRepo>()
+                    {
+                        new() { Name = "conan-test" }
+                    }
+                }
+            };
+            commonAppSettings.TimeOut = 100;
+            commonAppSettings.SW360 = new SW360()
+            {
+                ProjectName = "Test"
+            };
+            commonAppSettings.SbomSigning = new SbomSigningConfig
+            {
+                SBOMSignVerify = false
+            };
+            IJFrogService jFrogService = GetJfrogService(commonAppSettings);
+            PackageUploadHelper.JFrogService = jFrogService;
+            UploadToArtifactory.JFrogService = jFrogService;
+            ArtifactoryUploader.JFrogService = jFrogService;
+
+            //Act
+            await PackageUploader.UploadPackageToArtifactory(commonAppSettings, verifiedBomContent);
+
+            // Assert - components deserialized from the verified content
+            Assert.That(6, Is.EqualTo(PackageUploader.uploaderKpiData.ComponentInComparisonBOM), "Checks for no of components deserialized from verified content");
+        }
+
         private static IJFrogService GetJfrogService(CommonAppSettings appSettings)
         {
             ArtifactoryCredentials artifactoryUpload = new ArtifactoryCredentials()
