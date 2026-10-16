@@ -375,7 +375,7 @@ namespace SIT.Common.UTest
             CommonHelper.SetToolVersionforlinkreleases(settings);
 
             // Assert
-            Assert.AreEqual(":v11.0.6", CommonHelper.ToolVersion);
+            Assert.AreEqual(": v11.0.6", CommonHelper.ToolVersion);
         }
 
         [Test]
@@ -384,7 +384,7 @@ namespace SIT.Common.UTest
             // Arrange
             CommonHelper.ToolVersion = "1.2.3";
             var settings = new CommonAppSettings { ToolVersion = string.Empty };
-            string expected = $":v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
+            string expected = $": v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
 
             // Act
             CommonHelper.SetToolVersionforlinkreleases(settings);
@@ -398,7 +398,7 @@ namespace SIT.Common.UTest
         {
             // Arrange
             CommonHelper.ToolVersion = "4.5.6";
-            string expected = $":v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
+            string expected = $": v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
 
             // Act & Assert
             Assert.DoesNotThrow(() => CommonHelper.SetToolVersionforlinkreleases(null));
