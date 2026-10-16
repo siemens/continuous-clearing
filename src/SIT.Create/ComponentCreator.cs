@@ -363,8 +363,10 @@ namespace SIT.Create
             string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.DebugFormat("BoM Generation Path - {0}", bomGenerationPath);
 
-            await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
             CommonHelper.SetToolVersionforlinkreleases(appSettings);
+
+            await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
+            
             var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
 
             var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
