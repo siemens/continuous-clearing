@@ -14,11 +14,14 @@ using System.Text.RegularExpressions;
 namespace SIT.APICommunications.UTest
 {
     [TestFixture]
-    public class Sw360PagedApiResponseFetcherTest
+    public partial class Sw360PagedApiResponseFetcherTest
     {
+        [GeneratedRegex("page=(\\d+)")]
+        private static partial Regex PageNumberRegex();
+
         private static int GetPageNumberFromUrl(HttpRequestMessage request)
         {
-            System.Text.RegularExpressions.Match match = Regex.Match(request.RequestUri.ToString(), "page=(\\d+)");
+            System.Text.RegularExpressions.Match match = PageNumberRegex().Match(request.RequestUri!.ToString());
             return int.Parse(match.Groups[1].Value);
         }
 
@@ -218,7 +221,7 @@ namespace SIT.APICommunications.UTest
         public async Task GetPageAsync_BaseUrlWithoutQuery_BuildsUrlWithQuestionMarkSeparator()
         {
             // Arrange
-            HttpRequestMessage capturedRequest = null;
+            HttpRequestMessage? capturedRequest = null;
             var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             handlerMock
                 .Protected()
@@ -231,14 +234,14 @@ namespace SIT.APICommunications.UTest
             await Sw360PagedApiResponseFetcher.GetPageAsync(httpClient, "http://test.com/components", 2, 50);
 
             // Assert
-            Assert.That(capturedRequest.RequestUri.ToString(), Is.EqualTo("http://test.com/components?page=2&page_entries=50"));
+            Assert.That(capturedRequest!.RequestUri!.ToString(), Is.EqualTo("http://test.com/components?page=2&page_entries=50"));
         }
 
         [Test]
         public async Task GetPageAsync_BaseUrlWithExistingQuery_BuildsUrlWithAmpersandSeparator()
         {
             // Arrange
-            HttpRequestMessage capturedRequest = null;
+            HttpRequestMessage? capturedRequest = null;
             var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             handlerMock
                 .Protected()
@@ -251,14 +254,14 @@ namespace SIT.APICommunications.UTest
             await Sw360PagedApiResponseFetcher.GetPageAsync(httpClient, "http://test.com/components?name=foo", 0, 10);
 
             // Assert
-            Assert.That(capturedRequest.RequestUri.ToString(), Is.EqualTo("http://test.com/components?name=foo&page=0&page_entries=10"));
+            Assert.That(capturedRequest!.RequestUri!.ToString(), Is.EqualTo("http://test.com/components?name=foo&page=0&page_entries=10"));
         }
 
         [Test]
         public async Task GetPageAsync_WithExtraQueryParams_NormalizesLeadingSeparators()
         {
             // Arrange
-            HttpRequestMessage capturedRequest = null;
+            HttpRequestMessage? capturedRequest = null;
             var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             handlerMock
                 .Protected()
@@ -271,7 +274,7 @@ namespace SIT.APICommunications.UTest
             await Sw360PagedApiResponseFetcher.GetPageAsync(httpClient, "http://test.com/components", 1, 25, "&allDetails=true");
 
             // Assert
-            Assert.That(capturedRequest.RequestUri.ToString(), Is.EqualTo("http://test.com/components?allDetails=true&page=1&page_entries=25"));
+            Assert.That(capturedRequest!.RequestUri!.ToString(), Is.EqualTo("http://test.com/components?allDetails=true&page=1&page_entries=25"));
         }
 
         #endregion

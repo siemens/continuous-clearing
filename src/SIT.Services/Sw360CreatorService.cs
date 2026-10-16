@@ -535,7 +535,7 @@ namespace SIT.Services
                     AttachmentType = attachmenturl.Key,
                     AttachmentFile = attachmenturl.Value,
                     ReleaseId = releaseId,
-                    AttachmentReleaseComment = Dataconstant.ReleaseAttachmentComment
+                    AttachmentReleaseComment = $"{Dataconstant.ReleaseAttachmentComment}{CommonHelper.ToolVersion}"
                 };
                 attachmentApiUrl = m_SW360ApiCommunicationFacade.AttachComponentSourceToSW360(attachReport, comparisonBomData);
             }
