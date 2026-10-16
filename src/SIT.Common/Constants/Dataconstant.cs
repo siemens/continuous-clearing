@@ -121,7 +121,7 @@ namespace SIT.Common.Constants
         /// <summary>
         /// Linked by CA Tool.
         /// </summary>
-        public const string LinkedByCATool = "Linked By SITCreate";       
+        public const string LinkedByCATool = "Linked By SITCreate";
         /// <summary>
         /// Linked by CA Tool release relation: CONTAINED.
         /// </summary>

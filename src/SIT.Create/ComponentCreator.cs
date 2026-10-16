@@ -882,7 +882,7 @@ namespace SIT.Create
                     }
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
-                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;                    
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                     releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);
                 }
                 else
