@@ -9,7 +9,9 @@ using Moq;
 using Moq.Protected;
 using NUnit.Framework;
 using SIT.Common;
+using SIT.Common.Constants;
 using SIT.Create.Interfaces;
+using SIT.Create.Model;
 using System;
 using System.IO;
 using System.Net;
@@ -591,6 +593,293 @@ namespace SIT.Create.UTest
 
             // Act & Assert
             Assert.DoesNotThrow(() => method.Invoke(null, new object[] { string.Empty, nonExistentPath }));
+        }
+
+        #endregion
+
+        #region GetReleaseExternalIdForAlpine / GetComponentExternalIdForAlpine Tests
+
+        [Test]
+        public void GetReleaseExternalIdForAlpine_ReturnsExpectedExternalId()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]}{Dataconstant.ForwardSlash}zlib@1.2.11?arch=source";
+
+            // Act
+            string result = UrlHelper.GetReleaseExternalIdForAlpine("zlib", "1.2.11");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetComponentExternalIdForAlpine_ReturnsExpectedExternalId()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType]}{Dataconstant.ForwardSlash}zlib?arch=source";
+            var method = typeof(UrlHelper).GetMethod("GetComponentExternalIdForAlpine", BindingFlags.NonPublic | BindingFlags.Static);
+
+            // Act
+            string result = (string)method.Invoke(null, new object[] { "zlib" });
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        #endregion
+
+        #region GetDownloadPathForAlpineRepo Tests
+
+        [Test]
+        public void GetDownloadPathForAlpineRepo_ReturnsExistingDirectoryPath()
+        {
+            // Act
+            string result = UrlHelper.GetDownloadPathForAlpineRepo();
+
+            // Assert
+            Assert.That(result, Is.Not.Null.And.Not.Empty);
+            Assert.That(System.IO.Directory.Exists(result), Is.True);
+        }
+
+        #endregion
+
+        #region GetReleaseExternalId / GetComponentExternalId Tests
+
+        [Test]
+        public void GetReleaseExternalId_WithVersionContainingColon_EncodesVersionCorrectly()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]}{Dataconstant.ForwardSlash}adduser@3.118:debian10?arch=source";
+
+            // Act
+            string result = UrlHelper.GetReleaseExternalId("adduser", "3.118:debian10");
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetComponentExternalId_ReturnsExpectedExternalId()
+        {
+            // Arrange
+            string expected = $"{Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]}{Dataconstant.ForwardSlash}adduser?arch=source";
+            var method = typeof(UrlHelper).GetMethod("GetComponentExternalId", BindingFlags.NonPublic | BindingFlags.Static);
+
+            // Act
+            string result = (string)method.Invoke(null, new object[] { "adduser" });
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        #endregion
+
+        #region SearchForProjectURLTagInNuspecFile Tests
+
+        private static string InvokeSearchForProjectURLTagInNuspecFile(System.Xml.XmlDocument xmlDoc)
+        {
+            var method = typeof(UrlHelper).GetMethod("SearchForProjectURLTagInNuspecFile", BindingFlags.NonPublic | BindingFlags.Static);
+            return (string)method.Invoke(null, new object[] { xmlDoc });
+        }
+
+        [Test]
+        public void SearchForProjectURLTagInNuspecFile_WithGithubProjectUrl_ReturnsProjectUrl()
+        {
+            // Arrange
+            var xmlDoc = new System.Xml.XmlDocument();
+            xmlDoc.LoadXml("<package><metadata><projectUrl>https://github.com/example/repo</projectUrl></metadata></package>");
+
+            // Act
+            string result = InvokeSearchForProjectURLTagInNuspecFile(xmlDoc);
+
+            // Assert
+            Assert.That(result, Is.EqualTo("https://github.com/example/repo"));
+        }
+
+        [Test]
+        public void SearchForProjectURLTagInNuspecFile_WithNonGithubProjectUrlAndSourceUrl_ReturnsProjectSourceUrl()
+        {
+            // Arrange
+            var xmlDoc = new System.Xml.XmlDocument();
+            xmlDoc.LoadXml("<package><metadata><projectUrl>https://example.com/repo</projectUrl><projectSourceUrl>https://example.com/source</projectSourceUrl></metadata></package>");
+
+            // Act
+            string result = InvokeSearchForProjectURLTagInNuspecFile(xmlDoc);
+
+            // Assert
+            Assert.That(result, Is.EqualTo("https://example.com/source"));
+        }
+
+        [Test]
+        public void SearchForProjectURLTagInNuspecFile_WithNoProjectUrlTags_ReturnsEmptyString()
+        {
+            // Arrange
+            var xmlDoc = new System.Xml.XmlDocument();
+            xmlDoc.LoadXml("<package><metadata></metadata></package>");
+
+            // Act
+            string result = InvokeSearchForProjectURLTagInNuspecFile(xmlDoc);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        #endregion
+
+        #region GetCorrectFileExtension Tests
+
+        [Test]
+        public void GetCorrectFileExtension_WithForwardSlash_ReturnsFileNameAfterLastSlash()
+        {
+            // Act
+            string result = UrlHelper.GetCorrectFileExtension("https://example.com/path/to/file.tar.gz");
+
+            // Assert
+            Assert.That(result, Is.EqualTo("file.tar.gz"));
+        }
+
+        [Test]
+        public void GetCorrectFileExtension_WithoutForwardSlash_ReturnsEmptyString()
+        {
+            // Act
+            string result = UrlHelper.GetCorrectFileExtension("file.tar.gz");
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        #endregion
+
+        #region GetSourceURLFromPyPiResponse Tests
+
+        private static string InvokeGetSourceURLFromPyPiResponse(string response)
+        {
+            var method = typeof(UrlHelper).GetMethod("GetSourceURLFromPyPiResponse", BindingFlags.NonPublic | BindingFlags.Static);
+            return (string)method.Invoke(null, new object[] { response });
+        }
+
+        [Test]
+        public void GetSourceURLFromPyPiResponse_WithValidTarGzUrl_ReturnsSourceUrl()
+        {
+            // Arrange
+            string response = "{\"urls\":[{\"url\":\"https://files.pythonhosted.org/packages/example-1.0.tar.gz\"},{\"url\":\"https://files.pythonhosted.org/packages/example-1.0-py3-none-any.whl\"}]}";
+
+            // Act
+            string result = InvokeGetSourceURLFromPyPiResponse(response);
+
+            // Assert
+            Assert.That(result, Is.EqualTo("https://files.pythonhosted.org/packages/example-1.0.tar.gz"));
+        }
+
+        [Test]
+        public void GetSourceURLFromPyPiResponse_WithNoMatchingExtension_ReturnsEmptyString()
+        {
+            // Arrange
+            string response = "{\"urls\":[{\"url\":\"https://files.pythonhosted.org/packages/example-1.0-py3-none-any.whl\"}]}";
+
+            // Act
+            string result = InvokeGetSourceURLFromPyPiResponse(response);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void GetSourceURLFromPyPiResponse_WithInvalidJson_ReturnsEmptyStringWithoutThrowing()
+        {
+            // Arrange
+            string response = "not-a-valid-json";
+
+            // Act
+            string result = null;
+            Assert.DoesNotThrow(() => result = InvokeGetSourceURLFromPyPiResponse(response));
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
+        #endregion
+
+        #region GetProperSourceURL Tests
+
+        private static DebianPackage InvokeGetProperSourceURL(DebianPackage sourceURLDetails, System.Collections.Generic.List<string> urls)
+        {
+            var method = typeof(UrlHelper).GetMethod("GetProperSourceURL", BindingFlags.NonPublic | BindingFlags.Static);
+            return (DebianPackage)method.Invoke(null, new object[] { sourceURLDetails, urls });
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithOrigTarGzFile_SetsSourceAndDownloadUrlToOrigFile()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/adduser_3.118.orig.tar.gz",
+                "https://example.com/adduser_3.118.dsc"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.SourceUrl, Is.EqualTo("https://example.com/adduser_3.118.orig.tar.gz"));
+            Assert.That(result.DownloadUrl, Is.EqualTo("https://example.com/adduser_3.118.orig.tar.gz"));
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithMoreThanTwoUrls_PopulatesPatchURLs()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/adduser_3.118.dsc",
+                "https://example.com/adduser_3.118.orig.tar.gz",
+                "https://example.com/adduser_3.118.debian.tar.xz"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.PatchURLs, Is.EqualTo(urls.ToArray()));
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithoutOrigFile_FallsBackToDscFile()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/adduser_3.118.dsc"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.SourceUrl, Is.EqualTo("https://example.com/adduser_3.118.dsc"));
+            Assert.That(result.DownloadUrl, Is.EqualTo("https://example.com/adduser_3.118.dsc"));
+        }
+
+        [Test]
+        public void GetProperSourceURL_WithNoRecognizedFile_FallsBackToFirstUrl()
+        {
+            // Arrange
+            var urls = new System.Collections.Generic.List<string>
+            {
+                "https://example.com/unknown-file.bin"
+            };
+            var sourceURLDetails = new DebianPackage();
+
+            // Act
+            var result = InvokeGetProperSourceURL(sourceURLDetails, urls);
+
+            // Assert
+            Assert.That(result.SourceUrl, Is.EqualTo("https://example.com/unknown-file.bin"));
+            Assert.That(result.DownloadUrl, Is.EqualTo("https://example.com/unknown-file.bin"));
         }
 
         #endregion
