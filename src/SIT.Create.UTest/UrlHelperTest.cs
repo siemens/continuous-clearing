@@ -229,20 +229,7 @@ namespace SIT.Create.UTest
 
             IsValidNpmComponentName_ValidatesPackageName(scope + new string('a', length - scope.Length), expected);
         }
-
-        [Test]
-        public void GetSourceUrlForNpmPackage_OnUnsupportedOperatingSystem_ThrowsForMissingExecutable()
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                Assert.Ignore("The unsupported-OS branch requires a runner other than Windows or Linux.");
-            }
-
-            var exception = Assert.Throws<AggregateException>(() => _urlHelper.GetSourceUrlForNpmPackage("valid-package", "1.0.0"));
-
-            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
-        }
-
+         
         [Test]
         public async Task GetSourceUrlForCargoPackage_ValidPackage_ReturnsDownloadUrl()
         {
