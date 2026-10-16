@@ -102,7 +102,15 @@ namespace SIT.Common
             {
                 return string.Empty;
             }
-
+            // Skip the expensive mask/split/format work for very large bodies (e.g. JFrog AQL
+            // responses with hundreds of thousands of NuGet records) - these are never fully
+            // logged anyway (only up to 200 lines, or in verbose mode), so processing the whole
+            // string first was wasted CPU/memory that could hang the process on huge responses.
+            const int MaxResponseLengthToProcess = 500_000; // ~500KB of raw JSON
+            if (response.Length > MaxResponseLengthToProcess)
+            {
+                return $"[Response body omitted from log: {response.Length:N0} characters, exceeds {MaxResponseLengthToProcess:N0} character logging limit]";
+            }
             response = MaskSensitiveData(response);
             var lines = response.Split(NewLineSeparator, StringSplitOptions.None);
 
