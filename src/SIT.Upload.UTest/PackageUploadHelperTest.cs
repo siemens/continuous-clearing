@@ -43,6 +43,57 @@ namespace SIT.Upload.UTest
         }
 
         [Test]
+        public void GetComponentListFromComparisonBOM_GivenVerifiedBomContent_DeserializesContentWithoutReadingFile()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
+            string verifiedBomContent = File.ReadAllText(comparisonBOMPath);
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+
+            //Act - pass a non-existent path to prove the file is never re-read from disk
+            Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(
+                "non-existent-path.json", environmentHelperMock.Object, verifiedBomContent);
+
+            // Assert
+            Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components from verified content");
+            environmentHelperMock.Verify(x => x.CallEnvironmentExit(-1), Times.Never, "Should not exit, since verified content was used instead of the (missing) file");
+        }
+
+        [Test]
+        public void GetComponentListFromComparisonBOM_GivenNullVerifiedBomContent_FallsBackToReadingFile()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+
+            //Act
+            Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object, null);
+
+            // Assert
+            Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components read from file when verifiedBomContent is null");
+        }
+
+        [Test]
+        public void GetComponentListFromComparisonBOM_GivenEmptyVerifiedBomContent_FallsBackToReadingFile()
+        {
+            //Arrange
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string outFolder = Path.GetDirectoryName(exePath);
+            string comparisonBOMPath = Path.GetFullPath(Path.Combine(outFolder, "ArtifactoryUTTestFiles", "Test_Bom.cdx.json"));
+            Mock<IEnvironmentHelper> environmentHelperMock = new Mock<IEnvironmentHelper>();
+
+            //Act
+            Bom componentList = PackageUploadHelper.GetComponentListFromComparisonBOM(comparisonBOMPath, environmentHelperMock.Object, string.Empty);
+
+            // Assert
+            Assert.That(6, Is.EqualTo(componentList.Components.Count), "Checks for no of components read from file when verifiedBomContent is empty");
+        }
+
+        [Test]
         public async Task UploadingThePackages_SkipsInternalPrerelease_Nuget_IncrementsKpiAndAddsToSkippedList()
         {
             // Arrange

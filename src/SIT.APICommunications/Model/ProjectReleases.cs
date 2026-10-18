@@ -53,6 +53,12 @@ namespace SIT.APICommunications.Model
         [JsonProperty("linkedReleases")]
         public List<Sw360LinkedRelease> LinkedReleases { get; set; }
 
+        /// <summary>
+        /// Gets or sets the additional data of the project.
+        /// </summary>
+        [JsonProperty("additionalData")]
+        public Dictionary<string, string> AdditionalData { get; set; }
+
         #endregion Properties
     }
 }
