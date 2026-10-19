@@ -136,7 +136,7 @@ namespace SIT.Create
             var releaseUrl = validRelease?.Links?.Self?.Href;
             var releaseId = releaseUrl != null ? CommonHelper.GetSubstringOfLastOccurance(releaseUrl, "/") : string.Empty;
 
-            string sw360link = $"{validRelease?.Name}:{validRelease?.Version}:{appSettings?.SW360?.URL}{Dataconstant.Sw360ReleaseUrlApiSuffix}" +
+            string sw360link = $"{validRelease?.Name}:{validRelease?.Version}:{appSettings?.SW360?.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
                                $"{releaseId}#/tab-Summary";
 
             FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcessForValidation(releaseId, sw360link);

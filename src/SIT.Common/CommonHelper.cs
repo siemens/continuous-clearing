@@ -846,7 +846,7 @@ namespace SIT.Common
         /// <returns>The complete SW360 release URL.</returns>
         public static string Sw360URL(string sw360Env, string releaseId)
         {
-            string sw360URL = $"{sw360Env}{Dataconstant.Sw360ReleaseUrlApiSuffix}{releaseId}";
+            string sw360URL = $"{sw360Env}{"/components/releases/detail/"}{releaseId}";
             return sw360URL;
         }
 

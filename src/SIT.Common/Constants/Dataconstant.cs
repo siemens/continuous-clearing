@@ -305,11 +305,6 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string CargoProjectType = "CARGO";
 
-        /// <summary>
-        /// The API suffix for SW360 release URL endpoints.
-        /// </summary>
-        public const string Sw360ReleaseUrlApiSuffix = "/components/releases/detail/";
-
         #endregion
 
         #region Properties
