@@ -292,6 +292,11 @@ namespace SIT.APICommunications
         public const string AdditionalDataFossologyURL = "fossology url";
 
         /// <summary>
+        /// The additional data key recording when SIT.Create last synced the project.
+        /// </summary>
+        public const string SITCretelastsync = "SITCreateLastSyncAt";
+
+        /// <summary>
         /// The default filename for attachment JSON files.
         /// </summary>
         public const string AttachmentJsonFileName = "Attachment.json";
