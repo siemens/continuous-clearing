@@ -704,7 +704,7 @@ namespace SIT.Create
             try
             {
 
-                string sw360link = $"{item.Name}:{item.Version}:{appSettings.SW360.URL}{ApiConstant.Sw360ReleaseUrlApiSuffix}" +
+                string sw360link = $"{item.Name}:{item.Version}:{appSettings.SW360.URL}{Dataconstant.Sw360ReleaseUrlApiSuffix}" +
                     $"{item.ReleaseID}#/tab-Summary";
 
                 FossTriggerStatus fossResult = await sw360CreatorService.TriggerFossologyProcess(item.ReleaseID, sw360link);
