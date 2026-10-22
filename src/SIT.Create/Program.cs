@@ -130,8 +130,26 @@ namespace SIT.Create
                 {
                     Timeout = TimeSpan.FromSeconds(appSettings.TimeOut)
                 };
-                if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))
-                    await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
+                // KPI: "Infrastructure Availability" - report whether the Fossology dependency call succeeded or failed.
+                Stopwatch fossologyStopwatch = Stopwatch.StartNew();
+                bool fossologySuccess = true;
+                try
+                {
+                    bool fossologyUrlValid = await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper);
+                    fossologySuccess = fossologyUrlValid;
+                    if (fossologyUrlValid)
+                        await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
+                }
+                catch
+                {
+                    fossologySuccess = false;
+                    throw;
+                }
+                finally
+                {
+                    fossologyStopwatch.Stop();
+                    telemetryHelper?.TrackDependencyCall("Fossology", fossologySuccess, fossologyStopwatch.Elapsed, TelemetryConstant.SITCreateComponent);
+                }
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
