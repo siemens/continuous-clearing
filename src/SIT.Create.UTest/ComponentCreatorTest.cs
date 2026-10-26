@@ -536,6 +536,107 @@ namespace SIT.Create.UTest
         }
 
         [Test]
+        public async Task TriggerFossologyProcess_ProvidedReleaseId_BuildsSw360LinkWithModernReleaseDetailUrl()
+        {
+            //Arrange
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>(MockBehavior.Default);
+            FossTriggerStatus fossTriggerStatus = new FossTriggerStatus()
+            {
+                Content = new Content() { Message = "triggered succesfully" },
+                Links = new Links() { Self = new Self() { Href = "test_link" } },
+            };
+            CheckFossologyProcess checkFossologyProcess = new CheckFossologyProcess()
+            {
+                Status = "FAILURE"
+            };
+
+            ComparisonBomData item = new ComparisonBomData()
+            {
+                Name = "addr2line",
+                Version = "0.21.0",
+                ReleaseID = "d3367ab8b91a4f73a1edc1758bebc72b"
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360() { URL = "https://stage.sw360.siemens.com" },
+                Directory = new SIT.Common.Directory()
+            };
+
+            string capturedSw360Link = null;
+            sw360CreatorServiceMock
+                .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((_, link) => capturedSw360Link = link)
+                .ReturnsAsync(fossTriggerStatus);
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>()))
+                .ReturnsAsync(checkFossologyProcess);
+
+            //Act
+            await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
+
+            // Assert
+            Assert.AreEqual(
+                "addr2line:0.21.0:https://stage.sw360.siemens.com/components/releases/detail/d3367ab8b91a4f73a1edc1758bebc72b#/tab-Summary",
+                capturedSw360Link);
+            StringAssert.DoesNotContain("/group/guest/components/-/component/release/detailRelease/", capturedSw360Link);
+        }
+
+        [Test]
+        public async Task TriggerFossologyProcess_ProvidedReleaseId_ReturnsUploadIdAndBuildsModernSw360Link()
+        {
+            //Arrange
+            var sw360CreatorServiceMock = new Mock<ISw360CreatorService>(MockBehavior.Default);
+
+            ComparisonBomData item = new ComparisonBomData()
+            {
+                Name = "addr2line",
+                Version = "0.21.0",
+                ReleaseID = "d3367ab8b91a4f73a1edc1758bebc72b"
+            };
+
+            CommonAppSettings appSettings = new CommonAppSettings()
+            {
+                SW360 = new SW360() { URL = "https://stage.sw360.siemens.com" },
+                Directory = new SIT.Common.Directory()
+            };
+
+            var processStep = new ProcessSteps { ProcessStepIdInTool = "67890" };
+            var checkFossologyProcess = new CheckFossologyProcess
+            {
+                FossologyProcessInfo = new FossologyProcessInfo
+                {
+                    ExternalTool = "Fossology",
+                    ProcessSteps = new List<ProcessSteps> { processStep }.ToArray()
+                }
+            };
+
+            string capturedSw360Link = null;
+            sw360CreatorServiceMock
+                .Setup(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((_, link) => capturedSw360Link = link)
+                .ReturnsAsync(new FossTriggerStatus
+                {
+                    Content = new Content() { Message = "triggered succesfully" },
+                    Links = new Links() { Self = new Self() { Href = "fossologyLink" } }
+                });
+            sw360CreatorServiceMock
+                .Setup(x => x.CheckFossologyProcessStatus(It.IsAny<string>()))
+                .ReturnsAsync(checkFossologyProcess);
+
+            //Act
+            string uploadId = await ComponentCreator.TriggerFossologyProcess(item, sw360CreatorServiceMock.Object, appSettings);
+
+            // Assert
+            Assert.AreEqual("67890", uploadId);
+            Assert.AreEqual(
+                "addr2line:0.21.0:https://stage.sw360.siemens.com/components/releases/detail/d3367ab8b91a4f73a1edc1758bebc72b#/tab-Summary",
+                capturedSw360Link);
+            sw360CreatorServiceMock.Verify(x => x.TriggerFossologyProcess(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            sw360CreatorServiceMock.Verify(x => x.CheckFossologyProcessStatus("fossologyLink"), Times.Once);
+        }
+
+        [Test]
         public async Task TriggerFossologyProcess_ProvidedReleaseId_ReturnsEmptyForAggregateExpections()
         {
             //Act
