@@ -16,7 +16,7 @@ on:
         required: false
         type: string
         default: ''
-      release-bump:
+      release-version:
         description: 'Explicit version (e.g. 12.0.0 or 12.0.0-beta.1). Leave empty or "none" to use GitVersion.'
         required: false
         type: string
@@ -43,19 +43,17 @@ jobs:
       - name: Determine Version
         id: gitversion
         shell: pwsh
-        env:
-          VERSION_BUMP: ${{ github.event.inputs.release-bump }}
         run: |
-          $bump = "$env:VERSION_BUMP".Trim()
+          $releaseVersion = "${{ github.event.inputs.release-version }}".Trim()
 
-          if ($bump -and $bump -ne "none") {
-            if ($bump -notmatch '^\d+\.\d+\.\d+(-.+)?$') {
-              Write-Error "Invalid release-bump value '$bump'. Use an explicit version like 12.3.0 or 12.3.0-beta.1, or leave empty/none to use GitVersion."
+          if ($releaseVersion -and $releaseVersion -ne "none") {
+            if ($releaseVersion -notmatch '^\d+\.\d+\.\d+(-.+)?$') {
+              Write-Error "Invalid release-version value '$releaseVersion'. Use an explicit version like 12.3.0 or 12.3.0-beta.1, or leave empty/none to use GitVersion."
               exit 1
             }
-            Write-Host "Using explicit version: $bump"
-            $semVer = $bump
-            $parts = $bump -split '-', 2
+            Write-Host "Using explicit version: $releaseVersion"
+            $semVer = $releaseVersion
+            $parts = $releaseVersion -split '-', 2
             $majorMinorPatch = $parts[0]
             $preReleaseTag = if ($parts.Length -gt 1) { $parts[1] } else { "" }
           } else {

@@ -1,4 +1,4 @@
-﻿# Contributing
+# Contributing
 
 When contributing to this repository, first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. Make sure a pull request is made after every changes before merging to master.
 
@@ -63,28 +63,31 @@ version** - this avoids every routine commit silently bumping the patch
 version and causing version drift/collisions between beta and stable builds.
 
 **To cut a real release, no commit message convention is required.**
-Trigger the workflow manually and pick the bump type:
+Trigger the workflow manually and provide the version:
 
 1. Go to **Actions -> Build & Release -> Run workflow**.
-2. Set `release-bump` to `patch`, `minor`, or `major` (leave as `none` for a
-   normal build/pre-release with no version change).
+2. Set `release-version` to an explicit version such as `12.3.0` or
+   `12.3.0-beta.1` (leave empty or `none` for a normal build/pre-release
+   using the version computed by GitVersion).
 3. Optionally set `ref` to the branch/tag you want to release from.
-4. Run the workflow - GitVersion will compute the new version using the
-   selected bump on top of the last tag, build/pack/tag Docker with that
-   version, and create a draft release.
+4. Run the workflow - the build, pack and Docker steps use that version, and
+   a draft release is created.
 
-Alternative ways to bump (only needed in special cases):
+To run the workflow manually from the command line with the
+[GitHub CLI](https://cli.github.com/) instead of the UI:
 
-1. **`next-version` in `GitVersion.yml`** - Set a floor version so all
-   subsequent builds compute from at least that version:
-   ```yaml
-   next-version: 3.0.0
-   ```
-   Useful for a deliberate, one-time major/minor bump; revert or update
-   this value after the release if no longer needed.
+```powershell
+gh auth login
+gh workflow run build-and-release.yml --ref <branch> -f release-version=12.0.1
+gh run list --workflow build-and-release.yml --limit 3
+gh run watch
+```
 
-3. **Base tag on `master`** - Push a tag (e.g. `v3.0.0`) on `master` to set
-   a new baseline that GitVersion will increment from for subsequent builds.
+- `--ref` selects the branch/tag whose workflow file is used.
+- `-f release-version=...` sets the version. Omit it (or use `none`) to use
+  the version computed by GitVersion.
+- The run log of the `version` job should show `Using explicit version: 12.0.1`.
+
 
 ### How releases are triggered
 
