@@ -363,7 +363,10 @@ namespace SIT.Create
             string bomGenerationPath = appSettings.Directory.OutputFolder;
             Logger.DebugFormat("BoM Generation Path - {0}", bomGenerationPath);
 
+            CommonHelper.SetToolVersionforlinkreleases(appSettings);
+
             await CreateComponent(creatorHelper, sw360CreatorService, parsedBomData, sw360Url, appSettings);
+            
             var alreadyLinkedReleases = await GetAlreadyLinkedReleasesByProjectId(appSettings.SW360.ProjectID, sw360ProjectService);
 
             var manuallyLinkedReleases = await GetManuallyLinkedReleasesFromProject(alreadyLinkedReleases);
@@ -408,6 +411,10 @@ namespace SIT.Create
 
             // Notify user about manual steps required for Choco packages
             LoggerHelper.WriteChocoManualStepsNotification(ListofChocoComponents.ToList());
+
+            // Record when SIT.Create last synced the project in SW360 project additionalData
+            await sw360ProjectService.UpdateProjectAdditionalData(appSettings.SW360.ProjectID,
+                ApiConstant.SITCretelastsync, DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss"));
 
             Logger.Debug("CreateComponentInSw360():Create component process completed");
         }
@@ -461,7 +468,7 @@ namespace SIT.Create
         private static async Task<List<ReleaseLinked>> GetManuallyLinkedReleasesFromProject(List<ReleaseLinked> alreadyLinkedReleases)
         {
             var manuallyLinkedReleases = new List<ReleaseLinked>(alreadyLinkedReleases);
-            manuallyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase) == 0);
+            manuallyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, $"{Dataconstant.LinkedByCATool}{CommonHelper.ToolVersion}", StringComparison.OrdinalIgnoreCase) == 0);
             await Task.Yield();
             return manuallyLinkedReleases;
         }
@@ -877,7 +884,7 @@ namespace SIT.Create
                     }
                     string attachmentApiUrl = sw360CreatorService.AttachSourcesToReleasesCreated(releaseId, attachmentUrlList, item);
                     item.ReleaseAttachmentLink = attachmentApiUrl;
-                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;                    
+                    item.DownloadUrl = !attachmentUrlList.ContainsKey(SourceAttachmentType) ? Dataconstant.DownloadUrlNotFound : item.DownloadUrl;
                     releasesInfo = await sw360CreatorService.GetReleaseInfo(releaseId);
                 }
                 else

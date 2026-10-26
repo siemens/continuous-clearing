@@ -250,6 +250,17 @@ namespace SIT.Facade
         }
 
         /// <summary>
+        /// Asynchronously updates a project in SW360.
+        /// </summary>
+        /// <param name="projectId">The project identifier.</param>
+        /// <param name="httpContent">The HTTP content containing the update data.</param>
+        /// <returns>A task representing the asynchronous operation that returns an HTTP response message.</returns>
+        public async Task<HttpResponseMessage> UpdateProject(string projectId, HttpContent httpContent)
+        {
+            return await m_sw360ApiCommunication.UpdateProject(projectId, httpContent);
+        }
+
+        /// <summary>
         /// Attaches component source to SW360.
         /// </summary>
         /// <param name="attachReport">The attachment report data.</param>

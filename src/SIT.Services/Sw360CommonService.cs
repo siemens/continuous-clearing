@@ -155,7 +155,7 @@ namespace SIT.Services
                 Releasestatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
                     TryGetReleaseByKey(releaseName, releaseExternalId, externalIdKey)));
 
-              
+
                 foreach (Releasestatus result in results)
                 {
                     if (result != null && result.isReleaseExist)
