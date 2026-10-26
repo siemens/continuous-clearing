@@ -364,6 +364,47 @@ namespace SIT.Common.UTest
             Assert.AreEqual(first.CatoolRunningLocation, second.CatoolRunningLocation);
         }
 
+        [Test]
+        public void SetToolVersionforlinkreleases_WhenToolVersionProvided_SetsCommonHelperToolVersion()
+        {
+            // Arrange
+            CommonHelper.ToolVersion = null;
+            var settings = new CommonAppSettings { ToolVersion = "11.0.6" };
+
+            // Act
+            CommonHelper.SetToolVersionforlinkreleases(settings);
+
+            // Assert
+            Assert.AreEqual(": v11.0.6", CommonHelper.ToolVersion);
+        }
+
+        [Test]
+        public void SetToolVersionforlinkreleases_WhenToolVersionEmpty_FallsBackToAssemblyVersion()
+        {
+            // Arrange
+            CommonHelper.ToolVersion = "1.2.3";
+            var settings = new CommonAppSettings { ToolVersion = string.Empty };
+            string expected = $": v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
+
+            // Act
+            CommonHelper.SetToolVersionforlinkreleases(settings);
+
+            // Assert
+            Assert.AreEqual(expected, CommonHelper.ToolVersion);
+        }
+
+        [Test]
+        public void SetToolVersionforlinkreleases_WhenAppSettingsNull_FallsBackToAssemblyVersion()
+        {
+            // Arrange
+            CommonHelper.ToolVersion = "4.5.6";
+            string expected = $": v{CommonHelper.GetCatoolVersionFromProjectFile().CatoolVersion}";
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => CommonHelper.SetToolVersionforlinkreleases(null));
+            Assert.AreEqual(expected, CommonHelper.ToolVersion);
+        }
+
         #region ValidateKeycloakCredentials
 
         private static CommonAppSettings BuildAppSettingsWithSw360(string clientId, string clientSecret, string token)
@@ -2314,6 +2355,62 @@ namespace SIT.Common.UTest
 
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.That(result[0].Ref, Is.EqualTo("ref-1"));
+        }
+
+        [Test]
+        public void ExtractSw360Message_NullContent_ReturnsDefaultMessage()
+        {
+            string result = CommonHelper.ExtractSw360Message(null);
+
+            Assert.That(result, Is.EqualTo("No response content returned by SW360."));
+        }
+
+        [Test]
+        public void ExtractSw360Message_WhitespaceContent_ReturnsDefaultMessage()
+        {
+            string result = CommonHelper.ExtractSw360Message("   ");
+
+            Assert.That(result, Is.EqualTo("No response content returned by SW360."));
+        }
+
+        [Test]
+        public void ExtractSw360Message_JsonWithMessage_ReturnsMessage()
+        {
+            string content = "{\"timestamp\":\"2026-10-08T05:16:01Z\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"{message=Unauthorized user or empty commit message passed.}\"}";
+
+            string result = CommonHelper.ExtractSw360Message(content);
+
+            Assert.That(result, Is.EqualTo("{message=Unauthorized user or empty commit message passed.}"));
+        }
+
+        [Test]
+        public void ExtractSw360Message_JsonWithoutMessage_ReturnsRawContent()
+        {
+            string content = "{\"status\":400,\"error\":\"Bad Request\"}";
+
+            string result = CommonHelper.ExtractSw360Message(content);
+
+            Assert.That(result, Is.EqualTo(content));
+        }
+
+        [Test]
+        public void ExtractSw360Message_JsonWithEmptyMessage_ReturnsRawContent()
+        {
+            string content = "{\"message\":\"\"}";
+
+            string result = CommonHelper.ExtractSw360Message(content);
+
+            Assert.That(result, Is.EqualTo(content));
+        }
+
+        [Test]
+        public void ExtractSw360Message_InvalidJson_ReturnsRawContent()
+        {
+            string content = "not a json string";
+
+            string result = CommonHelper.ExtractSw360Message(content);
+
+            Assert.That(result, Is.EqualTo(content));
         }
     }
 
