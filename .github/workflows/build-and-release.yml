@@ -32,7 +32,7 @@ jobs:
   version:
     runs-on: windows-latest
     env:
-      VERSION_BUMP: ${{ github.event.inputs.release-bump || 'none' }}
+      VERSION_BUMP: ${{ github.event.inputs.release-bump || '12.0.1' }}
     outputs:
       semVer: ${{ steps.gitversion.outputs.semVer }}
       majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
