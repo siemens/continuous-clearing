@@ -3,13 +3,12 @@
 on:
   pull_request:
     branches:
-      - beta/beta_version_test
+      - main
   push:
     branches:
       - main
       - 'beta/**'
       - 'release/**'
-      - beta/beta_version_test
   # Manual trigger for cutting a release from any branch/tag.
   # - release-bump: controls the version calculation -
   #     'none'  -> no override, use GitVersion as computed (default)
@@ -20,19 +19,19 @@ on:
         description: 'Branch or tag to release from'
         required: false
         type: string
-        default: 'beta/beta_version_test'
+        default: ''
       release-bump:
         description: 'Bump keyword or explicit version to use (e.g. 12.3.0). Leave empty/none for no override.'
         required: false
         type: string
-        default: '12.0.0'
+        default: 'none'
 
 jobs:
 
   version:
     runs-on: windows-latest
     env:
-      VERSION_BUMP: ${{ github.event.inputs.release-bump || '12.0.1' }}
+      VERSION_BUMP: ${{ github.event.inputs.release-bump || '12.0.2' }}
     outputs:
       semVer: ${{ steps.gitversion.outputs.semVer }}
       majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
