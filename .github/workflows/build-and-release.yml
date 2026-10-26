@@ -1,4 +1,4 @@
-﻿name: Build & Release
+name: Build & Release
 
 on:
   pull_request:
@@ -9,10 +9,6 @@ on:
       - main
       - 'beta/**'
       - 'release/**'
-  # Manual trigger for cutting a release from any branch/tag.
-  # - release-bump: controls the version calculation -
-  #     'none'  -> no override, use GitVersion as computed (default)
-  #     explicit SemVer (e.g. '12.3.0' or '12.3.0-beta.1') -> bypass GitVersion and use this version directly
   workflow_dispatch:
     inputs:
       ref:
@@ -21,17 +17,15 @@ on:
         type: string
         default: ''
       release-bump:
-        description: 'Bump keyword or explicit version to use (e.g. 12.3.0). Leave empty/none for no override.'
+        description: 'Explicit version (e.g. 12.0.0 or 12.0.0-beta.1). Leave empty or "none" to use GitVersion.'
         required: false
         type: string
-        default: 'none'
+        default: ''
 
 jobs:
 
   version:
     runs-on: windows-latest
-    env:
-      VERSION_BUMP: ${{ github.event.inputs.release-bump || '12.0.2' }}
     outputs:
       semVer: ${{ steps.gitversion.outputs.semVer }}
       majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
@@ -49,40 +43,32 @@ jobs:
       - name: Determine Version
         id: gitversion
         shell: pwsh
+        env:
+          VERSION_BUMP: ${{ github.event.inputs.release-bump }}
         run: |
           $bump = "$env:VERSION_BUMP".Trim()
-          $explicitVersion = $null
-          $overrideArgs = @()
 
           if ($bump -and $bump -ne "none") {
-            if ($bump -match '^\d+\.\d+\.\d+(-.+)?$') {
-              Write-Host "Using explicit version: $bump"
-              $explicitVersion = $bump
-            } elseif ($bump -in @("patch", "minor", "major")) {
-              Write-Host "Forcing version bump: $bump"
-              $overrideArgs = @("/overrideconfig", "increment=$bump")
-            } else {
-              Write-Error "Invalid release-bump value '$bump'. Use 'patch', 'minor', 'major', or an explicit version like 12.3.0."
+            if ($bump -notmatch '^\d+\.\d+\.\d+(-.+)?$') {
+              Write-Error "Invalid release-bump value '$bump'. Use an explicit version like 12.3.0 or 12.3.0-beta.1, or leave empty/none to use GitVersion."
               exit 1
             }
-          }
-
-          if ($explicitVersion) {
-            $semVer = $explicitVersion
-            $parts = $explicitVersion -split '-', 2
+            Write-Host "Using explicit version: $bump"
+            $semVer = $bump
+            $parts = $bump -split '-', 2
             $majorMinorPatch = $parts[0]
             $preReleaseTag = if ($parts.Length -gt 1) { $parts[1] } else { "" }
-            Write-Host "SemVer: $semVer | MajorMinorPatch: $majorMinorPatch | PreReleaseTag: $preReleaseTag"
-            echo "semVer=$semVer" >> $env:GITHUB_OUTPUT
-            echo "majorMinorPatch=$majorMinorPatch" >> $env:GITHUB_OUTPUT
-            echo "preReleaseTag=$preReleaseTag" >> $env:GITHUB_OUTPUT
           } else {
-            $json = dotnet-gitversion /config GitVersion.yml @overrideArgs | ConvertFrom-Json
-            Write-Host "SemVer: $($json.SemVer) | MajorMinorPatch: $($json.MajorMinorPatch) | PreReleaseTag: $($json.PreReleaseTag)"
-            echo "semVer=$($json.SemVer)" >> $env:GITHUB_OUTPUT
-            echo "majorMinorPatch=$($json.MajorMinorPatch)" >> $env:GITHUB_OUTPUT
-            echo "preReleaseTag=$($json.PreReleaseTag)" >> $env:GITHUB_OUTPUT
+            $json = dotnet-gitversion /config GitVersion.yml | ConvertFrom-Json
+            $semVer = $json.SemVer
+            $majorMinorPatch = $json.MajorMinorPatch
+            $preReleaseTag = $json.PreReleaseTag
           }
+
+          Write-Host "SemVer: $semVer | MajorMinorPatch: $majorMinorPatch | PreReleaseTag: $preReleaseTag"
+          echo "semVer=$semVer" >> $env:GITHUB_OUTPUT
+          echo "majorMinorPatch=$majorMinorPatch" >> $env:GITHUB_OUTPUT
+          echo "preReleaseTag=$preReleaseTag" >> $env:GITHUB_OUTPUT
 
       - name: Determine Prerelease Flag
         id: set_prerelease
@@ -225,6 +211,16 @@ jobs:
         with:
           name: nuget-continuous-clearing
 
+      - name: Verify NuGet Package
+        shell: pwsh
+        run: |
+          Get-ChildItem *.nupkg
+          $expected = "continuous-clearing.${{ env.SEMVER }}.nupkg"
+          if (-not (Test-Path $expected)) {
+            Write-Error "Expected NuGet package '$expected' not found."
+            exit 1
+          }
+
       - name: Check if version tag already exists
         id: check_tag
         shell: pwsh
@@ -244,11 +240,16 @@ jobs:
         if: steps.check_tag.outputs.exists == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         shell: pwsh
         run: |
           $tag = "v${{ env.SEMVER }}"
           $notesFile = "${{ github.workspace }}/release_notes.txt"
-          Set-Content -Path $notesFile -Value "${{ github.event.head_commit.message }}"
+          $message = "$env:COMMIT_MESSAGE"
+          if ([string]::IsNullOrWhiteSpace($message)) {
+            $message = "Manual release"
+          }
+          Set-Content -Path $notesFile -Value $message
           $ghArgs = @($tag, "--title", "Release $tag", "--notes-file", $notesFile, "--repo", "${{ github.repository }}", "--draft")
           if ("${{ env.IS_PRERELEASE }}" -eq "true") {
             $ghArgs += "--prerelease"
