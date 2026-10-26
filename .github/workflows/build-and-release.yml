@@ -20,7 +20,7 @@ on:
         description: 'Explicit version (e.g. 12.0.0 or 12.0.0-beta.1). Leave empty or "none" to use GitVersion.'
         required: false
         type: string
-        default: ''
+        default: '12.0.1'
 
 jobs:
 
