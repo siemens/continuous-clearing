@@ -851,6 +851,429 @@ namespace SIT.Scan.UTest
             Assert.That(six, Is.Not.Null, "six should be found in packages");
             Assert.IsFalse(six.Isdevdependent, "Package with groups=\"dev\" (string format) should be marked as dev dependency");
         }
+
+        /// <summary>
+        /// In-memory mock uv.lock content used by the uv parser tests so the
+        /// tests do not depend on an external fixture file.
+        /// </summary>
+        private const string MockUvLockContent = @"version = 1
+revision = 3
+requires-python = "">=3.10""
+
+[[package]]
+name = ""sit-app""
+version = ""0.1.0""
+source = { virtual = ""."" }
+dependencies = [
+    { name = ""requests"" },
+    { name = ""jinja2"" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = ""requests"", specifier = "">=2.31.0"" },
+    { name = ""jinja2"", specifier = "">=3.1.6"" },
+]
+requires-dev = { dev = [
+    { name = ""pytest"", specifier = "">=8.0.0"" },
+    { name = ""black"", specifier = "">=24.0.0"" },
+] }
+
+[[package]]
+name = ""requests""
+version = ""2.31.0""
+source = { registry = ""https://pypi.org/simple"" }
+dependencies = [
+    { name = ""certifi"" },
+    { name = ""idna"" },
+    { name = ""urllib3"" },
+]
+
+[[package]]
+name = ""jinja2""
+version = ""3.1.6""
+source = { registry = ""https://pypi.org/simple"" }
+dependencies = [
+    { name = ""markupsafe"" },
+]
+
+[[package]]
+name = ""certifi""
+version = ""2024.2.2""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""idna""
+version = ""3.6""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""urllib3""
+version = ""2.2.1""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""markupsafe""
+version = ""2.1.5""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""pytest""
+version = ""8.1.1""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""black""
+version = ""24.3.0""
+source = { registry = ""https://pypi.org/simple"" }
+";
+
+        /// <summary>
+        /// Writes the mock uv.lock content to a unique temp file and returns its path.
+        /// The caller is responsible for deleting the file after use.
+        /// </summary>
+        private static string CreateMockUvLockFile()
+        {
+            string filePath = Path.Combine(Path.GetTempPath(), $"uv_{System.Guid.NewGuid():N}.lock");
+            System.IO.File.WriteAllText(filePath, MockUvLockContent);
+            return filePath;
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_GivenUvLock_ReturnsAllPackages()
+        {
+            //Arrange
+            string filePath = CreateMockUvLockFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - 8 third-party packages (the virtual root project is excluded)
+                Assert.That(packages.Count, Is.EqualTo(8), "Should detect 8 packages, excluding the virtual root project");
+                var requests = packages.Find(p => p.Name == "requests");
+                Assert.That(requests, Is.Not.Null, "requests should be found in packages");
+                Assert.That(requests.Version, Is.EqualTo("2.31.0"), "requests version should be parsed");
+                Assert.That(requests.PurlID, Does.Contain("pkg:pypi/requests@2.31.0"), "PurlID should be a PyPI purl");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_RequiresDevGroup_IdentifiesDevDependencies()
+        {
+            //Arrange
+            string filePath = CreateMockUvLockFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - pytest and black are in the root requires-dev dev group
+                var pytest = packages.Find(p => p.Name == "pytest");
+                var black = packages.Find(p => p.Name == "black");
+                Assert.That(pytest, Is.Not.Null, "pytest should be found in packages");
+                Assert.That(black, Is.Not.Null, "black should be found in packages");
+                Assert.IsTrue(pytest.Isdevdependent, "pytest should be marked as a dev dependency");
+                Assert.IsTrue(black.Isdevdependent, "black should be marked as a dev dependency");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_ProductionPackages_NotMarkedAsDev()
+        {
+            //Arrange
+            string filePath = CreateMockUvLockFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert
+                var requests = packages.Find(p => p.Name == "requests");
+                var jinja2 = packages.Find(p => p.Name == "jinja2");
+                Assert.IsFalse(requests.Isdevdependent, "requests should NOT be marked as a dev dependency");
+                Assert.IsFalse(jinja2.Isdevdependent, "jinja2 should NOT be marked as a dev dependency");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_PopulatesDependencyEdges()
+        {
+            //Arrange
+            string filePath = CreateMockUvLockFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - one dependency entry per package (root project excluded)
+                Assert.That(dependencies.Count, Is.EqualTo(8), "Should have a dependency entry for each non-root package");
+                var requestsDep = dependencies.Find(d => d.Ref.Contains("pkg:pypi/requests@2.31.0"));
+                Assert.That(requestsDep, Is.Not.Null, "requests dependency entry should exist");
+                Assert.That(requestsDep.Dependencies.Count, Is.EqualTo(3), "requests should have 3 sub-dependencies (certifi, idna, urllib3)");
+                Assert.That(requestsDep.Dependencies.Exists(d => d.Ref.Contains("certifi@2024.2.2")), Is.True, "requests should reference certifi with resolved version");
+
+                var jinjaDep = dependencies.Find(d => d.Ref.Contains("pkg:pypi/jinja2@3.1.6"));
+                Assert.That(jinjaDep, Is.Not.Null, "jinja2 dependency entry should exist");
+                Assert.That(jinjaDep.Dependencies.Count, Is.EqualTo(1), "jinja2 should have 1 sub-dependency (markupsafe)");
+                Assert.That(jinjaDep.Dependencies[0].Ref, Does.Contain("markupsafe@2.1.5"), "jinja2 should reference markupsafe with resolved version");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_VirtualRootProject_IsExcludedFromComponents()
+        {
+            //Arrange
+            string filePath = CreateMockUvLockFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - the virtual root project (sit-app) must not be emitted
+                var root = packages.Find(p => p.Name == "sit-app");
+                Assert.That(root, Is.Null, "The virtual root project should be excluded from BOM components");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        /// <summary>
+        /// Mock uv.lock whose root project uses nested dev groups via include-group
+        /// and whose dev packages have their own transitive dependencies.
+        /// </summary>
+        private const string MockUvLockNestedContent = @"version = 1
+revision = 3
+requires-python = "">=3.10""
+
+[[package]]
+name = ""sit-app""
+version = ""0.1.0""
+source = { virtual = ""."" }
+dependencies = [
+    { name = ""requests"" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = ""requests"", specifier = "">=2.31.0"" },
+]
+requires-dev = { dev = [
+    { include-group = ""lint"" },
+], lint = [
+    { name = ""flake8"", specifier = "">=7.0.0"" },
+] }
+
+[[package]]
+name = ""requests""
+version = ""2.31.0""
+source = { registry = ""https://pypi.org/simple"" }
+dependencies = [
+    { name = ""urllib3"" },
+]
+
+[[package]]
+name = ""urllib3""
+version = ""2.2.1""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""flake8""
+version = ""7.0.0""
+source = { registry = ""https://pypi.org/simple"" }
+dependencies = [
+    { name = ""pyflakes"" },
+]
+
+[[package]]
+name = ""pyflakes""
+version = ""3.2.0""
+source = { registry = ""https://pypi.org/simple"" }
+";
+
+        private static string CreateMockUvLockNestedFile()
+        {
+            string filePath = Path.Combine(Path.GetTempPath(), $"uv_nested_{System.Guid.NewGuid():N}.lock");
+            System.IO.File.WriteAllText(filePath, MockUvLockNestedContent);
+            return filePath;
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_IncludeGroupNesting_ResolvesNestedDevDependencies()
+        {
+            //Arrange
+            string filePath = CreateMockUvLockNestedFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - flake8 reached via dev -> include-group "lint"
+                var flake8 = packages.Find(p => p.Name == "flake8");
+                Assert.That(flake8, Is.Not.Null, "flake8 should be found in packages");
+                Assert.IsTrue(flake8.Isdevdependent, "flake8 should be dev via include-group nesting");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_TransitiveDevDependency_IsMarkedAsDev()
+        {
+            //Arrange
+            string filePath = CreateMockUvLockNestedFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - pyflakes is only a dependency of the dev package flake8
+                var pyflakes = packages.Find(p => p.Name == "pyflakes");
+                Assert.That(pyflakes, Is.Not.Null, "pyflakes should be found in packages");
+                Assert.IsTrue(pyflakes.Isdevdependent, "pyflakes should be dev via transitive propagation from flake8");
+
+                //Assert - urllib3 is a runtime transitive dependency and must remain non-dev
+                var urllib3 = packages.Find(p => p.Name == "urllib3");
+                Assert.That(urllib3, Is.Not.Null, "urllib3 should be found in packages");
+                Assert.IsFalse(urllib3.Isdevdependent, "urllib3 is a runtime dependency and should NOT be dev");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        /// <summary>
+        /// Mock uv.lock using the [package.dev-dependencies] table format emitted by
+        /// current uv versions (e.g. uv 0.12.x), as opposed to the legacy
+        /// [package.metadata].requires-dev representation. Includes a nested
+        /// include-group reference (dev -> lint) to verify group resolution.
+        /// </summary>
+        private const string MockUvLockDevDependenciesContent = @"version = 1
+revision = 3
+requires-python = "">=3.10""
+
+[[package]]
+name = ""sample-uv-project""
+version = ""0.1.0""
+source = { editable = ""."" }
+dependencies = [
+    { name = ""requests"" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = ""pytest"" },
+    { name = ""flake8"" },
+]
+lint = [
+    { name = ""flake8"" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = ""requests"", specifier = "">=2.31.0"" },
+]
+
+[[package]]
+name = ""requests""
+version = ""2.31.0""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""pytest""
+version = ""8.1.1""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""flake8""
+version = ""7.0.0""
+source = { registry = ""https://pypi.org/simple"" }
+dependencies = [
+    { name = ""pyflakes"" },
+]
+
+[[package]]
+name = ""pyflakes""
+version = ""3.2.0""
+source = { registry = ""https://pypi.org/simple"" }
+";
+
+        private static string CreateMockUvLockDevDependenciesFile()
+        {
+            string filePath = Path.Combine(Path.GetTempPath(), $"uv_{System.Guid.NewGuid():N}.lock");
+            System.IO.File.WriteAllText(filePath, MockUvLockDevDependenciesContent);
+            return filePath;
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_DevDependenciesTable_IdentifiesDevDependencies()
+        {
+            //Arrange - uses the modern [package.dev-dependencies] format
+            string filePath = CreateMockUvLockDevDependenciesFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - pytest is a direct dev dependency, flake8 is dev (also via include-group),
+                //pyflakes is dev transitively through flake8, and requests stays a runtime dependency.
+                var pytest = packages.Find(p => p.Name == "pytest");
+                var flake8 = packages.Find(p => p.Name == "flake8");
+                var pyflakes = packages.Find(p => p.Name == "pyflakes");
+                var requests = packages.Find(p => p.Name == "requests");
+
+                Assert.That(pytest, Is.Not.Null, "pytest should be found in packages");
+                Assert.That(flake8, Is.Not.Null, "flake8 should be found in packages");
+                Assert.That(pyflakes, Is.Not.Null, "pyflakes should be found in packages");
+                Assert.That(requests, Is.Not.Null, "requests should be found in packages");
+
+                Assert.IsTrue(pytest.Isdevdependent, "pytest should be dev via [package.dev-dependencies]");
+                Assert.IsTrue(flake8.Isdevdependent, "flake8 should be dev via [package.dev-dependencies]");
+                Assert.IsTrue(pyflakes.Isdevdependent, "pyflakes should be dev via transitive propagation from flake8");
+                Assert.IsFalse(requests.Isdevdependent, "requests is a runtime dependency and should NOT be dev");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
     }
 }
 

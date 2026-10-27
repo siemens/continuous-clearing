@@ -6,6 +6,7 @@
 
 using log4net;
 using Newtonsoft.Json;
+using NuGet.Packaging;
 using SIT.APICommunications.Model;
 using SIT.Common;
 using SIT.Common.Constants;
@@ -32,7 +33,7 @@ namespace SIT.Services
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ISW360ApicommunicationFacade m_SW360ApiCommunicationFacade = sw360ApiCommunicationFacade;
-        private readonly List<string> externalIdKeyList = new List<string>() { "?package-url=", "?purl.id=" };
+        private readonly List<string> externalIdKeyList = new List<string>() { "package-url" , "purl.id" };
 
         #region constructor
 
@@ -154,7 +155,7 @@ namespace SIT.Services
                 // sequentially so a component's total lookup latency isn't the sum of both round-trips.
                 Releasestatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
                     TryGetReleaseByKey(releaseName, releaseExternalId, externalIdKey)));
-
+                              
 
                 foreach (Releasestatus result in results)
                 {
@@ -186,28 +187,29 @@ namespace SIT.Services
         }
 
         /// <summary>
-        /// Looks up a release using a single external-id key format, retrying with an escaped id for NPM/Debian/
-        /// Alpine packages when the first attempt returns no matches.
+        /// Looks up a release using a single external-id key format, trying the escaped external id first and
+        /// retrying with the original (un-escaped) id (for all project types) when the first attempt returns no matches.
         /// </summary>
         private async Task<Releasestatus> TryGetReleaseByKey(string releaseName, string releaseExternalId, string externalIdKey)
         {
+           // string escapedReleaseExternalId = Uri.EscapeDataString(releaseExternalId);
             HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
             await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
             var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
             var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
             var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
 
-            //It's for Local Sw360 servers,making an API call with EscapeDataString..
-            if (sw360releasesdata.Count == 0 && (releaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.NpmProjectType]) || releaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]) || releaseExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.AlpineProjectType])))
-            {
-                Logger.Debug("GetReleaseDataByExternalId(): If releaseExternalId have NPM or Debian or Alpine . We reruning the api call.");
-                string escapedReleaseExternalId = Uri.EscapeDataString(releaseExternalId);
-                httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(escapedReleaseExternalId, externalIdKey);
-                await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
-                responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
-                componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
-                sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
-            }
+            ////It's for Local Sw360 servers,making an API call with the un-escaped external id..
+            ////Applies to all project types: when the escaped attempt returns no matches, retry with the original external id.
+            //if (sw360releasesdata.Count == 0)
+            //{
+            //    Logger.Debug("GetReleaseDataByExternalId(): No release found on first attempt. Retrying the api call with the original external id.");
+            //    httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
+            //    await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
+            //    responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+            //    componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
+            //    sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
+            //}
 
             return sw360releasesdata.Count > 0
                 ? GetReleaseExistStatus(releaseName, externalIdKey, sw360releasesdata)

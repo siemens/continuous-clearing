@@ -53,7 +53,7 @@ namespace SIT.APICommunications
         /// The maximum number of concurrent SW360 lookups (release/component existence checks) per component,
         /// bounded to avoid overwhelming the server while still parallelizing slow searchByExternalIds calls.
         /// </summary>
-        public const int Sw360LookupMaxConcurrency = 4;
+        public const int Sw360LookupMaxConcurrency = 1;
 
         /// <summary>
         /// The page size used to paginate JFrog AQL queries, kept below JFrog's configured aql.search.query.max.limit.

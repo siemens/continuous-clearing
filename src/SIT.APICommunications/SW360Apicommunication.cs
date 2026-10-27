@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using log4net;
+using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
@@ -16,6 +17,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -238,10 +240,13 @@ namespace SIT.APICommunications
         {
             HttpClient httpClient = GetHttpClient();
             httpClient.SetLogWarnings(false, "unable to get release details by externalid");
-            string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
-            await LogHandlingHelper.HttpRequestHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", httpClient, releaseByExternalIdUrl);
+            //string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
+
+
+            var url = QueryHelpers.AddQueryString(sw360ReleaseByExternalId,externalIdKey,purlId);
+            await LogHandlingHelper.HttpRequestHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", httpClient, url);
             // Matches are expected to be few, but route through the pagination-aware fetch so a large match count isn't silently truncated.
-            HttpResponseMessage response = await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, releaseByExternalIdUrl, ApiConstant.ListPageSize);
+            HttpResponseMessage response = await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, url, ApiConstant.ListPageSize);
             await LogHandlingHelper.HttpResponseHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", response);
             return response;
         }
