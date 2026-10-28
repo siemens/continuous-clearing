@@ -50,15 +50,7 @@ namespace SIT.Services
         public async Task<ComponentStatus> GetComponentDataByExternalId(string componentName, string componentExternalId)
         {
             Logger.DebugFormat("GetComponentDataByExternalId(): Starting to identifying Component through External Id - Name-{0},ExternalId-{1}", componentName, componentExternalId);
-            string externalIdUriString;
-            if (componentExternalId.Contains(Dataconstant.PurlCheck()[Dataconstant.NpmProjectType]))
-            {
-                externalIdUriString = Uri.EscapeDataString(componentExternalId);
-            }
-            else
-            {
-                externalIdUriString = componentExternalId;
-            }
+           
             ComponentStatus sw360components = new ComponentStatus();
             sw360components.isComponentExist = false;
 
@@ -67,7 +59,7 @@ namespace SIT.Services
                 // The two external-id key formats are independent lookups; run them concurrently instead of
                 // sequentially so a component's total lookup latency isn't the sum of both round-trips.
                 ComponentStatus[] results = await Task.WhenAll(externalIdKeyList.Select(externalIdKey =>
-                    TryGetComponentByKey(componentName, componentExternalId, externalIdUriString, externalIdKey)));
+                    TryGetComponentByKey(componentName, componentExternalId, componentExternalId, externalIdKey)));
 
                 // Replicate the original sequential loop's merge: whichever key (in list order) last had a
                 // non-empty match wins, unless an earlier key already matched true (which would have short-circuited).
@@ -109,7 +101,7 @@ namespace SIT.Services
             var sw360ComponentsList = await GetCompListFromExternalIDCombinations(externalIdUriString, externalIdKey);
             if (sw360ComponentsList.Count == 0 && externalIdUriString.Contains(Dataconstant.PurlCheck()[Dataconstant.DebianProjectType]))
             {
-                string newExternalIdUriString = Uri.EscapeDataString(componentExternalId.Replace("?arch=source", ""));
+                string newExternalIdUriString = componentExternalId.Replace("?arch=source", "");
                 sw360ComponentsList = await GetCompListFromExternalIDCombinations(newExternalIdUriString, externalIdKey);
             }
 
