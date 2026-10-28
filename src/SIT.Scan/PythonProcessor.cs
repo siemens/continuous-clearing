@@ -356,22 +356,28 @@ namespace SIT.Scan
 
             foreach (TomlNode entry in groupEntries.AsArray.Children)
             {
-                if (entry == null)
+                if (entry == null || !entry.IsTable)
                 {
                     continue;
                 }
 
-                var includeGroup = entry[TomlKeyIncludeGroup]?.ToString();
-                if (!string.IsNullOrEmpty(includeGroup))
+                if (entry.AsTable.HasKey(TomlKeyIncludeGroup))
                 {
-                    CollectUvGroupDependencyNames(includeGroup, groupsByName, devDependencyNames, visitedGroups);
+                    var includeGroup = entry[TomlKeyIncludeGroup]?.ToString();
+                    if (!string.IsNullOrEmpty(includeGroup))
+                    {
+                        CollectUvGroupDependencyNames(includeGroup, groupsByName, devDependencyNames, visitedGroups);
+                    }
                     continue;
                 }
 
-                var name = entry[TomlKeyName]?.ToString();
-                if (!string.IsNullOrEmpty(name))
+                if (entry.AsTable.HasKey(TomlKeyName))
                 {
-                    devDependencyNames.Add(CommonHelper.NormalizePypiName(name));
+                    var name = entry[TomlKeyName]?.ToString();
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        devDependencyNames.Add(CommonHelper.NormalizePypiName(name));
+                    }
                 }
             }
         }
