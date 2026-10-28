@@ -216,7 +216,17 @@ namespace SIT.Scan
             TomlTable tomlTable = fileParser.ParseTomlFile(filePath);
             CommonHelper.WarnIfDependencyFileRequired();
 
-            HashSet<string> devDependencyNames = BuildUvDevDependencySet(tomlTable);
+            // Index every non-root package node by normalized name and capture the root
+            // (virtual/editable) project node in a single pass over the lock file.
+            Dictionary<string, TomlNode> nodesByName = new(StringComparer.OrdinalIgnoreCase);
+            TomlNode rootNode = IndexUvPackages(tomlTable, nodesByName);
+
+            // Dev names declared in the root project's dev groups, then the full set of
+            // runtime- and dev-reachable packages computed as transitive closures over
+            // the dependency graph. Runtime reachability takes precedence over dev.
+            HashSet<string> declaredDevNames = BuildUvDevDependencySet(rootNode);
+            HashSet<string> runtimeNames = CollectReachableNames(GetUvNodeDependencyNames(rootNode), nodesByName);
+            HashSet<string> devNames = CollectReachableNames(declaredDevNames, nodesByName);
 
             foreach (TomlNode node in tomlTable[TomlKeyPackage])
             {
@@ -229,37 +239,61 @@ namespace SIT.Scan
 
                 string packageName = node[TomlKeyName].ToString();
                 string packageVersion = node.TryGetNode(TomlKeyVersion, out TomlNode versionNode) ? versionNode.ToString() : string.Empty;
+                string normalizedName = CommonHelper.NormalizePypiName(packageName);
+
+                bool isDev = devNames.Contains(normalizedName) && !runtimeNames.Contains(normalizedName);
 
                 PythonPackage pythonPackage = new()
                 {
                     Name = packageName,
                     Version = packageVersion,
                     PurlID = GeneratePypiPurl(packageName, packageVersion, Dataconstant.PoetryProjectType),
-                    Isdevdependent = IsUvDevDependency(packageName, devDependencyNames),
+                    Isdevdependent = isDev,
                     FoundType = Dataconstant.Discovered,
                     SpdxComponentDetails = new SpdxComponentInfo()
                 };
 
                 BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
-                PythonPackages.Add(pythonPackage);
-                keyValuePair.Add(new KeyValuePair<string, TomlNode>(pythonPackage.PurlID, node));
-            }
-
-            // Packages reachable only through a declared dev dependency are also
-            // development components, so propagate the dev flag transitively.
-            PropagateUvDevDependenciesTransitively(keyValuePair, PythonPackages);
-
-            foreach (var pythonPackage in PythonPackages)
-            {
-                if (pythonPackage.Isdevdependent)
+                if (isDev)
                 {
                     BomCreator.bomKpiData.DevDependentComponents++;
                 }
+
+                PythonPackages.Add(pythonPackage);
+                keyValuePair.Add(new KeyValuePair<string, TomlNode>(pythonPackage.PurlID, node));
             }
 
             BuildUvDependencyGraph(keyValuePair, dependencies, PythonPackages);
 
             return PythonPackages;
+        }
+
+        /// <summary>
+        /// Indexes every non-root uv package node by its normalized name and returns the
+        /// root (virtual/editable) project node, or null when none is present.
+        /// </summary>
+        /// <param name="tomlTable">Parsed uv.lock table.</param>
+        /// <param name="nodesByName">Accumulator mapping normalized package name to its node.</param>
+        /// <returns>The root project node, or null.</returns>
+        private static TomlNode IndexUvPackages(TomlTable tomlTable, Dictionary<string, TomlNode> nodesByName)
+        {
+            TomlNode rootNode = null;
+            foreach (TomlNode node in tomlTable[TomlKeyPackage])
+            {
+                if (IsUvRootProject(node))
+                {
+                    rootNode = node;
+                    continue;
+                }
+
+                string name = node.TryGetNode(TomlKeyName, out TomlNode nameNode) ? nameNode.ToString() : null;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    nodesByName[CommonHelper.NormalizePypiName(name)] = node;
+                }
+            }
+
+            return rootNode;
         }
 
         /// <summary>
@@ -271,36 +305,91 @@ namespace SIT.Scan
         /// Group entries may reference other groups via "include-group"; such nested
         /// groups are resolved recursively per the uv specification.
         /// </summary>
-        /// <param name="tomlTable">Parsed uv.lock table.</param>
+        /// <param name="rootNode">The root (virtual/editable) project node, may be null.</param>
         /// <returns>Set of normalized development dependency names.</returns>
-        private static HashSet<string> BuildUvDevDependencySet(TomlTable tomlTable)
+        private static HashSet<string> BuildUvDevDependencySet(TomlNode rootNode)
         {
             HashSet<string> devDependencyNames = new(StringComparer.OrdinalIgnoreCase);
-
-            foreach (TomlNode node in tomlTable[TomlKeyPackage])
+            if (rootNode == null)
             {
-                if (!IsUvRootProject(node))
-                {
-                    continue;
-                }
+                return devDependencyNames;
+            }
 
-                // Map each dev group name to its array of entries so that
-                // "include-group" references can be resolved across groups. Collect from
-                // both the current [package.dev-dependencies] table and the legacy
-                // [package.metadata].requires-dev table.
-                Dictionary<string, TomlNode> groupsByName = new(StringComparer.OrdinalIgnoreCase);
-                foreach (var devDependenciesTable in new[] { node[TomlKeyDevDependencies], node[TomlKeyMetadata]?[TomlKeyRequiresDev] })
-                {
-                    AddUvDevGroups(devDependenciesTable, groupsByName);
-                }
+            // Map each dev group name to its array of entries so that
+            // "include-group" references can be resolved across groups. Collect from
+            // both the current [package.dev-dependencies] table and the legacy
+            // [package.metadata].requires-dev table.
+            Dictionary<string, TomlNode> groupsByName = new(StringComparer.OrdinalIgnoreCase);
+            foreach (var devDependenciesTable in new[] { rootNode[TomlKeyDevDependencies], rootNode[TomlKeyMetadata]?[TomlKeyRequiresDev] })
+            {
+                AddUvDevGroups(devDependenciesTable, groupsByName);
+            }
 
-                foreach (var groupName in groupsByName.Keys)
-                {
-                    CollectUvGroupDependencyNames(groupName, groupsByName, devDependencyNames, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-                }
+            foreach (var groupName in groupsByName.Keys)
+            {
+                CollectUvGroupDependencyNames(groupName, groupsByName, devDependencyNames, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
             }
 
             return devDependencyNames;
+        }
+
+        /// <summary>
+        /// Computes the transitive closure of package names reachable from a set of seed
+        /// names by walking the uv dependency graph. Used for both the runtime closure
+        /// (seeded from the root's dependencies) and the dev closure (seeded from the
+        /// declared dev names); a single shared walk keeps the two classifications consistent.
+        /// </summary>
+        /// <param name="seedNames">Normalized names to start the walk from.</param>
+        /// <param name="nodesByName">All non-root package nodes keyed by normalized name.</param>
+        /// <returns>Set of normalized names reachable from the seeds (including the seeds).</returns>
+        private static HashSet<string> CollectReachableNames(IEnumerable<string> seedNames, Dictionary<string, TomlNode> nodesByName)
+        {
+            HashSet<string> reachable = new(StringComparer.OrdinalIgnoreCase);
+            foreach (string seed in seedNames)
+            {
+                CollectReachableNamesRecursively(seed, nodesByName, reachable);
+            }
+
+            return reachable;
+        }
+
+        /// <summary>
+        /// Adds a package and all of its transitive dependencies to the reachable set.
+        /// The set itself guards against cycles and repeated visits.
+        /// </summary>
+        private static void CollectReachableNamesRecursively(string packageName, Dictionary<string, TomlNode> nodesByName, HashSet<string> reachable)
+        {
+            if (string.IsNullOrEmpty(packageName) || !reachable.Add(packageName) || !nodesByName.TryGetValue(packageName, out TomlNode node))
+            {
+                return;
+            }
+
+            foreach (string childName in GetUvNodeDependencyNames(node))
+            {
+                CollectReachableNamesRecursively(childName, nodesByName, reachable);
+            }
+        }
+
+        /// <summary>
+        /// Enumerates the normalized names declared in a uv package node's
+        /// dependencies array (dependencies = [{ name = "..." }]).
+        /// </summary>
+        private static IEnumerable<string> GetUvNodeDependencyNames(TomlNode node)
+        {
+            var dependencies = node[TomlKeyDependencies];
+            if (dependencies == null || !dependencies.IsArray)
+            {
+                yield break;
+            }
+
+            foreach (TomlNode dependency in dependencies.AsArray.Children)
+            {
+                string childName = CommonHelper.NormalizePypiName(dependency?[TomlKeyName]?.ToString());
+                if (!string.IsNullOrEmpty(childName))
+                {
+                    yield return childName;
+                }
+            }
         }
 
         /// <summary>
@@ -356,28 +445,37 @@ namespace SIT.Scan
 
             foreach (TomlNode entry in groupEntries.AsArray.Children)
             {
-                if (entry == null || !entry.IsTable)
-                {
-                    continue;
-                }
+                CollectUvGroupEntry(entry, groupsByName, devDependencyNames, visitedGroups);
+            }
+        }
 
-                if (entry.AsTable.HasKey(TomlKeyIncludeGroup))
-                {
-                    var includeGroup = entry[TomlKeyIncludeGroup]?.ToString();
-                    if (!string.IsNullOrEmpty(includeGroup))
-                    {
-                        CollectUvGroupDependencyNames(includeGroup, groupsByName, devDependencyNames, visitedGroups);
-                    }
-                    continue;
-                }
+        /// <summary>
+        /// Processes a single uv dev-group entry: either resolves a nested
+        /// "include-group" reference or records a normalized dependency name.
+        /// </summary>
+        private static void CollectUvGroupEntry(TomlNode entry, Dictionary<string, TomlNode> groupsByName, HashSet<string> devDependencyNames, HashSet<string> visitedGroups)
+        {
+            if (entry == null || !entry.IsTable)
+            {
+                return;
+            }
 
-                if (entry.AsTable.HasKey(TomlKeyName))
+            if (entry.AsTable.HasKey(TomlKeyIncludeGroup))
+            {
+                var includeGroup = entry[TomlKeyIncludeGroup]?.ToString();
+                if (!string.IsNullOrEmpty(includeGroup))
                 {
-                    var name = entry[TomlKeyName]?.ToString();
-                    if (!string.IsNullOrEmpty(name))
-                    {
-                        devDependencyNames.Add(CommonHelper.NormalizePypiName(name));
-                    }
+                    CollectUvGroupDependencyNames(includeGroup, groupsByName, devDependencyNames, visitedGroups);
+                }
+                return;
+            }
+
+            if (entry.AsTable.HasKey(TomlKeyName))
+            {
+                var name = entry[TomlKeyName]?.ToString();
+                if (!string.IsNullOrEmpty(name))
+                {
+                    devDependencyNames.Add(CommonHelper.NormalizePypiName(name));
                 }
             }
         }
@@ -396,80 +494,6 @@ namespace SIT.Scan
             }
 
             return source.AsTable.HasKey(TomlKeySourceVirtual) || source.AsTable.HasKey(TomlKeySourceEditable);
-        }
-
-        /// <summary>
-        /// Determines if a uv package is a development dependency.
-        /// </summary>
-        /// <param name="name">Package name.</param>
-        /// <param name="devDependencyNames">Set of development dependency names.</param>
-        /// <returns>True if the package is a development dependency, false otherwise.</returns>
-        private static bool IsUvDevDependency(string name, HashSet<string> devDependencyNames)
-        {
-            return !string.IsNullOrEmpty(name) && devDependencyNames.Contains(CommonHelper.NormalizePypiName(name));
-        }
-
-        /// <summary>
-        /// Propagates the development flag transitively: any package reachable only
-        /// through a declared development dependency is itself a development component.
-        /// Walks the uv dependency graph starting from each explicitly-declared dev
-        /// package and marks every reachable package as development.
-        /// </summary>
-        /// <param name="keyValues">Purl-to-node pairs for every parsed package.</param>
-        /// <param name="PythonPackages">Parsed packages whose dev flags are updated.</param>
-        private static void PropagateUvDevDependenciesTransitively(List<KeyValuePair<string, TomlNode>> keyValues, List<PythonPackage> PythonPackages)
-        {
-            // Index each package and its uv.lock node by normalized name for quick lookup.
-            Dictionary<string, PythonPackage> packagesByName = new(StringComparer.OrdinalIgnoreCase);
-            Dictionary<string, TomlNode> nodesByName = new(StringComparer.OrdinalIgnoreCase);
-            for (int i = 0; i < PythonPackages.Count; i++)
-            {
-                string name = CommonHelper.NormalizePypiName(PythonPackages[i].Name);
-                packagesByName[name] = PythonPackages[i];
-                nodesByName[name] = keyValues[i].Value;
-            }
-
-            // Start from every package that is already marked as a dev dependency and
-            // mark everything reachable from it as dev too. "visited" prevents revisiting
-            // a package (also protects against cyclic dependency graphs).
-            HashSet<string> visited = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var package in PythonPackages)
-            {
-                if (package.Isdevdependent)
-                {
-                    MarkDevDependenciesRecursively(CommonHelper.NormalizePypiName(package.Name), packagesByName, nodesByName, visited);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Marks the given package and all of its child dependencies as development,
-        /// following the dependency chain recursively. The "visited" set ensures each
-        /// package is processed only once and stops cycles from looping forever.
-        /// </summary>
-        private static void MarkDevDependenciesRecursively(string packageName, Dictionary<string, PythonPackage> packagesByName, Dictionary<string, TomlNode> nodesByName, HashSet<string> visited)
-        {
-            // Already processed this package, so stop here.
-            if (!visited.Add(packageName) || !nodesByName.TryGetValue(packageName, out TomlNode node))
-            {
-                return;
-            }
-
-            var dependencies = node[TomlKeyDependencies];
-            if (dependencies == null || !dependencies.IsArray)
-            {
-                return;
-            }
-
-            foreach (TomlNode dependency in dependencies.AsArray.Children)
-            {
-                string childName = CommonHelper.NormalizePypiName(dependency?[TomlKeyName]?.ToString());
-                if (!string.IsNullOrEmpty(childName) && packagesByName.TryGetValue(childName, out PythonPackage childPackage))
-                {
-                    childPackage.Isdevdependent = true;
-                    MarkDevDependenciesRecursively(childName, packagesByName, nodesByName, visited);
-                }
-            }
         }
 
         /// <summary>

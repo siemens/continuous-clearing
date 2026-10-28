@@ -1274,6 +1274,86 @@ source = { registry = ""https://pypi.org/simple"" }
                 System.IO.File.Delete(filePath);
             }
         }
+
+        /// <summary>
+        /// Mock uv.lock where a package (click) is a direct runtime dependency of the
+        /// root project AND a transitive dependency of a dev package (black). Runtime
+        /// reachability must take precedence, so click must remain a runtime dependency.
+        /// </summary>
+        private const string MockUvLockSharedRuntimeAndDevContent = @"version = 1
+revision = 3
+requires-python = "">=3.10""
+
+[[package]]
+name = ""sample-uv-project""
+version = ""0.1.0""
+source = { editable = ""."" }
+dependencies = [
+    { name = ""click"" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = ""black"" },
+]
+
+[[package]]
+name = ""click""
+version = ""8.1.7""
+source = { registry = ""https://pypi.org/simple"" }
+
+[[package]]
+name = ""black""
+version = ""24.3.0""
+source = { registry = ""https://pypi.org/simple"" }
+dependencies = [
+    { name = ""click"" },
+    { name = ""pathspec"" },
+]
+
+[[package]]
+name = ""pathspec""
+version = ""0.12.1""
+source = { registry = ""https://pypi.org/simple"" }
+";
+
+        private static string CreateMockUvLockSharedRuntimeAndDevFile()
+        {
+            string filePath = Path.Combine(Path.GetTempPath(), $"uv_shared_{System.Guid.NewGuid():N}.lock");
+            System.IO.File.WriteAllText(filePath, MockUvLockSharedRuntimeAndDevContent);
+            return filePath;
+        }
+
+        [Test]
+        public void ExtractDetailsForUvLockfile_PackageReachableFromRuntimeAndDev_StaysRuntime()
+        {
+            //Arrange - click is a direct runtime dependency AND a dependency of dev package black
+            string filePath = CreateMockUvLockSharedRuntimeAndDevFile();
+            List<Dependency> dependencies = new List<Dependency>();
+
+            try
+            {
+                //Act
+                List<PythonPackage> packages = PythonProcessor.ExtractDetailsForUvLockfile(filePath, dependencies);
+
+                //Assert - runtime reachability must win over dev propagation
+                var click = packages.Find(p => p.Name == "click");
+                var black = packages.Find(p => p.Name == "black");
+                var pathspec = packages.Find(p => p.Name == "pathspec");
+
+                Assert.That(click, Is.Not.Null, "click should be found in packages");
+                Assert.That(black, Is.Not.Null, "black should be found in packages");
+                Assert.That(pathspec, Is.Not.Null, "pathspec should be found in packages");
+
+                Assert.IsFalse(click.Isdevdependent, "click is a runtime dependency of the root and must NOT be marked as dev even though black (dev) also depends on it");
+                Assert.IsTrue(black.Isdevdependent, "black should be dev via [package.dev-dependencies]");
+                Assert.IsTrue(pathspec.Isdevdependent, "pathspec should be dev transitively through black and is not runtime-reachable");
+            }
+            finally
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
     }
 }
 
