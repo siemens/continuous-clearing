@@ -184,24 +184,11 @@ namespace SIT.Services
         /// </summary>
         private async Task<Releasestatus> TryGetReleaseByKey(string releaseName, string releaseExternalId, string externalIdKey)
         {
-           // string escapedReleaseExternalId = Uri.EscapeDataString(releaseExternalId);
             HttpResponseMessage httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
             await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
             var responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
             var componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
-            var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
-
-            ////It's for Local Sw360 servers,making an API call with the un-escaped external id..
-            ////Applies to all project types: when the escaped attempt returns no matches, retry with the original external id.
-            //if (sw360releasesdata.Count == 0)
-            //{
-            //    Logger.Debug("GetReleaseDataByExternalId(): No release found on first attempt. Retrying the api call with the original external id.");
-            //    httpResponseComponent = await m_SW360ApiCommunicationFacade.GetReleaseByExternalId(releaseExternalId, externalIdKey);
-            //    await LogHandlingHelper.HttpResponseHandling("Response of get release data by externalId", $"MethodName:GetReleaseDataByExternalId()", httpResponseComponent);
-            //    responseContent = httpResponseComponent?.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
-            //    componentsRelease = JsonConvert.DeserializeObject<ComponentsRelease>(responseContent);
-            //    sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();
-            //}
+            var sw360releasesdata = componentsRelease?.Embedded?.Sw360Releases ?? new List<Sw360Releases>();         
 
             return sw360releasesdata.Count > 0
                 ? GetReleaseExistStatus(releaseName, externalIdKey, sw360releasesdata)
