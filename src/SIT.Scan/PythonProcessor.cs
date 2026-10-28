@@ -37,24 +37,6 @@ namespace SIT.Scan
         private const string devGroupName = "dev";
         private const string mainGroupName = "main";
 
-        // TOML key names used in poetry.lock / uv.lock files.
-        private const string TomlKeyPackage = "package";
-        private const string TomlKeyName = "name";
-        private const string TomlKeyVersion = "version";
-        private const string TomlKeySource = "source";
-        private const string TomlKeyMetadata = "metadata";
-        private const string TomlKeyDependencies = "dependencies";
-        private const string TomlKeyDevDependencies = "dev-dependencies";
-        private const string TomlKeyRequiresDev = "requires-dev";
-        private const string TomlKeyIncludeGroup = "include-group";
-        private const string TomlKeySourceVirtual = "virtual";
-        private const string TomlKeySourceEditable = "editable";
-        private const string TomlKeyGroups = "groups";
-        private const string TomlKeyCategory = "category";
-
-        // Placeholder value returned by the Tommy TOML library when a key is absent.
-        private const string TommyLazyPlaceholder = "Tommy.TomlLazy";
-
         /// <summary>
         ///Parses PackageFile
         /// </summary>
@@ -82,14 +64,14 @@ namespace SIT.Scan
                     listOfTemplateBomfilePaths.Add(config);
                     Logger.DebugFormat("ParsePackageFile():Template BOM file detected: {0}", config);
                 }
-                if (config.ToLower().EndsWith("poetry.lock"))
+                if (config.EndsWith("poetry.lock", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.DebugFormat("ParsePackageFile():Poetry lock file detected: {0}", config);
                     listofComponents = ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
                     ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents));
 
                 }
-                else if (config.ToLower().EndsWith("uv.lock"))
+                else if (config.EndsWith("uv.lock", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.DebugFormat("ParsePackageFile():uv lock file detected: {0}", config);
                     listofComponents = ExtractDetailsForUvLockfile(config, ListofDependenciesFromLockFile);
@@ -228,7 +210,7 @@ namespace SIT.Scan
             HashSet<string> runtimeNames = CollectReachableNames(GetUvNodeDependencyNames(rootNode), nodesByName);
             HashSet<string> devNames = CollectReachableNames(declaredDevNames, nodesByName);
 
-            foreach (TomlNode node in tomlTable[TomlKeyPackage])
+            foreach (TomlNode node in tomlTable[Dataconstant.TomlKeyPackage])
             {
                 // The virtual/editable root project represents the project itself,
                 // not a third-party dependency, so it is excluded from the BOM.
@@ -237,8 +219,8 @@ namespace SIT.Scan
                     continue;
                 }
 
-                string packageName = node[TomlKeyName].ToString();
-                string packageVersion = node.TryGetNode(TomlKeyVersion, out TomlNode versionNode) ? versionNode.ToString() : string.Empty;
+                string packageName = node[Dataconstant.TomlKeyName].ToString();
+                string packageVersion = node.TryGetNode(Dataconstant.TomlKeyVersion, out TomlNode versionNode) ? versionNode.ToString() : string.Empty;
                 string normalizedName = CommonHelper.NormalizePypiName(packageName);
 
                 bool isDev = devNames.Contains(normalizedName) && !runtimeNames.Contains(normalizedName);
@@ -278,7 +260,7 @@ namespace SIT.Scan
         private static TomlNode IndexUvPackages(TomlTable tomlTable, Dictionary<string, TomlNode> nodesByName)
         {
             TomlNode rootNode = null;
-            foreach (TomlNode node in tomlTable[TomlKeyPackage])
+            foreach (TomlNode node in tomlTable[Dataconstant.TomlKeyPackage])
             {
                 if (IsUvRootProject(node))
                 {
@@ -286,7 +268,7 @@ namespace SIT.Scan
                     continue;
                 }
 
-                string name = node.TryGetNode(TomlKeyName, out TomlNode nameNode) ? nameNode.ToString() : null;
+                string name = node.TryGetNode(Dataconstant.TomlKeyName, out TomlNode nameNode) ? nameNode.ToString() : null;
                 if (!string.IsNullOrEmpty(name))
                 {
                     nodesByName[CommonHelper.NormalizePypiName(name)] = node;
@@ -320,7 +302,7 @@ namespace SIT.Scan
             // both the current [package.dev-dependencies] table and the legacy
             // [package.metadata].requires-dev table.
             Dictionary<string, TomlNode> groupsByName = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var devDependenciesTable in new[] { rootNode[TomlKeyDevDependencies], rootNode[TomlKeyMetadata]?[TomlKeyRequiresDev] })
+            foreach (var devDependenciesTable in new[] { rootNode[Dataconstant.TomlKeyDevDependencies], rootNode[Dataconstant.TomlKeyMetadata]?[Dataconstant.TomlKeyRequiresDev] })
             {
                 AddUvDevGroups(devDependenciesTable, groupsByName);
             }
@@ -376,7 +358,7 @@ namespace SIT.Scan
         /// </summary>
         private static IEnumerable<string> GetUvNodeDependencyNames(TomlNode node)
         {
-            var dependencies = node[TomlKeyDependencies];
+            var dependencies = node[Dataconstant.TomlKeyDependencies];
             if (dependencies == null || !dependencies.IsArray)
             {
                 yield break;
@@ -384,7 +366,7 @@ namespace SIT.Scan
 
             foreach (TomlNode dependency in dependencies.AsArray.Children)
             {
-                string childName = CommonHelper.NormalizePypiName(dependency?[TomlKeyName]?.ToString());
+                string childName = CommonHelper.NormalizePypiName(dependency?[Dataconstant.TomlKeyName]?.ToString());
                 if (!string.IsNullOrEmpty(childName))
                 {
                     yield return childName;
@@ -460,9 +442,9 @@ namespace SIT.Scan
                 return;
             }
 
-            if (entry.AsTable.HasKey(TomlKeyIncludeGroup))
+            if (entry.AsTable.HasKey(Dataconstant.TomlKeyIncludeGroup))
             {
-                var includeGroup = entry[TomlKeyIncludeGroup]?.ToString();
+                var includeGroup = entry[Dataconstant.TomlKeyIncludeGroup]?.ToString();
                 if (!string.IsNullOrEmpty(includeGroup))
                 {
                     CollectUvGroupDependencyNames(includeGroup, groupsByName, devDependencyNames, visitedGroups);
@@ -470,9 +452,9 @@ namespace SIT.Scan
                 return;
             }
 
-            if (entry.AsTable.HasKey(TomlKeyName))
+            if (entry.AsTable.HasKey(Dataconstant.TomlKeyName))
             {
-                var name = entry[TomlKeyName]?.ToString();
+                var name = entry[Dataconstant.TomlKeyName]?.ToString();
                 if (!string.IsNullOrEmpty(name))
                 {
                     devDependencyNames.Add(CommonHelper.NormalizePypiName(name));
@@ -487,13 +469,13 @@ namespace SIT.Scan
         /// <returns>True if the node represents the root project.</returns>
         private static bool IsUvRootProject(TomlNode node)
         {
-            var source = node[TomlKeySource];
+            var source = node[Dataconstant.TomlKeySource];
             if (source == null || !source.IsTable)
             {
                 return false;
             }
 
-            return source.AsTable.HasKey(TomlKeySourceVirtual) || source.AsTable.HasKey(TomlKeySourceEditable);
+            return source.AsTable.HasKey(Dataconstant.TomlKeySourceVirtual) || source.AsTable.HasKey(Dataconstant.TomlKeySourceEditable);
         }
 
         /// <summary>
@@ -507,13 +489,13 @@ namespace SIT.Scan
         {
             foreach (var node in keyValues)
             {
-                var dep = node.Value[TomlKeyDependencies];
+                var dep = node.Value[Dataconstant.TomlKeyDependencies];
                 List<Dependency> subDependencies = new();
                 if (dep != null && dep.IsArray)
                 {
                     foreach (TomlNode dependency in dep.AsArray)
                     {
-                        var name = dependency?[TomlKeyName]?.ToString();
+                        var name = dependency?[Dataconstant.TomlKeyName]?.ToString();
                         if (!string.IsNullOrEmpty(name))
                         {
                             subDependencies.Add(new Dependency()
@@ -566,13 +548,13 @@ namespace SIT.Scan
             FileParser fileParser = new();
             TomlTable tomlTable = fileParser.ParseTomlFile(filePath);
             CommonHelper.WarnIfDependencyFileRequired();
-            foreach (TomlNode node in tomlTable[TomlKeyPackage])
+            foreach (TomlNode node in tomlTable[Dataconstant.TomlKeyPackage])
             {
                 PythonPackage pythonPackage = new()
                 {
-                    Name = node[TomlKeyName].ToString(),
-                    Version = node[TomlKeyVersion].ToString(),
-                    PurlID = GeneratePypiPurl(node[TomlKeyName].ToString(), node[TomlKeyVersion].ToString(), Dataconstant.PoetryProjectType),
+                    Name = node[Dataconstant.TomlKeyName].ToString(),
+                    Version = node[Dataconstant.TomlKeyVersion].ToString(),
+                    PurlID = GeneratePypiPurl(node[Dataconstant.TomlKeyName].ToString(), node[Dataconstant.TomlKeyVersion].ToString(), Dataconstant.PoetryProjectType),
                     // Support both Poetry 1.x (category) and Poetry 2.x (groups)
                     Isdevdependent = IsDevDependency(node),
                     FoundType = Dataconstant.Discovered,
@@ -601,10 +583,10 @@ namespace SIT.Scan
         private static bool IsDevDependency(TomlNode node)
         {
             // Poetry 2.x uses 'groups' field
-            if (node.HasKey(TomlKeyGroups))
+            if (node.HasKey(Dataconstant.TomlKeyGroups))
             {
-                var groupsNode = node[TomlKeyGroups];
-                if (groupsNode != null && !string.Equals(groupsNode.ToString(), TommyLazyPlaceholder, StringComparison.Ordinal))
+                var groupsNode = node[Dataconstant.TomlKeyGroups];
+                if (groupsNode != null && !string.Equals(groupsNode.ToString(), Dataconstant.TommyLazyPlaceholder, StringComparison.Ordinal))
                 {
                     // Check if any group in the list is a development group
                     return ContainsDevGroups(groupsNode);
@@ -612,11 +594,11 @@ namespace SIT.Scan
             }
 
             // Poetry 1.x uses 'category' field (fallback for backward compatibility)
-            if (node.HasKey(TomlKeyCategory))
+            if (node.HasKey(Dataconstant.TomlKeyCategory))
             {
-                string category = node[TomlKeyCategory]?.ToString() ?? string.Empty;
+                string category = node[Dataconstant.TomlKeyCategory]?.ToString() ?? string.Empty;
                 return !string.Equals(category, mainGroupName, StringComparison.Ordinal) &&
-                       !string.Equals(category, TommyLazyPlaceholder, StringComparison.Ordinal);
+                       !string.Equals(category, Dataconstant.TommyLazyPlaceholder, StringComparison.Ordinal);
             }
 
             // Default to production dependency if neither field is present or recognizable
@@ -692,7 +674,7 @@ namespace SIT.Scan
         {
             foreach (var node in keyValues)
             {
-                var dep = node.Value[TomlKeyDependencies];
+                var dep = node.Value[Dataconstant.TomlKeyDependencies];
                 List<Dependency> subDependencies = new();
                 if (dep != null && dep.ChildrenCount > 0)
                 {
