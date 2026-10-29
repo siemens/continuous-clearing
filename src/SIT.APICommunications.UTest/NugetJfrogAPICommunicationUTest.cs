@@ -59,20 +59,6 @@ namespace SIT.APICommunications.UTest
         }
 
         [Test]
-        public void NugetJfrogApiCommunication_UpdatePackagePropertiesInJfrog_ReturnsInvalidOperationException()
-        {
-            //Arrange
-            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
-            UploadArgs uploadArgs = new UploadArgs();
-
-            //Act
-            JfrogApicommunication jfrogApicommunication = new NugetJfrogApiCommunication("", "", repoCredentials, 100);
-
-            //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(() => { jfrogApicommunication.UpdatePackagePropertiesInJfrog("", "", uploadArgs); return Task.CompletedTask; });
-        }
-
-        [Test]
         public void NugetJfrogApiCommunication_MoveFromRepo_ReturnsInvalidOperationException()
         {
             //Arrange

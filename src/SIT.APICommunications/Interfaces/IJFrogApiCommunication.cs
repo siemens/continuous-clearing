@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using SIT.APICommunications.Model;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -51,11 +52,12 @@ namespace SIT.APICommunications.Interfaces
         Task<HttpResponseMessage> GetApiKey();
 
         /// <summary>
-        /// Updates package properties in JFrog Artifactory with SW360 release URL information.
+        /// Asynchronously sets (or updates) item properties on the destination artifact in JFrog
+        /// Artifactory after a successful copy/move operation.
         /// </summary>
-        /// <param name="sw360releaseUrl">The SW360 release URL to associate with the package.</param>
-        /// <param name="destRepoName">The destination repository name.</param>
-        /// <param name="uploadArgs">The upload arguments containing package details.</param>
-        void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs);
+        /// <param name="component">The component whose destination artifact should be updated.</param>
+        /// <param name="properties">The metadata properties to set, keyed by property name.</param>
+        /// <returns>An HttpResponseMessage indicating the result of the property update.</returns>
+        Task<HttpResponseMessage> SetPackagePropertiesInJfrog(ComponentsToArtifactory component, IReadOnlyDictionary<string, string> properties);
     }
 }
