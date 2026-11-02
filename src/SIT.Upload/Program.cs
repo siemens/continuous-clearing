@@ -85,7 +85,7 @@ namespace SIT.Upload
             Stopwatch jfrogStopwatch = Stopwatch.StartNew();
             var isValid = await artifactoryValidator.ValidateArtifactoryCredentials();
             jfrogStopwatch.Stop();
-            telemetryHelper?.TrackDependencyCall("Artifactory", isValid != -1, jfrogStopwatch.Elapsed, TelemetryConstant.SITUploadComponent);
+            telemetryHelper?.TrackDependencyCall("Artifactory", isValid != -1, jfrogStopwatch.Elapsed, TelemetryConstant.SITUploadComponent, isValid != -1 ? null : "Artifactory credentials validation failed");
             if (isValid == -1)
             {
                 environmentHelper.CallEnvironmentExit(-1);

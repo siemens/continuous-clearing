@@ -80,6 +80,46 @@ namespace SIT.Common.Constants
         /// dependent services so Grafana can surface whether failures originate from SIT or from a dependency.
         /// </summary>
         public const string DependencyHealthEvent = "DependencyHealth";
+
+        /// <summary>
+        /// Azure Pipelines predefined environment variable containing the Build ID of the running pipeline.
+        /// </summary>
+        public const string AzurePipelineBuildIdEnvironmentVariable = "BUILD_BUILDID";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable containing the pipeline (build) definition name.
+        /// </summary>
+        public const string AzurePipelineDefinitionNameEnvironmentVariable = "BUILD_DEFINITIONNAME";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable containing the Team Project name.
+        /// </summary>
+        public const string AzurePipelineTeamProjectEnvironmentVariable = "SYSTEM_TEAMPROJECT";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable containing the source branch being built.
+        /// </summary>
+        public const string AzurePipelineSourceBranchEnvironmentVariable = "BUILD_SOURCEBRANCHNAME";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable containing the repository name.
+        /// </summary>
+        public const string AzurePipelineRepositoryNameEnvironmentVariable = "BUILD_REPOSITORY_NAME";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable containing the name of the agent running the job.
+        /// </summary>
+        public const string AzurePipelineAgentNameEnvironmentVariable = "AGENT_NAME";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable identifying the stage name within the pipeline.
+        /// </summary>
+        public const string AzurePipelineStageNameEnvironmentVariable = "SYSTEM_STAGEDISPLAYNAME";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable containing the organization/collection URL
+        /// (e.g. "https://dev.azure.com/my-org/"). Combined with the Team Project and Build ID to build a
+        /// direct link to the pipeline run, so Grafana can surface a "Pipeline URL" for failed runs.
+        /// </summary>
+        public const string AzurePipelineCollectionUriEnvironmentVariable = "SYSTEM_COLLECTIONURI";
+        /// <summary>
+        /// Azure Pipelines predefined environment variable indicating whether the run is executing inside
+        /// Azure Pipelines ("True" when running in an Azure DevOps agent, unset otherwise).
+        /// </summary>
+        public const string AzurePipelineTfBuildEnvironmentVariable = "TF_BUILD";
         #endregion
 
         #region Properties

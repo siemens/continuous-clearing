@@ -32,6 +32,9 @@ namespace SIT.Common
         // If an orchestrator (CI pipeline/script) exports SIT_PIPELINE_RUN_ID before invoking the three tools in
         // sequence, all of them will share the same RunId; otherwise a new GUID is generated for this standalone run.
         private readonly string runId_;
+        // KPI: pipeline/CI context - captured once per run so every telemetry event (AppData, KPI, exception,
+        // dependency health) can be filtered/grouped by Azure DevOps build, definition, branch, stage, repo and agent.
+        private readonly Dictionary<string, string> pipelineMetadata_;
 
         #endregion
 
@@ -49,6 +52,7 @@ namespace SIT.Common
             // Falls back to a freshly generated GUID when no pipeline orchestrator has supplied a shared one.
             runId_ = Environment.GetEnvironmentVariable(TelemetryConstant.PipelineRunIdEnvironmentVariable)
                      ?? Guid.NewGuid().ToString();
+            pipelineMetadata_ = BuildPipelineMetadata();
         }
 
         #endregion
@@ -120,6 +124,58 @@ namespace SIT.Common
         }
 
         /// <summary>
+        /// Builds a dictionary of Azure DevOps pipeline metadata from the standard predefined environment
+        /// variables exposed to every pipeline task/script. When the tool is not running inside an Azure
+        /// Pipelines agent (e.g. local developer run), <see cref="TelemetryConstant.AzurePipelineTfBuildEnvironmentVariable"/>
+        /// ('TF_BUILD') is unset and an empty dictionary is returned so no misleading pipeline fields are sent.
+        /// </summary>
+        private static Dictionary<string, string> BuildPipelineMetadata()
+        {
+            var metadata = new Dictionary<string, string>();
+
+            bool runningInAzurePipelines = string.Equals(
+                Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineTfBuildEnvironmentVariable),
+                "True", StringComparison.OrdinalIgnoreCase);
+
+            if (!runningInAzurePipelines)
+            {
+                return metadata;
+            }
+
+            metadata["Pipeline Build Id"] = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineBuildIdEnvironmentVariable) ?? string.Empty;
+            metadata["Pipeline Definition Name"] = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineDefinitionNameEnvironmentVariable) ?? string.Empty;
+            metadata["Pipeline Team Project"] = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineTeamProjectEnvironmentVariable) ?? string.Empty;
+            metadata["Pipeline Source Branch"] = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineSourceBranchEnvironmentVariable) ?? string.Empty;
+            metadata["Pipeline Repository Name"] = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineRepositoryNameEnvironmentVariable) ?? string.Empty;
+            metadata["Pipeline Agent Name"] = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineAgentNameEnvironmentVariable) ?? string.Empty;
+            metadata["Pipeline Stage Name"] = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineStageNameEnvironmentVariable) ?? string.Empty;
+
+            // KPI: "Error Rate by Stage" - a direct link to the pipeline run, so a failed run can be opened
+            // from Grafana without having to manually navigate Azure DevOps by build id/team project.
+            string collectionUri = Environment.GetEnvironmentVariable(TelemetryConstant.AzurePipelineCollectionUriEnvironmentVariable);
+            string teamProject = metadata["Pipeline Team Project"];
+            string buildId = metadata["Pipeline Build Id"];
+            metadata["Pipeline URL"] = (!string.IsNullOrWhiteSpace(collectionUri) && !string.IsNullOrWhiteSpace(teamProject) && !string.IsNullOrWhiteSpace(buildId))
+                ? $"{collectionUri.TrimEnd('/')}/{teamProject}/_build/results?buildId={buildId}"
+                : string.Empty;
+
+            return metadata;
+        }
+
+        /// <summary>
+        /// Adds the captured Azure DevOps pipeline metadata (if any) to the given telemetry properties dictionary.
+        /// No-op when the tool isn't running inside an Azure Pipelines agent.
+        /// </summary>
+        /// <param name="properties">The telemetry event properties dictionary to enrich.</param>
+        private void AddPipelineMetadata(Dictionary<string, string> properties)
+        {
+            foreach (var kvp in pipelineMetadata_)
+            {
+                properties[kvp.Key] = kvp.Value;
+            }
+        }
+
+        /// <summary>
         /// Tracks the success/failure and latency of an outbound call to a dependent service
         /// (e.g. SW360, Artifactory). KPI: "Infrastructure Availability" - lets Grafana distinguish
         /// SIT-side failures from failures caused by an unavailable/slow dependency.
@@ -128,7 +184,8 @@ namespace SIT.Common
         /// <param name="success">Whether the call succeeded.</param>
         /// <param name="duration">How long the call took.</param>
         /// <param name="component">The standardized "Component" attribute identifying the SIT tool (e.g. Scan, Create, Upload).</param>
-        public void TrackDependencyCall(string serviceName, bool success, TimeSpan duration, string component)
+        /// <param name="errorMessage">The error message captured when the dependency call failed. Ignored when <paramref name="success"/> is true.</param>
+        public void TrackDependencyCall(string serviceName, bool success, TimeSpan duration, string component, string errorMessage = null)
         {
             if (telemetry_ == null)
             {
@@ -136,14 +193,24 @@ namespace SIT.Common
                 return;
             }
 
-            telemetry_.TrackCustomEvent(TelemetryConstant.DependencyHealthEvent, new Dictionary<string, string>
+            var dependencyData = new Dictionary<string, string>
             {
                 { "Service", serviceName ?? string.Empty },
-                { "Success", success.ToString() },
+                // NOTE: "Success" is a reserved property name in the underlying Telemetry.Uploader SDK
+                // (Telemetry.Flatten() always sets it via TrackEvent(..., success: true) by default and merges
+                // custom properties with TryAdd, so a custom "Success" key here is silently dropped/ignored).
+                // Use "Dependency Success" instead so the real success/failure value actually reaches Application Insights.
+                { "Dependency Success", success.ToString() },
                 { "Duration Seconds", duration.TotalSeconds.ToString("0.##", CultureInfo.InvariantCulture) },
                 { "Component", component ?? string.Empty },
-                { "Run Id", runId_ }
-            });
+                { "Run Id", runId_ },
+                // KPI: "Infrastructure Availability" - the actual error message when the dependency call
+                // failed, so Grafana/KQL can show *why* a dependency was unavailable, not just that it was.
+                { "Error Message", success ? string.Empty : (errorMessage ?? string.Empty) }
+            };
+            AddPipelineMetadata(dependencyData);
+
+            telemetry_.TrackCustomEvent(TelemetryConstant.DependencyHealthEvent, dependencyData);
         }
 
         /// <summary>
@@ -158,7 +225,7 @@ namespace SIT.Common
         {
             telemetry_.Initialize(toolName, toolVersion);
 
-            telemetry_.TrackCustomEvent(eventName, new Dictionary<string, string>
+            var appDataProperties = new Dictionary<string, string>
             {
                 { "CA Tool Version", toolVersion },
                 { "SW360 Project Name", appSettings?.SW360?.ProjectName },
@@ -176,7 +243,11 @@ namespace SIT.Common
                 // KPI: "Pipeline Completion Rate" / "Retry Rate" - lets Grafana join this event with the
                 // corresponding events from the other SIT tools (Scan/Create/Upload) that share the same RunId.
                 { "Run Id", runId_ }
-            });
+            };
+            // Attach Azure DevOps pipeline context (Build Id, Definition, Branch, Stage, Agent, Repo) when available.
+            AddPipelineMetadata(appDataProperties);
+
+            telemetry_.TrackCustomEvent(eventName, appDataProperties);
         }
 
         /// <summary>
@@ -198,6 +269,7 @@ namespace SIT.Common
             // KPI: "Pipeline Completion Rate" / "Retry Rate" - tag KPI events with the same RunId as the AppData
             // event so Scan/Create/Upload KPI numbers can be correlated back to a single pipeline execution.
             telemetryData["Run Id"] = runId_;
+            AddPipelineMetadata(telemetryData);
 
             telemetry_.TrackCustomEvent(eventName, telemetryData);
         }
@@ -214,6 +286,9 @@ namespace SIT.Common
         {
             { "Error Time", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) },
             { "Stack Trace", ex.StackTrace },
+            // KPI: "Error Rate by Stage" - the specific tool error message so Grafana can show *what*
+            // went wrong, not just that a failure occurred.
+            { "Error Message", ex.Message ?? string.Empty },
             // KPI: "Error Rate by Stage" - which SIT stage (Scan/Create/Upload) the failure occurred in.
             { "Component", component ?? string.Empty },
             // KPI: "Error Rate by Stage" - CA tool version, to spot regressions introduced by a specific release.
@@ -224,6 +299,7 @@ namespace SIT.Common
             // KPI: "Pipeline Completion Rate" / "Retry Rate" - correlate failures with the pipeline run that produced them.
             { "Run Id", runId_ }
         };
+            AddPipelineMetadata(exceptionData);
 
             telemetry_?.TrackException(ex, exceptionData);
         }

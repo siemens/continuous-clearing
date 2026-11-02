@@ -91,19 +91,21 @@ namespace SIT.Create
             Stopwatch sw360Stopwatch = Stopwatch.StartNew();
             int isValid;
             bool sw360Success = true;
+            string sw360ErrorMessage = null;
             try
             {
                 isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
             }
-            catch
+            catch (Exception ex)
             {
                 sw360Success = false;
+                sw360ErrorMessage = ex.Message;
                 throw;
             }
             finally
             {
                 sw360Stopwatch.Stop();
-                telemetryHelper?.TrackDependencyCall("SW360", sw360Success, sw360Stopwatch.Elapsed, TelemetryConstant.SITCreateComponent);
+                telemetryHelper?.TrackDependencyCall("SW360", sw360Success, sw360Stopwatch.Elapsed, TelemetryConstant.SITCreateComponent, sw360ErrorMessage);
             }
 
             if (isValid == -1)
@@ -133,22 +135,26 @@ namespace SIT.Create
                 // KPI: "Infrastructure Availability" - report whether the Fossology dependency call succeeded or failed.
                 Stopwatch fossologyStopwatch = Stopwatch.StartNew();
                 bool fossologySuccess = true;
+                string fossologyErrorMessage = null;
                 try
                 {
                     bool fossologyUrlValid = await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper);
                     fossologySuccess = fossologyUrlValid;
-                    if (fossologyUrlValid)
+                    if (!fossologyUrlValid)
+                        fossologyErrorMessage = "Fossology URL validation failed";
+                    else
                         await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
                 }
-                catch
+                catch (Exception ex)
                 {
                     fossologySuccess = false;
+                    fossologyErrorMessage = ex.Message;
                     throw;
                 }
                 finally
                 {
                     fossologyStopwatch.Stop();
-                    telemetryHelper?.TrackDependencyCall("Fossology", fossologySuccess, fossologyStopwatch.Elapsed, TelemetryConstant.SITCreateComponent);
+                    telemetryHelper?.TrackDependencyCall("Fossology", fossologySuccess, fossologyStopwatch.Elapsed, TelemetryConstant.SITCreateComponent, fossologyErrorMessage);
                 }
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);

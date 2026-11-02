@@ -157,19 +157,21 @@ namespace SIT.Scan
                 // KPI: "Infrastructure Availability" - report whether the SW360 dependency call succeeded or failed.
                 Stopwatch sw360Stopwatch = Stopwatch.StartNew();
                 bool sw360Success = true;
+                string sw360ErrorMessage = null;
                 try
                 {
                     await ValidateAppsettingsFile(appSettings, projectReleases);
                 }
-                catch
+                catch (Exception ex)
                 {
                     sw360Success = false;
+                    sw360ErrorMessage = ex.Message;
                     throw;
                 }
                 finally
                 {
                     sw360Stopwatch.Stop();
-                    telemetryHelper?.TrackDependencyCall("SW360", sw360Success, sw360Stopwatch.Elapsed, TelemetryConstant.SITScanComponent);
+                    telemetryHelper?.TrackDependencyCall("SW360", sw360Success, sw360Stopwatch.Elapsed, TelemetryConstant.SITScanComponent, sw360ErrorMessage);
                 }
             }
 
@@ -197,7 +199,7 @@ namespace SIT.Scan
             Stopwatch jfrogStopwatch = Stopwatch.StartNew();
             bool jfrogConnected = await _bomCreator.CheckJFrogConnection(appSettings);
             jfrogStopwatch.Stop();
-            telemetryHelper?.TrackDependencyCall("Artifactory", jfrogConnected, jfrogStopwatch.Elapsed, TelemetryConstant.SITScanComponent);
+            telemetryHelper?.TrackDependencyCall("Artifactory", jfrogConnected, jfrogStopwatch.Elapsed, TelemetryConstant.SITScanComponent, jfrogConnected ? null : "Artifactory connection check failed");
             if (jfrogConnected)
             {
                 await _bomCreator.GenerateBom(appSettings, new BomHelper(), new FileOperations(), projectReleases, caToolInformation);
