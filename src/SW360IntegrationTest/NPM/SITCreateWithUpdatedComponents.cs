@@ -39,8 +39,8 @@ namespace SW360IntegrationTest.NPM
                 TestHelper.RunSITScanExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
@@ -61,9 +61,9 @@ namespace SW360IntegrationTest.NPM
             // Check exit is normal
             Assert.AreEqual(0, TestHelper.RunSITCreateExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.FossologyURL, testParameters.FossUrl,
@@ -120,8 +120,7 @@ namespace SW360IntegrationTest.NPM
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
 
             string expectedcomponentType = "OSS";
             string expectedname = "rxjs";
@@ -147,8 +146,7 @@ namespace SW360IntegrationTest.NPM
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             //string expectedname = "zone.js";
             //string expectedversion = "0.10.3";
             //string expecteddownloadurl = "https://github.com/angular/angular.git";

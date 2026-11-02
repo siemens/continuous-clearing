@@ -1,0 +1,104 @@
+# --------------------------------------------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 2026 Siemens AG
+#
+#  SPDX-License-Identifier: MIT
+# --------------------------------------------------------------------------------------------------------------------
+#
+# Reusable step that resolves the SW360 project id for a build run:
+#   - looks up the project by name and version,
+#   - creates it with just name + version when it does not exist,
+#   - falls back to the supplied sw360ProjectId when creation fails.
+#
+# The resolved id is written to a portable file (the 'sw360ProjectIdFilePath'
+# parameter). The SIT steps read that file directly, so this works unchanged
+# (Azure DevOps, GitHub Actions, GitLab, local shell) with no vendor-specific
+# variable commands.
+
+parameters:
+  - name: sw360Url
+    type: string
+  - name: sw360ClientId
+    type: string
+  - name: sw360ClientSecret
+    type: string
+  - name: sw360ProjectId
+    type: string
+  - name: sw360ProjectName
+    type: string
+  - name: sw360ProjectVersion
+    type: string
+    default: "1.0.0"
+  - name: sw360ProjectIdFilePath
+    type: string
+    default: "$(Build.SourcesDirectory)/sw360-resolved-project-id.txt"
+
+steps:
+  - script: |
+      set -e
+      sudo apt-get update && sudo apt-get install -y jq
+
+      SW360_URL="${{ parameters.sw360Url }}"
+      PROJECT_NAME="${{ parameters.sw360ProjectName }}"
+      PROJECT_VERSION="${{ parameters.sw360ProjectVersion }}"
+      FALLBACK_ID="${{ parameters.sw360ProjectId }}"
+      TOKEN_URL="http://localhost/kc/realms/sw360/protocol/openid-connect/token"
+      CLIENT_ID="${{ parameters.sw360ClientId }}"
+      CLIENT_SECRET="${{ parameters.sw360ClientSecret }}"
+
+      echo "Requesting Keycloak Bearer token..."
+      TOKEN_RESPONSE=$(curl --silent --show-error -X POST "$TOKEN_URL" \
+        -H "Content-Type: application/x-www-form-urlencoded" \
+        -d "grant_type=client_credentials" \
+        -d "client_id=$CLIENT_ID" \
+        -d "client_secret=$CLIENT_SECRET")
+      AUTH_TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token // empty')
+
+      if [ -z "$AUTH_TOKEN" ]; then
+        echo "ERROR: Could not obtain Keycloak token. Response: $TOKEN_RESPONSE"
+        exit 1
+      fi
+
+      echo "Looking up SW360 project '$PROJECT_NAME' (version $PROJECT_VERSION)..."
+      SEARCH=$(curl --silent --show-error --location \
+        --header "Authorization: Bearer $AUTH_TOKEN" \
+        --header "Accept: application/hal+json" \
+        "$SW360_URL/resource/api/projects?name=$(printf '%s' "$PROJECT_NAME" | jq -sRr @uri)")
+
+      PROJECT_ID=$(echo "$SEARCH" | jq -r --arg n "$PROJECT_NAME" --arg v "$PROJECT_VERSION" \
+        '(._embedded["sw360:projects"] // [])[] | select(.name==$n and .version==$v) | .id' | head -n1)
+
+      if [ -z "$PROJECT_ID" ]; then
+        echo "Project not found. Creating '$PROJECT_NAME' (version $PROJECT_VERSION)..."
+        CREATE=$(curl --silent --show-error --location --write-out "\nHTTP_STATUS:%{http_code}" \
+          -X POST "$SW360_URL/resource/api/projects" \
+          --header "Authorization: Bearer $AUTH_TOKEN" \
+          --header "Content-Type: application/json" \
+          --header "Accept: application/hal+json" \
+          --data "{\"name\":\"$PROJECT_NAME\",\"version\":\"$PROJECT_VERSION\"}")
+
+        CREATE_BODY=$(echo "$CREATE" | awk '!/HTTP_STATUS/ {print}')
+        CREATE_STATUS=$(echo "$CREATE" | awk -F'HTTP_STATUS:' '{print $2}' | tr -d '[:space:]')
+        echo "Create status: $CREATE_STATUS"
+
+        PROJECT_ID=$(echo "$CREATE_BODY" | jq -r '.id // empty')
+        if [ -z "$PROJECT_ID" ]; then
+          PROJECT_ID=$(echo "$CREATE_BODY" | jq -r '._links.self.href // empty' | awk -F'/' '{print $NF}')
+        fi
+
+        if [ -z "$PROJECT_ID" ]; then
+          echo "ERROR: Failed to create project. Response: $CREATE_BODY"
+          if [ -n "$FALLBACK_ID" ]; then
+            echo "Falling back to provided sw360ProjectId: $FALLBACK_ID"
+            PROJECT_ID="$FALLBACK_ID"
+          else
+            exit 1
+          fi
+        fi
+      else
+        echo "Found existing project id: $PROJECT_ID"
+      fi
+
+      echo "Using SW360 project id: $PROJECT_ID"
+      # Write to a portable file so later steps (and non-Azure CI) can read it
+      echo "$PROJECT_ID" > "${{ parameters.sw360ProjectIdFilePath }}"
+    displayName: "Resolve or create SW360 project"

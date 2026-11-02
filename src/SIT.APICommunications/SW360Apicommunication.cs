@@ -443,6 +443,23 @@ namespace SIT.APICommunications
         }
 
         /// <summary>
+        /// Asynchronously updates an existing project in SW360.
+        /// </summary>
+        /// <param name="projectId">The unique identifier of the project to update.</param>
+        /// <param name="httpContent">The HTTP content containing the update data.</param>
+        /// <returns>An HttpResponseMessage indicating the result of the update operation.</returns>
+        public async Task<HttpResponseMessage> UpdateProject(string projectId, HttpContent httpContent)
+        {
+            HttpClient httpClient = GetHttpClient();
+            httpClient.SetLogWarnings(true, "unable to update last sync time in SW360 project");
+            string projectApi = $"{sw360ProjectsApi}/{projectId}";
+            await LogHandlingHelper.HttpRequestHandling("UpdateProject", $"MethodName:UpdateProject(), ProjectId: {projectId}", httpClient, projectApi, httpContent);
+            HttpResponseMessage response = await httpClient.PatchAsync(projectApi, httpContent);
+            await LogHandlingHelper.HttpResponseHandling("UpdateProject", $"MethodName:UpdateProject(), ProjectId: {projectId}", response);
+            return response;
+        }
+
+        /// <summary>
         /// Attaches component source to SW360 for a given report and comparison data.
         /// </summary>
         /// <param name="attachReport">The attachment report containing source details.</param>

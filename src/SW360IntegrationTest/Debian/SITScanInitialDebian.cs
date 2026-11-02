@@ -43,8 +43,8 @@ namespace SW360IntegrationTest.Debian
             Assert.AreEqual(0, TestHelper.RunSITScanExe(new string[]{
                 TestConstant.PackageFilePath, packagejsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,

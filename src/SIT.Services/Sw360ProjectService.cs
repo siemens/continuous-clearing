@@ -6,6 +6,7 @@
 
 using log4net;
 using Newtonsoft.Json;
+using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.Common;
 using SIT.Facade.Interfaces;
@@ -15,6 +16,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SIT.Services
@@ -126,6 +128,60 @@ namespace SIT.Services
             }
 
             return alreadyLinkedReleases;
+        }
+
+        /// <summary>
+        /// Adds or updates a key in the project's additionalData in SW360, preserving any existing entries.
+        /// </summary>
+        /// <param name="projectId">The SW360 project identifier.</param>
+        /// <param name="key">The additionalData key to add or update.</param>
+        /// <param name="value">The value to set for the given key.</param>
+        /// <returns>True if the project was updated successfully; otherwise, false.</returns>
+        public async Task<bool> UpdateProjectAdditionalData(string projectId, string key, string value)
+        {
+            try
+            {
+                HttpResponseMessage projectResponse = await m_SW360ApiCommunicationFacade.GetProjectById(projectId);
+                if (projectResponse == null || projectResponse.StatusCode != HttpStatusCode.OK)
+                {
+                    Logger.DebugFormat("UpdateProjectAdditionalData():Unable to get project {0}", projectId);
+                    return false;
+                }
+
+                string result = projectResponse.Content?.ReadAsStringAsync()?.Result ?? string.Empty;
+                var projectInfo = JsonConvert.DeserializeObject<ProjectReleases>(result);
+                var additionalData = projectInfo?.AdditionalData ?? new Dictionary<string, string>();
+                additionalData[key] = value;
+
+                string updateContent = JsonConvert.SerializeObject(new { additionalData });
+                HttpContent content = new StringContent(updateContent, Encoding.UTF8, ApiConstant.ApplicationJson);
+
+                HttpResponseMessage updateResponse = await m_SW360ApiCommunicationFacade.UpdateProject(projectId, content);
+                if (updateResponse == null || !updateResponse.IsSuccessStatusCode)
+                {
+                    string errorContent = updateResponse?.Content != null ? await updateResponse.Content.ReadAsStringAsync() : string.Empty;
+                    string sw360Message = CommonHelper.ExtractSw360Message(errorContent);
+                    Logger.WarnFormat("Failed to update last sync time in SW360 project '{0}'. Reason: {1}", projectId, sw360Message);
+                    Logger.DebugFormat("UpdateProjectAdditionalData():Failed to update project {0}. StatusCode:{1} & Content:{2}",
+                        projectId, updateResponse?.StatusCode, errorContent);
+                    return false;
+                }
+
+                Logger.DebugFormat("UpdateProjectAdditionalData():Successfully updated additionalData key '{0}' for project {1}", key, projectId);
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("Update Project AdditionalData", $"MethodName:UpdateProjectAdditionalData()", ex, $"Project ID: {projectId}");
+                Logger.Error("UpdateProjectAdditionalData()", ex);
+                return false;
+            }
+            catch (AggregateException ex)
+            {
+                LogHandlingHelper.ExceptionErrorHandling("Update Project AdditionalData", $"MethodName:UpdateProjectAdditionalData()", ex, $"Project ID: {projectId}");
+                Logger.Error("UpdateProjectAdditionalData()", ex);
+                return false;
+            }
         }
     }
 }

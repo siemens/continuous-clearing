@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Tommy;
@@ -69,14 +68,14 @@ namespace SIT.Scan
                 {
                     Logger.DebugFormat("ParsePackageFile():Poetry lock file detected: {0}", config);
                     listofComponents = ExtractDetailsForPoetryLockfile(config, ListofDependenciesFromLockFile);
-                    ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents, appSettings.ProjectType));
+                    ListofComponentsFromLockFile.AddRange(FormComponentReleaseExternalID(listofComponents));
 
                 }
                 else if ((config.EndsWith(FileConstant.CycloneDXFileExtension) || config.EndsWith(FileConstant.DependencyFileExtension) || config.EndsWith(FileConstant.SPDXFileExtension))
          && !config.EndsWith(FileConstant.SBOMTemplateFileExtension))
                 {
                     listofComponents = ExtractDetailsFromJson(config, appSettings, ref dependencies);
-                    listComponentForBOM.AddRange(FormComponentReleaseExternalID(listofComponents, appSettings.ProjectType));
+                    listComponentForBOM.AddRange(FormComponentReleaseExternalID(listofComponents));
                 }
             }
 
@@ -435,7 +434,7 @@ namespace SIT.Scan
         /// </summary>
         /// <param name="listOfComponents"></param>
         /// <returns>list of components</returns>
-        private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents, string projectType)
+        private static List<Component> FormComponentReleaseExternalID(List<PythonPackage> listOfComponents)
         {
             List<Component> listComponentForBOM = new List<Component>();
 

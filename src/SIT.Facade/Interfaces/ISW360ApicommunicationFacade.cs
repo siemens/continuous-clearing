@@ -37,6 +37,7 @@ namespace SIT.Facade.Interfaces
         Task<HttpResponseMessage> LinkReleasesToProject(HttpContent httpContent, string sw360ProjectId);
         Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent);
         Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent);
+        Task<HttpResponseMessage> UpdateProject(string projectId, HttpContent httpContent);
         string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData);
         void DownloadAttachmentUsingWebClient(string attachmentDownloadLink, string fileName);
         Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink);

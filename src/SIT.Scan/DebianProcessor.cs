@@ -413,7 +413,7 @@ namespace SIT.Scan
 
             foreach (var componentsInfo in bom.Components)
             {
-                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;               
+                BomCreator.bomKpiData.ComponentsinPackageLockJsonFile++;
                 DebianPackage package = new DebianPackage
                 {
                     Name = componentsInfo.Name,

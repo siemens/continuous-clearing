@@ -3,7 +3,6 @@
 //
 //  SPDX-License-Identifier: MIT
 // -------------------------------------------------------------------------------------------------------------------- 
-using Newtonsoft.Json;
 using SIT.APICommunications.Model;
 using System.Collections.Generic;
 
@@ -59,48 +58,6 @@ namespace SIT.Upload.Model
         public List<ComponentsToArtifactory> SkippedPreReleasePackagesMaven { get; set; }
         public List<ComponentsToArtifactory> SkippedPreReleasePackagesCargo { get; set; }
         public List<ComponentsToArtifactory> SkippedPreReleasePackagesChoco { get; set; }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// The Model class for ProjectResponse
-    /// </summary>
-    public class ProjectResponse
-    {
-        #region Properties
-
-        [JsonProperty("npm")]
-        public List<JsonComponents> Npm { get; set; }
-        [JsonProperty("nuget")]
-        public List<JsonComponents> Nuget { get; set; }
-        [JsonProperty("conan")]
-        public List<JsonComponents> Conan { get; set; }
-        [JsonProperty("poetry")]
-        public List<JsonComponents> Python { get; set; }
-        [JsonProperty("debian")]
-        public List<JsonComponents> Debian { get; set; }
-        [JsonProperty("maven")]
-        public List<JsonComponents> Maven { get; set; }
-        [JsonProperty("cargo")]
-        public List<JsonComponents> Cargo { get; set; }
-        [JsonProperty("choco")]
-        public List<JsonComponents> Choco { get; set; }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// The Model class for JsonComponents
-    /// </summary>
-    public class JsonComponents
-    {
-        #region Properties
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        [JsonProperty("version")]
-        public string Version { get; set; }
 
         #endregion
     }

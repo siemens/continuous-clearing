@@ -37,6 +37,7 @@ namespace SIT.APICommunications.Interfaces
         Task<HttpResponseMessage> UpdateLinkedRelease(string projectId, string releaseId, UpdateLinkedRelease updateLinkedRelease);
         Task<HttpResponseMessage> UpdateRelease(string releaseId, HttpContent httpContent);
         Task<HttpResponseMessage> UpdateComponent(string componentId, HttpContent httpContent);
+        Task<HttpResponseMessage> UpdateProject(string projectId, HttpContent httpContent);
         string AttachComponentSourceToSW360(AttachReport attachReport, ComparisonBomData comparisonBomData);
         void DownloadAttachmentUsingWebClient(string attachmentDownloadLink, string fileName);
         Task<HttpResponseMessage> GetComponentDetailsByUrl(string componentLink);
