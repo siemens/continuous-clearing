@@ -305,6 +305,36 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string CargoProjectType = "CARGO";
 
+        // TOML key names used in poetry.lock / uv.lock files.
+        /// <summary>TOML key for a package entry.</summary>
+        public const string TomlKeyPackage = "package";
+        /// <summary>TOML key for a package name.</summary>
+        public const string TomlKeyName = "name";
+        /// <summary>TOML key for a package version.</summary>
+        public const string TomlKeyVersion = "version";
+        /// <summary>TOML key for a package source table.</summary>
+        public const string TomlKeySource = "source";
+        /// <summary>TOML key for the package metadata table.</summary>
+        public const string TomlKeyMetadata = "metadata";
+        /// <summary>TOML key for a package dependencies array.</summary>
+        public const string TomlKeyDependencies = "dependencies";
+        /// <summary>TOML key for the uv dev-dependencies table.</summary>
+        public const string TomlKeyDevDependencies = "dev-dependencies";
+        /// <summary>TOML key for the legacy requires-dev table.</summary>
+        public const string TomlKeyRequiresDev = "requires-dev";
+        /// <summary>TOML key for a uv dev-group include-group reference.</summary>
+        public const string TomlKeyIncludeGroup = "include-group";
+        /// <summary>TOML source key identifying a virtual root project.</summary>
+        public const string TomlKeySourceVirtual = "virtual";
+        /// <summary>TOML source key identifying an editable root project.</summary>
+        public const string TomlKeySourceEditable = "editable";
+        /// <summary>TOML key for poetry package groups.</summary>
+        public const string TomlKeyGroups = "groups";
+        /// <summary>TOML key for a poetry package category.</summary>
+        public const string TomlKeyCategory = "category";
+        /// <summary>Placeholder value returned by the Tommy TOML library when a key is absent.</summary>
+        public const string TommyLazyPlaceholder = "Tommy.TomlLazy";
+
         #endregion
 
         #region Properties

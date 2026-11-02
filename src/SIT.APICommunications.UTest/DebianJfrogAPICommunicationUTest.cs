@@ -28,19 +28,6 @@ namespace SIT.APICommunications.UTest
         }
 
         [Test]
-        public void DebainJfrogApiCommunication_UpdatePackagePropertiesInJfrog_ReturnsInvalidOperationException()
-        {
-            //Arrange
-            ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials();
-
-            //Act
-            JfrogApicommunication jfrogApicommunication = new DebianJfrogApiCommunication("", "", repoCredentials, 100);
-
-            //Assert
-            Assert.ThrowsAsync<InvalidOperationException>(() => { jfrogApicommunication.UpdatePackagePropertiesInJfrog("", "", new UploadArgs()); return Task.CompletedTask; });
-        }
-
-        [Test]
         public void DebainJfrogApiCommunication_GetPackageInfo_ReturnsInvalidOperationException()
         {
             //Arrange

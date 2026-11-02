@@ -5,6 +5,7 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using log4net;
+using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
@@ -16,6 +17,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -236,14 +238,7 @@ namespace SIT.APICommunications
         /// <returns>An HttpResponseMessage containing the release data.</returns>
         public async Task<HttpResponseMessage> GetReleaseByExternalId(string purlId, string externalIdKey = "")
         {
-            HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get release details by externalid");
-            string releaseByExternalIdUrl = $"{sw360ReleaseByExternalId}{externalIdKey}{purlId}";
-            await LogHandlingHelper.HttpRequestHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", httpClient, releaseByExternalIdUrl);
-            // Matches are expected to be few, but route through the pagination-aware fetch so a large match count isn't silently truncated.
-            HttpResponseMessage response = await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, releaseByExternalIdUrl, ApiConstant.ListPageSize);
-            await LogHandlingHelper.HttpResponseHandling("Request for get release data by ExternalId", $"MethodName:GetReleaseByExternalId()", response);
-            return response;
+            return await GetByExternalIdAsync(sw360ReleaseByExternalId, "release", "GetReleaseByExternalId", purlId, externalIdKey);
         }
 
         /// <summary>
@@ -254,13 +249,29 @@ namespace SIT.APICommunications
         /// <returns>An HttpResponseMessage containing the component data.</returns>
         public async Task<HttpResponseMessage> GetComponentByExternalId(string purlId, string externalIdKey = "")
         {
+            return await GetByExternalIdAsync(sw360ComponentByExternalId, "component", "GetComponentByExternalId", purlId, externalIdKey);
+        }
+
+        /// <summary>
+        /// Shared lookup for SW360 release/component resources by external identifier. Builds the query URL,
+        /// routes through the pagination-aware fetch so a large match count isn't silently truncated, and
+        /// returns the raw <see cref="HttpResponseMessage"/>.
+        /// </summary>
+        /// <param name="baseUrl">The SW360 base endpoint (release or component by-external-id URL).</param>
+        /// <param name="resourceName">The resource label used in log/warning messages (e.g. "release" or "component").</param>
+        /// <param name="methodName">The public method name used in request/response log context.</param>
+        /// <param name="purlId">The Package URL identifier.</param>
+        /// <param name="externalIdKey">The external identifier key prefix.</param>
+        /// <returns>An HttpResponseMessage containing the resource data.</returns>
+        private async Task<HttpResponseMessage> GetByExternalIdAsync(string baseUrl, string resourceName, string methodName, string purlId, string externalIdKey)
+        {
             HttpClient httpClient = GetHttpClient();
-            httpClient.SetLogWarnings(false, "unable to get component details by externalid");
-            string componentByExternalIdUrl = $"{sw360ComponentByExternalId}{externalIdKey}{purlId}";
-            await LogHandlingHelper.HttpRequestHandling("Request for get component data by ExternalId", $"MethodName:GetComponentByExternalId()", httpClient, componentByExternalIdUrl);
+            httpClient.SetLogWarnings(false, $"unable to get {resourceName} details by externalid");
+            var url = QueryHelpers.AddQueryString(baseUrl, externalIdKey, purlId);
+            await LogHandlingHelper.HttpRequestHandling($"Request for get {resourceName} data by ExternalId", $"MethodName:{methodName}()", httpClient, url);
             // Matches are expected to be few, but route through the pagination-aware fetch so a large match count isn't silently truncated.
-            HttpResponseMessage response = await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, componentByExternalIdUrl, ApiConstant.ListPageSize);
-            await LogHandlingHelper.HttpResponseHandling("Request for get component data by ExternalId", $"MethodName:GetComponentByExternalId()", response);
+            HttpResponseMessage response = await Sw360PagedApiResponseFetcher.FetchAllPagesTolerantAsync(httpClient, url, ApiConstant.ListPageSize);
+            await LogHandlingHelper.HttpResponseHandling($"Request for get {resourceName} data by ExternalId", $"MethodName:{methodName}()", response);
             return response;
         }
 

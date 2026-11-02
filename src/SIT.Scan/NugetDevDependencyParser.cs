@@ -195,7 +195,7 @@ namespace SIT.Scan
                     else
                     {
                         //when it's running as container
-                        isTestProject = ParseJsonInContainer(filePath, ref container);
+                        isTestProject = ParseJsonInContainer(filePath, assetFile.PackageSpec.RestoreMetadata?.ProjectPath, ref container);
                     }
 
                     if (isTestProject)
@@ -263,19 +263,13 @@ namespace SIT.Scan
         /// Attempts to discover the referenced .csproj when running inside a container by inspecting the assets file path.
         /// </summary>
         /// <param name="filePath">Path to the project.assets.json file.</param>
+        /// <param name="restoreProjectPath">Project path read from the NuGet restore metadata.</param>
         /// <param name="container">Container whose name may be updated from discovered project.</param>
         /// <returns>True when a project file was found and identified as a test project; otherwise false.</returns>
-        private static bool ParseJsonInContainer(string filePath, ref Container container)
+        private static bool ParseJsonInContainer(string filePath, string restoreProjectPath, ref Container container)
         {
             bool isTestProject;
-            string csprojFilePath = "";
-            string dirName = Path.GetDirectoryName(filePath);
-            if (dirName.Contains("obj"))
-            {
-                dirName = dirName.Replace("obj", "");
-                string[] filePaths = Directory.GetFiles(dirName, "*.csproj");
-                csprojFilePath = filePaths.Length > 0 ? filePaths[0] : "";
-            }
+            string csprojFilePath = GetProjectFilePath(filePath, restoreProjectPath);
             if (!string.IsNullOrEmpty(csprojFilePath) && File.Exists(csprojFilePath))
             {
                 Logger.DebugFormat("ParseJsonFile():Linux Asset FileName: {0}", csprojFilePath);
@@ -291,6 +285,45 @@ namespace SIT.Scan
             }
 
             return isTestProject;
+        }
+
+        private static string GetProjectFilePath(string filePath, string restoreProjectPath)
+        {
+            if (!string.IsNullOrEmpty(restoreProjectPath) && File.Exists(restoreProjectPath))
+            {
+                return restoreProjectPath;
+            }
+
+            string dirName = Path.GetDirectoryName(filePath);
+            if (string.IsNullOrEmpty(dirName) || !Path.GetFileName(dirName).Equals("obj", StringComparison.OrdinalIgnoreCase))
+            {
+                return "";
+            }
+
+            DirectoryInfo projectDirectory = Directory.GetParent(dirName);
+            while (projectDirectory != null)
+            {
+                try
+                {
+                    string[] filePaths = Directory.GetFiles(projectDirectory.FullName, "*.csproj");
+                    if (filePaths.Length > 0)
+                    {
+                        return filePaths[0];
+                    }
+                }
+                catch (IOException ex)
+                {
+                    Logger.DebugFormat("GetProjectFilePath():Unable to inspect directory {0}: {1}", projectDirectory.FullName, ex.Message);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Logger.DebugFormat("GetProjectFilePath():Unable to inspect directory {0}: {1}", projectDirectory.FullName, ex.Message);
+                }
+
+                projectDirectory = projectDirectory.Parent;
+            }
+
+            return "";
         }
 
         /// <summary>

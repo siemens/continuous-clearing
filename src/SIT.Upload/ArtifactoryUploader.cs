@@ -75,6 +75,9 @@ namespace SIT.Upload
                     return responsemessage;
                 }
 
+                // Package copied/moved successfully - update metadata properties.
+                await PackageUploadHelper.UpdateJfrogMetadataProperties(JFrogApiCommInstance, component);
+
                 await PackageUploadHelper.JfrogFoundPackagesAsync(component, displayPackagesInfo, operationType, responsemessage, dryRunSuffix);
             }
             catch (HttpRequestException ex)

@@ -136,6 +136,56 @@ namespace SIT.Services.UTest
         }
 
         [Test]
+        public async Task GetReleaseDataByExternalId_NonNpmDebianAlpine_RetriesWithOriginalExternalId()
+        {
+            // Arrange
+            Self self = new();
+            Links links = new();
+            Sw360Releases sw360Releases = new();
+            var releaseList = new List<Sw360Releases>();
+            ReleaseEmbedded releaseEmbedded = new();
+
+            self.Href = "http://localhost:8090/resource/api/releases/uiweriwfoowefih87398r3ur093u0";
+            links.Self = self;
+            sw360Releases.Name = "flask";
+            sw360Releases.Version = "2.0.0";
+            sw360Releases.Links = links;
+            sw360Releases.ExternalIds = new ExternalIds() { Package_Url = "pkg:pypi/flask@2.0.0" };
+            releaseList.Add(sw360Releases);
+            releaseEmbedded.Sw360Releases = releaseList;
+
+            // First (escaped) lookup returns no releases, original-id retry returns a match.
+            ComponentsRelease emptyRelease = new ComponentsRelease() { Embedded = new ReleaseEmbedded() { Sw360Releases = new List<Sw360Releases>() } };
+            ComponentsRelease populatedRelease = new ComponentsRelease() { Embedded = releaseEmbedded };
+
+            HttpResponseMessage emptyResponse = new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(emptyRelease), Encoding.UTF8, "application/json")
+            };
+            HttpResponseMessage populatedResponse = new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(populatedRelease), Encoding.UTF8, "application/json")
+            };
+
+            string externalId = "pkg:pypi/flask@2.0.0";
+            string escapedExternalId = Uri.EscapeDataString(externalId);
+
+            Mock<ISW360ApicommunicationFacade> sw360ApiCommunicationFacade = new();
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetReleaseByExternalId(escapedExternalId, It.IsAny<string>())).ReturnsAsync(emptyResponse);
+            sw360ApiCommunicationFacade.Setup(
+                x => x.GetReleaseByExternalId(externalId, It.IsAny<string>())).ReturnsAsync(populatedResponse);
+
+            // Act
+            ISW360CommonService sW360CommonService = new SW360CommonService(sw360ApiCommunicationFacade.Object);
+            var actual = await sW360CommonService.GetReleaseDataByExternalId("flask", "2.0.0", externalId);
+
+            // Assert
+            Assert.That(actual, Is.Not.Null);
+            sw360ApiCommunicationFacade.Verify(x => x.GetReleaseByExternalId(externalId, It.IsAny<string>()), Times.AtLeastOnce);
+        }
+
+        [Test]
         public async Task GetReleaseDataByExternalId_PassReleaseInfo_ThrowsHttpRequestException()
         {
             // Arrange
