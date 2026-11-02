@@ -18,6 +18,16 @@ namespace ArtifactoryUploader.Constants
 
         public const string Log4netArtifactoryUploaderConfigFileName = "log4netArtifactoryUploader.config";
         public const string Cargo = "cargo";
+
+        /// <summary>
+        /// The JFrog item property name used to record which tool uploaded the artifact.
+        /// </summary>
+        public const string UploadedByProperty = "uploadedby";
+
+        /// <summary>
+        /// The value written to the <see cref="UploadedByProperty"/> property.
+        /// </summary>
+        public const string UploadedByValue = "SIT.Upload";
         #endregion
     }
 }

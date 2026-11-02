@@ -158,7 +158,8 @@ namespace SW360KeycloakService
         private async Task<string> GenerateAccessTokenAsync()
         {
             if (string.IsNullOrWhiteSpace(_settings.ClientId) ||
-                string.IsNullOrWhiteSpace(_settings.ClientSecret))
+                string.IsNullOrWhiteSpace(_settings.ClientSecret) ||
+                string.IsNullOrWhiteSpace(_settings.SW360BaseUrl))
             {
                 Logger.Debug("KeycloakTokenCacheService: ClientId, ClientSecret or SW360 URL not set. Falling back to existing token.");
                 return _settings.KeyCloakToken;

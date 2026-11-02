@@ -1,4 +1,4 @@
-﻿using CycloneDX.Models;
+using CycloneDX.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SIT.APICommunications.Model;
@@ -31,8 +31,8 @@ namespace SW360IntegrationTest.Conan
                 TestHelper.RunSITScanExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
@@ -54,9 +54,9 @@ namespace SW360IntegrationTest.Conan
             // Check return with warning code 2
             Assert.AreEqual(2, TestHelper.RunSITCreateExe(new string[] {
                 TestConstant.BomFolderPath,bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
                 TestConstant.SW360URL, testParameters.SW360URL,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,
                 TestConstant.FossologyURL, testParameters.FossUrl,
@@ -113,8 +113,7 @@ namespace SW360IntegrationTest.Conan
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
 
             //url formation for retrieving component details
             string url = TestConstant.Sw360ComponentApi + TestConstant.componentNameUrl + "libcurl";
@@ -130,8 +129,7 @@ namespace SW360IntegrationTest.Conan
             //Setting the httpclient
             var httpClient = new HttpClient() { };
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string expectedname = "libcurl";
             string expectedversion = "8.18.0";
             string expectedexternalid = "pkg:conan/libcurl@8.18.0";

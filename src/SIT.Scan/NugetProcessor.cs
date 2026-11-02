@@ -9,7 +9,6 @@ using log4net;
 using Newtonsoft.Json;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
-using SIT.APICommunications;
 using SIT.APICommunications.Model.AQL;
 using SIT.Common;
 using SIT.Common.Constants;
@@ -722,7 +721,7 @@ namespace SIT.Scan
                     component.Purl = CommonHelper.GeneratePurlForProjectType(Dataconstant.NugetProjectType, component.Name, component.Version);
                 }
                 var componentsForBOM = new List<Component>(bomList.Components);
-                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath); 
+                CommonHelper.GetDetailsForManuallyAdded(componentsForBOM, listComponentForBOM, filepath);
             }
 
             if (bomList.Dependencies != null)

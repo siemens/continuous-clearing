@@ -54,6 +54,7 @@ namespace SIT.Common
             }
         }
         public bool MultipleProjectType { get; set; } = false;
+        public string ToolVersion { get; set; } = string.Empty;
         public Telemetry Telemetry { get; set; }
         public SW360 SW360 { get; set; }
         public Directory Directory { get; set; }

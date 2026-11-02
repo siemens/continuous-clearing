@@ -46,7 +46,7 @@ namespace SW360IntegrationTest.NPM
             // Arrange
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(testParameters.SW360AuthTokenType, testParameters.SW360AuthTokenValue);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestConstant.TestSw360TokenType, TestConstant.TestSw360TokenValue);
             string componentName = "samplecomponent";
             string componentVersion = "1.0.0";
             string componentType = "OSS";
@@ -94,8 +94,8 @@ namespace SW360IntegrationTest.NPM
             Assert.AreEqual(0, TestHelper.RunSITScanExe(new string[]{
                 TestConstant.PackageFilePath, packagjsonPath,
                 TestConstant.BomFolderPath, bomPath,
-                TestConstant.Sw360Token, testParameters.SW360AuthTokenValue,
-                TestConstant.SW360AuthTokenType, testParameters.SW360AuthTokenType,
+                TestConstant.KeycloakClientId, testParameters.KeycloakClientId,
+                TestConstant.KeycloakClientSecret, testParameters.KeycloakClientSecret,
                 TestConstant.SW360URL, testParameters.SW360URL,
                 TestConstant.SW360ProjectID, testParameters.SW360ProjectID,
                 TestConstant.SW360ProjectName, testParameters.SW360ProjectName,

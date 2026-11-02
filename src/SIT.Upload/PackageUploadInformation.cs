@@ -5,17 +5,13 @@
 // -------------------------------------------------------------------------------------------------------------------- 
 
 using log4net;
-using Newtonsoft.Json;
 using SIT.APICommunications;
 using SIT.APICommunications.Model;
 using SIT.Common;
-using SIT.Common.Constants;
-using SIT.Common.Interface;
 using SIT.Common.Logging;
 using SIT.Upload.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -28,7 +24,6 @@ namespace SIT.Upload
         #region Fields
 
         static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private const string ReportFileName = "Artifactory";
 
         #endregion
 
@@ -254,11 +249,14 @@ namespace SIT.Upload
         /// <param name="filepath">The file path for storing package information.</param>
         private static void AppendUnknownPackages(StringBuilder content, List<ComponentsToArtifactory> packages, string name, string filepath)
         {
-            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
             if (packages?.Count > 0)
             {
-                content.AppendLine($"[yellow]Artifactory upload will not be done due to Report not in Approved state and package details can be found at {filename}[/]\n");
-                DisplayErrorForUnknownPackages(packages, name, filepath);
+                content.AppendLine();
+                foreach (var package in packages)
+                {
+                    content.AppendLine($"⚠ [white]{package.Name}[/]-[cyan]{package.Version}[/] [yellow]is not in report approved state.[/]");
+                }
+                content.AppendLine();
             }
         }
 
@@ -373,7 +371,7 @@ namespace SIT.Upload
             string filePath)
         {
             Logger.InfoFormat("\n{0}:\n", name);
-            DisplayErrorForUnknownPackages(lists.UnknownPackages, name, filePath);
+            DisplayErrorForUnknownPackages(lists.UnknownPackages);
             DisplayErrorForJfrogFoundPackages(lists.JfrogFoundPackages);
             DisplayErrorForJfrogPackages(lists.JfrogNotFoundPackages);
             DisplayOptionalDevDepPackages(lists.OptionalDevDepPackages);
@@ -489,381 +487,21 @@ namespace SIT.Upload
         }
 
         /// <summary>
-        /// Displays a warning message when there are no packages to upload.
+        /// Displays a warning listing the packages whose report is not in Approved state.
         /// </summary>
-        /// <param name="filename">The filename where package details can be found.</param>
-        private static void WarningMessageForNoPackages(string filename)
+        /// <param name="unknownPackages">List of packages whose report is not in Approved state.</param>
+        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages)
         {
-            if (!LoggerFactory.UseSpectreConsole)
-                Logger.WarnFormat("Artifactory upload will not be done due to Report not in Approved state and package details can be found at {0}\n", filename);
-        }
-
-        /// <summary>
-        /// Displays error information for unknown packages.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown packages.</param>
-        /// <param name="name">The name of the package type.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        private static void DisplayErrorForUnknownPackages(List<ComponentsToArtifactory> unknownPackages, string name, string filepath)
-        {
-            ProjectResponse projectResponse = new ProjectResponse();
-            IFileOperations fileOperations = new FileOperations();
-            var filename = Path.Combine(filepath, $"Artifactory_{FileConstant.artifactoryReportNotApproved}");
-
-            if (unknownPackages.Count != 0)
+            if (LoggerFactory.UseSpectreConsole || unknownPackages == null || unknownPackages.Count == 0)
             {
-                var packageHandlers = new Dictionary<string, Action<List<ComponentsToArtifactory>, ProjectResponse, IFileOperations, string, string>>
-        {
-            { "Npm", GetNotApprovedNpmPackages },
-            { "Nuget", GetNotApprovedNugetPackages },
-            { "Conan", GetNotApprovedConanPackages },
-            { "Debian", GetNotApprovedDebianPackages },
-            { "Maven", GetNotApprovedMavenPackages },
-            { "Poetry", GetNotApprovedPythonPackages },
-            { "Choco", GetNotApprovedChocoPackages   },
-            { "Cargo", GetNotApprovedCargoPackages   }
-        };
-
-                if (packageHandlers.TryGetValue(name, out var handler))
-                {
-                    handler(unknownPackages, projectResponse, fileOperations, filepath, filename);
-                }
+                return;
             }
-        }
 
-        /// <summary>
-        /// Gets not approved npm packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown npm packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        private static void GetNotApprovedNpmPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
+            foreach (var package in unknownPackages)
             {
-                string json = File.ReadAllText(filename);
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> npmComponents = new List<JsonComponents>();
-                foreach (var npmpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = npmpackage.Name;
-                    jsonComponents.Version = npmpackage.Version;
-                    npmComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Npm = npmComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-
+                Logger.WarnFormat("{0}-{1} is not in report approved state.", package.Name, package.Version);
             }
-            else
-            {
-                projectResponse.Npm = new List<JsonComponents>();
-                foreach (var npmpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = npmpackage.Name;
-                    jsonComponents.Version = npmpackage.Version;
-                    projectResponse.Npm.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
-        }
-
-        /// <summary>
-        /// Gets not approved NuGet packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown NuGet packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        private static void GetNotApprovedNugetPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> nugetComponents = new List<JsonComponents>();
-                foreach (var nugetpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = nugetpackage.Name;
-                    jsonComponents.Version = nugetpackage.Version;
-                    nugetComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Nuget = nugetComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            else
-            {
-                projectResponse.Nuget = new List<JsonComponents>();
-                foreach (var nugetpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = nugetpackage.Name;
-                    jsonComponents.Version = nugetpackage.Version;
-                    projectResponse.Nuget.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
-        }
-
-        /// <summary>
-        /// Gets not approved Cargo packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown Cargo packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        private static void GetNotApprovedCargoPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> cargoComponents = new List<JsonComponents>();
-                foreach (var cargoPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = cargoPackage.Name;
-                    jsonComponents.Version = cargoPackage.Version;
-                    cargoComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Cargo = cargoComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            else
-            {
-                projectResponse.Cargo = new List<JsonComponents>();
-                foreach (var cargoPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = cargoPackage.Name;
-                    jsonComponents.Version = cargoPackage.Version;
-                    projectResponse.Cargo.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
-        }
-
-        /// <summary>
-        /// Gets not approved Conan packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown Conan packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        private static void GetNotApprovedConanPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> conanComponents = new List<JsonComponents>();
-                foreach (var conanpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = conanpackage.Name;
-                    jsonComponents.Version = conanpackage.Version;
-                    conanComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Conan = conanComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-
-
-            }
-            else
-            {
-                projectResponse.Conan = new List<JsonComponents>();
-                foreach (var conanpackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = conanpackage.Name;
-                    jsonComponents.Version = conanpackage.Version;
-                    projectResponse.Conan.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
-
-        }
-
-        /// <summary>
-        /// Gets not approved Python packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown Python packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        private static void GetNotApprovedPythonPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> pythonComponents = new List<JsonComponents>();
-                foreach (var pythonPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = pythonPackage.Name;
-                    jsonComponents.Version = pythonPackage.Version;
-                    pythonComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Python = pythonComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-
-
-            }
-            else
-            {
-                projectResponse.Python = new List<JsonComponents>();
-                foreach (var pythonPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = pythonPackage.Name;
-                    jsonComponents.Version = pythonPackage.Version;
-                    projectResponse.Python.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
-        }
-
-        /// <summary>
-        /// Gets not approved Debian packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown Debian packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        public static void GetNotApprovedDebianPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> debianComponents = new List<JsonComponents>();
-                foreach (var debianPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = debianPackage.Name;
-                    jsonComponents.Version = debianPackage.Version;
-                    debianComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Debian = debianComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-
-
-            }
-            else
-            {
-                projectResponse.Debian = new List<JsonComponents>();
-                foreach (var debianPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = debianPackage.Name;
-                    jsonComponents.Version = debianPackage.Version;
-                    projectResponse.Debian.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
-        }
-
-        /// <summary>
-        /// Gets not approved Maven packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown Maven packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        private static void GetNotApprovedMavenPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> mavenComponents = new List<JsonComponents>();
-                foreach (var mavenPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = mavenPackage.Name;
-                    jsonComponents.Version = mavenPackage.Version;
-                    mavenComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Maven = mavenComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-
-
-            }
-            else
-            {
-                projectResponse.Maven = new List<JsonComponents>();
-                foreach (var mavenPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = mavenPackage.Name;
-                    jsonComponents.Version = mavenPackage.Version;
-                    projectResponse.Maven.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
-        }
-
-        /// <summary>
-        /// Gets not approved Chocolatey packages and writes them to the report file.
-        /// </summary>
-        /// <param name="unknownPackages">List of unknown Chocolatey packages.</param>
-        /// <param name="projectResponse">The project response object.</param>
-        /// <param name="fileOperations">The file operations interface.</param>
-        /// <param name="filepath">The file path for storing package information.</param>
-        /// <param name="filename">The filename for the report.</param>
-        public static void GetNotApprovedChocoPackages(List<ComponentsToArtifactory> unknownPackages, ProjectResponse projectResponse, IFileOperations fileOperations, string filepath, string filename)
-        {
-            if (File.Exists(filename))
-            {
-                string json = File.ReadAllText(filename);
-
-                ProjectResponse myDeserializedClass = JsonConvert.DeserializeObject<ProjectResponse>(json);
-                List<JsonComponents> chocoComponents = new List<JsonComponents>();
-                foreach (var chocoPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = chocoPackage.Name;
-                    jsonComponents.Version = chocoPackage.Version;
-                    chocoComponents.Add(jsonComponents);
-                }
-                myDeserializedClass.Choco = chocoComponents;
-                fileOperations.WriteContentToReportNotApprovedFile(myDeserializedClass, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            else
-            {
-                projectResponse.Choco = new List<JsonComponents>();
-                foreach (var chocoPackage in unknownPackages)
-                {
-                    JsonComponents jsonComponents = new JsonComponents();
-                    jsonComponents.Name = chocoPackage.Name;
-                    jsonComponents.Version = chocoPackage.Version;
-                    projectResponse.Choco.Add(jsonComponents);
-                }
-                fileOperations.WriteContentToReportNotApprovedFile(projectResponse, filepath, FileConstant.artifactoryReportNotApproved, ReportFileName);
-            }
-            WarningMessageForNoPackages(filename);
+            Logger.Info("\n");
         }
 
         /// <summary>

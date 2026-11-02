@@ -293,5 +293,18 @@ namespace SIT.APICommunications.UTest
             //Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateComponent("", httpContent));
         }
+
+        [Test]
+        public void SW360Apicommunication_UpdateProject_ReturnsInvalidOperationException()
+        {
+            //Arrange
+            var jsonString = JsonConvert.SerializeObject(new { additionalData = new { SITCreateLastSyncAt = "2026-10-08T12:34:56" } });
+            HttpContent httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            SW360Apicommunication sW360Apicommunication = new SW360Apicommunication(connectionSettings);
+
+            //Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await sW360Apicommunication.UpdateProject("12345", httpContent));
+        }
     }
 }

@@ -99,7 +99,7 @@ namespace SIT.Common
                 {
                     LogHandlingHelper.ExceptionErrorHandling("InvalidOperationException", "RunAsync()", ex, "");
                     Logger.ErrorFormat("Exception in RunAsync method(). {0}", ex.Message);
-                    
+
                 }
 
                 // Read stdout/stderr

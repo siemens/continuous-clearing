@@ -89,7 +89,7 @@ namespace SIT.APICommunications
         /// <summary>
         /// The API suffix for SW360 release URL endpoints.
         /// </summary>
-        public const string Sw360ReleaseUrlApiSuffix = "/group/guest/components/-/component/release/detailRelease/";
+        public const string Sw360ReleaseUrlApiSuffix = "/components/releases/detail/";
 
         /// <summary>
         /// The API endpoint for searching SW360 releases by external ID.
@@ -290,6 +290,11 @@ namespace SIT.APICommunications
         /// The additional data key for Fossology URL.
         /// </summary>
         public const string AdditionalDataFossologyURL = "fossology url";
+
+        /// <summary>
+        /// The additional data key recording when SIT.Create last synced the project.
+        /// </summary>
+        public const string SITCretelastsync = "SITCreateLastSyncAt";
 
         /// <summary>
         /// The default filename for attachment JSON files.

@@ -50,5 +50,16 @@ namespace SIT.Common.Interface
         /// <param name="bomFilePath">Path to BOM file</param>
         /// <param name="environmentHelper">Environment helper for exit handling</param>
         void SigningVerification(CommonAppSettings appSettings, string bomFilePath, IEnvironmentHelper environmentHelper);
+
+        /// <summary>
+        /// Validates the SBOM signature and returns the exact content that was verified.
+        /// The returned content must be consumed directly by the caller instead of re-reading
+        /// the file from disk, closing the TOCTOU window between verification and use.
+        /// </summary>
+        /// <param name="appSettings">Application settings</param>
+        /// <param name="bomFilePath">Path to BOM file</param>
+        /// <param name="environmentHelper">Environment helper for exit handling</param>
+        /// <returns>The verified BOM content, or null if verification failed.</returns>
+        string SigningVerificationWithContent(CommonAppSettings appSettings, string bomFilePath, IEnvironmentHelper environmentHelper);
     }
 }

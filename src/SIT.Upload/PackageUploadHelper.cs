@@ -6,6 +6,7 @@
 
 // Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api SIT aql
 
+using ArtifactoryUploader.Constants;
 using CycloneDX.Models;
 using log4net;
 using Newtonsoft.Json;
@@ -54,14 +55,25 @@ namespace SIT.Upload
         /// </summary>
         /// <param name="comparisonBomFilePath">The file path to the comparison BOM.</param>
         /// <param name="environmentHelper">The environment helper for exit operations.</param>
+        /// <param name="verifiedBomContent">
+        /// Optional pre-verified BOM content. When supplied (SBOM signing verification is enabled),
+        /// this exact content is deserialized instead of re-reading the file from disk, ensuring the
+        /// content consumed is the same content whose signature was verified (TOCTOU protection).
+        /// </param>
         /// <returns>A Bom object containing the components.</returns>
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper)
+        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string? verifiedBomContent = null)
         {
             Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
             Bom componentsToBoms = null;
             try
             {
-                if (File.Exists(comparisonBomFilePath))
+                if (!string.IsNullOrEmpty(verifiedBomContent))
+                {
+                    // Use the already signature-verified content; do not re-read from disk.
+                    componentsToBoms = CycloneDX.Json.Serializer.Deserialize(verifiedBomContent);
+                    LogHandlingHelper.ListOfBomFileComponents(comparisonBomFilePath, componentsToBoms.Components ?? new List<Component>());
+                }
+                else if (File.Exists(comparisonBomFilePath))
                 {
                     string json = File.ReadAllText(comparisonBomFilePath);
                     componentsToBoms = CycloneDX.Json.Serializer.Deserialize(json);
@@ -551,6 +563,62 @@ namespace SIT.Upload
         }
 
         /// <summary>
+        /// Builds the JFrog metadata property map to apply to a successfully uploaded artifact.
+        /// </summary>
+        /// <returns>A dictionary of property names to values. Empty when no metadata is available.</returns>
+        public static IReadOnlyDictionary<string, string> BuildJfrogMetadataProperties()
+        {
+            var properties = new Dictionary<string, string>();
+
+            // Mark every successfully uploaded artifact (all package types) with the uploading tool.
+            properties[ArtifactoryConstant.UploadedByProperty] = ArtifactoryConstant.UploadedByValue;
+
+            return properties;
+        }
+
+        /// <summary>
+        /// Updates JFrog item properties on a successfully copied/moved artifact. Failures are logged
+        /// as warnings and never interrupt the upload flow (best-effort metadata update).
+        /// </summary>
+        /// <param name="jfrogApiCommunication">The JFrog API communication instance.</param>
+        /// <param name="component">The component whose destination artifact should be updated.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public static async Task UpdateJfrogMetadataProperties(IJFrogApiCommunication jfrogApiCommunication, ComponentsToArtifactory component)
+        {
+            if (jfrogApiCommunication == null || component == null || component.DryRun)
+            {
+                return;
+            }
+
+            IReadOnlyDictionary<string, string> properties = BuildJfrogMetadataProperties();
+            if (properties.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                HttpResponseMessage response = await jfrogApiCommunication.SetPackagePropertiesInJfrog(component, properties);
+                if (response == null || !response.IsSuccessStatusCode)
+                {
+                    Logger.DebugFormat("UpdateJfrogMetadataProperties(): Failed to update metadata properties for component {0} {1}. StatusCode: {2}", component.Name, component.Version, response?.StatusCode);
+                }
+                else
+                {
+                    Logger.DebugFormat("UpdateJfrogMetadataProperties(): Metadata properties updated for component {0} {1}.", component.Name, component.Version);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.DebugFormat("UpdateJfrogMetadataProperties(): HTTP error updating metadata properties for component {0} {1}. {2}", component.Name, component.Version, ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.DebugFormat("UpdateJfrogMetadataProperties(): Timed out updating metadata properties for component {0} {1}. {2}", component.Name, component.Version, ex);
+            }
+        }
+
+        /// <summary>
         /// Gets the JFrog API communication instance for the specified component.
         /// </summary>
         /// <param name="component">The component to get the API instance for.</param>
@@ -558,7 +626,6 @@ namespace SIT.Upload
         /// <returns>An instance of IJFrogApiCommunication.</returns>
         public static IJFrogApiCommunication GetJfrogApiCommInstance(ComponentsToArtifactory component, int timeout)
         {
-
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
             {
                 Token = component.Token,

@@ -23,8 +23,9 @@ stages:
       stageName: npm
       displayName: "B&R CA Tool NPM"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: 80ea2219c1dc488c867ba952d578b053
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
+      sw360ProjectId: 40dcdf6ea842ee685fb20f7638001547
       sw360ProjectName: "Test-NPM"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
@@ -45,8 +46,9 @@ stages:
       stageName: conan
       displayName: "B&R CA Tool CONAN"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: f36c5cc520664d1f91fe659931a3ea58
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
+      sw360ProjectId: 40dcdf6ea842ee685fb20f7638005229
       sw360ProjectName: "Test-Conan"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
@@ -67,8 +69,9 @@ stages:
       stageName: nuget
       displayName: "B&R CA Tool NUGET"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: cb0dfd43b35748d880d4c9f201ca7139
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
+      sw360ProjectId: 40dcdf6ea842ee685fb20f7638002286
       sw360ProjectName: "Test-Nuget"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
@@ -89,7 +92,8 @@ stages:
       stageName: poetry
       displayName: "B&R CA Tool POETRY"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
       sw360ProjectId: a331b8488fa140b6a8714d003a0d3a79
       sw360ProjectName: "Test-Poetry"
       fossologyUrl: $(FOSSOLOGY_URL)
@@ -111,8 +115,9 @@ stages:
       stageName: maven
       displayName: "B&R CA Tool MAVEN"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: 401cef6ca8d5470190f3dd903e6bc12f
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
+      sw360ProjectId: 40dcdf6ea842ee685fb20f7638005dcb
       sw360ProjectName: "Test-Maven"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
@@ -133,8 +138,9 @@ stages:
       stageName: multi_npm_nuget
       displayName: "B&R CA Tool Multi(NPM+Nuget)"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: 760a780b0392498caa1c6dfe2a198498
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
+      sw360ProjectId: 40dcdf6ea842ee685fb20f763800397b
       sw360ProjectName: "Test-Multi"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
@@ -156,7 +162,8 @@ stages:
       stageName: debian
       displayName: "B&R CA Tool DEBAIN"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
       sw360ProjectId: 527891008f7042078850f913d62530b9
       sw360ProjectName: "Test-Debian"
       fossologyUrl: $(FOSSOLOGY_URL)
@@ -178,7 +185,8 @@ stages:
       stageName: cargo
       displayName: "B&R CA Tool CARGO"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
       sw360ProjectId: 3e4e30ddfa82419091a0208b39f51db2
       sw360ProjectName: "Test-Cargo"
       fossologyUrl: $(FOSSOLOGY_URL)
@@ -200,8 +208,9 @@ stages:
       stageName: choco
       displayName: "B&R CA Tool CHOCO"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: 28b0f7b4c77f4dfaa071e0a8772c8cf3
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
+      sw360ProjectId: 40dcdf6ea842ee685fb20f7638006b05
       sw360ProjectName: "Test-Choco"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)
@@ -221,8 +230,9 @@ stages:
       stageName: alpine
       displayName: "B&R CA Tool ALPINE"
       sw360Url: $(SW360_URL)
-      sw360Token: $(SW360_TOKEN)
-      sw360ProjectId: f6258e704ef1416e940a87f14b940d9b
+      sw360ClientId: $(SW360_CLIENT_ID)
+      sw360ClientSecret: $(SW360_CLIENT_SECRET)
+      sw360ProjectId: 40dcdf6ea842ee685fb20f7638007d53
       sw360ProjectName: "Test-Alpine"
       fossologyUrl: $(FOSSOLOGY_URL)
       JfrogUrl: $(JFROG_URL)

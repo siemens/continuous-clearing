@@ -93,7 +93,7 @@ namespace SIT.Scan
             if (bom.Components != null)
             {
                 AddSiemensDirectProperty(ref bom);
-            }            
+            }
             int totalUnsupportedComponents = ListUnsupportedComponentsForBom.Components.Count;
             BomCreator.bomKpiData.ComponentsinPackageLockJsonFile += ListUnsupportedComponentsForBom.Components.Count;
             ListUnsupportedComponentsForBom.Components = ListUnsupportedComponentsForBom.Components.Distinct(new ComponentEqualityComparer()).ToList();

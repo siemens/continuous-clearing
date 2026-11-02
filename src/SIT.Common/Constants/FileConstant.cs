@@ -141,6 +141,10 @@ namespace SIT.Common.Constants
         /// </summary>
         public static readonly string DockerCMDTool = Path.Combine(@"/bin/bash");
         /// <summary>
+        /// npm CLI executable name (resolved from PATH). Used to invoke npm directly without a shell.
+        /// </summary>
+        public static readonly string NpmCLITool = "npm";
+        /// <summary>
         /// File name for package.json.
         /// </summary>
         public const string PackageJsonFileName = "package.json";
@@ -164,10 +168,6 @@ namespace SIT.Common.Constants
         /// File name for multiple versions file.
         /// </summary>
         public const string multipleversionsFileName = "Multipleversions.json";
-        /// <summary>
-        /// File name for Artifactory report not approved.
-        /// </summary>
-        public const string artifactoryReportNotApproved = "ReportNotApproved.json";
         /// <summary>
         /// Basic SBOM name.
         /// </summary>

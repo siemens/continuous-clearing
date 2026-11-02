@@ -268,7 +268,9 @@ Users have the flexibility to generate a basic SBOM even if connections to SW360
 
   * **Project Type :** **Python**
 
-    * Input file repository should contain **poetry.lock** file.
+    * Input file repository should contain a **poetry.lock** file (Poetry projects) or a **uv.lock** file.
+
+    * Both **poetry.lock** and **uv.lock** are configured under the `Poetry` > `Include` section in appSettings.json; the file pattern can be changed there if required.
 
   * **Project Type :** **Conan**
     * Input file repository should contain ***.dep.json** file.

@@ -685,7 +685,7 @@ namespace SIT.Upload
         /// <param name="aqlResultList">The list of AQL results to search.</param>
         /// <param name="component">The component to find.</param>
         /// <returns>The matching AQL result, or an empty result if not found.</returns>
-        private static AqlResult GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
+        private static AqlResult? GetArtifactoryRepoName(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogpackageName = GetFullNameOfComponent(component);
             if (component.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))

@@ -55,15 +55,6 @@ namespace SIT.Services.Interface
         Task<Sw360AttachmentHash> GetAttachmentDownloadLink(string releaseAttachmentUrl);
 
         /// <summary>
-        /// Asynchronously gets the upload description from SW360.
-        /// </summary>
-        /// <param name="componentName">The component name.</param>
-        /// <param name="componetVersion">The component version.</param>
-        /// <param name="sw360url">The SW360 URL.</param>
-        /// <returns>A task representing the asynchronous operation that returns the upload description.</returns>
-        Task<string> GetUploadDescriptionfromSW360(string componentName, string componetVersion, string sw360url);
-
-        /// <summary>
         /// Gets the duplicate components by PURL identifier.
         /// </summary>
         /// <returns>A list of duplicate components.</returns>
