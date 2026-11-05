@@ -27,7 +27,7 @@ namespace SIT.Upload
 
         #region Properties
 
-        public static IJFrogService JFrogService { get; set; }
+        public static IJFrogService JFrogService { get; set; } = null!;
 
         #endregion
 
@@ -50,7 +50,7 @@ namespace SIT.Upload
             List<AqlResult> jfrogPackagesListAql = await GetJfrogRepoInfoForAllTypePackages(destRepoNames);
 
             // Update the repo path
-            List<Component> bomComponents = UpdateJfroRepoPathProperty(m_ComponentsInBOM, uploadedPackages, jfrogPackagesListAql);
+            List<Component> bomComponents = UpdateJfroRepoPathProperty(m_ComponentsInBOM, uploadedPackages ?? [], jfrogPackagesListAql);
             m_ComponentsInBOM.Components = bomComponents;
             return m_ComponentsInBOM;
 
@@ -79,7 +79,7 @@ namespace SIT.Upload
 
                 // get jfrog details of a component from the aqlresult set
                 string packageNameEXtension = PackageUploadHelper.GetPackageNameExtensionBasedOnComponentType(package);
-                AqlResult jfrogData = GetJfrogInfoOfThePackageUploaded(jfrogPackagesListAql, package, packageNameEXtension);
+                AqlResult? jfrogData = GetJfrogInfoOfThePackageUploaded(jfrogPackagesListAql, package, packageNameEXtension);
 
                 // if package not exists in jfrog list move to nect item in the loop
                 if (jfrogData == null) { continue; }
@@ -94,12 +94,10 @@ namespace SIT.Upload
                     continue;
                 }
 
-                if (component.Properties.Exists(x => x.Name.Equals(Dataconstant.Cdx_JfrogRepoPath, StringComparison.OrdinalIgnoreCase)))
+                var existingRepoPath = component.Properties.Find(x => x.Name.Equals(Dataconstant.Cdx_JfrogRepoPath, StringComparison.OrdinalIgnoreCase));
+                if (existingRepoPath != null)
                 {
-                    component
-                        .Properties
-                        .Find(x => x.Name.Equals(Dataconstant.Cdx_JfrogRepoPath, StringComparison.OrdinalIgnoreCase))
-                        .Value = newRepoPath;
+                    existingRepoPath.Value = newRepoPath;
                     continue;
                 }
 
@@ -131,7 +129,7 @@ namespace SIT.Upload
         /// <param name="package">The package to find information for.</param>
         /// <param name="packageNameEXtension">The package name extension.</param>
         /// <returns>The AQL result for the uploaded package, or null if not found.</returns>
-        private static AqlResult GetJfrogInfoOfThePackageUploaded(List<AqlResult> jfrogPackagesListAql, ComponentsToArtifactory package, string packageNameEXtension)
+        private static AqlResult? GetJfrogInfoOfThePackageUploaded(List<AqlResult> jfrogPackagesListAql, ComponentsToArtifactory package, string packageNameEXtension)
         {
             string pkgType = package.ComponentType ?? string.Empty;
             if (pkgType.Equals("CONAN", StringComparison.OrdinalIgnoreCase))

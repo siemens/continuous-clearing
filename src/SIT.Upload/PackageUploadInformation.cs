@@ -23,7 +23,7 @@ namespace SIT.Upload
     {
         #region Fields
 
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(typeof(PackageUploadInformation));
 
         #endregion
 
@@ -168,7 +168,7 @@ namespace SIT.Upload
         /// </summary>
         /// <param name="packageLists">Variable number of package lists to check.</param>
         /// <returns>True if any list contains packages, otherwise false.</returns>
-        private static bool HasAnyPackages(params List<ComponentsToArtifactory>[] packageLists)
+        private static bool HasAnyPackages(params List<ComponentsToArtifactory>?[] packageLists)
         {
             return packageLists.Any(list => list?.Count > 0);
         }
@@ -199,8 +199,8 @@ namespace SIT.Upload
             List<ComponentsToArtifactory> JfrogFoundPackages,
             List<ComponentsToArtifactory> JfrogNotFoundPackages,
             List<ComponentsToArtifactory> SucessfullPackages,
-            List<ComponentsToArtifactory> OptionalDevDepPackages,
-            List<ComponentsToArtifactory> SkippedPreReleasePackages = null);
+            List<ComponentsToArtifactory>? OptionalDevDepPackages,
+            List<ComponentsToArtifactory>? SkippedPreReleasePackages = null);
 
         /// <summary>
         /// Appends package content to a StringBuilder for display.
@@ -228,7 +228,7 @@ namespace SIT.Upload
         /// </summary>
         /// <param name="content">The StringBuilder to append content to.</param>
         /// <param name="packages">List of packages skipped because of a pre-release version.</param>
-        private static void AppendSkippedPreReleasePackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        private static void AppendSkippedPreReleasePackages(StringBuilder content, List<ComponentsToArtifactory>? packages)
         {
             if (packages?.Count > 0)
             {
@@ -326,7 +326,7 @@ namespace SIT.Upload
         /// </summary>
         /// <param name="content">The StringBuilder to append content to.</param>
         /// <param name="packages">List of optional devDependency packages not found in JFrog.</param>
-        private static void AppendOptionalDevDependencyPackages(StringBuilder content, List<ComponentsToArtifactory> packages)
+        private static void AppendOptionalDevDependencyPackages(StringBuilder content, List<ComponentsToArtifactory>? packages)
         {
             if (packages?.Count > 0)
             {
@@ -383,7 +383,7 @@ namespace SIT.Upload
         /// Logs packages skipped because they are a pre-release version.
         /// </summary>
         /// <param name="skippedPreReleasePackages">List of skipped pre-release packages.</param>
-        private static void DisplaySkippedPreReleasePackagesLogger(List<ComponentsToArtifactory> skippedPreReleasePackages)
+        private static void DisplaySkippedPreReleasePackagesLogger(List<ComponentsToArtifactory>? skippedPreReleasePackages)
         {
             if (skippedPreReleasePackages == null || skippedPreReleasePackages.Count == 0)
             {
@@ -401,7 +401,7 @@ namespace SIT.Upload
         /// Logs npm optional devDependency packages that were not found in JFrog.
         /// </summary>
         /// <param name="optionalDevDepPackages">List of optional devDependency packages not found in JFrog.</param>
-        private static void DisplayOptionalDevDepPackages(List<ComponentsToArtifactory> optionalDevDepPackages)
+        private static void DisplayOptionalDevDepPackages(List<ComponentsToArtifactory>? optionalDevDepPackages)
         {
             if (optionalDevDepPackages == null || optionalDevDepPackages.Count == 0)
             {
@@ -519,7 +519,7 @@ namespace SIT.Upload
         /// - Packages not actioned due to error
         /// If one or both counts are greater than zero, it logs the message and calls <see cref="EnvironmentHelper.CallEnvironmentExit(int)"/> with exit code 2.
         /// </remarks>
-        public static void SetExitCode(UploaderKpiData uploaderKpiData, EnvironmentHelper environmentHelper, DisplayPackagesInfo displayPackagesInfo = null)
+        public static void SetExitCode(UploaderKpiData uploaderKpiData, EnvironmentHelper environmentHelper, DisplayPackagesInfo? displayPackagesInfo = null)
         {
             var notInRepo = uploaderKpiData.PackagesNotExistingInRemoteCache;
             var notUploadedError = uploaderKpiData.PackagesNotUploadedDueToError;

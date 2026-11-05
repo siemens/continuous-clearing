@@ -27,7 +27,7 @@ namespace SIT.Upload
     {
         #region Fields
 
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(typeof(PackageUploader));
         public static readonly UploaderKpiData uploaderKpiData = new UploaderKpiData();
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
 
@@ -51,7 +51,7 @@ namespace SIT.Upload
             //Reading the CycloneBOM data
             var bomFilePath = Path.Combine(appSettings.Directory.OutputFolder, appSettings.SW360.ProjectName + "_" + FileConstant.BomFileName);
             Logger.DebugFormat("UploadPackageToArtifactory(): Identified bom file with path: {0}", bomFilePath);
-            Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper, verifiedBomContent);
+            Bom m_ComponentsInBOM = PackageUploadHelper.GetComponentListFromComparisonBOM(bomFilePath, environmentHelper, verifiedBomContent)!; // null only after CallEnvironmentExit
 
             LoggerHelper.DisplayAllSettings(m_ComponentsInBOM.Components, appSettings);
             uploaderKpiData.ComponentInComparisonBOM = m_ComponentsInBOM.Components.Count;
@@ -71,7 +71,7 @@ namespace SIT.Upload
 
             //Updating the component's new location
             var fileOperations = new FileOperations();
-            string bomGenerationPath = Path.GetDirectoryName(bomFilePath);
+            string bomGenerationPath = Path.GetDirectoryName(bomFilePath) ?? string.Empty;
             PackageUploadHelper.UpdateBomArtifactoryRepoUrl(ref m_ComponentsInBOM, m_ComponentsToBeUploaded);
 
             //update Jfrog Repository Path For Successfully Uploaded Items
