@@ -168,12 +168,12 @@ namespace SIT.APICommunications.UTest
             listener.Prefixes.Add(prefix);
             listener.Start();
 
-            string requestedRawUrl = null;
-            string requestedMethod = null;
+            string? requestedRawUrl = null;
+            string? requestedMethod = null;
             var serverTask = Task.Run(async () =>
             {
                 var context = await listener.GetContextAsync();
-                requestedRawUrl = context.Request.Url.PathAndQuery;
+                requestedRawUrl = context.Request.Url?.PathAndQuery;
                 requestedMethod = context.Request.HttpMethod;
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.Close();
