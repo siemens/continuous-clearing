@@ -13,12 +13,10 @@ using SIT.Common;
 using SIT.Services.Interface;
 using SIT.Upload.Model;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Directory = System.IO.Directory;
 
 namespace SIT.Upload
 {
@@ -192,34 +190,6 @@ namespace SIT.Upload
             }
 
             return packageInfo;
-        }
-
-        /// <summary>
-        /// Gets the path for Artifactory upload directory.
-        /// </summary>
-        /// <returns>The local path for Artifactory upload.</returns>
-        public static string GettPathForArtifactoryUpload()
-        {
-            string localPathforartifactory = string.Empty;
-            try
-            {
-                String Todaysdate = DateTime.Now.ToString("dd-MM-yyyy_ss");
-                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\{Todaysdate}\\";
-                if (!Directory.Exists(localPathforartifactory))
-                {
-                    localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
-                }
-            }
-            catch (IOException ex)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Failed to create directory ", ex, "IOException occurred while creating the directory.");
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Unauthorized access while creating directory", ex, "UnauthorizedAccessException occurred while creating the directory.");
-            }
-
-            return localPathforartifactory;
         }
 
         #endregion
