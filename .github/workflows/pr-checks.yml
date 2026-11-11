@@ -14,10 +14,21 @@ jobs:
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
           versionSpec: '5.12.0'
-          
+
+      - name: Add Artifactory NuGet source
+        shell: pwsh
+        env:
+          ARTIFACTORY__ADMIN_USER: ${{ secrets.JFROGTOKEN_USER }}
+          ARTIFACTORY__ADMIN_API_KEY: ${{ secrets.JFROGTOKEN }}
+        run: |
+          $nugetConfig = "$(Get-Location)\src\nuget.config"
+          dotnet nuget remove source "Artifactory" --configfile "$nugetConfig" 2>$null
+          dotnet nuget add source "https://siemens.jfrog.io/artifactory/api/nuget/v3/energy-dev-nuget-egll" --name "Artifactory" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$nugetConfig"
+          dotnet nuget list source --configfile "$nugetConfig"
+
       - name: Restore Packages
-        run: dotnet restore src\ContinuousClearingTool.sln
-        
+        run: dotnet restore src\ContinuousClearingTool.sln --configfile src\nuget.config
+
       - name: Build
         run: dotnet build src\ContinuousClearingTool.sln
 

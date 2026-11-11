@@ -58,6 +58,16 @@ jobs:
         Write-Host "📄 Updated JSON content:"
         Get-Content $filePath | Write-Host
 
+  - task: PowerShell@2
+    displayName: 'Add Artifactory NuGet source'
+    env:
+      ARTIFACTORY__ADMIN_USER: $(JfrogToken_User)
+      ARTIFACTORY__ADMIN_API_KEY: $(JFrogToken)
+    inputs:
+      targetType: 'inline'
+      script: |
+        dotnet nuget add source "https://siemens.jfrog.io/artifactory/api/nuget/v3/energy-dev-nuget-egll" --name "Artifactory" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$(Build.SourcesDirectory)/src/nuget.config"
+
   - task: DotNetCoreCLI@2
     displayName: 'Restore Dependencies'
     inputs:
@@ -177,7 +187,18 @@ jobs:
             exit 1
         fi
       displayName: 'Update Integration Test Configuration'
-    
+
+    - task: PowerShell@2
+      displayName: 'Add Artifactory NuGet source'
+      env:
+        ARTIFACTORY__ADMIN_USER: $(JfrogToken_User)
+        ARTIFACTORY__ADMIN_API_KEY: $(JFrogToken)
+      inputs:
+        targetType: 'inline'
+        pwsh: true
+        script: |
+          dotnet nuget add source "https://siemens.jfrog.io/artifactory/api/nuget/v3/energy-dev-nuget-egll" --name "Artifactory" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$(Build.SourcesDirectory)/src/nuget.config"
+
     - task: DotNetCoreCLI@2
       displayName: 'Restore Dependencies'
       inputs:
@@ -318,7 +339,18 @@ jobs:
         sonar.coverage.exclusions=**/*Test*/**
         sonar.exclusions=**/**/appSettingsSW360IntegrationTest.json,src/TestUtilities/appSettingsSW360IntegrationTest.json,**/*Test*/**
         sonar.coverageReportPaths=$(Build.SourcesDirectory)/CoverageForSonar/SonarQube.xml
-        
+
+
+  - task: PowerShell@2
+    displayName: 'Add Artifactory NuGet source'
+    env:
+      ARTIFACTORY__ADMIN_USER: $(JfrogToken_User)
+      ARTIFACTORY__ADMIN_API_KEY: $(JFrogToken)
+    inputs:
+      targetType: 'inline'
+      pwsh: true
+      script: |
+        dotnet nuget add source "https://siemens.jfrog.io/artifactory/api/nuget/v3/energy-dev-nuget-egll" --name "Artifactory" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$(Build.SourcesDirectory)/src/nuget.config"
 
   - task: DotNetCoreCLI@2
     enabled: false
