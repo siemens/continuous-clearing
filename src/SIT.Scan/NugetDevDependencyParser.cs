@@ -384,7 +384,7 @@ namespace SIT.Scan
                 bool exists = components.TryGetValue(depPackage.Id, out BuildInfoComponent existingDependency);
                 if (exists)
                 {
-                    depPackage = (existingDependency as NuGetComponent)!;
+                    depPackage = existingDependency as NuGetComponent;
                 }
 
                 //Dependencies or not adding as a componenst since it's just a
