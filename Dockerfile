@@ -45,10 +45,9 @@ ARG MAVEN_VERSION=3.9.11
 ENV MAVEN_HOME=/opt/maven
 ENV PATH="${MAVEN_HOME}/bin:${PATH}"
 RUN apt-get update && \
-   apt-get upgrade -y && \
-   apt-get install -y --no-install-recommends \
-       ca-certificates \
-       curl \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
        gnupg && \
    mkdir -p /etc/apt/keyrings && \
    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
