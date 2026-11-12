@@ -1,0 +1,122 @@
+name: SW360 Compatibility Analysis
+
+on:
+
+  # Manual execution
+  workflow_dispatch:
+    inputs:
+      sw360Version:
+        description: "Optional SW360 version"
+        required: false
+        type: string
+
+  # Run daily
+  schedule:
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+
+  compatibility-analysis:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Clean generated artifacts
+        run: |
+          rm -rf specs/*
+          rm -rf catalogs/*
+          rm -rf reports/*
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+
+      ##################################################################
+      # STEP 1
+      ##################################################################
+
+      - name: Run SW360 OpenAPI Provider
+        uses: github/copilot-agent@v1
+        with:
+          agent-file: .github/agents/sw360-openapi-provider.md
+          input: |
+            {
+              "version": "${{ github.event.inputs.sw360Version }}"
+            }
+
+      ##################################################################
+      # STEP 2
+      ##################################################################
+
+      - name: Run Application Dependency Scanner
+        uses: github/copilot-agent@v1
+        with:
+          agent-file: .github/agents/application-dependency-scanner.md
+          input: |
+            {
+              "applications": [
+                {
+                  "application": "continuous-clearing",
+                  "repository": "https://github.com/siemens/continuous-clearing",
+                  "branch": "main"
+                },
+                {
+                  "application": "vector",
+                  "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector",
+                  "branch": "main"
+                }
+              ]
+            }
+
+      ##################################################################
+      # STEP 3
+      ##################################################################
+
+      - name: Run SW360 Compatibility Analyzer
+        uses: github/copilot-agent@v1
+        with:
+          agent-file: .github/agents/sw360-compatibility-analyzer.md
+          input: |
+            {
+              "sw360Spec": "specs/",
+              "applicationCatalogs": [
+                "catalogs/continuous-clearing-api-catalog.json",
+                "catalogs/vector-api-catalog.json"
+              ]
+            }
+
+      ##################################################################
+      # ARTIFACTS
+      ##################################################################
+
+      - name: Upload Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibility-reports
+          path: |
+            reports/
+            catalogs/
+            specs/
+
+      ##################################################################
+      # COMMIT GENERATED FILES
+      ##################################################################
+
+      - name: Commit Generated Reports
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add reports/
+          git add catalogs/
+          git add specs/
+
+          git diff --cached --quiet || \
+          git commit -m "Update SW360 compatibility analysis"
+
+      - name: Push Reports
+        run: git pusha
