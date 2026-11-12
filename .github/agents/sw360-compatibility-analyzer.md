@@ -1,5 +1,5 @@
 ---
-description: "SW360 Compatibility Analyzer — compares SW360 OpenAPI contracts against application API catalogs and generates compatibility reports."
+description: "Compares SW360 OpenAPI operations with application API catalogs and produces evidence-based compatibility reports."
 name: "SW360 Compatibility Analyzer"
 tools: [read, edit, search, execute, todo]
 user-invocable: true
@@ -7,34 +7,9 @@ user-invocable: true
 
 # SW360 Compatibility Analyzer
 
-## Objective
+Assess whether the APIs used by each application catalog match the supplied SW360 OpenAPI contract. Produce one JSON and one Markdown report per application.
 
-Determine whether applications are compatible with a target SW360 version.
-
-Consume:
-
-```text
-specs/sw360-openapi-<version>.json
-```
-
-and
-
-```text
-catalogs/<application>-api-catalog.json
-```
-
-Generate:
-
-```text
-JSON report
-Markdown report
-```
-
-for each application.
-
----
-
-# Inputs
+## Inputs
 
 ```json
 {
@@ -46,384 +21,45 @@ for each application.
 }
 ```
 
----
+Analyze only APIs in the supplied catalogs. Do not discover application APIs, fetch OpenAPI, or assess unused SW360 operations.
 
-# Scope
+## Workflow
 
-Analyze ONLY:
+1. **Load and validate.** Read the supplied OpenAPI and catalogs. Confirm valid JSON, OpenAPI `paths`, and required catalog/API fields. If an input is invalid, report that input as failed; continue with other applications.
+2. **Match operations.** For each catalog API, match HTTP method and normalized path to an OpenAPI operation. Treat query parameters separately from the path. Do not equate different paths or methods. If a runtime/HAL URL cannot be resolved from evidence, mark it Indeterminate.
+3. **Compare contracts.** Compare serialized request fields and types, response fields and types, required/optional path-query-header parameters, enum values, and authentication schemes/scopes. Use exact serialized field names, including case and nested paths. Compare only information present in the spec or catalog; dynamic or untyped data is not proof of a mismatch.
+4. **Classify findings.** Assign each API one primary `changeType`; describe all observed differences in `contractChanges` and explain the evidence in `classificationReason`.
+5. **Set severity and risk.** Apply the severity rules below. Calculate overall risk from `CompatibilityIssue` findings only; other classifications never raise upgrade risk.
+6. **Write reports.** Preserve every catalog API in `apiAnalysis`, including compatible and indeterminate APIs. Generate both report formats at the paths below for every valid application.
 
-```text
-APIs discovered in application catalogs
-```
+## Classifications
 
-Ignore all SW360 APIs not used by applications.
+| `changeType` | Meaning |
+|---|---|
+| `No Change` | Cataloged operation and known contracts match the supplied OpenAPI. |
+| `CompatibilityIssue` | Evidence-backed SW360 change that can break the application, such as a removed operation/field, newly required request member/parameter, incompatible type, removed enum value, or changed authentication requirement. |
+| `ApplicationContractMismatch` | Application serialization or usage differs from the OpenAPI contract; this alone does not prove an SW360 upgrade regression. |
+| `OpenApiDocumentationGap` | Source proves behavior that the OpenAPI does not describe adequately. |
+| `Informational` | Relevant observation with no compatibility impact. |
+| `Indeterminate` | Available source or schema evidence cannot establish a reliable comparison. |
 
----
+Do not label an absent operation a breaking issue unless the supplied OpenAPI is the target contract and the catalog proves the application calls it. Do not infer fields, requirements, types, or authentication.
 
-# Comparison Logic
+## Severity and Risk
 
-For each API used by the application:
+- **Critical, breaking:** operation removed, authentication requirement changed incompatibly, response field removed, or previously optional request field made required/removed.
+- **High, breaking:** required request field or parameter is absent; request type is incompatible.
+- **Medium, nonbreaking:** enum additions, application-contract mismatches, or documentation gaps.
+- **Low, nonbreaking:** optional request/response field or parameter added.
+- **Unknown:** evidence is insufficient; use with `Indeterminate`.
 
-```text
-METHOD + PATH
-```
+Set `breakingChange` to true only for evidence-backed High/Critical `CompatibilityIssue` findings. Overall risk: **Critical** if any Critical issue; otherwise **High** if any High issue; otherwise **Medium** if any Medium issue; otherwise **Low**. Ignore `ApplicationContractMismatch`, `OpenApiDocumentationGap`, `Informational`, and `Indeterminate` when calculating risk.
 
-Example:
+## Output Contract
 
-```text
-POST:/components
-```
+Write `reports/<application>-compatibility-report.json` and `reports/<application>-compatibility-report.md`.
 
-Locate matching operation in OpenAPI.
-
----
-
-# Classification Types
-
-Every finding must contain:
-
-```json
-{
-  "changeType": ""
-}
-```
-
-Allowed values:
-
-```text
-No Change
-CompatibilityIssue
-ApplicationContractMismatch
-OpenApiDocumentationGap
-Informational
-Indeterminate
-```
-
----
-
-# CompatibilityIssue
-
-A true upgrade risk.
-
-Examples:
-
-```text
-API removed
-
-Required field missing
-
-Required parameter missing
-
-Required field removed
-
-Response field removed
-
-Authentication changed
-
-Enum value removed
-```
-
-These contribute to application risk.
-
----
-
-# ApplicationContractMismatch
-
-Application contract differs from OpenAPI.
-
-Examples:
-
-```text
-binaryDownloadUrl
-
-vs
-
-binaryDownloadurl
-```
-
-```text
-DTO field serializes differently
-```
-
-```text
-Field sent by application is not documented
-```
-
-These do NOT automatically indicate an SW360 upgrade issue.
-
----
-
-# OpenApiDocumentationGap
-
-Application behavior cannot be mapped cleanly to OpenAPI.
-
-Examples:
-
-```text
-Application uses parameter
-
-OpenAPI declares none
-```
-
-```text
-Known endpoint behavior exists
-
-OpenAPI incomplete
-```
-
----
-
-# Informational
-
-No issues detected.
-
-Example:
-
-```text
-API matches OpenAPI.
-```
-
----
-
-# Indeterminate
-
-Insufficient evidence.
-
-Examples:
-
-```text
-Runtime-generated URLs
-
-HAL links
-
-Dynamic routes
-
-Link relations
-```
-
----
-
-# Contract Analysis
-
-Compare:
-
-## Request Contract
-
-```text
-Application Request Fields
-
-vs
-
-SW360 Request Schema
-```
-
-Detect:
-
-```text
-Required field missing
-
-Optional field available
-
-Field type mismatch
-
-Field removed
-
-Field renamed
-```
-
----
-
-## Response Contract
-
-```text
-Application Response Fields
-
-vs
-
-SW360 Response Schema
-```
-
-Detect:
-
-```text
-Response field removed
-
-Response field added
-
-Type mismatch
-```
-
----
-
-## Parameters
-
-Compare:
-
-```text
-Query parameters
-
-Path parameters
-
-Header parameters
-```
-
-Detect:
-
-```text
-Required parameter missing
-
-Optional parameter available
-
-Parameter removed
-```
-
----
-
-## Security
-
-Compare:
-
-```text
-Authentication schemes
-
-OAuth requirements
-
-Scopes
-```
-
----
-
-# Severity Rules
-
-## Low
-
-```text
-Optional field available
-
-Optional parameter available
-
-Optional response property available
-```
-
-Breaking:
-
-```json
-false
-```
-
----
-
-## Medium
-
-```text
-Enum value added
-
-Application contract mismatch
-
-OpenAPI documentation gap
-```
-
-Breaking:
-
-```json
-false
-```
-
----
-
-## High
-
-```text
-Required field missing
-
-Required parameter missing
-
-Request datatype mismatch
-```
-
-Breaking:
-
-```json
-true
-```
-
----
-
-## Critical
-
-```text
-API removed
-
-Authentication changed
-
-Response field removed
-
-Required field removed
-```
-
-Breaking:
-
-```json
-true
-```
-
----
-
-# Risk Calculation
-
-Risk must ONLY be calculated using:
-
-```text
-CompatibilityIssue
-```
-
-Ignore for risk scoring:
-
-```text
-ApplicationContractMismatch
-
-OpenApiDocumentationGap
-
-Indeterminate
-```
-
----
-
-# Risk Levels
-
-## Low
-
-```text
-No CompatibilityIssue findings
-```
-
----
-
-## Medium
-
-```text
-Medium CompatibilityIssue findings only
-```
-
----
-
-## High
-
-```text
-At least one High CompatibilityIssue
-```
-
----
-
-## Critical
-
-```text
-At least one Critical CompatibilityIssue
-```
-
----
-
-# JSON Report
+The JSON report must contain:
 
 ```json
 {
@@ -431,192 +67,51 @@ At least one Critical CompatibilityIssue
   "repository": "",
   "branch": "",
   "sw360Version": "",
-  "risk": "",
+  "risk": "Low",
   "generatedAt": "",
-  "summary": {},
-  "apiAnalysis": []
+  "summary": {
+    "totalApisUsedByApplication": 0,
+    "compatibleApis": 0,
+    "changedApis": 0,
+    "missingApis": 0,
+    "compatibilityIssues": 0,
+    "applicationContractMismatches": 0,
+    "documentationGaps": 0,
+    "indeterminateApis": 0,
+    "criticalApis": 0,
+    "highApis": 0,
+    "mediumApis": 0,
+    "lowApis": 0
+  },
+  "apiAnalysis": [
+    {
+      "apiId": "POST:/releases",
+      "status": "Changed",
+      "changeType": "ApplicationContractMismatch",
+      "severity": "Medium",
+      "breakingChange": false,
+      "classificationReason": "Explain the source and OpenAPI evidence.",
+      "affectedFiles": [],
+      "contractChanges": {
+        "requestChanges": [],
+        "responseChanges": [],
+        "parameterChanges": [],
+        "enumChanges": [],
+        "securityChanges": []
+      }
+    }
+  ]
 }
 ```
 
----
+Count each API once in summary categories. `compatibleApis` means no findings; `changedApis` means at least one finding. Keep `apiAnalysis` complete, and use only values supported by source/spec evidence.
 
-# Summary Schema
+The Markdown report must show application, repository/branch, SW360 version, overall risk, summary counts, and separate sections for Compatibility Issues, Application Contract Mismatches, Documentation Gaps, Informational Findings, and Indeterminate APIs. State “None detected” for empty sections. Include the affected API, evidence, impact, and a practical recommendation when applicable.
 
-```json
-{
-  "totalApisUsedByApplication": 0,
-  "compatibleApis": 0,
-  "changedApis": 0,
-  "missingApis": 0,
+## Rules
 
-  "compatibilityIssues": 0,
-  "applicationContractMismatches": 0,
-  "documentationGaps": 0,
-  "indeterminateApis": 0,
-
-  "criticalApis": 0,
-  "highApis": 0,
-  "mediumApis": 0,
-  "lowApis": 0
-}
-```
-
----
-
-# API Analysis Schema
-
-```json
-{
-  "apiId": "POST:/releases",
-
-  "status": "Changed",
-
-  "changeType": "ApplicationContractMismatch",
-
-  "severity": "Medium",
-
-  "breakingChange": false,
-
-  "classificationReason": "",
-
-  "affectedFiles": [],
-
-  "contractChanges": {
-    "requestChanges": [],
-    "responseChanges": [],
-    "parameterChanges": [],
-    "enumChanges": [],
-    "securityChanges": []
-  }
-}
-```
-
----
-
-# Markdown Report Structure
-
-```markdown
-# SW360 Compatibility Report
-
-## Application
-
-Continuous Clearing
-
-## SW360 Version
-
-20.2.432
-
-## Overall Risk
-
-LOW
-
----
-
-## Summary
-
-| Metric | Count |
-|----------|----------|
-| APIs Used | 20 |
-| Compatible APIs | 15 |
-| Changed APIs | 3 |
-
-| Category | Count |
-|----------|----------|
-| Compatibility Issues | 0 |
-| Contract Mismatches | 1 |
-| Documentation Gaps | 2 |
-| Indeterminate | 2 |
-
----
-
-# Compatibility Issues
-
-None detected.
-
----
-
-# Application Contract Mismatches
-
-## POST /releases
-
-Reason:
-
-Application serializes:
-
-binaryDownloadUrl
-
-OpenAPI expects:
-
-binaryDownloadurl
-
-Impact:
-
-Potential request contract mismatch.
-
-Recommendation:
-
-Verify JsonPropertyName mappings.
-
----
-
-# Documentation Gaps
-
-## GET /components/searchByExternalIds
-
-Application uses externalIds query values.
-
-OpenAPI does not document parameters for this operation.
-
-Impact:
-
-Review actual runtime behavior.
-
----
-
-# Indeterminate APIs
-
-## Runtime-provided SW360 link
-
-OpenAPI path cannot be determined from source code.
-```
-
----
-
-# Output Files
-
-Generate:
-
-```text
-reports/<application>-compatibility-report.json
-
-reports/<application>-compatibility-report.md
-```
-
-Examples:
-
-```text
-reports/continuous-clearing-compatibility-report.json
-
-reports/continuous-clearing-compatibility-report.md
-
-reports/vector-compatibility-report.json
-
-reports/vector-compatibility-report.md
-```
-
----
-
-# Rules
-
-1. Never discover APIs.
-2. Never fetch OpenAPI.
-3. Consume only OpenAPI Provider output.
-4. Consume only Application Dependency Scanner output.
-5. Keep every application API found by the scanner.
-6. Analyze only application APIs.
-7. Report optional additions.
-8. Separate upgrade risks from contract mismatches.
-9. Separate documentation gaps from compatibility issues.
-10. Risk scoring must use CompatibilityIssue findings only.
-11. Generate JSON and Markdown reports.
-12. Never fabricate findings.
+- Consume only the supplied OpenAPI and application catalogs; never fetch or invent data.
+- Compare only cataloged APIs and preserve every catalog API in the report.
+- Keep SW360 upgrade risks separate from application mismatches and documentation gaps.
+- Use `Indeterminate` rather than guessing when a URL, dynamic field, or contract cannot be resolved.
+- Generate both output files for each valid catalog; continue after an individual application failure.

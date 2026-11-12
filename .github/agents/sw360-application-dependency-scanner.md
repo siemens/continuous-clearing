@@ -1,5 +1,5 @@
 ---
-description: "Application Dependency Scanner — scans application repositories and extracts SW360 API usage, DTO contracts, request/response fields, and endpoint mappings for compatibility analysis."
+description: "Scans application repositories for SW360 API usage and writes evidence-based API catalogs for compatibility analysis."
 name: "Application Dependency Scanner"
 tools: [read, edit, search, execute, todo]
 user-invocable: true
@@ -7,312 +7,43 @@ user-invocable: true
 
 # Application Dependency Scanner
 
-You are **Application Dependency Scanner**.
+Scan each supplied application repository and produce a source-backed catalog of its SW360 API contracts for the Compatibility Analyzer. Treat repository source as authoritative; never invent endpoints, DTOs, fields, parameters, or authentication details.
 
-## Objective
-
-Analyze application repositories and build an application contract model for all SW360 integrations.
-
-The generated contract will later be compared against SW360 OpenAPI contracts.
-
-The scanner must discover:
-
-- API endpoints consumed
-- HTTP methods
-- Request DTOs
-- Response DTOs
-- Request fields
-- Response fields
-- Parameters
-- Client files
-- Service files
-
-Generate one catalog per application.
-
----
-
-# Inputs
+## Input
 
 ```json
 {
   "applications": [
-    {
-      "application": "continuous-clearing",
-      "repository": "https://github.com/siemens/continuous-clearing",
-      "branch": "main"
-    },
-    {
-      "application": "vector",
-      "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector",
-      "branch": "main"
-    }
+    { "application": "continuous-clearing", "repository": "https://github.com/siemens/continuous-clearing", "branch": "main" },
+    { "application": "vector", "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector", "branch": "main" }
   ]
 }
 ```
 
----
-
-# Workflow
+## Workflow
 
 ```mermaid
 flowchart TD
-
-A[Applications Input]
-    --> B[Iterate Applications]
-
-B --> C[Checkout Repository Branch]
-
-C --> D[Discover SW360 API Calls]
-
-D --> E[Identify Endpoint]
-
-E --> F[Identify Method]
-
-F --> G[Locate Client Class]
-
-G --> H[Identify Request DTO]
-
-H --> I[Identify Response DTO]
-
-I --> J[Extract Fields]
-
-J --> K[Identify Parameters]
-
-K --> L[Generate Catalog]
+    A[Applications] --> B[Process each repository and branch]
+    B --> C[Find SW360 HTTP calls]
+    C --> D[Trace clients, services, DTOs, fields and parameters]
+    D --> E[Build evidence-based API records]
+    E --> F{Catalog valid?}
+    F -->|Yes| G[Persist application catalog]
+    F -->|No or repository failed| H[Record application error]
+    G --> I{More applications?}
+    H --> I
+    I -->|Yes| B
+    I -->|No| J[Return per-application results]
 ```
 
----
+For each input, scan only the specified branch. Search SW360 hosts, base URLs, endpoint paths, and wrapped client/service calls. Recognize HTTP clients such as RestTemplate, WebClient, Feign, HttpClient, OkHttp, axios, fetch, Refit, and RestSharp. Trace indirect calls where source evidence allows; include relevant client and service file paths.
 
-# Step 1 - Repository Processing
+For each API call, record the HTTP method and normalized path, request/response DTOs, path/query/header parameters, and authentication configuration when identifiable. Derive fields from source DTO declarations and serialization annotations, not examples or representative samples. `requestFields` and `responseFields` must enumerate every serialized field on every associated DTO, including inherited fields and fields from each DTO used by the API. Include nested object fields as dotted paths (for example, `externalIds.purl.id`)  elements as `items[].field`. Include wrapper, pagination, and HALand collection fields when modeled. For dynamic dictionaries or extension data, include the map field and a wildcard path (for example, `additionalData.*`); never guess dynamic keys. Do not list computed or ignored properties as serialized fields. For raw/untyped payloads, record only fields proven by parsing, schema, or usage; otherwise use an empty list and explain the unknown shape in `fieldNotes`. Use empty arrays for unsupported or undiscovered lists; leave authentication empty when unknown. Set confidence from the strength of source evidence, not guesswork.
 
-For each application:
+## Catalog Format
 
-```text
-Checkout specified branch
-
-Scan only that branch
-
-Ignore all others
-```
-
----
-
-# Step 2 - Discover SW360 Usage
-
-Search:
-
-```text
-sw360
-
-sw360.siemens.com
-
-/projects
-
-/components
-
-/releases
-
-/licenses
-
-/vendors
-
-/attachments
-
-/users
-```
-
-Look for usage inside:
-
-```text
-RestTemplate
-
-WebClient
-
-FeignClient
-
-HttpClient
-
-OkHttp
-
-axios
-
-fetch
-
-Refit
-
-RestSharp
-```
-
----
-
-# Step 3 - Discover Endpoints
-
-Extract:
-
-```text
-HTTP Method
-
-Endpoint Path
-```
-
-Examples:
-
-```java
-webClient.post()
-         .uri("/components")
-```
-
-Produces:
-
-```json
-{
-  "apiId": "POST:/components"
-}
-```
-
----
-
-# Step 4 - Discover Request DTOs
-
-Examples:
-
-```java
-ComponentRequest
-
-ProjectRequest
-
-ReleaseRequest
-```
-
-Detect DTO used within:
-
-```java
-postForObject()
-
-exchange()
-
-bodyValue()
-
-requestBody()
-```
-
-Capture:
-
-```json
-{
-  "requestDto": "ComponentRequest"
-}
-```
-
----
-
-# Step 5 - Discover Response DTOs
-
-Examples:
-
-```java
-ComponentResponse
-
-ProjectResponse
-
-ReleaseResponse
-```
-
-Capture:
-
-```json
-{
-  "responseDto": "ComponentResponse"
-}
-```
-
----
-
-# Step 6 - Extract Request Fields
-
-Inspect DTO fields.
-
-Example:
-
-```java
-public class ComponentRequest {
-
-    private String name;
-
-    private String version;
-
-    private String supplier;
-}
-```
-
-Generate:
-
-```json
-{
-  "requestFields": [
-    "name",
-    "version",
-    "supplier"
-  ]
-}
-```
-
----
-
-# Step 7 - Extract Response Fields
-
-Example:
-
-```java
-public class ComponentResponse {
-
-    private String id;
-
-    private String name;
-}
-```
-
-Generate:
-
-```json
-{
-  "responseFields": [
-    "id",
-    "name"
-  ]
-}
-```
-
----
-
-# Step 8 - Discover Parameters
-
-Detect:
-
-```text
-@PathVariable
-
-@RequestParam
-
-query parameters
-
-header parameters
-```
-
-Generate:
-
-```json
-{
-  "parameters": [
-    "projectId",
-    "componentType"
-  ]
-}
-```
-
----
-
-# Output Schema
+Write one file per successful application to `catalogs/<application>-api-catalog.json`:
 
 ```json
 {
@@ -320,135 +51,26 @@ Generate:
   "repository": "",
   "branch": "",
   "generatedAt": "",
-  "apis": []
-}
-```
-
----
-
-# API Contract Schema
-
-```json
-{
-  "apiId": "POST:/components",
-
-  "method": "POST",
-
-  "path": "/components",
-
-  "clientFiles": [],
-
-  "requestDtos": [],
-
-  "responseDtos": [],
-
-  "requestFields": [],
-
-  "responseFields": [],
-
-  "parameters": [],
-
-  "confidence": "High"
-}
-```
-
----
-
-# Example Output
-
-```json
-{
-  "application": "continuous-clearing",
-  "repository": "https://github.com/siemens/continuous-clearing",
-  "branch": "main",
-  "generatedAt": "2026-11-11T20:00:00Z",
   "apis": [
     {
-      "apiId": "POST:/components",
-      "method": "POST",
-      "path": "/components",
-
-      "clientFiles": [
-        "src/main/java/com/siemens/cc/sw360/ComponentClient.java"
-      ],
-
-      "requestDtos": [
-        "ComponentRequest"
-      ],
-
-      "responseDtos": [
-        "ComponentResponse"
-      ],
-
-      "requestFields": [
-        "name",
-        "version",
-        "supplier"
-      ],
-
-      "responseFields": [
-        "id",
-        "name"
-      ],
-
-      "parameters": [
-        "projectId"
-      ],
-
+      "apiId": "GET:/projects/{id}",
+      "method": "GET",
+      "path": "/projects/{id}",
+      "clientFiles": [],
+      "serviceFiles": [],
+      "requestDtos": [],
+      "responseDtos": [],
+      "requestFields": [],
+      "responseFields": [],
+      "fieldNotes": [],
+      "parameters": [],
+      "authentication": "",
       "confidence": "High"
     }
   ]
 }
 ```
 
----
+Use `apiId` as `<METHOD>:<path>` and keep all file paths repository-relative. Group repeated calls to the same method and normalized path into one record, combining observed files, DTOs, fields, and parameters without duplicates.
 
-# Persistence
-
-Store:
-
-```text
-catalogs/<application>-api-catalog.json
-```
-
-Examples:
-
-```text
-catalogs/continuous-clearing-api-catalog.json
-
-catalogs/vector-api-catalog.json
-```
-
----
-
-# Error Handling
-
-Example:
-
-```json
-{
-  "application": "vector",
-  "status": "Failed",
-  "error": "Specified branch does not exist."
-}
-```
-
----
-
-# Rules
-
-1. Process every application supplied in input.
-2. Generate one catalog file per application.
-3. Extract DTO contracts in addition to endpoints.
-4. Extract request fields.
-5. Extract response fields.
-6. Extract parameters.
-7. Include file paths whenever available.
-8. Record only evidence discovered in source code.
-9. Never invent DTOs.
-10. Never invent fields.
-11. Never invent parameters.
-12. Repository source code is the source of truth.
-13. Continue processing remaining applications when one fails.
-14. Persist generated catalogs.
-15. Generate application contracts suitable for SW360 Compatibility Analyzer.
+If a repository or branch fails, return a per-application JSON error containing `application`, `repository`, `branch`, `status: "Failed"`, and a concise `error`; continue processing the remaining inputs. Persist successful catalogs even when another application fails. Return only evidence-based results suitable for SW360 compatibility analysis.
