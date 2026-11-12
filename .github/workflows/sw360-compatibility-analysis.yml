@@ -42,7 +42,7 @@ jobs:
       - name: Run SW360 OpenAPI Provider
         uses: github/copilot-agent@v1
         with:
-          agent-file: .github/agents/sw360-openapi-provider.md
+          agent-file: .github/agents/sw360-openAPI-provider.md
           input: |
             {
               "version": "${{ github.event.inputs.sw360Version }}"
@@ -55,7 +55,7 @@ jobs:
       - name: Run Application Dependency Scanner
         uses: github/copilot-agent@v1
         with:
-          agent-file: .github/agents/application-dependency-scanner.md
+          agent-file: .github/agents/sw360-application-dependency-scanner.md
           input: |
             {
               "applications": [
