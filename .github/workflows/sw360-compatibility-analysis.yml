@@ -1,15 +1,6 @@
 name: SW360 Compatibility Analysis
 
 on:
-
-  # Manual execution
-  workflow_dispatch:
-    inputs:
-      sw360Version:
-        description: "Optional SW360 version"
-        required: false
-        type: string
-
   # Run daily
   schedule:
     - cron: "0 2 * * *"
@@ -18,44 +9,30 @@ permissions:
   contents: write
 
 jobs:
-
   compatibility-analysis:
-
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Clean generated artifacts
-        run: |
-          rm -rf specs/*
-          rm -rf catalogs/*
-          rm -rf reports/*
-
       - name: Checkout Repository
         uses: actions/checkout@v4
-
 
       ##################################################################
       # STEP 1
       ##################################################################
 
-      - name: Run SW360 OpenAPI Provider
+      - name: Run SW360 Release Analyzer
         uses: github/copilot-agent@v1
         with:
-          agent-file: .github/agents/sw360-openAPI-provider.md
-          input: |
-            {
-              "version": "${{ github.event.inputs.sw360Version }}"
-            }
+          agent-file: .github/agents/sw360-release-analyzer.agent.md
 
       ##################################################################
       # STEP 2
       ##################################################################
 
-      - name: Run Application Dependency Scanner
+      - name: Run Application Dependency Analyzer
         uses: github/copilot-agent@v1
         with:
-          agent-file: .github/agents/sw360-application-dependency-scanner.md
+          agent-file: .github/agents/sw360-application-dependency-tracker.agent.md
           input: |
             {
               "applications": [
@@ -79,7 +56,7 @@ jobs:
       - name: Run SW360 Compatibility Analyzer
         uses: github/copilot-agent@v1
         with:
-          agent-file: .github/agents/sw360-compatibility-analyzer.md
+          agent-file: .github/agents/sw360-compatibility-analyzer.agent.md
           input: |
             {
               "sw360Spec": "specs/",
@@ -119,4 +96,4 @@ jobs:
           git commit -m "Update SW360 compatibility analysis"
 
       - name: Push Reports
-        run: git pusha
+        run: git push
