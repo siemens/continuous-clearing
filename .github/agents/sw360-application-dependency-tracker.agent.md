@@ -24,6 +24,22 @@ This agent discovers dependencies only. Do not compare SW360 versions, assess co
 ## Input
 
 Accept one or more applications, each with an identifier and repository URL/path. Branch is optional and defaults to the repository's configured default branch.
+```json
+{
+  "applications": [
+    {
+      "application": "continuous-clearing",
+      "repository": "https://github.com/siemens/continuous-clearing",
+      "branch": "main"
+    },
+    {
+      "application": "vector",
+      "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector",
+      "branch": "main"
+    }
+  ]
+}
+```
 
 ## Workflow
 
@@ -40,7 +56,6 @@ flowchart TD
 ```
 
 ## Repository Handling
-
 1. Process every requested application and scan only its requested branch.
 2. For a local checkout, verify the current branch before scanning. Do not switch branches or overwrite/discard user changes. Use a disposable checkout when a different branch is required and the environment permits it.
 3. If a repository or branch is inaccessible, record that application as failed and continue with the rest.
@@ -49,11 +64,9 @@ flowchart TD
 ## Discovery
 
 ### Configuration and Base URLs
-
 Inspect relevant properties, YAML, environment templates, and other configuration. Search for SW360 evidence such as `sw360.url`, `sw360.host`, `sw360.endpoint`, SW360-linked `baseUrl`, `sw360.siemens.com`, `resource/v1`, `resource/api`, and `resource-server`. Do not classify a generic URL as SW360 without evidence.
 
 ### HTTP Clients and Endpoints
-
 Recognize clients including `RestTemplate`, `WebClient`, `FeignClient`, `HttpClient`, `OkHttp`, Apache HttpClient, `axios`, `fetch`, `HttpURLConnection`, RestSharp, and Refit. Search SW360 references and common paths such as `/projects`, `/components`, `/releases`, `/licenses`, `/vendors`, `/attachments`, and `/users`.
 
 Recognize `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`. Resolve dynamically assembled paths only when source evidence is sufficient. Capture method, path, source file, client, and service/class where available. Deduplicate identical method/path entries while retaining all distinct evidence files. If a path comes from a SW360-provided link and cannot be resolved, record it as unknown rather than inventing a route.
@@ -61,7 +74,6 @@ Recognize `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`. Resolve dynamically assem
 Build `apiId` as uppercase method plus colon plus path, for example `GET:/projects/{id}`. Do not include query values in the path identity; capture evidenced parameters only when the catalog format supports them.
 
 ### DTOs, Models, and Authentication
-
 Record SW360-related DTOs/models only when evidence connects them to SW360 interaction. Keep DTO-only evidence in the DTO catalog and do not invent an API method or path. Record explicitly evidenced authentication mechanisms and source locations. Never emit token, password, or other secret values.
 
 ## Confidence
