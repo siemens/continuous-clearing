@@ -1,0 +1,164 @@
+{
+  "application": "vector",
+  "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector",
+  "branch": "main",
+  "generatedAt": "2026-11-13T05:16:53Z",
+  "baseUrls": [
+    {
+      "url": "https://sw360.siemens.com/",
+      "file": "Vector/appsettings.json"
+    },
+    {
+      "url": "https://sw360.siemens.com/",
+      "file": "Vector/appsettings.Development.json"
+    }
+  ],
+  "authentication": [
+    {
+      "type": "OAuth2 Client Credentials (Keycloak)",
+      "file": "Vector/Sw360.Connector/Authentication/KeycloakTokenCacheService.cs"
+    },
+    {
+      "type": "Bearer Token",
+      "file": "Vector/Sw360.Connector/Api/Sw360Client.cs"
+    },
+    {
+      "type": "Bearer Token refresh on HTTP 401",
+      "file": "Vector/Sw360.Connector/Authentication/TokenRefreshDelegatingHandler.cs"
+    }
+  ],
+  "sw360Dependencies": [
+    {
+      "apiId": "GET:/resource/api/components",
+      "method": "GET",
+      "path": "/resource/api/components",
+      "service": "Sw360Client",
+      "files": ["Vector/Sw360.Connector/Api/Sw360Client.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["Sw360ComponentListResponse", "Sw360Component"],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/components/{id}",
+      "method": "GET",
+      "path": "/resource/api/components/{id}",
+      "service": "Sw360Client",
+      "files": ["Vector/Sw360.Connector/Api/Sw360Client.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["Sw360Component"],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/releases",
+      "method": "GET",
+      "path": "/resource/api/releases",
+      "service": "Sw360Client",
+      "files": ["Vector/Sw360.Connector/Api/Sw360Client.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["Sw360ReleaseListResponse", "Sw360Release"],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/releases/{id}",
+      "method": "GET",
+      "path": "/resource/api/releases/{id}",
+      "service": "Sw360Client",
+      "files": ["Vector/Sw360.Connector/Api/Sw360Client.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["Sw360Release"],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/projects",
+      "method": "GET",
+      "path": "/resource/api/projects",
+      "service": "Sw360Client",
+      "files": ["Vector/Sw360.Connector/Api/Sw360Client.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["Sw360ProjectListResponse", "Sw360Project", "Sw360ProjectQuery"],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/projects/{id}",
+      "method": "GET",
+      "path": "/resource/api/projects/{id}",
+      "service": "Sw360Client",
+      "files": ["Vector/Sw360.Connector/Api/Sw360Client.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["Sw360Project"],
+      "confidence": "Medium"
+    }
+  ],
+  "dtoDependencies": [
+    {
+      "dto": "Sw360Component",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360Component.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360Links",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360Links.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360Link",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360Links.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360PageInfo",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ListResponses.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360ComponentListResponse",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ListResponses.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360ComponentEmbedded",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ListResponses.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360ReleaseListResponse",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ListResponses.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360ReleaseEmbedded",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ListResponses.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360ProjectListResponse",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ListResponses.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360ProjectEmbedded",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ListResponses.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360Project",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360Project.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360LinkedProject",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360Project.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360ProjectQuery",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360ProjectQuery.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360Release",
+      "files": ["Vector/Sw360.Connector/Api/Models/Sw360Release.cs"],
+      "confidence": "High"
+    }
+  ]
+}
