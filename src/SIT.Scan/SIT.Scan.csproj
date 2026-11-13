@@ -33,6 +33,9 @@
 		<!--<PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.10.0" />-->
 		<PackageReference Include="System.Text.Json" Version="10.0.14" />
 		<PackageReference Include="Microsoft.ComponentDetection.Detectors" Version="5.2.15" />
+		<!-- Lift the netcoreapp1.x-era transitive deps of DotNet.Glob (via ComponentDetection) off NETStandard.Library 1.6.1 / Microsoft.NETCore.Platforms 1.1.0 -->
+		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
+		<PackageReference Include="NETStandard.Library" Version="2.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.14" />
 		<PackageReference Include="NuGet.Frameworks" Version="6.13.2" ExcludeAssets="runtime" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />

@@ -10,23 +10,29 @@ ENV PATH="${PATH}:${DOTNET_ROOT}"
 # would otherwise reference files that only exist inside the container and not on the pipeline agent.
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 WORKDIR /app/out
-# Install Microsoft package repository and the .NET 10 SDK.
-# The SDK is required (not just runtime) because NuGet scanning invokes MSBuildLocator/MSBuild
+# Install the .NET 10 SDK via the official dotnet-install script.
+# The SDK is required (not just runtime) because NuGet scanning invokes MSBuildLocator/MSBuild.
+# The script is used instead of the packages.microsoft.com apt package because the apt repo lags
+# behind the serviced SDK feature band (it still shipped 10.0.30x after that band left support).
+# --channel 10.0 always resolves to the latest serviced 10.0.x SDK (same as UseDotNet@2 '10.0.x').
+ARG DOTNET_CHANNEL=10.0
 
 RUN apt-get update && \
    apt-get upgrade -y && \
    apt-get install -y --no-install-recommends \
-       wget \
        ca-certificates \
-       gnupg \
-       apt-transport-https && \
-   wget https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb && \
-   dpkg -i packages-microsoft-prod.deb && \
-   rm packages-microsoft-prod.deb && \
-   apt-get update && \
-   apt-get install -y --no-install-recommends \
-       dotnet-sdk-10.0 && \
-   apt-get purge -y --auto-remove wget gnupg apt-transport-https && \
+       curl \
+       libicu76 \
+       libssl3t64 \
+       libgcc-s1 \
+       libstdc++6 \
+       zlib1g && \
+   curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && \
+   bash /tmp/dotnet-install.sh --channel "${DOTNET_CHANNEL}" --install-dir "${DOTNET_ROOT}" --no-path && \
+   rm -f /tmp/dotnet-install.sh && \
+   ln -sf "${DOTNET_ROOT}/dotnet" /usr/bin/dotnet && \
+   dotnet --list-sdks && dotnet --list-runtimes && \
+   apt-get purge -y --auto-remove curl && \
    rm -rf /var/lib/apt/lists/*
 # Creating required directories
 RUN mkdir -p \
