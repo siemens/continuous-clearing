@@ -1,12 +1,12 @@
 # SW360 Agent Usage
 
-Run the agents in order: **OpenAPI Provider -> Application Dependency Scanner -> Compatibility Analyzer**. The analyzer compares application usage against one SW360 specification; it does not compare two releases.
+Run the agents in order: **sw360 release analyzer -> Application Dependency Scanner -> Compatibility Analyzer**. The analyzer compares application usage against one SW360 specification; it does not compare two releases.
 
 ## Manual
 
 In a Copilot agent session with repository, terminal, and network access, attach or reference each agent definition and provide its input. Run the next step only after the required output exists.
 
-1. **Retrieve the specification.** Use [SW360 OpenAPI Provider](agent/sw360-openAPI-provider.md) with `{"version":"20.2.432"}` or `{}` for the live deployment. Note the returned `specLocation` and `resolvedVersion`. A requested version with the same major and minor as the live deployment resolves to the live version; other versions may require Docker or a source build.
+1. **Generates difference between latest release and previous release** Use [SW360 release analyzer agent](agent/sw360-release-analyzer.agent.md) 
 2. **Scan application repositories.** Use [Application Dependency Scanner](agent/sw360-application-dependency-scanner.md) with:
 
    ```json
@@ -19,7 +19,7 @@ In a Copilot agent session with repository, terminal, and network access, attach
    ```
 
    Successful scans write `catalogs/<application>-api-catalog.json`. Check per-application errors; private repositories require appropriate access.
-3. **Analyze compatibility.** Use [SW360 Compatibility Analyzer](agent/sw360-compatibility-analyzer.md) with the actual `specLocation` from step 1 and the successful catalog paths from step 2. For example:
+3. **Analyze compatibility.** Use [SW360 Compatibility Analyzer](agent/sw360-compatibility-analyzer.md) with the generated report from step 1 and the successful catalog paths from step 2. For example:
 
    ```json
    {
