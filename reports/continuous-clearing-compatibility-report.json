@@ -2,429 +2,359 @@
   "application": "continuous-clearing",
   "repository": "https://github.com/siemens/continuous-clearing",
   "branch": "main",
-  "sw360Version": "20.2.432",
-  "risk": "Low",
-  "generatedAt": "2026-11-12T12:40:58.002Z",
+  "oldRelease": "sw360-20.1.1",
+  "newRelease": "sw360-20.2.0-rc-1",
+  "risk": "MEDIUM",
+  "generatedAt": "2026-11-13T05:24:49.768Z",
   "summary": {
-    "totalApisUsedByApplication": 20,
-    "compatibleApis": 7,
-    "changedApis": 10,
-    "missingApis": 0,
-    "compatibilityIssues": 0,
-    "applicationContractMismatches": 3,
-    "documentationGaps": 7,
-    "indeterminateApis": 3,
+    "totalApisUsedByApplication": 19,
+    "apisWithReportedChanges": 10,
+    "addedApis": 0,
+    "modifiedApis": 10,
+    "removedApis": 0,
+    "unchangedApis": 8,
+    "unresolvedApis": 1,
+    "breakingApis": 0,
     "criticalApis": 0,
     "highApis": 0,
-    "mediumApis": 10,
-    "lowApis": 7
+    "mediumApis": 6,
+    "lowApis": 4
   },
   "apiAnalysis": [
     {
-      "apiId": "GET:/projects",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
+      "apiId": "GET:/resource/api/projects",
+      "diffApiId": "GET:/projects",
+      "status": "Modified",
+      "severity": "Low",
       "breakingChange": false,
-      "classificationReason": "The application uses the legacy query parameter _sw360_portlet_projects_STATE; OpenAPI declares state but not this parameter.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360ProjectService.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [
-          "The application uses the legacy query parameter _sw360_portlet_projects_STATE; OpenAPI declares state but not this parameter."
-        ],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/projects/{id}",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The application model reads embedded release and linked-release details that are not described by the ProjectMixin response schema.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360ProjectService.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The application model reads embedded release and linked-release details that are not described by the ProjectMixin response schema."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/users",
-      "status": "Indeterminate",
-      "changeType": "Indeterminate",
-      "severity": "Unknown",
-      "breakingChange": false,
-      "classificationReason": "The application catalog has no typed response DTO or response fields, so its consumed response contract cannot be compared.",
       "affectedFiles": [
         "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/releases",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The 200 response is documented only as an object with no properties, so the cataloged release and attachment response fields cannot be verified.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs",
-        "src/SIT.Services/Sw360Service.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The 200 response is documented only as an object with no properties, so the cataloged release and attachment response fields cannot be verified."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/releases/searchByExternalIds",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The application consumes a paginated HAL release collection, while OpenAPI declares a ReleaseMixin response and omits the collection wrapper.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs",
-        "src/SIT.Services/Sw360Service.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The application consumes a paginated HAL release collection, while OpenAPI declares a ReleaseMixin response and omits the collection wrapper."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/releases/{id}",
-      "status": "Changed",
-      "changeType": "ApplicationContractMismatch",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The application deserializes release fields at the response root, while OpenAPI references EntityModelRelease with a content wrapper.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs",
-        "src/SIT.Services/Sw360Service.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The application deserializes release fields at the response root, while OpenAPI references EntityModelRelease with a content wrapper."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/releases/{id}/triggerFossologyProcess",
-      "status": "Compatible",
-      "changeType": "No Change",
-      "severity": "Low",
-      "breakingChange": false,
-      "classificationReason": "Matched operation and cataloged contract fields are present in the supplied OpenAPI schema.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/components",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The application consumes page metadata and a namespaced HAL component collection that the OpenAPI response schema does not describe.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs",
-        "src/SIT.Services/Sw360Service.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The application consumes page metadata and a namespaced HAL component collection that the OpenAPI response schema does not describe."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/components/searchByExternalIds",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The application sends externalIds as a query parameter, but the operation declares none; its paginated namespaced response wrapper is also undocumented.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
         "parameterChanges": [
-          "The application sends externalIds as a query parameter, but the operation declares none; its paginated namespaced response wrapper is also undocumented."
-        ],
-        "enumChanges": [],
-        "securityChanges": []
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
       }
     },
     {
-      "apiId": "GET:/components/{id}",
-      "status": "Compatible",
-      "changeType": "No Change",
+      "apiId": "GET:/resource/api/users",
+      "diffApiId": "GET:/users",
+      "status": "Modified",
       "severity": "Low",
       "breakingChange": false,
-      "classificationReason": "Matched operation and cataloged contract fields are present in the supplied OpenAPI schema.",
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs",
-        "src/SIT.Services/Sw360Service.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:luceneSearch.default",
+            "change": "default changed: unspecified -> true."
+          }
+        ]
       }
     },
     {
-      "apiId": "POST:/projects/{id}/releases",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
+      "apiId": "GET:/resource/api/projects/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/releases/{id}/triggerFossologyProcess",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/components",
+      "diffApiId": "GET:/components",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/releases/searchByExternalIds",
+      "diffApiId": "GET:/releases/searchByExternalIds",
+      "status": "Modified",
       "severity": "Medium",
       "breakingChange": false,
-      "classificationReason": "The request body is documented as an unconstrained object; the AddLinkedRelease map value fields releaseRelation and comment are not specified.",
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [
-          "The request body is documented as an unconstrained object; the AddLinkedRelease map value fields releaseRelation and comment are not specified."
-        ],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
       }
     },
     {
-      "apiId": "PATCH:/projects/{id}/release/{releaseId}",
-      "status": "Compatible",
-      "changeType": "No Change",
-      "severity": "Low",
-      "breakingChange": false,
-      "classificationReason": "Matched operation and cataloged contract fields are present in the supplied OpenAPI schema.",
+      "apiId": "GET:/resource/api/components/searchByExternalIds",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
     },
     {
-      "apiId": "POST:/components",
-      "status": "Compatible",
-      "changeType": "No Change",
-      "severity": "Low",
-      "breakingChange": false,
-      "classificationReason": "Matched operation and cataloged contract fields are present in the supplied OpenAPI schema.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "POST:/releases",
-      "status": "Changed",
-      "changeType": "ApplicationContractMismatch",
+      "apiId": "GET:/resource/api/releases/{id}",
+      "diffApiId": "GET:/releases/{id}",
+      "status": "Modified",
       "severity": "Medium",
       "breakingChange": false,
-      "classificationReason": "The application request DTO includes _links, which is not declared in the OpenAPI ReleaseMixin request schema.",
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [
-          "The application request DTO includes _links, which is not declared in the OpenAPI ReleaseMixin request schema."
-        ],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
       }
     },
     {
-      "apiId": "PATCH:/releases/{id}",
-      "status": "Changed",
-      "changeType": "ApplicationContractMismatch",
+      "apiId": "GET:/resource/api/components/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "POST:/resource/api/projects/{id}/releases",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "PATCH:/resource/api/projects/{id}/release/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "POST:/resource/api/components",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "POST:/resource/api/releases",
+      "diffApiId": "POST:/releases",
+      "status": "Modified",
       "severity": "Medium",
       "breakingChange": false,
-      "classificationReason": "The application request DTO includes _links, which is not declared in the OpenAPI ReleaseMixin request schema.",
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [
-          "The application request DTO includes _links, which is not declared in the OpenAPI ReleaseMixin request schema."
-        ],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
       }
     },
     {
-      "apiId": "PATCH:/components/{id}",
-      "status": "Compatible",
-      "changeType": "No Change",
-      "severity": "Low",
+      "apiId": "PATCH:/resource/api/releases/{id}",
+      "diffApiId": "PATCH:/releases/{id}",
+      "status": "Modified",
+      "severity": "Medium",
       "breakingChange": false,
-      "classificationReason": "Matched operation and cataloged contract fields are present in the supplied OpenAPI schema.",
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
       }
     },
     {
-      "apiId": "PATCH:/projects/{id}",
-      "status": "Compatible",
-      "changeType": "No Change",
-      "severity": "Low",
+      "apiId": "PATCH:/resource/api/components/{id}",
+      "diffApiId": "PATCH:/components/{id}",
+      "status": "Modified",
+      "severity": "Medium",
       "breakingChange": false,
-      "classificationReason": "Matched operation and cataloged contract fields are present in the supplied OpenAPI schema.",
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360ProjectService.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
       }
     },
     {
-      "apiId": "POST:/releases/{releaseId}/attachments",
-      "status": "Compatible",
-      "changeType": "No Change",
+      "apiId": "PATCH:/resource/api/projects/{id}",
+      "diffApiId": "PATCH:/projects/{id}",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "ResponseSchema",
+      "description": "Runtime OpenAPI contract changed: ResponseSchema.",
+      "details": {
+        "responseChanges": [
+          {
+            "field": "responses.403",
+            "change": "Response status added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/resource/api/releases/{id}/attachments",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/AttachmentHelper.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/releases",
+      "diffApiId": "GET:/releases",
+      "status": "Modified",
       "severity": "Low",
       "breakingChange": false,
-      "classificationReason": "Matched operation and cataloged contract fields are present in the supplied OpenAPI schema.",
       "affectedFiles": [
-        "src/SIT.APICommunications/AttachmentHelper.cs",
-        "src/SIT.Services/Sw360CreatorService.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
       }
     },
     {
       "apiId": "GET:<SW360-provided-link>",
-      "status": "Indeterminate",
-      "changeType": "Indeterminate",
-      "severity": "Unknown",
-      "breakingChange": false,
-      "classificationReason": "The request target is supplied at runtime by SW360 and cannot be resolved to a static OpenAPI operation.",
+      "status": "Unresolved",
+      "severity": "",
+      "breakingChange": null,
       "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360CreatorService.cs",
-        "src/SIT.Services/Sw360Service.cs"
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:<SW360-attachment-download-link>",
-      "status": "Indeterminate",
-      "changeType": "Indeterminate",
-      "severity": "Unknown",
-      "breakingChange": false,
-      "classificationReason": "The download URL is supplied at runtime; its static operation and response contract cannot be determined.",
-      "affectedFiles": [
-        "src/SIT.APICommunications/SW360Apicommunication.cs",
-        "src/SIT.Services/Sw360Service.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
+      "changeType": "Unresolved",
+      "modificationType": "",
+      "description": "Compatibility could not be determined from the release diff because the catalog path is unknown or a SW360-provided link.",
+      "details": {}
     }
   ]
 }

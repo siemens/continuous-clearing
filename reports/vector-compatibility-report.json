@@ -2,224 +2,134 @@
   "application": "vector",
   "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector",
   "branch": "main",
-  "sw360Version": "20.2.432",
-  "risk": "Low",
-  "generatedAt": "2026-11-12T12:40:58.002Z",
+  "oldRelease": "sw360-20.1.1",
+  "newRelease": "sw360-20.2.0-rc-1",
+  "risk": "MEDIUM",
+  "generatedAt": "2026-11-13T05:24:49.768Z",
   "summary": {
-    "totalApisUsedByApplication": 10,
-    "compatibleApis": 0,
-    "changedApis": 10,
-    "missingApis": 0,
-    "compatibilityIssues": 0,
-    "applicationContractMismatches": 3,
-    "documentationGaps": 7,
-    "indeterminateApis": 0,
+    "totalApisUsedByApplication": 6,
+    "apisWithReportedChanges": 4,
+    "addedApis": 0,
+    "modifiedApis": 4,
+    "removedApis": 0,
+    "unchangedApis": 2,
+    "unresolvedApis": 0,
+    "breakingApis": 0,
     "criticalApis": 0,
     "highApis": 0,
-    "mediumApis": 10,
-    "lowApis": 0
+    "mediumApis": 1,
+    "lowApis": 3
   },
   "apiAnalysis": [
     {
-      "apiId": "GET:/components",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
+      "apiId": "GET:/resource/api/components",
+      "diffApiId": "GET:/components",
+      "status": "Modified",
+      "severity": "Low",
       "breakingChange": false,
-      "classificationReason": "The connector consumes page metadata and a namespaced HAL component collection, while the OpenAPI collection response does not describe those fields.",
       "affectedFiles": [
         "Vector/Sw360.Connector/Api/Sw360Client.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector consumes page metadata and a namespaced HAL component collection, while the OpenAPI collection response does not describe those fields."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
       }
     },
     {
-      "apiId": "GET:/components?name={name}",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The connector consumes page metadata and a namespaced HAL component collection, while the OpenAPI collection response does not describe those fields.",
+      "apiId": "GET:/resource/api/components/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
       "affectedFiles": [
         "Vector/Sw360.Connector/Api/Sw360Client.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector consumes page metadata and a namespaced HAL component collection, while the OpenAPI collection response does not describe those fields."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
     },
     {
-      "apiId": "GET:/components/{id}",
-      "status": "Changed",
-      "changeType": "ApplicationContractMismatch",
-      "severity": "Medium",
+      "apiId": "GET:/resource/api/releases",
+      "diffApiId": "GET:/releases",
+      "status": "Modified",
+      "severity": "Low",
       "breakingChange": false,
-      "classificationReason": "The connector deserializes component fields at the response root, while OpenAPI references EntityModelComponent with a content wrapper.",
       "affectedFiles": [
         "Vector/Sw360.Connector/Api/Sw360Client.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector deserializes component fields at the response root, while OpenAPI references EntityModelComponent with a content wrapper."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
       }
     },
     {
-      "apiId": "GET:/releases",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
+      "apiId": "GET:/resource/api/releases/{id}",
+      "diffApiId": "GET:/releases/{id}",
+      "status": "Modified",
       "severity": "Medium",
       "breakingChange": false,
-      "classificationReason": "The connector consumes a paginated HAL release collection, but OpenAPI documents the 200 response only as an object without properties.",
       "affectedFiles": [
         "Vector/Sw360.Connector/Api/Sw360Client.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector consumes a paginated HAL release collection, but OpenAPI documents the 200 response only as an object without properties."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
       }
     },
     {
-      "apiId": "GET:/releases?name={name}",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
+      "apiId": "GET:/resource/api/projects",
+      "diffApiId": "GET:/projects",
+      "status": "Modified",
+      "severity": "Low",
       "breakingChange": false,
-      "classificationReason": "The connector consumes a paginated HAL release collection, but OpenAPI documents the 200 response only as an object without properties.",
       "affectedFiles": [
         "Vector/Sw360.Connector/Api/Sw360Client.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector consumes a paginated HAL release collection, but OpenAPI documents the 200 response only as an object without properties."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
       }
     },
     {
-      "apiId": "GET:/releases/{id}",
-      "status": "Changed",
-      "changeType": "ApplicationContractMismatch",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The connector deserializes release fields at the response root, while OpenAPI references EntityModelRelease with a content wrapper.",
+      "apiId": "GET:/resource/api/projects/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
       "affectedFiles": [
         "Vector/Sw360.Connector/Api/Sw360Client.cs"
       ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector deserializes release fields at the response root, while OpenAPI references EntityModelRelease with a content wrapper."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/projects",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe.",
-      "affectedFiles": [
-        "Vector/Sw360.Connector/Api/Sw360Client.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/projects?{filters}",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe.",
-      "affectedFiles": [
-        "Vector/Sw360.Connector/Api/Sw360Client.cs",
-        "Vector/Vector.Application/Services/Sw360ComplianceService.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/projects?name={name}",
-      "status": "Changed",
-      "changeType": "OpenApiDocumentationGap",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe.",
-      "affectedFiles": [
-        "Vector/Sw360.Connector/Api/Sw360Client.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
-    },
-    {
-      "apiId": "GET:/projects/{id}",
-      "status": "Changed",
-      "changeType": "ApplicationContractMismatch",
-      "severity": "Medium",
-      "breakingChange": false,
-      "classificationReason": "The connector deserializes project fields at the response root, while OpenAPI references EntityModelProject with a content wrapper.",
-      "affectedFiles": [
-        "Vector/Sw360.Connector/Api/Sw360Client.cs"
-      ],
-      "contractChanges": {
-        "requestChanges": [],
-        "responseChanges": [
-          "The connector deserializes project fields at the response root, while OpenAPI references EntityModelProject with a content wrapper."
-        ],
-        "parameterChanges": [],
-        "enumChanges": [],
-        "securityChanges": []
-      }
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
     }
   ]
 }

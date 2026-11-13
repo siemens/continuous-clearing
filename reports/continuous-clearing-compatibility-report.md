@@ -2,138 +2,478 @@
 
 ## Application
 
-continuous-clearing
+Continuous Clearing
 
-## Repository and Branch
+## SW360 Release Transition
 
-https://github.com/siemens/continuous-clearing (main)
+sw360-20.1.1 to sw360-20.2.0-rc-1
 
-## SW360 Version
+## Risk
 
-20.2.432
-
-## Overall Risk
-
-LOW. No breaking CompatibilityIssue findings were identified.
+MEDIUM
 
 ## Summary
 
 | Metric | Count |
-|---|---:|
-| totalApisUsedByApplication | 20 |
-| compatibleApis | 7 |
-| changedApis | 10 |
-| missingApis | 0 |
-| compatibilityIssues | 0 |
-| applicationContractMismatches | 3 |
-| documentationGaps | 7 |
-| indeterminateApis | 3 |
-| criticalApis | 0 |
-| highApis | 0 |
-| mediumApis | 10 |
-| lowApis | 7 |
+|---------|---------|
+| APIs Used | 19 |
+| APIs With Reported Changes | 10 |
+| Added APIs | 0 |
+| Modified APIs | 10 |
+| Removed APIs | 0 |
+| Unchanged APIs | 8 |
+| Unresolved APIs | 1 |
+| Breaking APIs | 0 |
+| Critical APIs | 0 |
+| High APIs | 0 |
+| Medium APIs | 6 |
+| Low APIs | 4 |
 
-## Compatibility Issues
+## API Analysis
 
-None detected.
+### GET:/resource/api/projects
 
-## Application Contract Mismatches
+Status: Modified
 
-### GET:/releases/{id}
+Diff API ID: GET:/projects
 
-The application deserializes release fields at the response root, while OpenAPI references EntityModelRelease with a content wrapper.
+Severity: Low
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs, src/SIT.Services/Sw360Service.cs
+Breaking Change: No
 
-### POST:/releases
+Modification Type: Parameter
 
-The application request DTO includes _links, which is not declared in the OpenAPI ReleaseMixin request schema.
+Description: Runtime OpenAPI contract changed: Parameter.
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs
+Affected Files:
 
-### PATCH:/releases/{id}
+- src/SIT.APICommunications/SW360Apicommunication.cs
 
-The application request DTO includes _links, which is not declared in the OpenAPI ReleaseMixin request schema.
+Reported Details:
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs
+```json
+{
+  "parameterChanges": [
+    {
+      "field": "query:searchText",
+      "change": "Optional parameter added."
+    }
+  ]
+}
+```
 
+---
 
-## Documentation Gaps
+### GET:/resource/api/users
 
-### GET:/projects
+Status: Modified
 
-The application uses the legacy query parameter _sw360_portlet_projects_STATE; OpenAPI declares state but not this parameter.
+Diff API ID: GET:/users
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360ProjectService.cs, src/SIT.Services/Sw360CreatorService.cs
+Severity: Low
 
-### GET:/projects/{id}
+Breaking Change: No
 
-The application model reads embedded release and linked-release details that are not described by the ProjectMixin response schema.
+Modification Type: Parameter
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360ProjectService.cs
+Description: Runtime OpenAPI contract changed: Parameter.
 
-### GET:/releases
+Affected Files:
 
-The 200 response is documented only as an object with no properties, so the cataloged release and attachment response fields cannot be verified.
+- src/SIT.APICommunications/SW360Apicommunication.cs
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs, src/SIT.Services/Sw360Service.cs
+Reported Details:
 
-### GET:/releases/searchByExternalIds
+```json
+{
+  "parameterChanges": [
+    {
+      "field": "query:luceneSearch.default",
+      "change": "default changed: unspecified -> true."
+    }
+  ]
+}
+```
 
-The application consumes a paginated HAL release collection, while OpenAPI declares a ReleaseMixin response and omits the collection wrapper.
+---
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs, src/SIT.Services/Sw360Service.cs
+### GET:/resource/api/projects/{id}
 
-### GET:/components
+Status: Unchanged
 
-The application consumes page metadata and a namespaced HAL component collection that the OpenAPI response schema does not describe.
+Description: No change was reported for this API in the release transition.
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs, src/SIT.Services/Sw360Service.cs
+Affected Files:
 
-### GET:/components/searchByExternalIds
+- src/SIT.APICommunications/SW360Apicommunication.cs
 
-The application sends externalIds as a query parameter, but the operation declares none; its paginated namespaced response wrapper is also undocumented.
+---
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs
+### GET:/resource/api/releases/{id}/triggerFossologyProcess
 
-### POST:/projects/{id}/releases
+Status: Unchanged
 
-The request body is documented as an unconstrained object; the AddLinkedRelease map value fields releaseRelation and comment are not specified.
+Description: No change was reported for this API in the release transition.
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs
+Affected Files:
 
+- src/SIT.APICommunications/SW360Apicommunication.cs
 
-## Informational Findings
+---
 
-None detected.
+### GET:/resource/api/components
 
-## Indeterminate APIs
+Status: Modified
 
-### GET:/users
+Diff API ID: GET:/components
 
-The application catalog has no typed response DTO or response fields, so its consumed response contract cannot be compared.
+Severity: Low
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs
+Breaking Change: No
+
+Modification Type: Parameter
+
+Description: Runtime OpenAPI contract changed: Parameter.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "parameterChanges": [
+    {
+      "field": "query:searchText",
+      "change": "Optional parameter added."
+    }
+  ]
+}
+```
+
+---
+
+### GET:/resource/api/releases/searchByExternalIds
+
+Status: Modified
+
+Diff API ID: GET:/releases/searchByExternalIds
+
+Severity: Medium
+
+Breaking Change: No
+
+Modification Type: Enum
+
+Description: Runtime OpenAPI contract changed: Enum.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "enumChanges": [
+    {
+      "field": "responses.200.application/vnd.hal+json.schema.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    }
+  ]
+}
+```
+
+---
+
+### GET:/resource/api/components/searchByExternalIds
+
+Status: Unchanged
+
+Description: No change was reported for this API in the release transition.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+---
+
+### GET:/resource/api/releases/{id}
+
+Status: Modified
+
+Diff API ID: GET:/releases/{id}
+
+Severity: Medium
+
+Breaking Change: No
+
+Modification Type: Enum
+
+Description: Runtime OpenAPI contract changed: Enum.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "enumChanges": [
+    {
+      "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    }
+  ]
+}
+```
+
+---
+
+### GET:/resource/api/components/{id}
+
+Status: Unchanged
+
+Description: No change was reported for this API in the release transition.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+---
+
+### POST:/resource/api/projects/{id}/releases
+
+Status: Unchanged
+
+Description: No change was reported for this API in the release transition.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+---
+
+### PATCH:/resource/api/projects/{id}/release/{id}
+
+Status: Unchanged
+
+Description: No change was reported for this API in the release transition.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+---
+
+### POST:/resource/api/components
+
+Status: Unchanged
+
+Description: No change was reported for this API in the release transition.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+---
+
+### POST:/resource/api/releases
+
+Status: Modified
+
+Diff API ID: POST:/releases
+
+Severity: Medium
+
+Breaking Change: No
+
+Modification Type: Enum
+
+Description: Runtime OpenAPI contract changed: Enum.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "enumChanges": [
+    {
+      "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    },
+    {
+      "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    }
+  ]
+}
+```
+
+---
+
+### PATCH:/resource/api/releases/{id}
+
+Status: Modified
+
+Diff API ID: PATCH:/releases/{id}
+
+Severity: Medium
+
+Breaking Change: No
+
+Modification Type: Enum
+
+Description: Runtime OpenAPI contract changed: Enum.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "enumChanges": [
+    {
+      "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    },
+    {
+      "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    }
+  ]
+}
+```
+
+---
+
+### PATCH:/resource/api/components/{id}
+
+Status: Modified
+
+Diff API ID: PATCH:/components/{id}
+
+Severity: Medium
+
+Breaking Change: No
+
+Modification Type: Enum
+
+Description: Runtime OpenAPI contract changed: Enum.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "enumChanges": [
+    {
+      "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    }
+  ]
+}
+```
+
+---
+
+### PATCH:/resource/api/projects/{id}
+
+Status: Modified
+
+Diff API ID: PATCH:/projects/{id}
+
+Severity: Medium
+
+Breaking Change: No
+
+Modification Type: ResponseSchema
+
+Description: Runtime OpenAPI contract changed: ResponseSchema.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "responseChanges": [
+    {
+      "field": "responses.403",
+      "change": "Response status added."
+    }
+  ]
+}
+```
+
+---
+
+### POST:/resource/api/releases/{id}/attachments
+
+Status: Unchanged
+
+Description: No change was reported for this API in the release transition.
+
+Affected Files:
+
+- src/SIT.APICommunications/AttachmentHelper.cs
+
+---
+
+### GET:/resource/api/releases
+
+Status: Modified
+
+Diff API ID: GET:/releases
+
+Severity: Low
+
+Breaking Change: No
+
+Modification Type: Parameter
+
+Description: Runtime OpenAPI contract changed: Parameter.
+
+Affected Files:
+
+- src/SIT.APICommunications/SW360Apicommunication.cs
+
+Reported Details:
+
+```json
+{
+  "parameterChanges": [
+    {
+      "field": "query:searchText",
+      "change": "Optional parameter added."
+    }
+  ]
+}
+```
+
+---
 
 ### GET:<SW360-provided-link>
 
-The request target is supplied at runtime by SW360 and cannot be resolved to a static OpenAPI operation.
+Status: Unresolved
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360CreatorService.cs, src/SIT.Services/Sw360Service.cs
+Description: Compatibility could not be determined from the release diff because the catalog path is unknown or a SW360-provided link.
 
-### GET:<SW360-attachment-download-link>
+Affected Files:
 
-The download URL is supplied at runtime; its static operation and response contract cannot be determined.
+- src/SIT.APICommunications/SW360Apicommunication.cs
 
-Affected files: src/SIT.APICommunications/SW360Apicommunication.cs, src/SIT.Services/Sw360Service.cs
+---
 
-
-## Compatible APIs
-
-- GET:/releases/{id}/triggerFossologyProcess
-- GET:/components/{id}
-- PATCH:/projects/{id}/release/{releaseId}
-- POST:/components
-- PATCH:/components/{id}
-- PATCH:/projects/{id}
-- POST:/releases/{releaseId}/attachments

@@ -2,115 +2,188 @@
 
 ## Application
 
-vector
+Vector
 
-## Repository and Branch
+## SW360 Release Transition
 
-https://siemens.ghe.com/portfolio/acdc-tc-vector (main)
+sw360-20.1.1 to sw360-20.2.0-rc-1
 
-## SW360 Version
+## Risk
 
-20.2.432
-
-## Overall Risk
-
-LOW. No breaking CompatibilityIssue findings were identified.
+MEDIUM
 
 ## Summary
 
 | Metric | Count |
-|---|---:|
-| totalApisUsedByApplication | 10 |
-| compatibleApis | 0 |
-| changedApis | 10 |
-| missingApis | 0 |
-| compatibilityIssues | 0 |
-| applicationContractMismatches | 3 |
-| documentationGaps | 7 |
-| indeterminateApis | 0 |
-| criticalApis | 0 |
-| highApis | 0 |
-| mediumApis | 10 |
-| lowApis | 0 |
+|---------|---------|
+| APIs Used | 6 |
+| APIs With Reported Changes | 4 |
+| Added APIs | 0 |
+| Modified APIs | 4 |
+| Removed APIs | 0 |
+| Unchanged APIs | 2 |
+| Unresolved APIs | 0 |
+| Breaking APIs | 0 |
+| Critical APIs | 0 |
+| High APIs | 0 |
+| Medium APIs | 1 |
+| Low APIs | 3 |
 
-## Compatibility Issues
+## API Analysis
 
-None detected.
+### GET:/resource/api/components
 
-## Application Contract Mismatches
+Status: Modified
 
-### GET:/components/{id}
+Diff API ID: GET:/components
 
-The connector deserializes component fields at the response root, while OpenAPI references EntityModelComponent with a content wrapper.
+Severity: Low
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+Breaking Change: No
 
-### GET:/releases/{id}
+Modification Type: Parameter
 
-The connector deserializes release fields at the response root, while OpenAPI references EntityModelRelease with a content wrapper.
+Description: Runtime OpenAPI contract changed: Parameter.
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+Affected Files:
 
-### GET:/projects/{id}
+- Vector/Sw360.Connector/Api/Sw360Client.cs
 
-The connector deserializes project fields at the response root, while OpenAPI references EntityModelProject with a content wrapper.
+Reported Details:
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+```json
+{
+  "parameterChanges": [
+    {
+      "field": "query:searchText",
+      "change": "Optional parameter added."
+    }
+  ]
+}
+```
 
+---
 
-## Documentation Gaps
+### GET:/resource/api/components/{id}
 
-### GET:/components
+Status: Unchanged
 
-The connector consumes page metadata and a namespaced HAL component collection, while the OpenAPI collection response does not describe those fields.
+Description: No change was reported for this API in the release transition.
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+Affected Files:
 
-### GET:/components?name={name}
+- Vector/Sw360.Connector/Api/Sw360Client.cs
 
-The connector consumes page metadata and a namespaced HAL component collection, while the OpenAPI collection response does not describe those fields.
+---
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+### GET:/resource/api/releases
 
-### GET:/releases
+Status: Modified
 
-The connector consumes a paginated HAL release collection, but OpenAPI documents the 200 response only as an object without properties.
+Diff API ID: GET:/releases
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+Severity: Low
 
-### GET:/releases?name={name}
+Breaking Change: No
 
-The connector consumes a paginated HAL release collection, but OpenAPI documents the 200 response only as an object without properties.
+Modification Type: Parameter
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+Description: Runtime OpenAPI contract changed: Parameter.
 
-### GET:/projects
+Affected Files:
 
-The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe.
+- Vector/Sw360.Connector/Api/Sw360Client.cs
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+Reported Details:
 
-### GET:/projects?{filters}
+```json
+{
+  "parameterChanges": [
+    {
+      "field": "query:searchText",
+      "change": "Optional parameter added."
+    }
+  ]
+}
+```
 
-The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe.
+---
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs, Vector/Vector.Application/Services/Sw360ComplianceService.cs
+### GET:/resource/api/releases/{id}
 
-### GET:/projects?name={name}
+Status: Modified
 
-The connector consumes page metadata and a namespaced HAL project collection that the OpenAPI collection schema does not describe.
+Diff API ID: GET:/releases/{id}
 
-Affected files: Vector/Sw360.Connector/Api/Sw360Client.cs
+Severity: Medium
 
+Breaking Change: No
 
-## Informational Findings
+Modification Type: Enum
 
-None detected.
+Description: Runtime OpenAPI contract changed: Enum.
 
-## Indeterminate APIs
+Affected Files:
 
-None detected.
+- Vector/Sw360.Connector/Api/Sw360Client.cs
 
-## Compatible APIs
+Reported Details:
 
-None.
+```json
+{
+  "enumChanges": [
+    {
+      "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+      "change": "Enum values added: \"ADS_JSON\"."
+    }
+  ]
+}
+```
+
+---
+
+### GET:/resource/api/projects
+
+Status: Modified
+
+Diff API ID: GET:/projects
+
+Severity: Low
+
+Breaking Change: No
+
+Modification Type: Parameter
+
+Description: Runtime OpenAPI contract changed: Parameter.
+
+Affected Files:
+
+- Vector/Sw360.Connector/Api/Sw360Client.cs
+
+Reported Details:
+
+```json
+{
+  "parameterChanges": [
+    {
+      "field": "query:searchText",
+      "change": "Optional parameter added."
+    }
+  ]
+}
+```
+
+---
+
+### GET:/resource/api/projects/{id}
+
+Status: Unchanged
+
+Description: No change was reported for this API in the release transition.
+
+Affected Files:
+
+- Vector/Sw360.Connector/Api/Sw360Client.cs
+
+---
+
