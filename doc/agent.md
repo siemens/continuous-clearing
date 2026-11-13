@@ -1,49 +1,38 @@
-# SW360 Agent Usage
+SW360 Agent Workflow
 
-Run the agents in order: **OpenAPI Provider -> Application Dependency Scanner -> Compatibility Analyzer**. The analyzer compares application usage against one SW360 specification; it does not compare two releases.
+Use the agents in this order:
 
-## Manual
+1. **SW360 Release Analyzer** (`sw360-release-analyzer.agent.md`) discovers the newest published SW360 release and its immediate predecessor, obtains or derives exact-release OpenAPI specs, compares API operations, and writes `reports/sw360-api-diff-<latest-release>.json`. It also stores specs under `specs/` and updates `state/release-state.json` only after successful validation. If the newest release was already processed, it exits without regenerating the report.
+2. **SW360 Application Dependency Tracker** (`sw360-application-dependency-tracker.agent.md`) scans each requested application and writes successful catalogs to `catalogs/<application>-api-catalog.json`, plus a consolidated execution summary at `registry/api-dependency-catalog.json`. It continues after an individual application fails; check the summary and pass only successful catalog paths to the next step.
+3. **SW360 Compatibility Analyzer** (`sw360-compatibility-analyzer.agent.md`) matches each catalog's used APIs against the release diff and writes `reports/<application>-compatibility-report.json` and `.md`.
 
-In a Copilot agent session with repository, terminal, and network access, attach or reference each agent definition and provide its input. Run the next step only after the required output exists.
+The compatibility analyzer does not compare releases or read OpenAPI specs. The release diff is its sole source of API changes; it reports only changes matching an application's catalog. `Unchanged` means no change was reported, while `Unresolved` means compatibility could not be determined. Review unresolved entries and source evidence before making upgrade decisions.
 
-1. **Retrieve the specification.** Use [SW360 OpenAPI Provider](agent/sw360-openAPI-provider.md) with `{"version":"20.2.432"}` or `{}` for the live deployment. Note the returned `specLocation` and `resolvedVersion`. A requested version with the same major and minor as the live deployment resolves to the live version; other versions may require Docker or a source build.
-2. **Scan application repositories.** Use [Application Dependency Scanner](agent/sw360-application-dependency-scanner.md) with:
+## Running the workflow
 
-   ```json
-   {
-     "applications": [
-       {"application":"continuous-clearing","repository":"https://github.com/siemens/continuous-clearing","branch":"main"},
-       {"application":"vector","repository":"https://siemens.ghe.com/portfolio/acdc-tc-vector","branch":"main"}
-     ]
-   }
-   ```
+In a Copilot agent session, reference the corresponding definition under `.github/agents/` and provide each agent with its required input. Ensure repository, network, and terminal access are available. Run each step only after its required outputs exist and validate successfully.
 
-   Successful scans write `catalogs/<application>-api-catalog.json`. Check per-application errors; private repositories require appropriate access.
-3. **Analyze compatibility.** Use [SW360 Compatibility Analyzer](agent/sw360-compatibility-analyzer.md) with the actual `specLocation` from step 1 and the successful catalog paths from step 2. For example:
+For example, provide the dependency tracker with:
 
-   ```json
-   {
-     "sw360Spec": "specs/sw360-release-20.2.432.json",
-     "applicationCatalogs": [
-       "catalogs/continuous-clearing-api-catalog.json",
-       "catalogs/vector-api-catalog.json"
-     ]
-   }
-   ```
+```json
+{
+  "applications": [
+    {"application": "continuous-clearing", "repository": "https://github.com/siemens/continuous-clearing", "branch": "main"},
+    {"application": "vector", "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector", "branch": "main"}
+  ]
+}
+```
 
-   Each valid application produces `reports/<application>-compatibility-report.json` and `.md`. Review indeterminate results and source evidence before making upgrade decisions.
+For the compatibility analyzer, reference the release diff and successful catalog paths, for example:
 
-## Pipeline
+```text
+reports/sw360-api-diff-sw360-20.2.0-rc-1.json
+catalogs/continuous-clearing-api-catalog.json
+catalogs/vector-api-catalog.json
+```
 
-The existing [compatibility workflow](workflows/sw360-compatibility-analysis.yml) defines the same sequence, uploads `specs/`, `catalogs/`, and `reports/` as the `compatibility-reports` artifact, and commits generated files. It declares manual execution with an optional `sw360Version` input and a daily schedule at 02:00 UTC.
+The release analyzer discovers release tags itself; do not hardcode a baseline or fabricate a spec. The dependency tracker scans only the requested branch and must not overwrite application source. Private repositories need suitable access. Never include credential values in generated catalogs or reports.
 
-Before enabling it in GitHub Actions, address these prerequisites and mismatches:
+## GitHub Actions
 
-- Place the workflow under `.github/workflows/` in the repository's default branch for manual dispatch and scheduled runs. Configure repository write permissions for the final commit and push.
-- The workflow references agent files under `.github/agents/`, but the definitions currently live in `agent/`. Align the paths and confirm that the configured `github/copilot-agent@v1` action exists, is available to the repository, and supports the shown `agent-file` and `input` arguments; the workflow alone does not establish this.
-- Move cleanup after checkout if it is intended to remove checked-out generated files. Ensure any cleanup is appropriate for the files that should be retained.
-- Pass the provider's actual `specLocation` to the analyzer, not `specs/`. Pass only catalogs from successful scans, and stop or report failures when required inputs are unavailable.
-- An empty dispatch input currently becomes `"version": ""`; omit it or send `null` for the provider's documented live-deployment behavior. Scheduled runs also need this handling.
-- Provide network access and credentials for private repositories and the SW360 endpoint; release-specific retrieval may additionally need Docker or build dependencies.
-
-Once configured, run **Actions -> SW360 Compatibility Analysis -> Run workflow**, optionally set `sw360Version`, and inspect the run logs and uploaded artifact. Scheduled runs use the configured default behavior without a dispatch input.
+The workflow in `.github/workflows/sw360-compatibility-analysis.yml` is a separate automation entry point. Before relying on it, verify its agent paths, action availability and input contract, permissions for any commit/push, cleanup order, and handling of failed scans or missing outputs against the current agent definitions. Provide the required SW360 and private-repository access, and any Docker/build dependencies needed to obtain release specs. Inspect the workflow run logs and generated artifact to confirm the full sequence succeeded.
