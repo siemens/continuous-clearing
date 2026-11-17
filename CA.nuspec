@@ -60,11 +60,8 @@
     <file src="out\net10.0\log4net.dll" target="tools\log4net.dll"/>
     <file src="out\net10.0\Polly.Core.dll" target="tools\Polly.Core.dll"/>
     <file src="out\net10.0\Polly.dll" target="tools\Polly.dll"/>
-    <file src="out\net10.0\Markdig.Signed.dll" target="tools\Markdig.Signed.dll"/>
     <file src="out\net10.0\Microsoft.ApplicationInsights.dll" target="tools\Microsoft.ApplicationInsights.dll"/>
     <file src="out\net10.0\Microsoft.Build.Locator.dll" target="tools\Microsoft.Build.Locator.dll"/>
-    <file src="out\net10.0\Microsoft.CodeAnalysis.CSharp.dll" target="tools\Microsoft.CodeAnalysis.CSharp.dll"/>
-    <file src="out\net10.0\Microsoft.CodeAnalysis.dll" target="tools\Microsoft.CodeAnalysis.dll"/>
     <file src="out\net10.0\Microsoft.ComponentDetection.Common.dll" target="tools\Microsoft.ComponentDetection.Common.dll"/>
     <file src="out\net10.0\Microsoft.ComponentDetection.Contracts.dll" target="tools\Microsoft.ComponentDetection.Contracts.dll"/>
     <file src="out\net10.0\Microsoft.ComponentDetection.Detectors.dll" target="tools\Microsoft.ComponentDetection.Detectors.dll"/>
@@ -87,18 +84,13 @@
     <file src="out\net10.0\Microsoft.Extensions.Http.dll" target="tools\Microsoft.Extensions.Http.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.Abstractions.dll" target="tools\Microsoft.Extensions.Logging.Abstractions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Logging.dll" target="tools\Microsoft.Extensions.Logging.dll"/>
-    <file src="out\net10.0\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll" target="tools\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Options.dll" target="tools\Microsoft.Extensions.Options.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll" target="tools\Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
     <file src="out\net10.0\Microsoft.Extensions.Primitives.dll" target="tools\Microsoft.Extensions.Primitives.dll"/>
     <file src="out\net10.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="tools\Microsoft.VisualStudio.CodeCoverage.Shim.dll"/>
-    <file src="out\net10.0\Microsoft.Web.Administration.dll" target="tools\Microsoft.Web.Administration.dll"/>
-    <file src="out\net10.0\Microsoft.Win32.Registry.AccessControl.dll" target="tools\Microsoft.Win32.Registry.AccessControl.dll"/>
     <file src="out\net10.0\Microsoft.Win32.SystemEvents.dll" target="tools\Microsoft.Win32.SystemEvents.dll"/>
-    <file src="out\net10.0\Namotion.Reflection.dll" target="tools\Namotion.Reflection.dll"/>
     <file src="out\net10.0\Newtonsoft.Json.Bson.dll" target="tools\Newtonsoft.Json.Bson.dll"/>
     <file src="out\net10.0\Newtonsoft.Json.dll" target="tools\Newtonsoft.Json.dll"/>
-    <file src="out\net10.0\NJsonSchema.dll" target="tools\NJsonSchema.dll"/>
     <file src="out\net10.0\NuGet.Common.dll" target="tools\NuGet.Common.dll"/>
     <file src="out\net10.0\NuGet.Configuration.dll" target="tools\NuGet.Configuration.dll"/>
     <file src="out\net10.0\NuGet.DependencyResolver.Core.dll" target="tools\NuGet.DependencyResolver.Core.dll"/>
@@ -123,132 +115,21 @@
     <file src="out\net10.0\SIT.Create.exe" target="tools\SIT.Create.exe"/>
     <file src="out\net10.0\SIT.Create.pdb" target="tools\SIT.Create.pdb"/>
     <file src="out\net10.0\SIT.Create.runtimeconfig.json" target="tools\SIT.Create.runtimeconfig.json"/>
-    <file src="out\net10.0\System.CodeDom.dll" target="tools\System.CodeDom.dll"/>
     <file src="out\net10.0\System.Configuration.ConfigurationManager.dll" target="tools\System.Configuration.ConfigurationManager.dll"/>
     <file src="out\net10.0\System.Diagnostics.EventLog.dll" target="tools\System.Diagnostics.EventLog.dll"/>
-    <file src="out\net10.0\System.DirectoryServices.dll" target="tools\System.DirectoryServices.dll"/>
     <file src="out\net10.0\System.Drawing.Common.dll" target="tools\System.Drawing.Common.dll"/>
     <file src="out\net10.0\System.Private.Windows.Core.dll" target="tools\System.Private.Windows.Core.dll"/>
     <file src="out\net10.0\System.Private.Windows.GdiPlus.dll" target="tools\System.Private.Windows.GdiPlus.dll"/>
-    <file src="out\net10.0\System.Management.dll" target="tools\System.Management.dll"/>
     <file src="out\net10.0\System.Net.Http.Formatting.dll" target="tools\System.Net.Http.Formatting.dll"/>
     <file src="out\net10.0\System.Security.Cryptography.Pkcs.dll" target="tools\System.Security.Cryptography.Pkcs.dll"/>
     <file src="out\net10.0\System.Security.Cryptography.ProtectedData.dll" target="tools\System.Security.Cryptography.ProtectedData.dll"/>
-    <file src="out\net10.0\System.Security.Permissions.dll" target="tools\System.Security.Permissions.dll"/>
-    <file src="out\net10.0\System.Windows.Extensions.dll" target="tools\System.Windows.Extensions.dll"/>
     <file src="out\net10.0\SIT.Telemetry.dll" target="tools\SIT.Telemetry.dll"/>
     <file src="out\net10.0\Tommy.dll" target="tools\Tommy.dll"/>
     <file src="out\net10.0\YamlDotNet.dll" target="tools\YamlDotNet.dll"/>
-    <file src="out\net10.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\cs\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\cs\Microsoft.CodeAnalysis.resources.dll" target="tools\cs\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\de\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\de\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\de\Microsoft.CodeAnalysis.resources.dll" target="tools\de\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\es\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\es\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\es\Microsoft.CodeAnalysis.resources.dll" target="tools\es\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\fr\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\fr\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\fr\Microsoft.CodeAnalysis.resources.dll" target="tools\fr\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\it\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\it\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\it\Microsoft.CodeAnalysis.resources.dll" target="tools\it\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\ja\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\ja\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\ja\Microsoft.CodeAnalysis.resources.dll" target="tools\ja\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\ko\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\ko\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\ko\Microsoft.CodeAnalysis.resources.dll" target="tools\ko\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\pl\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\pl\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\pl\Microsoft.CodeAnalysis.resources.dll" target="tools\pl\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\pt-BR\Microsoft.CodeAnalysis.resources.dll" target="tools\pt-BR\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\ru\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\ru\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\ru\Microsoft.CodeAnalysis.resources.dll" target="tools\ru\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\tr\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\tr\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\tr\Microsoft.CodeAnalysis.resources.dll" target="tools\tr\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\zh-Hans\Microsoft.CodeAnalysis.resources.dll" target="tools\zh-Hans\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll" target="tools\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll"/>
-    <file src="out\net10.0\zh-Hant\Microsoft.CodeAnalysis.resources.dll" target="tools\zh-Hant\Microsoft.CodeAnalysis.resources.dll"/>
-    <file src="out\net10.0\runtimes\linux-arm\native\libpsl-native.so" target="tools\runtimes\linux-arm\native\libpsl-native.so"/>
-    <file src="out\net10.0\runtimes\linux-arm64\native\libpsl-native.so" target="tools\runtimes\linux-arm64\native\libpsl-native.so"/>
-    <file src="out\net10.0\runtimes\linux-musl-x64\native\libpsl-native.so" target="tools\runtimes\linux-musl-x64\native\libpsl-native.so"/>
-    <file src="out\net10.0\runtimes\linux-x64\native\libmi.so" target="tools\runtimes\linux-x64\native\libmi.so"/>
-    <file src="out\net10.0\runtimes\linux-x64\native\libpsl-native.so" target="tools\runtimes\linux-x64\native\libpsl-native.so"/>
-    <file src="out\net10.0\runtimes\linux-x64\native\libpsrpclient.so" target="tools\runtimes\linux-x64\native\libpsrpclient.so"/>
-    <file src="out\net10.0\runtimes\osx\native\libmi.dylib" target="tools\runtimes\osx\native\libmi.dylib"/>
-    <file src="out\net10.0\runtimes\osx\native\libpsl-native.dylib" target="tools\runtimes\osx\native\libpsl-native.dylib"/>
-    <file src="out\net10.0\runtimes\osx\native\libpsrpclient.dylib" target="tools\runtimes\osx\native\libpsrpclient.dylib"/>
-    <file src="out\net10.0\runtimes\win-arm\native\mi.dll" target="tools\runtimes\win-arm\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win-arm\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win-arm\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win-arm\native\miutils.dll" target="tools\runtimes\win-arm\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win-arm\native\PowerShell.Core.Instrumentation.dll" target="tools\runtimes\win-arm\native\PowerShell.Core.Instrumentation.dll"/>
-    <file src="out\net10.0\runtimes\win-arm\native\pwrshplugin.dll" target="tools\runtimes\win-arm\native\pwrshplugin.dll"/>
-    <file src="out\net10.0\runtimes\win-arm64\native\mi.dll" target="tools\runtimes\win-arm64\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win-arm64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win-arm64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win-arm64\native\miutils.dll" target="tools\runtimes\win-arm64\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win-arm64\native\PowerShell.Core.Instrumentation.dll" target="tools\runtimes\win-arm64\native\PowerShell.Core.Instrumentation.dll"/>
-    <file src="out\net10.0\runtimes\win-arm64\native\pwrshplugin.dll" target="tools\runtimes\win-arm64\native\pwrshplugin.dll"/>
-    <file src="out\net10.0\runtimes\win-x64\native\PowerShell.Core.Instrumentation.dll" target="tools\runtimes\win-x64\native\PowerShell.Core.Instrumentation.dll"/>
-    <file src="out\net10.0\runtimes\win-x64\native\pwrshplugin.dll" target="tools\runtimes\win-x64\native\pwrshplugin.dll"/>
-    <file src="out\net10.0\runtimes\win-x86\native\PowerShell.Core.Instrumentation.dll" target="tools\runtimes\win-x86\native\PowerShell.Core.Instrumentation.dll"/>
-    <file src="out\net10.0\runtimes\win-x86\native\pwrshplugin.dll" target="tools\runtimes\win-x86\native\pwrshplugin.dll"/>
-    <file src="out\net10.0\runtimes\win10-x64\native\mi.dll" target="tools\runtimes\win10-x64\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win10-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win10-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win10-x64\native\miutils.dll" target="tools\runtimes\win10-x64\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win10-x86\native\mi.dll" target="tools\runtimes\win10-x86\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win10-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win10-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win10-x86\native\miutils.dll" target="tools\runtimes\win10-x86\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win7-x64\native\mi.dll" target="tools\runtimes\win7-x64\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win7-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win7-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win7-x64\native\miutils.dll" target="tools\runtimes\win7-x64\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win7-x86\native\mi.dll" target="tools\runtimes\win7-x86\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win7-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win7-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win7-x86\native\miutils.dll" target="tools\runtimes\win7-x86\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win8-x64\native\mi.dll" target="tools\runtimes\win8-x64\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win8-x64\native\miutils.dll" target="tools\runtimes\win8-x64\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win8-x86\native\mi.dll" target="tools\runtimes\win8-x86\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win8-x86\native\miutils.dll" target="tools\runtimes\win8-x86\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win81-x64\native\mi.dll" target="tools\runtimes\win81-x64\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win81-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win81-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win81-x64\native\miutils.dll" target="tools\runtimes\win81-x64\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\win81-x86\native\mi.dll" target="tools\runtimes\win81-x86\native\mi.dll"/>
-    <file src="out\net10.0\runtimes\win81-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" target="tools\runtimes\win81-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
-    <file src="out\net10.0\runtimes\win81-x86\native\miutils.dll" target="tools\runtimes\win81-x86\native\miutils.dll"/>
-    <file src="out\net10.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Utility.dll" target="tools\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Utility.dll"/>
-    <file src="out\net10.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.MarkdownRender.dll" target="tools\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.MarkdownRender.dll"/>
-    <file src="out\net10.0\runtimes\unix\lib\netcoreapp3.1\System.Management.Automation.dll" target="tools\runtimes\unix\lib\netcoreapp3.1\System.Management.Automation.dll"/>
-    <file src="out\net10.0\runtimes\unix\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll" target="tools\runtimes\unix\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll"/>
-    <file src="out\net10.0\runtimes\unix\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\unix\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\System.Security.Cryptography.Pkcs.dll" target="tools\runtimes\win\lib\net10.0\System.Security.Cryptography.Pkcs.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\Microsoft.Win32.SystemEvents.dll" target="tools\runtimes\win\lib\net10.0\Microsoft.Win32.SystemEvents.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.dll" target="tools\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.dll"/>
     <file src="out\net10.0\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.Messages.dll" target="tools\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.Messages.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll" target="tools\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp2.0\System.Management.dll" target="tools\runtimes\win\lib\netcoreapp2.0\System.Management.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll" target="tools\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Utility.dll" target="tools\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Utility.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.CoreCLR.Eventing.dll" target="tools\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.CoreCLR.Eventing.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.MarkdownRender.dll" target="tools\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.MarkdownRender.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netcoreapp3.1\System.Management.Automation.dll" target="tools\runtimes\win\lib\netcoreapp3.1\System.Management.Automation.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll" target="tools\runtimes\win\lib\netstandard1.5\System.ServiceProcess.ServiceController.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netstandard2.0\Microsoft.Win32.Registry.AccessControl.dll" target="tools\runtimes\win\lib\netstandard2.0\Microsoft.Win32.Registry.AccessControl.dll"/>
-    <file src="out\net10.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll" target="tools\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll"/>
-    <file src="out\net10.0\runtimes\win-arm\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win-arm\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win-arm\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win-arm\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win-arm64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win-arm64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win-arm64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win-arm64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win10-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win10-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win10-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win10-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win10-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win10-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win10-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win10-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win7-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win7-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win7-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win7-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win7-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win7-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win7-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win7-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win8-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win8-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win8-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win8-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win8-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win8-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win8-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win8-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win81-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win81-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win81-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win81-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
-    <file src="out\net10.0\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" target="tools\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll"/>
-    <file src="out\net10.0\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" target="tools\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll"/>
     <file src="out\net10.0\Azure.Core.dll" target="tools\Azure.Core.dll"/>
 	  <file src="out\net10.0\Azure.Identity.dll" target="tools\Azure.Identity.dll"/>
 	  <file src="out\net10.0\Azure.Security.KeyVault.Certificates.dll" target="tools\Azure.Security.KeyVault.Certificates.dll"/>
@@ -264,5 +145,18 @@
    <file src="out\net10.0\SW360KeycloakService.dll" target="tools\SW360KeycloakService.dll"/>
     <file src="out\net10.0\SW360KeycloakService.pdb" target="tools\SW360KeycloakService.pdb"/>
     <file src="out\net10.0\SW360KeycloakService.deps.json" target="tools\SW360KeycloakService.deps.json"/>
+    <file src="out\net10.0\Docker.DotNet.dll" target="tools\Docker.DotNet.dll"/>
+    <file src="out\net10.0\DotNet.Glob.dll" target="tools\DotNet.Glob.dll"/>
+    <file src="out\net10.0\Microsoft.AspNetCore.WebUtilities.dll" target="tools\Microsoft.AspNetCore.WebUtilities.dll"/>
+    <file src="out\net10.0\Microsoft.Extensions.Hosting.Abstractions.dll" target="tools\Microsoft.Extensions.Hosting.Abstractions.dll"/>
+    <file src="out\net10.0\Microsoft.Net.Http.Headers.dll" target="tools\Microsoft.Net.Http.Headers.dll"/>
+    <file src="out\net10.0\MoreLinq.dll" target="tools\MoreLinq.dll"/>
+    <file src="out\net10.0\SemanticVersioning.dll" target="tools\SemanticVersioning.dll"/>
+    <file src="out\net10.0\Spectre.Console.Ansi.dll" target="tools\Spectre.Console.Ansi.dll"/>
+    <file src="out\net10.0\Sprache.dll" target="tools\Sprache.dll"/>
+    <file src="out\net10.0\System.Reactive.dll" target="tools\System.Reactive.dll"/>
+    <file src="out\net10.0\Tomlyn.Signed.dll" target="tools\Tomlyn.Signed.dll"/>
+    <file src="out\net10.0\Validation.dll" target="tools\Validation.dll"/>
+    <file src="out\net10.0\Valleysoft.DockerfileModel.dll" target="tools\Valleysoft.DockerfileModel.dll"/>
   </files>
 </package>
