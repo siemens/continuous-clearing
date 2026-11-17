@@ -26,7 +26,7 @@ namespace SIT.Telemetry
                 return string.Empty;
             }
             byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
-            return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            return Convert.ToHexStringLower(hashBytes);
         }
         #endregion
     }

@@ -13,12 +13,10 @@ using SIT.Common;
 using SIT.Services.Interface;
 using SIT.Upload.Model;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Directory = System.IO.Directory;
 
 namespace SIT.Upload
 {
@@ -26,14 +24,14 @@ namespace SIT.Upload
     {
         #region Fields
 
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(typeof(ArtifactoryUploader));
 
         #endregion
 
         #region Properties
 
-        public static IJFrogService JFrogService { get; set; }
-        public static IJFrogApiCommunication JFrogApiCommInstance { get; set; }
+        public static IJFrogService JFrogService { get; set; } = null!;
+        public static IJFrogApiCommunication JFrogApiCommInstance { get; set; } = null!;
 
         #endregion
 
@@ -161,9 +159,9 @@ namespace SIT.Upload
         /// <param name="jFrogService">The JFrog service instance.</param>
         /// <param name="component">The component to get information for.</param>
         /// <returns>A task containing the AQL result with package information, or null if not found.</returns>
-        private static async Task<AqlResult> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
+        private static async Task<AqlResult?> GetPackageInfoWithRetry(IJFrogService jFrogService, ComponentsToArtifactory component)
         {
-            async Task<AqlResult> TryGetPackageInfo(ComponentsToArtifactory component)
+            async Task<AqlResult?> TryGetPackageInfo(ComponentsToArtifactory component)
                 => await jFrogService.GetPackageInfo(component);
 
             var packageInfo = await TryGetPackageInfo(component);
@@ -192,34 +190,6 @@ namespace SIT.Upload
             }
 
             return packageInfo;
-        }
-
-        /// <summary>
-        /// Gets the path for Artifactory upload directory.
-        /// </summary>
-        /// <returns>The local path for Artifactory upload.</returns>
-        public static string GettPathForArtifactoryUpload()
-        {
-            string localPathforartifactory = string.Empty;
-            try
-            {
-                String Todaysdate = DateTime.Now.ToString("dd-MM-yyyy_ss");
-                localPathforartifactory = $"{Directory.GetParent(Directory.GetCurrentDirectory())}\\ClearingTool\\ArtifactoryFiles\\{Todaysdate}\\";
-                if (!Directory.Exists(localPathforartifactory))
-                {
-                    localPathforartifactory = Directory.CreateDirectory(localPathforartifactory).ToString();
-                }
-            }
-            catch (IOException ex)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Failed to create directory ", ex, "IOException occurred while creating the directory.");
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("GettPathForArtifactoryUpload", $"Unauthorized access while creating directory", ex, "UnauthorizedAccessException occurred while creating the directory.");
-            }
-
-            return localPathforartifactory;
         }
 
         #endregion

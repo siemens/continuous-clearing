@@ -17,47 +17,47 @@ namespace SIT.Upload.Model
     {
         #region Properties
 
-        public List<ComponentsToArtifactory> UnknownPackagesNpm { get; set; }
-        public List<ComponentsToArtifactory> UnknownPackagesNuget { get; set; }
-        public List<ComponentsToArtifactory> UnknownPackagesConan { get; set; }
-        public List<ComponentsToArtifactory> UnknownPackagesPython { get; set; }
-        public List<ComponentsToArtifactory> UnknownPackagesDebian { get; set; }
-        public List<ComponentsToArtifactory> UnknownPackagesMaven { get; set; }
-        public List<ComponentsToArtifactory> UnknownPackagesCargo { get; set; }
-        public List<ComponentsToArtifactory> UnknownPackagesChoco { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesNpm { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundOptionalDevDepsNpm { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesNuget { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesConan { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesPython { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesDebian { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesMaven { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesCargo { get; set; }
-        public List<ComponentsToArtifactory> JfrogNotFoundPackagesChoco { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesNpm { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesNuget { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesConan { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesPython { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesDebian { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesMaven { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesCargo { get; set; }
-        public List<ComponentsToArtifactory> JfrogFoundPackagesChoco { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesNpm { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesNuget { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesConan { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesPython { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesCargo { get; set; }
-        public List<ComponentsToArtifactory> SuccessfullPackagesChoco { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesNpm { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesNuget { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesConan { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesPython { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesDebian { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesMaven { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesCargo { get; set; }
-        public List<ComponentsToArtifactory> SkippedPreReleasePackagesChoco { get; set; }
+        public List<ComponentsToArtifactory> UnknownPackagesNpm { get; set; } = [];
+        public List<ComponentsToArtifactory> UnknownPackagesNuget { get; set; } = [];
+        public List<ComponentsToArtifactory> UnknownPackagesConan { get; set; } = [];
+        public List<ComponentsToArtifactory> UnknownPackagesPython { get; set; } = [];
+        public List<ComponentsToArtifactory> UnknownPackagesDebian { get; set; } = [];
+        public List<ComponentsToArtifactory> UnknownPackagesMaven { get; set; } = [];
+        public List<ComponentsToArtifactory> UnknownPackagesCargo { get; set; } = [];
+        public List<ComponentsToArtifactory> UnknownPackagesChoco { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesNpm { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundOptionalDevDepsNpm { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesNuget { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesConan { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesPython { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesDebian { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesMaven { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesCargo { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogNotFoundPackagesChoco { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesNpm { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesNuget { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesConan { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesPython { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesDebian { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesMaven { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesCargo { get; set; } = [];
+        public List<ComponentsToArtifactory> JfrogFoundPackagesChoco { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesNpm { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesNuget { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesConan { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesPython { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesDebian { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesMaven { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesCargo { get; set; } = [];
+        public List<ComponentsToArtifactory> SuccessfullPackagesChoco { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesNpm { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesNuget { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesConan { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesPython { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesDebian { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesMaven { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesCargo { get; set; } = [];
+        public List<ComponentsToArtifactory> SkippedPreReleasePackagesChoco { get; set; } = [];
 
         #endregion
     }

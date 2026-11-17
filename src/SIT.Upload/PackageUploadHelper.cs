@@ -37,14 +37,14 @@ namespace SIT.Upload
     {
         #region Fields
 
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(typeof(PackageUploadHelper));
         private static bool SetWarningCode;
 
         #endregion
 
         #region Properties
 
-        public static IJFrogService JFrogService { get; set; }
+        public static IJFrogService JFrogService { get; set; } = null!;
 
         #endregion
 
@@ -61,10 +61,10 @@ namespace SIT.Upload
         /// content consumed is the same content whose signature was verified (TOCTOU protection).
         /// </param>
         /// <returns>A Bom object containing the components.</returns>
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string? verifiedBomContent = null)
+        public static Bom? GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string? verifiedBomContent = null)
         {
             Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
-            Bom componentsToBoms = null;
+            Bom? componentsToBoms = null;
             try
             {
                 if (!string.IsNullOrEmpty(verifiedBomContent))
@@ -103,7 +103,7 @@ namespace SIT.Upload
         /// <param name="responseMessage">The HTTP response message.</param>
         /// <param name="dryRunSuffix">The suffix for dry run mode.</param>
         /// <returns>A task containing the components to Artifactory information.</returns>
-        private static Task<ComponentsToArtifactory> GetPackageinfo(ComponentsToArtifactory item, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
+        private static Task<ComponentsToArtifactory> GetPackageinfo(ComponentsToArtifactory item, string operationType, HttpResponseMessage responseMessage, string? dryRunSuffix)
         {
 
             ComponentsToArtifactory components = new ComponentsToArtifactory()
@@ -174,7 +174,7 @@ namespace SIT.Upload
         /// <param name="responseMessage">The HTTP response message.</param>
         /// <param name="dryRunSuffix">The suffix for dry run mode.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
+        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo, string operationType, HttpResponseMessage responseMessage, string? dryRunSuffix)
         {
             ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
             AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, notFound: false);
@@ -491,7 +491,7 @@ namespace SIT.Upload
         /// <returns>A task representing the asynchronous operation.</returns>
         private static async Task SourceRepoFoundToUploadArtifactory(PackageType packageType, UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            const string dryRunSuffix = null;
+            const string? dryRunSuffix = null;
             string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
             ArtifactoryUploader.JFrogService = JFrogService;
             ArtifactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
