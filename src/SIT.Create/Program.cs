@@ -76,13 +76,37 @@ namespace SIT.Create
             (sw360ProjectService, sW360ApicommunicationFacade) = await Getsw360ProjectServiceObject(appSettings);
             ProjectReleases projectReleases = new ProjectReleases();
 
+            // Create the telemetry helper early (if enabled) so dependency health (SW360) can be reported
+            // during this run, in addition to the final app-data/KPI events sent via StartTelemetry.
+            TelemetryHelper telemetryHelper = appSettings.Telemetry?.Enable == true ? new TelemetryHelper(appSettings) : null;
+            telemetryHelper?.EnsureInitialized(caToolInformation.CatoolVersion, TelemetryConstant.SITCreateComponent);
+
             string FolderPath = CommonHelper.LogFolderInitialization(appSettings, logFileNameWithTimestamp, m_Verbose);
             Logger.Logger.Log(null, Level.Debug, $"log manager initiated folder name: {FolderPath}", null);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             settingsManager.CheckRequiredArgsToRun(appSettings, Dataconstant.Create);
             LoggerHelper.SpectreConsoleInitialMessage("SIT Create");
             CommonHelper.DisplayTokenExpiryWarning(appSettings);
-            int isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+            // KPI: "Infrastructure Availability" - report whether the SW360 dependency call succeeded or failed.
+            Stopwatch sw360Stopwatch = Stopwatch.StartNew();
+            int isValid;
+            bool sw360Success = true;
+            string sw360ErrorMessage = null;
+            try
+            {
+                isValid = await CreatorValidator.ValidateAppSettings(appSettings, sw360ProjectService, projectReleases);
+            }
+            catch (Exception ex)
+            {
+                sw360Success = false;
+                sw360ErrorMessage = ex.Message;
+                throw;
+            }
+            finally
+            {
+                sw360Stopwatch.Stop();
+                telemetryHelper?.TrackDependencyCall("SW360", sw360Success, sw360Stopwatch.Elapsed, TelemetryConstant.SITCreateComponent, sw360ErrorMessage);
+            }
 
             if (isValid == -1)
             {
@@ -108,8 +132,30 @@ namespace SIT.Create
                 {
                     Timeout = TimeSpan.FromSeconds(appSettings.TimeOut)
                 };
-                if (await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper))
-                    await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
+                // KPI: "Infrastructure Availability" - report whether the Fossology dependency call succeeded or failed.
+                Stopwatch fossologyStopwatch = Stopwatch.StartNew();
+                bool fossologySuccess = true;
+                string fossologyErrorMessage = null;
+                try
+                {
+                    bool fossologyUrlValid = await CreatorValidator.FossologyUrlValidation(appSettings, client, environmentHelper);
+                    fossologySuccess = fossologyUrlValid;
+                    if (!fossologyUrlValid)
+                        fossologyErrorMessage = "Fossology URL validation failed";
+                    else
+                        await CreatorValidator.TriggerFossologyValidation(appSettings, sW360ApicommunicationFacade, environmentHelper);
+                }
+                catch (Exception ex)
+                {
+                    fossologySuccess = false;
+                    fossologyErrorMessage = ex.Message;
+                    throw;
+                }
+                finally
+                {
+                    fossologyStopwatch.Stop();
+                    telemetryHelper?.TrackDependencyCall("Fossology", fossologySuccess, fossologyStopwatch.Elapsed, TelemetryConstant.SITCreateComponent, fossologyErrorMessage);
+                }
             }
             await InitiatePackageCreatorProcess(appSettings, sw360ProjectService, sW360ApicommunicationFacade);
 
@@ -119,8 +165,7 @@ namespace SIT.Create
             // Initialize telemetry with CATool version and instrumentation key only if Telemetry is enabled in appsettings
             if (appSettings.Telemetry.Enable)
             {
-                TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
-                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreateAppData, TelemetryConstant.CreateKpiData, CreatorStopWatch?.Elapsed);
+                telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, ComponentCreator.KpiData, TelemetryConstant.CreateAppData, TelemetryConstant.CreateKpiData, TelemetryConstant.SITCreateComponent, CreatorStopWatch?.Elapsed);
             }
             Logger.Logger.Log(null, Level.Notice, $"End of SIT Create execution: {DateTime.Now}\n", null);
 
