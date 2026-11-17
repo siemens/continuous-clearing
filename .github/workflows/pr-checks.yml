@@ -22,7 +22,7 @@ jobs:
           ARTIFACTORY__ADMIN_API_KEY: ${{ secrets.JFROGTOKEN }}
         run: |
           $nugetConfig = "$(Get-Location)\src\nuget.config"
-          dotnet nuget update source "Artifactory" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$nugetConfig"
+          dotnet nuget update source "energy-dev-nuget-egll" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$nugetConfig"
           dotnet nuget list source --configfile "$nugetConfig"
 
       - name: Restore Packages
