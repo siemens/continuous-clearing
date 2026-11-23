@@ -58,11 +58,24 @@ jobs:
         Write-Host "📄 Updated JSON content:"
         Get-Content $filePath | Write-Host
 
+  - task: PowerShell@2
+    displayName: 'Set Artifactory NuGet credentials'
+    env:
+      ARTIFACTORY__ADMIN_USER: $(JfrogToken_User)
+      ARTIFACTORY__ADMIN_API_KEY: $(JFrogToken)
+    inputs:
+      targetType: 'inline'
+      pwsh: true
+      script: |
+        dotnet nuget update source "energy-dev-nuget-egll" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$(Build.SourcesDirectory)/src/nuget.config"
+
   - task: DotNetCoreCLI@2
     displayName: 'Restore Dependencies'
     inputs:
       command: 'restore'
       projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
+      feedsToUse: 'config'
+      nugetConfigPath: '$(Build.SourcesDirectory)/src/nuget.config'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
@@ -177,12 +190,25 @@ jobs:
             exit 1
         fi
       displayName: 'Update Integration Test Configuration'
-    
+
+    - task: PowerShell@2
+      displayName: 'Set Artifactory NuGet credentials'
+      env:
+        ARTIFACTORY__ADMIN_USER: $(JfrogToken_User)
+        ARTIFACTORY__ADMIN_API_KEY: $(JFrogToken)
+      inputs:
+        targetType: 'inline'
+        pwsh: true
+        script: |
+          dotnet nuget update source "energy-dev-nuget-egll" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$(Build.SourcesDirectory)/src/nuget.config"
+
     - task: DotNetCoreCLI@2
       displayName: 'Restore Dependencies'
       inputs:
         command: 'restore'
         projects: '$(Build.SourcesDirectory)/src/ContinuousClearingTool.sln'
+        feedsToUse: 'config'
+        nugetConfigPath: '$(Build.SourcesDirectory)/src/nuget.config'
 
     - task: DotNetCoreCLI@2
       displayName: 'Build Solution'
@@ -318,7 +344,17 @@ jobs:
         sonar.coverage.exclusions=**/*Test*/**
         sonar.exclusions=**/**/appSettingsSW360IntegrationTest.json,src/TestUtilities/appSettingsSW360IntegrationTest.json,**/*Test*/**
         sonar.coverageReportPaths=$(Build.SourcesDirectory)/CoverageForSonar/SonarQube.xml
-        
+
+  - task: PowerShell@2
+    displayName: 'Set Artifactory NuGet credentials'
+    env:
+      ARTIFACTORY__ADMIN_USER: $(JfrogToken_User)
+      ARTIFACTORY__ADMIN_API_KEY: $(JFrogToken)
+    inputs:
+      targetType: 'inline'
+      pwsh: true
+      script: |
+        dotnet nuget update source "energy-dev-nuget-egll" --username "$env:ARTIFACTORY__ADMIN_USER" --password "$env:ARTIFACTORY__ADMIN_API_KEY" --store-password-in-clear-text --configfile "$(Build.SourcesDirectory)/src/nuget.config"
 
   - task: DotNetCoreCLI@2
     enabled: false
