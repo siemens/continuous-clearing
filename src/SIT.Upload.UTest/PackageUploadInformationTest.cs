@@ -326,8 +326,7 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(unknownPackages, jfrogFoundPackages, jfrogNotFoundPackages, successfulPackages, null, null),
-                "TestPackageType",
-                filepath
+                "TestPackageType"
             });
 
             // Assert
@@ -353,8 +352,7 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, null, null),
-                "EmptyPackageType",
-                filepath
+                "EmptyPackageType"
             });
 
             // Assert
@@ -397,8 +395,7 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(emptyList, jfrogFoundPackages, emptyList, emptyList, null, null),
-                "npm",
-                filepath
+                "npm"
             });
 
             // Assert
@@ -428,8 +425,7 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(emptyList, emptyList, jfrogNotFoundPackages, emptyList, null, null),
-                "NuGet",
-                filepath
+                "NuGet"
             });
 
             // Assert
@@ -459,8 +455,7 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(emptyList, emptyList, emptyList, successfulPackages, null, null),
-                "Maven",
-                filepath
+                "Maven"
             });
 
             // Assert
@@ -519,8 +514,7 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(unknownPackages, jfrogFoundPackages, jfrogNotFoundPackages, successfulPackages, null, null),
-                "Python",
-                filepath
+                "Python"
             });
 
             // Assert
@@ -673,8 +667,7 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, optionalDevDep, null),
-                "npm",
-                filepath
+                "npm"
             });
 
             // Assert
@@ -707,16 +700,14 @@ namespace SIT.Upload.UTest
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, null, null),
-                "npm",
-                filepath
+                "npm"
             });
 
             // Act - empty optional list
             method.Invoke(null, new object[]
             {
                 CreatePackageDisplayLists(emptyList, emptyList, emptyList, emptyList, new List<ComponentsToArtifactory>(), null),
-                "npm",
-                filepath
+                "npm"
             });
 
             // Assert - no warn events emitted for optional devDep block
@@ -889,7 +880,7 @@ namespace SIT.Upload.UTest
             var content = new System.Text.StringBuilder();
 
             // Act
-            method.Invoke(null, new object[] { content, null, "Npm", "..\\path" });
+            method.Invoke(null, new object[] { content, null });
 
             // Assert
             Assert.AreEqual(string.Empty, content.ToString());
@@ -906,7 +897,7 @@ namespace SIT.Upload.UTest
             var content = new System.Text.StringBuilder();
 
             // Act
-            method.Invoke(null, new object[] { content, new List<ComponentsToArtifactory>(), "Npm", "..\\path" });
+            method.Invoke(null, new object[] { content, new List<ComponentsToArtifactory>() });
 
             // Assert
             Assert.AreEqual(string.Empty, content.ToString());
@@ -927,7 +918,7 @@ namespace SIT.Upload.UTest
             var content = new System.Text.StringBuilder();
 
             // Act
-            method.Invoke(null, new object[] { content, packages, "Npm", "..\\path" });
+            method.Invoke(null, new object[] { content, packages });
 
             // Assert
             var result = content.ToString();
@@ -952,7 +943,7 @@ namespace SIT.Upload.UTest
             var content = new System.Text.StringBuilder();
 
             // Act
-            method.Invoke(null, new object[] { content, packages, "Npm", "..\\path" });
+            method.Invoke(null, new object[] { content, packages });
 
             // Assert
             var result = content.ToString();
