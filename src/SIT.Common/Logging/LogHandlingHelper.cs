@@ -39,6 +39,7 @@ namespace SIT.Common
             var logBuilder = new StringBuilder();
             BuildErrorLog(logBuilder, context, details, null, additionalDetails, ex);
             Logger.DebugFormat("{0}{1}", Environment.NewLine, logBuilder.ToString());
+            TelemetryHelper.ReportException(ex);
         }
         public static void BasicErrorHandling(string context, string details, string message, string additional)
         {

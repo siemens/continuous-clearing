@@ -35,6 +35,10 @@ namespace SIT.Common
         // KPI: pipeline/CI context - captured once per run so every telemetry event (AppData, KPI, exception,
         // dependency health) can be filtered/grouped by Azure DevOps build, definition, branch, stage, repo and agent.
         private readonly Dictionary<string, string> pipelineMetadata_;
+        // Active instance, so exceptions handled anywhere in the tool can be reported before the process exits.
+        private static TelemetryHelper active_;
+        private string component_;
+        private string catoolVersion_;
 
         #endregion
 
@@ -87,7 +91,7 @@ namespace SIT.Common
                 Logger.ErrorFormat("An error occurred: {0}", ex.Message);
                 // KPI: "Error Rate by Stage" - pass component/version/project context so failures can be
                 // filtered and grouped by stage (Scan/Create/Upload), project and tool version in Grafana.
-                TrackException(ex, component, catoolVersion);
+                // ExceptionErrorHandling above already reported this exception to telemetry.
                 environmentHelper.CallEnvironmentExit(-1);
             }
             finally
@@ -111,6 +115,8 @@ namespace SIT.Common
                 return;
             }
 
+            component_ = component;
+            catoolVersion_ = catoolVersion;
             telemetry_ = new SIT.Telemetry.Telemetry(TelemetryConstant.Type, new TelemetryOptions
             {
                 ConnectionString = appSettings_?.Telemetry?.ApplicationInsightsConnectionString ?? string.Empty,
@@ -121,6 +127,31 @@ namespace SIT.Common
                 Version = catoolVersion ?? string.Empty,
                 Organization = TelemetryConstant.Organization
             });
+            active_ = this;
+        }
+
+        /// <summary>
+        /// Sends a handled exception to the Application Insights 'exceptions' table and flushes immediately,
+        /// because the tool usually terminates via Environment.Exit right after handling the failure.
+        /// Does nothing when telemetry is disabled or not initialized; never throws.
+        /// </summary>
+        public static void ReportException(Exception ex)
+        {
+            var helper = active_;
+            if (ex == null || helper?.telemetry_ == null)
+            {
+                return;
+            }
+
+            try
+            {
+                helper.TrackException(ex, helper.component_, helper.catoolVersion_);
+                helper.telemetry_.Flush();
+            }
+            catch (Exception)
+            {
+                // Telemetry must never break the tool.
+            }
         }
 
         /// <summary>
