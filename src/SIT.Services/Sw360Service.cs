@@ -339,47 +339,6 @@ namespace SIT.Services
         }
 
         /// <summary>
-        /// gets upload description frim sw360
-        /// </summary>
-        /// <param name="componentName"></param>
-        /// <param name="componetVersion"></param>
-        /// <param name="sw360url"></param>
-        /// <returns>description</returns>
-        [ExcludeFromCodeCoverage]
-        public async Task<string> GetUploadDescriptionfromSW360(string componentName, string componetVersion, string sw360url)
-        {
-            try
-            {
-                string href;
-                string releaseurl;
-                string releaseid = string.Empty;
-                var response = await m_SW360ApiCommunicationFacade.GetReleaseByCompoenentName(componentName);
-                LogHandlingHelper.HttpResponseOfStringContent("Response of Get Upload Description from SW360", $"MethodName:GetUploadDescriptionfromSW360()", response);
-                var responseData = JsonConvert.DeserializeObject<ComponentsRelease>(response);
-
-                for (int index = 0; index < responseData?.Embedded?.Sw360Releases?.Count; index++)
-                {
-                    if (responseData.Embedded.Sw360Releases[index].Name.Equals(componentName?.ToUpperInvariant()
-, StringComparison.InvariantCultureIgnoreCase)
-                        && responseData.Embedded.Sw360Releases[index].Version.Equals(componetVersion, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        href = responseData.Embedded.Sw360Releases[index].Links.Self.Href;
-                        releaseid = CommonHelper.GetSubstringOfLastOccurance(href, "/");
-                        releaseurl = sw360url + ApiConstant.Sw360ReleaseUrlApiSuffix + releaseid + "#/tab-Summary";
-                        Logger.DebugFormat("GetUploadDescriptionfromSW360:ComponentName-{0}:{1} : {2}", componentName, componetVersion, href);
-                        return releaseurl;
-                    }
-                }
-            }
-            catch (HttpRequestException e)
-            {
-                LogHandlingHelper.ExceptionErrorHandling("Get Upload Description from SW360", $"MethodName:GetUploadDescriptionfromSW360()", e, "");
-                Logger.Error($"GetUploadDescriptionfromSW360():", e);
-            }
-            return "";
-        }
-
-        /// <summary>
         /// gets available components list
         /// </summary>
         /// <param name="sw360Releases"></param>

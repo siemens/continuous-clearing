@@ -33,8 +33,8 @@ namespace SIT.Upload
     public static class Program
     {
         private static bool m_Verbose = false;
-        public static Stopwatch UploaderStopWatch { get; set; }
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static Stopwatch UploaderStopWatch { get; set; } = new();
+        static readonly ILog Logger = LoggerFactory.GetLogger(typeof(Program));
         private static readonly EnvironmentHelper environmentHelper = new EnvironmentHelper();
         static readonly SbomSigningValidation sbomSigningValidation = new();
         static async Task Main(string[] args)
@@ -48,7 +48,7 @@ namespace SIT.Upload
             SettingsManager settingsManager = new SettingsManager();
             // do not change the order of getting ca tool information
             CatoolInfo caToolInformation = CommonHelper.GetCatoolVersionFromProjectFile();
-            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation).FullName;
+            Log4Net.CatoolCurrentDirectory = System.IO.Directory.GetParent(caToolInformation.CatoolRunningLocation)!.FullName;
             string logFileNameWithTimestamp = $"{FileConstant.SITUploadLog}_{DateTime.Now:yyyyMMdd_HHmmss}.log";
             CommonHelper.DefaultLogFolderInitialization(logFileNameWithTimestamp, m_Verbose);
             Logger.Debug($"====================<<<<< SIT Upload >>>>>====================");
@@ -64,9 +64,9 @@ namespace SIT.Upload
             ListofPerametersForCli listofPerameters = new ListofPerametersForCli();
             LoggerHelper.LogInputParameters(caToolInformation, appSettings, listofPerameters, exeType: Dataconstant.Upload, bomFilePath: bomFilePath);
             if (!appSettings.Jfrog.DryRun)
-                Logger.Logger.Log(null, Level.Alert, $"SIT Upload is running in release mode !!! \n", null);
+                Logger.Logger.Log(null!, Level.Alert, $"SIT Upload is running in release mode !!! \n", null!);
             else
-                Logger.Logger.Log(null, Level.Alert, $"SIT Upload is running in dry-run mode, no packages will be moved \n", null);
+                Logger.Logger.Log(null!, Level.Alert, $"SIT Upload is running in dry-run mode, no packages will be moved \n", null!);
 
             //Validator method to check token validity
             ArtifactoryCredentials artifactoryCredentials = new ArtifactoryCredentials()
@@ -99,7 +99,7 @@ namespace SIT.Upload
                 TelemetryHelper telemetryHelper = new TelemetryHelper(appSettings);
                 telemetryHelper.StartTelemetry(caToolInformation.CatoolVersion, PackageUploader.uploaderKpiData, TelemetryConstant.UploadAppData, TelemetryConstant.UploadKpiData, UploaderStopWatch?.Elapsed);
             }
-            Logger.Logger.Log(null, Level.Notice, $"End of SIT Upload execution : {DateTime.Now}\n", null);
+            Logger.Logger.Log(null!, Level.Notice, $"End of SIT Upload execution : {DateTime.Now}\n", null!);
             // publish logs and BOM file to pipeline artifact
 
             PipelineArtifactUploader.UploadArtifacts();
@@ -128,7 +128,7 @@ namespace SIT.Upload
             }
             else
             {
-                string filepath = string.Empty;
+                string? filepath = string.Empty;
                 // If project name is not provided, look for the latest BOM file in the output folder that does not contain the backup key
                 var bomFiles = System.IO.Directory.GetFiles(
                     appSettings.Directory.OutputFolder,

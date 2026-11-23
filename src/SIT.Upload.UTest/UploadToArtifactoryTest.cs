@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // SPDX-FileCopyrightText: 2026 Siemens AG
 //
 //  SPDX-License-Identifier: MIT
@@ -475,7 +475,7 @@ namespace SIT.Upload.UTest
             Property repoNameProperty = new Property
             {
                 Name = Dataconstant.Cdx_ArtifactoryRepoName,
-                Value = "Reponame"
+                Value = "Reponame-pypi-src-lookup"
             };
             List<Property> properties = new List<Property>() { repoNameProperty };
             var item = new Component
@@ -523,7 +523,8 @@ namespace SIT.Upload.UTest
             Assert.AreEqual("pypi-repo", result.Repo);
             Assert.AreEqual("path/to/package", result.Path);
         }
-        public async static Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
+        [Test]
+        public async Task GetSrcRepoDetailsForPyPiOrConanPackages_WhenConanRepoExists_ReturnsArtifactoryRepoName()
         {
             // Arrange
             Property prop1 = new Property
@@ -1044,6 +1045,85 @@ namespace SIT.Upload.UTest
             Assert.AreEqual("pkg:cargo/my-cargo-crate@1.0.0", result[0].Purl);
             Assert.AreEqual("cargo-third-party", result[0].DestRepoName);
             Assert.IsTrue(result[0].JfrogRepoPath.Contains("my-cargo-crate.1.0.0.crate"));
+        }
+
+        private static string InvokeGetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult, Component item)
+        {
+            var method = typeof(UploadToArtifactory).GetMethod("GetPackagePath",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+            return (string)method.Invoke(null, [component, aqlResult, item])!;
+        }
+
+        [Test]
+        public void GetPackagePath_NpmWithAqlResult_ReturnsAqlPath()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "NPM", Name = "lodash" };
+            var result = InvokeGetPackagePath(component, new AqlResult { Path = "lodash/-/custom" }, new Component());
+            Assert.AreEqual("lodash/-/custom", result);
+        }
+
+        [Test]
+        public void GetPackagePath_NpmWithoutAqlResult_ReturnsDefaultPath()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "NPM", Name = "lodash" };
+            var result = InvokeGetPackagePath(component, null, new Component());
+            Assert.AreEqual("lodash/-", result);
+        }
+
+        [Test]
+        public void GetPackagePath_ConanPathContainsPackage_ReturnsTrimmedPath()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "CONAN", Name = "zlib", Version = "1.2.13" };
+            var result = InvokeGetPackagePath(component, new AqlResult { Path = "_/zlib/1.2.13/_/0/package/abc" }, new Component());
+            Assert.AreEqual("_/zlib/1.2.13", result);
+        }
+
+        [Test]
+        public void GetPackagePath_ConanPathWithoutPackage_ReturnsOriginalPath()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "CONAN", Name = "zlib", Version = "1.2.13" };
+            var result = InvokeGetPackagePath(component, new AqlResult { Path = "_/other/2.0.0" }, new Component());
+            Assert.AreEqual("_/other/2.0.0", result);
+        }
+
+        [Test]
+        public void GetPackagePath_ConanWithoutAqlResult_ReturnsEmpty()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "CONAN", Name = "zlib", Version = "1.2.13" };
+            var result = InvokeGetPackagePath(component, null, new Component());
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
+        public void GetPackagePath_MavenWithGroup_ReturnsGroupPath()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "MAVEN", Name = "core", Version = "2.0.0" };
+            var result = InvokeGetPackagePath(component, null, new Component { Name = "core", Group = "org.example.lib" });
+            Assert.AreEqual("org/example/lib/core/2.0.0", result);
+        }
+
+        [Test]
+        public void GetPackagePath_MavenWithoutGroup_ReturnsNamePath()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "MAVEN", Name = "core", Version = "2.0.0" };
+            var result = InvokeGetPackagePath(component, null, new Component { Name = "core" });
+            Assert.AreEqual("core/2.0.0", result);
+        }
+
+        [Test]
+        public void GetPackagePath_Debian_ReturnsPoolPath()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "DEBIAN", Name = "libssl" };
+            var result = InvokeGetPackagePath(component, null, new Component());
+            Assert.AreEqual("pool/main/l/libssl", result);
+        }
+
+        [Test]
+        public void GetPackagePath_UnknownType_ReturnsEmpty()
+        {
+            var component = new ComponentsToArtifactory { ComponentType = "NUGET", Name = "pkg" };
+            var result = InvokeGetPackagePath(component, null, new Component());
+            Assert.AreEqual(string.Empty, result);
         }
     }
 

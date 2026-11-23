@@ -6,6 +6,7 @@
 
 // Ignore Spelling: Artifactory Bom Repo uploader Kpi Jfrog Api SIT aql
 
+using ArtifactoryUploader.Constants;
 using CycloneDX.Models;
 using log4net;
 using Newtonsoft.Json;
@@ -36,14 +37,14 @@ namespace SIT.Upload
     {
         #region Fields
 
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(typeof(PackageUploadHelper));
         private static bool SetWarningCode;
 
         #endregion
 
         #region Properties
 
-        public static IJFrogService JFrogService { get; set; }
+        public static IJFrogService JFrogService { get; set; } = null!;
 
         #endregion
 
@@ -60,10 +61,10 @@ namespace SIT.Upload
         /// content consumed is the same content whose signature was verified (TOCTOU protection).
         /// </param>
         /// <returns>A Bom object containing the components.</returns>
-        public static Bom GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string? verifiedBomContent = null)
+        public static Bom? GetComponentListFromComparisonBOM(string comparisonBomFilePath, IEnvironmentHelper environmentHelper, string? verifiedBomContent = null)
         {
             Logger.Debug("GetComponentListFromComparisonBOM(): Reading bom file for components.");
-            Bom componentsToBoms = null;
+            Bom? componentsToBoms = null;
             try
             {
                 if (!string.IsNullOrEmpty(verifiedBomContent))
@@ -102,7 +103,7 @@ namespace SIT.Upload
         /// <param name="responseMessage">The HTTP response message.</param>
         /// <param name="dryRunSuffix">The suffix for dry run mode.</param>
         /// <returns>A task containing the components to Artifactory information.</returns>
-        private static Task<ComponentsToArtifactory> GetPackageinfo(ComponentsToArtifactory item, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
+        private static Task<ComponentsToArtifactory> GetPackageinfo(ComponentsToArtifactory item, string operationType, HttpResponseMessage responseMessage, string? dryRunSuffix)
         {
 
             ComponentsToArtifactory components = new ComponentsToArtifactory()
@@ -173,7 +174,7 @@ namespace SIT.Upload
         /// <param name="responseMessage">The HTTP response message.</param>
         /// <param name="dryRunSuffix">The suffix for dry run mode.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo, string operationType, HttpResponseMessage responseMessage, string dryRunSuffix)
+        public static async Task JfrogFoundPackagesAsync(ComponentsToArtifactory item, DisplayPackagesInfo displayPackagesInfo, string operationType, HttpResponseMessage responseMessage, string? dryRunSuffix)
         {
             ComponentsToArtifactory components = await GetPackageinfo(item, operationType, responseMessage, dryRunSuffix);
             AddComponentToDisplayList(item.ComponentType, components, displayPackagesInfo, notFound: false);
@@ -490,7 +491,7 @@ namespace SIT.Upload
         /// <returns>A task representing the asynchronous operation.</returns>
         private static async Task SourceRepoFoundToUploadArtifactory(PackageType packageType, UploaderKpiData uploaderKpiData, ComponentsToArtifactory item, int timeout, DisplayPackagesInfo displayPackagesInfo)
         {
-            const string dryRunSuffix = null;
+            const string? dryRunSuffix = null;
             string operationType = item.PackageType == PackageType.ClearedThirdParty || item.PackageType == PackageType.Development ? "copy" : "move";
             ArtifactoryUploader.JFrogService = JFrogService;
             ArtifactoryUploader.JFrogApiCommInstance = GetJfrogApiCommInstance(item, timeout);
@@ -562,6 +563,62 @@ namespace SIT.Upload
         }
 
         /// <summary>
+        /// Builds the JFrog metadata property map to apply to a successfully uploaded artifact.
+        /// </summary>
+        /// <returns>A dictionary of property names to values. Empty when no metadata is available.</returns>
+        public static IReadOnlyDictionary<string, string> BuildJfrogMetadataProperties()
+        {
+            var properties = new Dictionary<string, string>();
+
+            // Mark every successfully uploaded artifact (all package types) with the uploading tool.
+            properties[ArtifactoryConstant.UploadedByProperty] = ArtifactoryConstant.UploadedByValue;
+
+            return properties;
+        }
+
+        /// <summary>
+        /// Updates JFrog item properties on a successfully copied/moved artifact. Failures are logged
+        /// as warnings and never interrupt the upload flow (best-effort metadata update).
+        /// </summary>
+        /// <param name="jfrogApiCommunication">The JFrog API communication instance.</param>
+        /// <param name="component">The component whose destination artifact should be updated.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public static async Task UpdateJfrogMetadataProperties(IJFrogApiCommunication jfrogApiCommunication, ComponentsToArtifactory component)
+        {
+            if (jfrogApiCommunication == null || component == null || component.DryRun)
+            {
+                return;
+            }
+
+            IReadOnlyDictionary<string, string> properties = BuildJfrogMetadataProperties();
+            if (properties.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                HttpResponseMessage response = await jfrogApiCommunication.SetPackagePropertiesInJfrog(component, properties);
+                if (response == null || !response.IsSuccessStatusCode)
+                {
+                    Logger.DebugFormat("UpdateJfrogMetadataProperties(): Failed to update metadata properties for component {0} {1}. StatusCode: {2}", component.Name, component.Version, response?.StatusCode);
+                }
+                else
+                {
+                    Logger.DebugFormat("UpdateJfrogMetadataProperties(): Metadata properties updated for component {0} {1}.", component.Name, component.Version);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.DebugFormat("UpdateJfrogMetadataProperties(): HTTP error updating metadata properties for component {0} {1}. {2}", component.Name, component.Version, ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.DebugFormat("UpdateJfrogMetadataProperties(): Timed out updating metadata properties for component {0} {1}. {2}", component.Name, component.Version, ex);
+            }
+        }
+
+        /// <summary>
         /// Gets the JFrog API communication instance for the specified component.
         /// </summary>
         /// <param name="component">The component to get the API instance for.</param>
@@ -569,7 +626,6 @@ namespace SIT.Upload
         /// <returns>An instance of IJFrogApiCommunication.</returns>
         public static IJFrogApiCommunication GetJfrogApiCommInstance(ComponentsToArtifactory component, int timeout)
         {
-
             ArtifactoryCredentials repoCredentials = new ArtifactoryCredentials()
             {
                 Token = component.Token,

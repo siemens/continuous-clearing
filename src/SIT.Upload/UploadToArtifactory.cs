@@ -28,7 +28,7 @@ namespace SIT.Upload
     {
         #region Fields
 
-        static readonly ILog Logger = LoggerFactory.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static readonly ILog Logger = LoggerFactory.GetLogger(typeof(UploadToArtifactory));
         private static readonly Dictionary<string, IList<AqlResult>> repoCache = new();
         private const string Choco = "CHOCO";
         private const string Nuget = "NUGET";
@@ -43,7 +43,7 @@ namespace SIT.Upload
 
         #region Properties
 
-        public static IJFrogService JFrogService { get; set; }
+        public static IJFrogService JFrogService { get; set; } = null!;
 
         #endregion
 
@@ -70,7 +70,7 @@ namespace SIT.Upload
 
                 if (packageType != PackageType.Unknown)
                 {
-                    AqlResult aqlResult = await GetSrcRepoDetailsForComponent(item);
+                    AqlResult? aqlResult = await GetSrcRepoDetailsForComponent(item);
                     ComponentsToArtifactory components = new ComponentsToArtifactory()
                     {
                         Name = !string.IsNullOrEmpty(item.Group) ? $"{item.Group}/{item.Name}" : item.Name,
@@ -266,7 +266,7 @@ namespace SIT.Upload
         /// <param name="item">The component to evaluate.</param>
         /// <param name="appSettings">The common application settings.</param>
         /// <returns>The destination repository name.</returns>
-        private static string GetDestinationRepo(Component item, CommonAppSettings appSettings)
+        private static string? GetDestinationRepo(Component item, CommonAppSettings appSettings)
         {
             var packageType = GetPackageType(item);
             var componentType = GetComponentType(item);
@@ -303,7 +303,7 @@ namespace SIT.Upload
         /// <param name="aqlResult">The AQL query result.</param>
         /// <param name="item">The source component.</param>
         /// <returns>The package path.</returns>
-        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult aqlResult, Component item)
+        private static string GetPackagePath(ComponentsToArtifactory component, AqlResult? aqlResult, Component item)
         {
             switch (component.ComponentType)
             {
@@ -323,7 +323,7 @@ namespace SIT.Upload
 
                     if (path.Contains(package))
                     {
-                        int index = path.IndexOf(package);
+                        int index = path.IndexOf(package, StringComparison.Ordinal);
                         return path.Substring(0, index + package.Length);
                     }
                     else
@@ -478,13 +478,13 @@ namespace SIT.Upload
         /// <returns>A task representing the asynchronous operation.</returns>
         private static async Task AddUnknownPackagesAsync(Component item, DisplayPackagesInfo displayPackagesInfo)
         {
-            string GetPropertyValue(string propertyName) =>
+            string? GetPropertyValue(string propertyName) =>
                   item.Properties
                       .Find(p => p.Name == propertyName)?
                       .Value?
                       .ToUpperInvariant();
 
-            string projectType = GetPropertyValue(Dataconstant.Cdx_ProjectType);
+            string? projectType = GetPropertyValue(Dataconstant.Cdx_ProjectType);
             ComponentsToArtifactory components = await GetUnknownPackageinfo(item);
             AddUnknownComponentToDisplayList(projectType, components, displayPackagesInfo);
         }
@@ -495,7 +495,7 @@ namespace SIT.Upload
         /// <param name="projectType">The type of the project.</param>
         /// <param name="component">The component to add.</param>
         /// <param name="displayPackagesInfo">The display information for packages.</param>
-        private static void AddUnknownComponentToDisplayList(string projectType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo)
+        private static void AddUnknownComponentToDisplayList(string? projectType, ComponentsToArtifactory component, DisplayPackagesInfo displayPackagesInfo)
         {
             switch (projectType)
             {
@@ -551,19 +551,15 @@ namespace SIT.Upload
         /// <param name="developmentRepo">The development repository name.</param>
         /// <param name="clearedThirdPartyRepo">The cleared third-party repository name.</param>
         /// <returns>The repository name corresponding to the package type.</returns>
-        private static string GetRepoName(PackageType packageType, string internalRepo, string developmentRepo, string clearedThirdPartyRepo)
+        private static string? GetRepoName(PackageType packageType, string internalRepo, string developmentRepo, string? clearedThirdPartyRepo)
         {
-            switch (packageType)
+            return packageType switch
             {
-                case PackageType.Internal:
-                    return internalRepo;
-                case PackageType.Development:
-                    return developmentRepo;
-                case PackageType.ClearedThirdParty:
-                    return clearedThirdPartyRepo;
-                default:
-                    return string.Empty;
-            }
+                PackageType.Internal => internalRepo,
+                PackageType.Development => developmentRepo,
+                PackageType.ClearedThirdParty => clearedThirdPartyRepo,
+                _ => string.Empty
+            };
         }
 
         /// <summary>
@@ -571,12 +567,13 @@ namespace SIT.Upload
         /// </summary>
         /// <param name="item">The component to retrieve repository details for.</param>
         /// <returns>The AQL result containing repository details, or null if not found.</returns>
-        public async static Task<AqlResult> GetSrcRepoDetailsForComponent(Component item)
+        public async static Task<AqlResult?> GetSrcRepoDetailsForComponent(Component item)
         {
+            string?[] RepoNames() => [item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value];
             if (item.Purl.Contains("pypi", StringComparison.OrdinalIgnoreCase))
             {
                 // get the  component list from Jfrog for given repo
-                var aqlResultList = await GetPypiListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService);
+                var aqlResultList = await GetPypiListOfComponentsFromRepo(RepoNames(), JFrogService);
                 if (aqlResultList.Count > 0)
                 {
                     return GetArtifactoryRepoName(aqlResultList, item);
@@ -584,7 +581,7 @@ namespace SIT.Upload
             }
             else if (item.Purl.Contains("conan", StringComparison.OrdinalIgnoreCase))
             {
-                var aqlConanResultList = await GetListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService);
+                var aqlConanResultList = await GetListOfComponentsFromRepo(RepoNames(), JFrogService);
 
                 if (aqlConanResultList.Count > 0)
                 {
@@ -593,7 +590,7 @@ namespace SIT.Upload
             }
             else if (item.Purl.Contains("npm", StringComparison.OrdinalIgnoreCase))
             {
-                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService, "npm");
+                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(RepoNames(), JFrogService, "npm");
 
                 if (aqlResultList.Count > 0)
                 {
@@ -602,7 +599,7 @@ namespace SIT.Upload
             }
             else if (item.Purl.Contains(ArtifactoryConstant.Cargo, StringComparison.OrdinalIgnoreCase))
             {
-                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(new string[] { item.Properties.Find(x => x.Name == Dataconstant.Cdx_ArtifactoryRepoName)?.Value }, JFrogService, ArtifactoryConstant.Cargo);
+                var aqlResultList = await GetPackageTypeBased_ListOfComponentsFromRepo(RepoNames(), JFrogService, ArtifactoryConstant.Cargo);
 
                 if (aqlResultList.Count > 0)
                 {
@@ -620,14 +617,14 @@ namespace SIT.Upload
         /// <param name="jFrogService">The JFrog service instance.</param>
         /// <param name="packageType">The type of package (npm or cargo).</param>
         /// <returns>A list of AQL results for the specified package type.</returns>
-        public static async Task<List<AqlResult>> GetPackageTypeBased_ListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService, string packageType)
+        public static async Task<List<AqlResult>> GetPackageTypeBased_ListOfComponentsFromRepo(string?[] repoList, IJFrogService jFrogService, string packageType)
         {
             var aqlResultList = new List<AqlResult>();
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
+                foreach (var repo in repoList.OfType<string>().Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    if (repoCache.TryGetValue(repo, out IList<AqlResult> value))
+                    if (repoCache.TryGetValue(repo, out var value))
                     {
                         aqlResultList.AddRange(value);
                     }
@@ -657,14 +654,14 @@ namespace SIT.Upload
         /// <param name="repoList">The list of repository names.</param>
         /// <param name="jFrogService">The JFrog service instance.</param>
         /// <returns>A list of AQL results for internal components.</returns>
-        public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        public static async Task<List<AqlResult>> GetListOfComponentsFromRepo(string?[] repoList, IJFrogService jFrogService)
         {
             var aqlResultList = new List<AqlResult>();
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
+                foreach (var repo in repoList.OfType<string>().Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    if (repoCache.TryGetValue(repo, out IList<AqlResult> value))
+                    if (repoCache.TryGetValue(repo, out var value))
                     {
                         aqlResultList.AddRange(value);
                     }
@@ -733,14 +730,12 @@ namespace SIT.Upload
         /// <param name="aqlResultList">The list of AQL results to search.</param>
         /// <param name="component">The component to find.</param>
         /// <returns>The matching AQL result, or null if not found.</returns>
-        private static AqlResult GetArtifactoryRepoNameForConan(List<AqlResult> aqlResultList, Component component)
+        private static AqlResult? GetArtifactoryRepoNameForConan(List<AqlResult> aqlResultList, Component component)
         {
             string jfrogcomponentPath = $"{component.Name}/{component.Version}";
 
-            AqlResult repoName = aqlResultList.Find(x => x.Path.Contains(
+            return aqlResultList.Find(x => x.Path.Contains(
                 jfrogcomponentPath, StringComparison.OrdinalIgnoreCase));
-
-            return repoName;
         }
 
         /// <summary>
@@ -749,15 +744,15 @@ namespace SIT.Upload
         /// <param name="repoList">The list of repository names.</param>
         /// <param name="jFrogService">The JFrog service instance.</param>
         /// <returns>A list of AQL results for PyPI components.</returns>
-        public static async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string[] repoList, IJFrogService jFrogService)
+        public static async Task<List<AqlResult>> GetPypiListOfComponentsFromRepo(string?[] repoList, IJFrogService jFrogService)
         {
             var aqlResultList = new List<AqlResult>();
 
             if (repoList != null && repoList.Length > 0)
             {
-                foreach (var repo in repoList.Where(r => !string.IsNullOrWhiteSpace(r)))
+                foreach (var repo in repoList.OfType<string>().Where(r => !string.IsNullOrWhiteSpace(r)))
                 {
-                    if (repoCache.TryGetValue(repo, out IList<AqlResult> value))
+                    if (repoCache.TryGetValue(repo, out var value))
                     {
                         aqlResultList.AddRange(value);
                     }
@@ -779,7 +774,7 @@ namespace SIT.Upload
         /// <returns>The package type.</returns>
         private static PackageType GetPackageType(Component item)
         {
-            string GetPropertyValue(string propertyName) =>
+            string? GetPropertyValue(string propertyName) =>
                     item.Properties
                         .Find(p => p.Name == propertyName)?
                         .Value?
