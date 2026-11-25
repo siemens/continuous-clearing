@@ -123,7 +123,7 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string LinkedByCATool = "Linked By SITCreate";
         /// <summary>
-        /// Linked by CA Tool.
+        /// Linked by CA Tool .
         /// </summary>
         public const string LinkedByCAToolOldComment = "Linked by CA Tool";        
         /// <summary>
