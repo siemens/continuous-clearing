@@ -119,9 +119,13 @@ namespace SIT.Common.Constants
         /// </summary>
         public const string NotFoundInJFrog = "Not Found in JFrogRepo";
         /// <summary>
-        /// Linked by CA Tool.
+        /// Linked By SITCreate.
         /// </summary>
         public const string LinkedByCATool = "Linked By SITCreate";
+        /// <summary>
+        /// Linked by CA Tool.
+        /// </summary>
+        public const string LinkedByCAToolOldComment = "Linked by CA Tool";
         /// <summary>
         /// Linked by CA Tool release relation: CONTAINED.
         /// </summary>

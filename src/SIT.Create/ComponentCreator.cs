@@ -468,9 +468,22 @@ namespace SIT.Create
         private static async Task<List<ReleaseLinked>> GetManuallyLinkedReleasesFromProject(List<ReleaseLinked> alreadyLinkedReleases)
         {
             var manuallyLinkedReleases = new List<ReleaseLinked>(alreadyLinkedReleases);
-            manuallyLinkedReleases.RemoveAll(x => string.Compare(x.Comment, $"{Dataconstant.LinkedByCATool}{CommonHelper.ToolVersion}", StringComparison.OrdinalIgnoreCase) == 0);
+            manuallyLinkedReleases.RemoveAll(x => IsLinkedByTool(x.Comment));
             await Task.Yield();
             return manuallyLinkedReleases;
+        }
+
+        /// <summary>
+        /// Returns true when the release link comment indicates it was linked by the tool (current or legacy comment, any version).
+        /// </summary>
+        private static bool IsLinkedByTool(string comment)
+        {
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                return false;
+            }
+            return comment.Contains(Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase)
+                || comment.Contains(Dataconstant.LinkedByCAToolOldComment, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
