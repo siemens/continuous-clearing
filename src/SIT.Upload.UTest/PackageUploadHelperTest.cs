@@ -6,11 +6,13 @@
 
 // Ignore Spelling: Aritfactory Uploader
 
+using ArtifactoryUploader.Constants;
 using CycloneDX.Models;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Moq;
 using NUnit.Framework;
 using SIT.APICommunications;
+using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
 using SIT.Common.Constants;
 using SIT.Common.Interface;
@@ -1071,6 +1073,180 @@ namespace SIT.Upload.UTest
             Assert.AreEqual(1, displayPackagesInfo.JfrogNotFoundPackagesNuget.Count);
             Assert.IsTrue(displayPackagesInfo.JfrogNotFoundPackagesNuget[0].IsOptionalDevDependency,
                 "IsOptionalDevDependency must be copied by GetSucessFulPackageinfo.");
+        }
+
+        [Test]
+        public void BuildJfrogMetadataProperties_Always_ContainsUploadedByProperty()
+        {
+            // Act
+            IReadOnlyDictionary<string, string> properties = PackageUploadHelper.BuildJfrogMetadataProperties();
+
+            // Assert
+            Assert.That(properties, Is.Not.Null, "Properties dictionary should never be null");
+            Assert.That(properties.ContainsKey(ArtifactoryConstant.UploadedByProperty), Is.True, "uploadedby property should always be present");
+            Assert.That(properties[ArtifactoryConstant.UploadedByProperty], Is.EqualTo(ArtifactoryConstant.UploadedByValue), "uploadedby value should match the configured tool value");
+        }
+
+        [Test]
+        public void BuildJfrogMetadataProperties_Always_ContainsOnlyTheUploadedByProperty()
+        {
+            // Act
+            IReadOnlyDictionary<string, string> properties = PackageUploadHelper.BuildJfrogMetadataProperties();
+
+            // Assert - only the uploadedby property is written
+            Assert.That(properties.Count, Is.EqualTo(1), "Only the uploadedby property should be written");
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_SuccessfulResponse_SetsPropertiesOnce()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                Name = "test-pkg",
+                Version = "1.0.0",
+                DryRun = false
+            };
+            var jfrogMock = new Mock<IJFrogApiCommunication>();
+            jfrogMock
+                .Setup(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+                .ReturnsAsync(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
+
+            // Act
+            await PackageUploadHelper.UpdateJfrogMetadataProperties(jfrogMock.Object, component);
+
+            // Assert
+            jfrogMock.Verify(x => x.SetPackagePropertiesInJfrog(component, It.Is<IReadOnlyDictionary<string, string>>(
+                p => p.ContainsKey(ArtifactoryConstant.UploadedByProperty))), Times.Once, "Metadata PUT should be issued exactly once");
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_FailedResponse_DoesNotThrow()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                Name = "test-pkg",
+                Version = "1.0.0",
+                DryRun = false
+            };
+            var jfrogMock = new Mock<IJFrogApiCommunication>();
+            jfrogMock
+                .Setup(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+                .ReturnsAsync(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
+
+            // Act & Assert - a non-success status is best-effort and must not throw
+            Assert.DoesNotThrowAsync(async () =>
+                await PackageUploadHelper.UpdateJfrogMetadataProperties(jfrogMock.Object, component));
+            jfrogMock.Verify(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_NullResponse_DoesNotThrow()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                Name = "test-pkg",
+                Version = "1.0.0",
+                DryRun = false
+            };
+            var jfrogMock = new Mock<IJFrogApiCommunication>();
+            jfrogMock
+                .Setup(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+                .ReturnsAsync((HttpResponseMessage)null);
+
+            // Act & Assert
+            Assert.DoesNotThrowAsync(async () =>
+                await PackageUploadHelper.UpdateJfrogMetadataProperties(jfrogMock.Object, component));
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_HttpRequestException_IsSwallowed()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                Name = "test-pkg",
+                Version = "1.0.0",
+                DryRun = false
+            };
+            var jfrogMock = new Mock<IJFrogApiCommunication>();
+            jfrogMock
+                .Setup(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+                .ThrowsAsync(new HttpRequestException("network error"));
+
+            // Act & Assert - best-effort update must not propagate transport errors
+            Assert.DoesNotThrowAsync(async () =>
+                await PackageUploadHelper.UpdateJfrogMetadataProperties(jfrogMock.Object, component));
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_TaskCanceledException_IsSwallowed()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                Name = "test-pkg",
+                Version = "1.0.0",
+                DryRun = false
+            };
+            var jfrogMock = new Mock<IJFrogApiCommunication>();
+            jfrogMock
+                .Setup(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+                .ThrowsAsync(new TaskCanceledException("timed out"));
+
+            // Act & Assert
+            Assert.DoesNotThrowAsync(async () =>
+                await PackageUploadHelper.UpdateJfrogMetadataProperties(jfrogMock.Object, component));
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_DryRun_SkipsPropertyUpdate()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                Name = "test-pkg",
+                Version = "1.0.0",
+                DryRun = true
+            };
+            var jfrogMock = new Mock<IJFrogApiCommunication>();
+
+            // Act
+            await PackageUploadHelper.UpdateJfrogMetadataProperties(jfrogMock.Object, component);
+
+            // Assert - dry runs must never issue a property update
+            jfrogMock.Verify(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_NullApiCommunication_SkipsPropertyUpdate()
+        {
+            // Arrange
+            var component = new ComponentsToArtifactory
+            {
+                Name = "test-pkg",
+                Version = "1.0.0",
+                DryRun = false
+            };
+
+            // Act & Assert - a null API instance must be handled gracefully
+            Assert.DoesNotThrowAsync(async () =>
+                await PackageUploadHelper.UpdateJfrogMetadataProperties(null, component));
+        }
+
+        [Test]
+        public async Task UpdateJfrogMetadataProperties_NullComponent_SkipsPropertyUpdate()
+        {
+            // Arrange
+            var jfrogMock = new Mock<IJFrogApiCommunication>();
+
+            // Act
+            await PackageUploadHelper.UpdateJfrogMetadataProperties(jfrogMock.Object, null);
+
+            // Assert
+            jfrogMock.Verify(x => x.SetPackagePropertiesInJfrog(It.IsAny<ComponentsToArtifactory>(), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Never);
         }
     }
 }

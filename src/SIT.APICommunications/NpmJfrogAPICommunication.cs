@@ -140,21 +140,6 @@ namespace SIT.APICommunications
             return result;
         }
 
-        /// <summary>
-        /// Updates the package properties in JFrog Artifactory with the SW360 release URL.
-        /// </summary>
-        /// <param name="sw360releaseUrl">The SW360 release URL.</param>
-        /// <param name="destRepoName">The destination repository name.</param>
-        /// <param name="uploadArgs">The upload arguments containing package information.</param>
-        public override void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs)
-        {
-            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
-            const HttpContent httpContent = null;
-            string url = $"{DomainName}/api/storage/{destRepoName}/{uploadArgs.PackageName}/-/{uploadArgs.ReleaseName}-{uploadArgs.Version}.tgz?" +
-              $"properties=sw360url={sw360releaseUrl}";
-            httpClient.PutAsync(url, httpContent);
-        }
-
         #endregion
     }
 }

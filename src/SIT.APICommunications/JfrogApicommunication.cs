@@ -6,7 +6,11 @@
 
 using SIT.APICommunications.Interfaces;
 using SIT.APICommunications.Model;
+using SIT.Common;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -123,12 +127,90 @@ namespace SIT.APICommunications
         public abstract Task<HttpResponseMessage> MoveFromRepo(ComponentsToArtifactory component);
 
         /// <summary>
-        /// Updates package properties in JFrog Artifactory with SW360 release URL information.
+        /// Asynchronously sets (or updates) item properties on the destination artifact in JFrog
+        /// Artifactory after a successful copy/move operation. The destination path is derived from
+        /// the component's copy/move API URL, so this works uniformly across all package types.
         /// </summary>
-        /// <param name="sw360releaseUrl">The SW360 release URL to associate with the package.</param>
-        /// <param name="destRepoName">The destination repository name.</param>
-        /// <param name="uploadArgs">The upload arguments containing package details.</param>
-        public abstract void UpdatePackagePropertiesInJfrog(string sw360releaseUrl, string destRepoName, UploadArgs uploadArgs);
+        /// <param name="component">The component whose destination artifact should be updated.</param>
+        /// <param name="properties">The metadata properties to set, keyed by property name.</param>
+        /// <returns>An HttpResponseMessage indicating the result of the property update.</returns>
+        public virtual async Task<HttpResponseMessage> SetPackagePropertiesInJfrog(ComponentsToArtifactory component, IReadOnlyDictionary<string, string> properties)
+        {
+            if (component == null || properties == null || properties.Count == 0)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NoContent);
+            }
+
+            string destinationPath = GetDestinationStoragePath(component);
+            if (string.IsNullOrEmpty(destinationPath))
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    ReasonPhrase = "Unable to resolve destination path for property update"
+                };
+            }
+
+            string encodedProperties = string.Join(";", properties
+                .Where(p => !string.IsNullOrEmpty(p.Key) && !string.IsNullOrEmpty(p.Value))
+                .Select(p => $"{Uri.EscapeDataString(p.Key)}={Uri.EscapeDataString(p.Value)}"));
+
+            if (string.IsNullOrEmpty(encodedProperties))
+            {
+                return new HttpResponseMessage(HttpStatusCode.NoContent);
+            }
+
+            string url = $"{DomainName}/api/storage/{destinationPath}?properties={encodedProperties}&recursive=1";
+
+            HttpClient httpClient = GetHttpClient(ArtifactoryCredentials);
+            httpClient.SetLogWarnings(false, "unable to update package properties in jfrog repository");
+            const HttpContent httpContent = null;
+
+            await LogHandlingHelper.HttpRequestHandling("Set Package Properties In Jfrog", "MethodName:SetPackagePropertiesInJfrog()", httpClient, url, httpContent);
+            HttpResponseMessage response = await httpClient.PutAsync(url, httpContent);
+            await LogHandlingHelper.HttpResponseHandling("Set Package Properties In Jfrog", "MethodName:SetPackagePropertiesInJfrog()", response, "");
+
+            return response;
+        }
+
+        /// <summary>
+        /// Extracts the destination storage path (repo/path) from the component's copy/move API URL.
+        /// The copy/move URLs end with a <c>?to=/{repo}/{path}</c> segment that identifies the final
+        /// artifact location. Trailing wildcards and dry-run suffixes are removed.
+        /// </summary>
+        /// <param name="component">The component to resolve the destination path for.</param>
+        /// <returns>The destination storage path, or an empty string when it cannot be resolved.</returns>
+        private static string GetDestinationStoragePath(ComponentsToArtifactory component)
+        {
+            string sourceUrl = component.PackageType == PackageType.Internal
+                ? component.MovePackageApiUrl
+                : component.CopyPackageApiUrl;
+
+            if (string.IsNullOrEmpty(sourceUrl))
+            {
+                return string.Empty;
+            }
+
+            const string marker = "?to=/";
+            int markerIndex = sourceUrl.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+            if (markerIndex < 0)
+            {
+                return string.Empty;
+            }
+
+            string path = sourceUrl.Substring(markerIndex + marker.Length);
+
+            // Remove any trailing query parameters (e.g. &dry=1) that follow the destination.
+            int ampersandIndex = path.IndexOf('&');
+            if (ampersandIndex >= 0)
+            {
+                path = path.Substring(0, ampersandIndex);
+            }
+
+            // Remove trailing wildcard used for AQL searches (Debian/Conan).
+            path = path.TrimEnd('*');
+
+            return path.Trim('/');
+        }
 
         #endregion Methods
     }
