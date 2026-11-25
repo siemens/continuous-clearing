@@ -482,8 +482,13 @@ namespace SIT.Create
             {
                 return false;
             }
-            return comment.Contains(Dataconstant.LinkedByCATool, StringComparison.OrdinalIgnoreCase)
-                || comment.Contains(Dataconstant.LinkedByCAToolOldComment, StringComparison.OrdinalIgnoreCase);
+
+            var comments = new List<string>
+            {
+                Dataconstant.LinkedByCATool,
+                Dataconstant.LinkedByCAToolOldComment
+            };
+            return comments.Any(c => comment.Contains(c, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>

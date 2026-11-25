@@ -1480,7 +1480,8 @@ namespace SIT.Create.UTest
                 new ReleaseLinked { ReleaseId = "3", Comment = "linked by ca tool:v8.0.0" },
                 new ReleaseLinked { ReleaseId = "4", Comment = "Manually linked by user" },
                 new ReleaseLinked { ReleaseId = "5", Comment = null },
-                new ReleaseLinked { ReleaseId = "6", Comment = "" }
+                new ReleaseLinked { ReleaseId = "6", Comment = "" },
+                new ReleaseLinked { ReleaseId = "7", Comment = "Linked By SITCreate: v11.2.0" },
             };
             var method = typeof(ComponentCreator).GetMethod("GetManuallyLinkedReleasesFromProject",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
@@ -1490,7 +1491,30 @@ namespace SIT.Create.UTest
 
             //Assert
             Assert.That(result.Select(r => r.ReleaseId), Is.EquivalentTo(new[] { "4", "5", "6" }));
-            Assert.That(linked, Has.Count.EqualTo(6), "Input list must not be modified.");
+            Assert.That(linked, Has.Count.EqualTo(7), "Input list must not be modified.");
+        }
+
+        [Test]
+        public async Task GetManuallyLinkedReleasesFromProject_AllManuallyLinked_ReturnsAllReleases()
+        {
+            //Arrange
+            var linked = new List<ReleaseLinked>
+            {
+                new ReleaseLinked { ReleaseId = "1", Comment = "Manually linked by user" },
+                new ReleaseLinked { ReleaseId = "2", Comment = "Added for security review" },
+                new ReleaseLinked { ReleaseId = "3", Comment = null },
+                new ReleaseLinked { ReleaseId = "4", Comment = "" },
+            };
+            var method = typeof(ComponentCreator).GetMethod("GetManuallyLinkedReleasesFromProject",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            //Act
+            var result = await (Task<List<ReleaseLinked>>)method.Invoke(null, new object[] { linked });
+
+            //Assert
+            Assert.That(result, Is.Not.SameAs(linked), "A new list instance must be returned.");
+            Assert.That(result.Select(r => r.ReleaseId), Is.EqualTo(new[] { "1", "2", "3", "4" }));
+            Assert.That(linked, Has.Count.EqualTo(4), "Input list must not be modified.");
         }
 
         #region SBOM Signing Condition Tests
