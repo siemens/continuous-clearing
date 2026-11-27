@@ -23,7 +23,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
@@ -156,9 +155,9 @@ namespace SIT.Scan
                 LogHandlingHelper.ExceptionErrorHandling("IOException", ParsePackageConfigMethod, ex, $"File Path: {packagesFilePath}");
                 Logger.Error($"IOException occurred while parsing the package file: {packagesFilePath}. Details: {ex.Message}", ex);
             }
-            catch (XmlSyntaxException ex)
+            catch (XmlException ex)
             {
-                LogHandlingHelper.ExceptionErrorHandling("XmlSyntaxException", ParsePackageConfigMethod, ex, $"File Path: {packagesFilePath}");
+                LogHandlingHelper.ExceptionErrorHandling("XmlException", ParsePackageConfigMethod, ex, $"File Path: {packagesFilePath}");
                 Logger.Error($"XML syntax error occurred while parsing the package file: {packagesFilePath}. Details: {ex.Message}", ex);
             }
             return nugetPackages;
@@ -228,10 +227,10 @@ namespace SIT.Scan
                 LogHandlingHelper.ExceptionErrorHandling("Error occurred while accessing .csproj files.", "Parsecsproj()", ex, "");
                 Logger.Error($"IOException occurred while parsing .csproj files for dependencies. Details: {ex.Message}", ex);
             }
-            catch (XmlSyntaxException ex)
+            catch (XmlException ex)
             {
                 LogHandlingHelper.ExceptionErrorHandling("Error occurred while parsing XML in .csproj files.", "Parsecsproj()", ex, "");
-                Logger.Error($"XmlSyntaxException occurred while parsing .csproj files for dependencies. Details: {ex.Message}", ex);
+                Logger.Error($"XmlException occurred while parsing .csproj files for dependencies. Details: {ex.Message}", ex);
             }
             return referenceList;
         }
