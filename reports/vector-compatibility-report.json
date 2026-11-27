@@ -1,0 +1,135 @@
+{
+  "application": "vector",
+  "repository": "https://siemens.ghe.com/portfolio/acdc-tc-vector",
+  "branch": "main",
+  "oldRelease": "sw360-20.1.1",
+  "newRelease": "sw360-20.2.0-rc-1",
+  "risk": "MEDIUM",
+  "generatedAt": "2026-11-13T05:24:49.768Z",
+  "summary": {
+    "totalApisUsedByApplication": 6,
+    "apisWithReportedChanges": 4,
+    "addedApis": 0,
+    "modifiedApis": 4,
+    "removedApis": 0,
+    "unchangedApis": 2,
+    "unresolvedApis": 0,
+    "breakingApis": 0,
+    "criticalApis": 0,
+    "highApis": 0,
+    "mediumApis": 1,
+    "lowApis": 3
+  },
+  "apiAnalysis": [
+    {
+      "apiId": "GET:/resource/api/components",
+      "diffApiId": "GET:/components",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "Vector/Sw360.Connector/Api/Sw360Client.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/components/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "Vector/Sw360.Connector/Api/Sw360Client.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/releases",
+      "diffApiId": "GET:/releases",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "Vector/Sw360.Connector/Api/Sw360Client.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/releases/{id}",
+      "diffApiId": "GET:/releases/{id}",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "Vector/Sw360.Connector/Api/Sw360Client.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/projects",
+      "diffApiId": "GET:/projects",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "Vector/Sw360.Connector/Api/Sw360Client.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/projects/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "Vector/Sw360.Connector/Api/Sw360Client.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    }
+  ]
+}

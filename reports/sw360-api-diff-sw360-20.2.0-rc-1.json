@@ -1,0 +1,1383 @@
+{
+  "repository": "eclipse-sw360/sw360",
+  "oldRelease": "sw360-20.1.1",
+  "newRelease": "sw360-20.2.0-rc-1",
+  "oldReleaseDate": "2026-08-24T10:50:18Z",
+  "newReleaseDate": "2026-11-05T09:34:03Z",
+  "generatedAt": "2026-11-13T05:01:29.336Z",
+  "comparisonConfidence": "High",
+  "versionInfo": {
+    "expectedRelease": "sw360-20.2.0-rc-1",
+    "runtimeApiVersion": "20.2.0",
+    "versionMatch": false
+  },
+  "specSource": {
+    "oldRelease": "runtime-api-docs",
+    "newRelease": "runtime-api-docs"
+  },
+  "summary": {
+    "addedApis": 3,
+    "removedApis": 0,
+    "modifiedApis": 63,
+    "breakingChanges": 1
+  },
+  "apiChanges": [
+    {
+      "apiId": "GET:/admin/cache/stats",
+      "method": "GET",
+      "path": "/admin/cache/stats",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.items.endpoint",
+            "change": "Enum values added: \"COMPONENTS_ALL_DETAILS\", \"COMPONENTS_WITHOUT_DETAILS\"."
+          },
+          {
+            "field": "responses.403.application/vnd.hal+json.schema.items.endpoint",
+            "change": "Enum values added: \"COMPONENTS_ALL_DETAILS\", \"COMPONENTS_WITHOUT_DETAILS\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/admin/cache/stats/{endpoint}",
+      "method": "GET",
+      "path": "/admin/cache/stats/{endpoint}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.items.endpoint",
+            "change": "Enum values added: \"COMPONENTS_ALL_DETAILS\", \"COMPONENTS_WITHOUT_DETAILS\"."
+          },
+          {
+            "field": "responses.400.application/vnd.hal+json.schema.items.endpoint",
+            "change": "Enum values added: \"COMPONENTS_ALL_DETAILS\", \"COMPONENTS_WITHOUT_DETAILS\"."
+          },
+          {
+            "field": "responses.403.application/vnd.hal+json.schema.items.endpoint",
+            "change": "Enum values added: \"COMPONENTS_ALL_DETAILS\", \"COMPONENTS_WITHOUT_DETAILS\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/attachments",
+      "method": "GET",
+      "path": "/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/attachments",
+      "method": "POST",
+      "path": "/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/attachments/{id}",
+      "method": "GET",
+      "path": "/attachments/{id}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/clearingrequests",
+      "method": "GET",
+      "path": "/clearingrequests",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "severity": "Low",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:priority",
+            "change": "Optional parameter added."
+          },
+          {
+            "field": "query:clearingType",
+            "change": "Optional parameter added."
+          },
+          {
+            "field": "query:group",
+            "change": "Optional parameter added."
+          },
+          {
+            "field": "query:dateField",
+            "change": "Optional parameter added."
+          },
+          {
+            "field": "query:fromDate",
+            "change": "Optional parameter added."
+          },
+          {
+            "field": "query:toDate",
+            "change": "Optional parameter added."
+          },
+          {
+            "field": "query:days",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/components",
+      "method": "GET",
+      "path": "/components",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "severity": "Low",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/components/mergecomponents",
+      "method": "PATCH",
+      "path": "/components/mergecomponents",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/components/splitComponents",
+      "method": "PATCH",
+      "path": "/components/splitComponents",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.srcComponent.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "requestBody.application/json.schema.targetComponent.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/components/{componentId}/attachments",
+      "method": "POST",
+      "path": "/components/{componentId}/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.multipart/mixed.schema.attachment.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "requestBody.multipart/form-data.schema.attachment.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/components/{id}",
+      "method": "PATCH",
+      "path": "/components/{id}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/components/{id}/attachment/{attachmentId}",
+      "method": "PATCH",
+      "path": "/components/{id}/attachment/{attachmentId}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/components/{id}/attachments",
+      "method": "GET",
+      "path": "/components/{id}/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/components/{id}/releases",
+      "method": "GET",
+      "path": "/components/{id}/releases",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter, Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          },
+          {
+            "field": "query:luceneSearch",
+            "change": "Optional parameter added."
+          }
+        ],
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.releaseWithSameComponent.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/ecc",
+      "method": "GET",
+      "path": "/ecc",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter, Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ],
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.500.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/ecc/{releaseId}",
+      "method": "PATCH",
+      "path": "/ecc/{releaseId}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/moderationrequest",
+      "method": "GET",
+      "path": "/moderationrequest",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter, Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "query:moderationState",
+            "change": "Enum values added: \"open\", \"closed\", \"all\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.releaseAdditions.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.releaseDeletions.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ],
+        "parameterChanges": [
+          {
+            "field": "query:moderationState.default",
+            "change": "default changed: unspecified -> \"all\"."
+          },
+          {
+            "field": "query:luceneSearch.default",
+            "change": "default changed: false -> true."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/moderationrequest/byState",
+      "method": "GET",
+      "path": "/moderationrequest/byState",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.releaseAdditions.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.releaseDeletions.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/moderationrequest/mySubmissions",
+      "method": "GET",
+      "path": "/moderationrequest/mySubmissions",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.releaseAdditions.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.releaseDeletions.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/packages",
+      "method": "GET",
+      "path": "/packages",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter, Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:luceneSearch.default",
+            "change": "default changed: unspecified -> true."
+          },
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ],
+        "enumChanges": [
+          {
+            "field": "responses.200.application/hal+json.schema.items.release.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/packages",
+      "method": "POST",
+      "path": "/packages",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.release.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.201.application/vnd.hal+json.schema.content.release.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/packages/{id}",
+      "method": "GET",
+      "path": "/packages/{id}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.release.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/packages/{id}",
+      "method": "PATCH",
+      "path": "/packages/{id}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.release.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/hal+json.schema.release.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects",
+      "method": "GET",
+      "path": "/projects",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "severity": "Low",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/projects/network/{id}",
+      "method": "PATCH",
+      "path": "/projects/network/{id}",
+      "changeType": "Modified",
+      "modificationType": "ResponseSchema",
+      "description": "Runtime OpenAPI contract changed: ResponseSchema.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "responseChanges": [
+          {
+            "field": "responses.202",
+            "change": "Response status added."
+          },
+          {
+            "field": "responses.403",
+            "change": "Response status added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects/network/{id}/linkedResources",
+      "method": "GET",
+      "path": "/projects/network/{id}/linkedResources",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.linkedReleases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.linkedReleases.items.releaseWithSameComponent.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.subprojects.items.linkedReleases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.subprojects.items.linkedReleases.items.releaseWithSameComponent.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects/network/{id}/releases",
+      "method": "GET",
+      "path": "/projects/network/{id}/releases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.releaseWithSameComponent.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects/releases",
+      "method": "GET",
+      "path": "/projects/releases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/projects/{id}",
+      "method": "PATCH",
+      "path": "/projects/{id}",
+      "changeType": "Modified",
+      "modificationType": "ResponseSchema",
+      "description": "Runtime OpenAPI contract changed: ResponseSchema.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "responseChanges": [
+          {
+            "field": "responses.403",
+            "change": "Response status added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/projects/{id}/attachment/{attachmentId}",
+      "method": "PATCH",
+      "path": "/projects/{id}/attachment/{attachmentId}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PUT:/projects/{id}/attachmentUsage",
+      "method": "PUT",
+      "path": "/projects/{id}/attachmentUsage",
+      "changeType": "Added",
+      "description": "New endpoint in exact-release runtime OpenAPI.",
+      "severity": "Low",
+      "breakingChange": false
+    },
+    {
+      "apiId": "GET:/projects/{id}/attachments",
+      "method": "GET",
+      "path": "/projects/{id}/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/projects/{id}/linkProjects",
+      "method": "POST",
+      "path": "/projects/{id}/linkProjects",
+      "changeType": "Modified",
+      "modificationType": "ResponseSchema",
+      "description": "Runtime OpenAPI contract changed: ResponseSchema.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "responseChanges": [
+          {
+            "field": "responses.409",
+            "change": "Response status added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects/{id}/linkedProjects/releases",
+      "method": "GET",
+      "path": "/projects/{id}/linkedProjects/releases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects/{id}/releases",
+      "method": "GET",
+      "path": "/projects/{id}/releases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects/{id}/releases/ecc",
+      "method": "GET",
+      "path": "/projects/{id}/releases/ecc",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter, Enum.",
+      "severity": "High",
+      "breakingChange": true,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:pageable",
+            "change": "Parameter removed."
+          },
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ],
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/projects/{id}/saveAttachmentUsages",
+      "method": "POST",
+      "path": "/projects/{id}/saveAttachmentUsages",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "severity": "Low",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "operation.deprecated",
+            "change": "Operation deprecated changed: false -> true."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/projects/{id}/tabCounts",
+      "method": "GET",
+      "path": "/projects/{id}/tabCounts",
+      "changeType": "Modified",
+      "modificationType": "ResponseSchema",
+      "description": "Runtime OpenAPI contract changed: ResponseSchema.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "responseChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.eccClassifiedCount",
+            "change": "Optional field added."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.eccOpenCount",
+            "change": "Optional field added."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.readmeOssObligationCount",
+            "change": "Optional field added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/projects/{id}/updateLicenseObligation",
+      "method": "PATCH",
+      "path": "/projects/{id}/updateLicenseObligation",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.additionalProperties.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/projects/{id}/updateObligation",
+      "method": "PATCH",
+      "path": "/projects/{id}/updateObligation",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.additionalProperties.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/projects/{projectId}/attachments",
+      "method": "POST",
+      "path": "/projects/{projectId}/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.multipart/mixed.schema.attachment.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "requestBody.multipart/form-data.schema.attachment.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases",
+      "method": "GET",
+      "path": "/releases",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "severity": "Low",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/releases",
+      "method": "POST",
+      "path": "/releases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/releases/mergereleases",
+      "method": "PATCH",
+      "path": "/releases/mergereleases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases/mySubscriptions",
+      "method": "GET",
+      "path": "/releases/mySubscriptions",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases/recentReleases",
+      "method": "GET",
+      "path": "/releases/recentReleases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases/searchByExternalIds",
+      "method": "GET",
+      "path": "/releases/searchByExternalIds",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases/{id}",
+      "method": "GET",
+      "path": "/releases/{id}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/releases/{id}",
+      "method": "PATCH",
+      "path": "/releases/{id}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases/{id}/adsInformation",
+      "method": "GET",
+      "path": "/releases/{id}/adsInformation",
+      "changeType": "Added",
+      "description": "New endpoint in exact-release runtime OpenAPI.",
+      "severity": "Low",
+      "breakingChange": false
+    },
+    {
+      "apiId": "PATCH:/releases/{id}/attachment/{attachmentId}",
+      "method": "PATCH",
+      "path": "/releases/{id}/attachment/{attachmentId}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases/{id}/attachments",
+      "method": "GET",
+      "path": "/releases/{id}/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/releases/{id}/fossology",
+      "method": "GET",
+      "path": "/releases/{id}/fossology",
+      "changeType": "Added",
+      "description": "New endpoint in exact-release runtime OpenAPI.",
+      "severity": "Low",
+      "breakingChange": false
+    },
+    {
+      "apiId": "GET:/releases/{id}/linkedPackages",
+      "method": "GET",
+      "path": "/releases/{id}/linkedPackages",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.404.application/vnd.hal+json.schema._embedded.items.content.release.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/releases/{id}/spdxLicenses",
+      "method": "POST",
+      "path": "/releases/{id}/spdxLicenses",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/hal+json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/releases/{releaseId}/attachments",
+      "method": "POST",
+      "path": "/releases/{releaseId}/attachments",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.multipart/mixed.schema.attachment.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "requestBody.multipart/form-data.schema.attachment.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "DELETE:/releases/{releaseId}/attachments/{attachmentIds}",
+      "method": "DELETE",
+      "path": "/releases/{releaseId}/attachments/{attachmentIds}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/reports",
+      "method": "GET",
+      "path": "/reports",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter, Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "query:module",
+            "change": "Enum values added: \"obligations\"."
+          }
+        ],
+        "parameterChanges": [
+          {
+            "field": "query:selectedProjectRelationship",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/reports/download",
+      "method": "GET",
+      "path": "/reports/download",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "severity": "Low",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:format",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/users",
+      "method": "GET",
+      "path": "/users",
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "severity": "Low",
+      "breakingChange": false,
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:luceneSearch.default",
+            "change": "default changed: unspecified -> true."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/vendors/{id}",
+      "method": "PATCH",
+      "path": "/vendors/{id}",
+      "changeType": "Modified",
+      "modificationType": "ResponseSchema",
+      "description": "Runtime OpenAPI contract changed: ResponseSchema.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "responseChanges": [
+          {
+            "field": "responses.404",
+            "change": "Response status added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/vendors/{id}/releases",
+      "method": "GET",
+      "path": "/vendors/{id}/releases",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/vulnerabilities",
+      "method": "GET",
+      "path": "/vulnerabilities",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema._embedded.items.content.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/vulnerabilities",
+      "method": "POST",
+      "path": "/vulnerabilities",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.201.application/vnd.hal+json.schema.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/vulnerabilities/{externalId}",
+      "method": "PATCH",
+      "path": "/vulnerabilities/{externalId}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.201.application/vnd.hal+json.schema.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/vulnerabilities/{id}",
+      "method": "GET",
+      "path": "/vulnerabilities/{id}",
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "severity": "Medium",
+      "breakingChange": false,
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.releases.items.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    }
+  ]
+}

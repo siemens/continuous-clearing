@@ -1,0 +1,360 @@
+{
+  "application": "continuous-clearing",
+  "repository": "https://github.com/siemens/continuous-clearing",
+  "branch": "main",
+  "oldRelease": "sw360-20.1.1",
+  "newRelease": "sw360-20.2.0-rc-1",
+  "risk": "MEDIUM",
+  "generatedAt": "2026-11-13T05:24:49.768Z",
+  "summary": {
+    "totalApisUsedByApplication": 19,
+    "apisWithReportedChanges": 10,
+    "addedApis": 0,
+    "modifiedApis": 10,
+    "removedApis": 0,
+    "unchangedApis": 8,
+    "unresolvedApis": 1,
+    "breakingApis": 0,
+    "criticalApis": 0,
+    "highApis": 0,
+    "mediumApis": 6,
+    "lowApis": 4
+  },
+  "apiAnalysis": [
+    {
+      "apiId": "GET:/resource/api/projects",
+      "diffApiId": "GET:/projects",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/users",
+      "diffApiId": "GET:/users",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:luceneSearch.default",
+            "change": "default changed: unspecified -> true."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/projects/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/releases/{id}/triggerFossologyProcess",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/components",
+      "diffApiId": "GET:/components",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/releases/searchByExternalIds",
+      "diffApiId": "GET:/releases/searchByExternalIds",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/components/searchByExternalIds",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/releases/{id}",
+      "diffApiId": "GET:/releases/{id}",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:/resource/api/components/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "POST:/resource/api/projects/{id}/releases",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "PATCH:/resource/api/projects/{id}/release/{id}",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "POST:/resource/api/components",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "POST:/resource/api/releases",
+      "diffApiId": "POST:/releases",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/resource/api/releases/{id}",
+      "diffApiId": "PATCH:/releases/{id}",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          },
+          {
+            "field": "responses.200.application/vnd.hal+json.schema.content.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/resource/api/components/{id}",
+      "diffApiId": "PATCH:/components/{id}",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Enum",
+      "description": "Runtime OpenAPI contract changed: Enum.",
+      "details": {
+        "enumChanges": [
+          {
+            "field": "requestBody.application/json.schema.attachments.items.attachmentType",
+            "change": "Enum values added: \"ADS_JSON\"."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "PATCH:/resource/api/projects/{id}",
+      "diffApiId": "PATCH:/projects/{id}",
+      "status": "Modified",
+      "severity": "Medium",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "ResponseSchema",
+      "description": "Runtime OpenAPI contract changed: ResponseSchema.",
+      "details": {
+        "responseChanges": [
+          {
+            "field": "responses.403",
+            "change": "Response status added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "POST:/resource/api/releases/{id}/attachments",
+      "status": "Unchanged",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/AttachmentHelper.cs"
+      ],
+      "changeType": "Unchanged",
+      "modificationType": "",
+      "description": "No change was reported for this API in the release transition.",
+      "details": {}
+    },
+    {
+      "apiId": "GET:/resource/api/releases",
+      "diffApiId": "GET:/releases",
+      "status": "Modified",
+      "severity": "Low",
+      "breakingChange": false,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Modified",
+      "modificationType": "Parameter",
+      "description": "Runtime OpenAPI contract changed: Parameter.",
+      "details": {
+        "parameterChanges": [
+          {
+            "field": "query:searchText",
+            "change": "Optional parameter added."
+          }
+        ]
+      }
+    },
+    {
+      "apiId": "GET:<SW360-provided-link>",
+      "status": "Unresolved",
+      "severity": "",
+      "breakingChange": null,
+      "affectedFiles": [
+        "src/SIT.APICommunications/SW360Apicommunication.cs"
+      ],
+      "changeType": "Unresolved",
+      "modificationType": "",
+      "description": "Compatibility could not be determined from the release diff because the catalog path is unknown or a SW360-provided link.",
+      "details": {}
+    }
+  ]
+}

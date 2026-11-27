@@ -1,0 +1,255 @@
+{
+  "application": "continuous-clearing",
+  "repository": "https://github.com/siemens/continuous-clearing",
+  "branch": "main",
+  "generatedAt": "2026-11-13T05:16:53Z",
+  "baseUrls": [
+    {
+      "url": "http://127.0.0.1:8080",
+      "file": "pipelines/templates/azure-pipelines-start-sw360-fossology-containers-template.yml"
+    },
+    {
+      "url": null,
+      "file": "src/SIT.Common/appSettings.json"
+    }
+  ],
+  "authentication": [
+    {
+      "type": "Bearer Token (Keycloak client credentials)",
+      "file": "src/SW360KeycloakService/KeycloakTokenCacheService.cs"
+    },
+    {
+      "type": "Configured Authorization token (scheme from SW360.AuthTokenType)",
+      "file": "src/SIT.APICommunications/Sw360HttpClientFactory.cs"
+    }
+  ],
+  "sw360Dependencies": [
+    {
+      "apiId": "GET:/resource/api/projects",
+      "method": "GET",
+      "path": "/resource/api/projects",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "High"
+    },
+    {
+      "apiId": "GET:/resource/api/users",
+      "method": "GET",
+      "path": "/resource/api/users",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "High"
+    },
+    {
+      "apiId": "GET:/resource/api/projects/{id}",
+      "method": "GET",
+      "path": "/resource/api/projects/{id}",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/releases/{id}/triggerFossologyProcess",
+      "method": "GET",
+      "path": "/resource/api/releases/{id}/triggerFossologyProcess",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/components",
+      "method": "GET",
+      "path": "/resource/api/components",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["ComponentsModel", "Sw360Components"],
+      "confidence": "High"
+    },
+    {
+      "apiId": "GET:/resource/api/releases/searchByExternalIds",
+      "method": "GET",
+      "path": "/resource/api/releases/searchByExternalIds",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "High"
+    },
+    {
+      "apiId": "GET:/resource/api/components/searchByExternalIds",
+      "method": "GET",
+      "path": "/resource/api/components/searchByExternalIds",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "High"
+    },
+    {
+      "apiId": "GET:/resource/api/releases/{id}",
+      "method": "GET",
+      "path": "/resource/api/releases/{id}",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/components/{id}",
+      "method": "GET",
+      "path": "/resource/api/components/{id}",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "POST:/resource/api/projects/{id}/releases",
+      "method": "POST",
+      "path": "/resource/api/projects/{id}/releases",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "PATCH:/resource/api/projects/{id}/release/{id}",
+      "method": "PATCH",
+      "path": "/resource/api/projects/{id}/release/{id}",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["UpdateLinkedRelease"],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "POST:/resource/api/components",
+      "method": "POST",
+      "path": "/resource/api/components",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["CreateComponent"],
+      "confidence": "High"
+    },
+    {
+      "apiId": "POST:/resource/api/releases",
+      "method": "POST",
+      "path": "/resource/api/releases",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": ["Releases"],
+      "confidence": "High"
+    },
+    {
+      "apiId": "PATCH:/resource/api/releases/{id}",
+      "method": "PATCH",
+      "path": "/resource/api/releases/{id}",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "PATCH:/resource/api/components/{id}",
+      "method": "PATCH",
+      "path": "/resource/api/components/{id}",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "PATCH:/resource/api/projects/{id}",
+      "method": "PATCH",
+      "path": "/resource/api/projects/{id}",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "POST:/resource/api/releases/{id}/attachments",
+      "method": "POST",
+      "path": "/resource/api/releases/{id}/attachments",
+      "service": "AttachmentHelper",
+      "files": ["src/SIT.APICommunications/AttachmentHelper.cs"],
+      "clientType": "HttpWebRequest",
+      "dtoDependencies": ["AttachReport", "AttachmentJson"],
+      "confidence": "Medium"
+    },
+    {
+      "apiId": "GET:/resource/api/releases",
+      "method": "GET",
+      "path": "/resource/api/releases",
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": "HttpClient",
+      "dtoDependencies": [],
+      "confidence": "High"
+    },
+    {
+      "apiId": "GET:<SW360-provided-link>",
+      "method": "GET",
+      "path": null,
+      "service": "SW360Apicommunication",
+      "files": ["src/SIT.APICommunications/SW360Apicommunication.cs"],
+      "clientType": null,
+      "dtoDependencies": [],
+      "confidence": "Low"
+    }
+  ],
+  "dtoDependencies": [
+    {
+      "dto": "ComponentsModel",
+      "files": ["src/SIT.APICommunications/Model/ComponentsModel.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Sw360Components",
+      "files": ["src/SIT.APICommunications/Model/Sw360Components.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "CreateComponent",
+      "files": ["src/SIT.APICommunications/Model/CreateComponent.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "Releases",
+      "files": ["src/SIT.APICommunications/Model/Releases.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "UpdateLinkedRelease",
+      "files": ["src/SIT.APICommunications/Model/UpdateLinkedRelease.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "AttachReport",
+      "files": ["src/SIT.APICommunications/Model/AttachReport.cs"],
+      "confidence": "High"
+    },
+    {
+      "dto": "AttachmentJson",
+      "files": ["src/SIT.APICommunications/Model/AttachmentJson.cs"],
+      "confidence": "High"
+    }
+  ]
+}
